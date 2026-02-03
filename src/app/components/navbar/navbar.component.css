@@ -1,0 +1,58 @@
+.app-header {
+    background-color: var(--primary-blue);
+    color: var(--white);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-logo {
+    height: 40px;
+    width: auto;
+    border-radius: 4px;
+}
+
+.app-header h1 {
+    color: var(--white);
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.app-header nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.app-header nav a {
+    color: var(--white);
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .app-header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+    }
+
+    .logo-area {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .app-header nav ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+}

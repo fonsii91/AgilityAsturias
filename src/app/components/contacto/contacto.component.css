@@ -1,0 +1,72 @@
+.contact-container {
+    padding: 2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h2 {
+    color: var(--primary-blue);
+    margin-bottom: 2rem;
+}
+
+.contact-card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+.contact-section {
+    margin: 1.5rem 0;
+}
+
+h3 {
+    font-size: 1.1rem;
+    color: var(--text-light);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+address {
+    font-style: normal;
+    color: var(--text-main);
+    line-height: 1.5;
+}
+
+a {
+    color: var(--primary-blue);
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+.whatsapp-link {
+    color: #25D366;
+    /* WhatsApp Green */
+    background: #f0fdf4;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.whatsapp-link:hover {
+    background: #dcfce7;
+    text-decoration: none;
+}
+
+.divider {
+    height: 1px;
+    background-color: #eee;
+    width: 80%;
+    margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+    .contact-card {
+        padding: 1.5rem 1rem;
+    }
+}

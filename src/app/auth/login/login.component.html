@@ -1,0 +1,22 @@
+<div class="login-container">
+    <div class="login-card">
+        <div class="logo-area">
+            <!-- Placeholder for logo if needed, or just text -->
+            <h2>Sign In</h2>
+        </div>
+
+        <p>Welcome to Agility Asturias. Please sign in to continue.</p>
+
+        <div class="google-btn-wrapper">
+            <asl-google-signin-button type='standard' size='large'></asl-google-signin-button>
+        </div>
+
+        <div *ngIf="user" class="user-info">
+            <img [src]="user.photoUrl" alt="User photo">
+            <div>
+                <p class="name">{{ user.name }}</p>
+                <p class="email">{{ user.email }}</p>
+            </div>
+        </div>
+    </div>
+</div>

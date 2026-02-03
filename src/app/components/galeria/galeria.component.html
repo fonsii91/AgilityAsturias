@@ -1,0 +1,30 @@
+<div class="gallery-container">
+    <h2>Galería</h2>
+    <p class="subtitle">Momentos destacados de nuestros equipos.</p>
+
+    <div class="gallery-masonry" [@listAnimation]="images().length">
+        <div *ngFor="let image of images(); let i = index" class="gallery-item" (click)="openLightbox(i)">
+            <img [src]="image.url" [alt]="image.alt" loading="lazy">
+            <div class="overlay">
+                <span>Ver entera</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div class="lightbox" *ngIf="lightboxOpen()" (click)="closeLightbox()">
+    <div class="lightbox-content" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="closeLightbox()">&times;</button>
+
+        <button class="nav-btn prev" (click)="prevImage($event)">&#10094;</button>
+
+        <img [src]="images()[currentImageIndex()].url" [alt]="images()[currentImageIndex()].alt" class="lightbox-img">
+
+        <button class="nav-btn next" (click)="nextImage($event)">&#10095;</button>
+
+        <div class="lightbox-caption">
+            {{ images()[currentImageIndex()].alt }}
+        </div>
+    </div>
+</div>
