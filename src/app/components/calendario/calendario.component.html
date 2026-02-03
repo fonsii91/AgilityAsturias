@@ -1,0 +1,18 @@
+<div class="calendar-container">
+    <h1>Calendario de Competiciones {{ currentYear }}</h1>
+
+    <div class="months-grid">
+        <div class="month-card" *ngFor="let month of months">
+            <h2>{{ month.name }}</h2>
+            <div class="weekdays">
+                <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+            </div>
+            <div class="days-grid">
+                <div *ngFor="let day of month.days" class="day" [class.other-month]="day.isOtherMonth"
+                    [class.weekend]="day.isWeekend" [class.competition]="day.isCompetition">
+                    <span *ngIf="!day.isOtherMonth">{{ day.date | date:'d' }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

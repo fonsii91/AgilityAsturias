@@ -1,14 +1,20 @@
 <header class="app-header">
     <div class="logo-area">
+        <button class="mobile-menu-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
         <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo" class="nav-logo">
         <h1>Agility Asturias</h1>
     </div>
     <nav>
-        <ul>
-            <li><a routerLink="/">Home</a></li>
-            <li><a routerLink="/reservas">Reservas</a></li>
-            <li><a routerLink="/galeria">Galería</a></li>
-            <li><a routerLink="/contacto">Contacto</a></li>
+        <ul [class.active]="isMenuOpen">
+            <li><a routerLink="/" (click)="closeMenu()">Home</a></li>
+            <li><a routerLink="/reservas" (click)="closeMenu()">Reservas</a></li>
+            <li><a routerLink="/galeria" (click)="closeMenu()">Galería</a></li>
+            <li><a routerLink="/calendario" (click)="closeMenu()">Calendario</a></li>
+            <li><a routerLink="/contacto" (click)="closeMenu()">Contacto</a></li>
         </ul>
     </nav>
 </header>

@@ -1,10 +1,11 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 interface TimeSlot {
     id: number;
     day: string;
-    time: string;
+    startTime: string;
+    endTime: string;
     currentBookings: number;
     maxBookings: number;
 }
@@ -17,12 +18,44 @@ interface TimeSlot {
     styleUrl: './gestionar-reservas.component.css'
 })
 export class GestionarReservasComponent {
-    slots = signal<TimeSlot[]>([
-        { id: 1, day: 'Lunes', time: '17:00', currentBookings: 3, maxBookings: 5 },
-        { id: 2, day: 'Lunes', time: '18:00', currentBookings: 5, maxBookings: 5 },
-        { id: 3, day: 'Miércoles', time: '17:00', currentBookings: 1, maxBookings: 5 },
-        { id: 4, day: 'Viernes', time: '16:00', currentBookings: 0, maxBookings: 5 },
-    ]);
+    slots = signal<TimeSlot[]>(this.generateSlots());
+
+    groupedSlots = computed(() => {
+        const slots = this.slots();
+        const daysOrder = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+
+        const groups = daysOrder.map(day => ({
+            day,
+            slots: slots.filter(s => s.day === day)
+        })).filter(group => group.slots.length > 0);
+
+        return groups;
+    });
+
+    generateSlots(): TimeSlot[] {
+        const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+        const slots: TimeSlot[] = [];
+        let idCounter = 1;
+
+        days.forEach(day => {
+            // Morning slots: Only Monday and Thursday
+            if (day === 'Lunes' || day === 'Jueves') {
+                slots.push(
+                    { id: idCounter++, day, startTime: '10:00', endTime: '11:30', currentBookings: 0, maxBookings: 5 },
+                    { id: idCounter++, day, startTime: '11:30', endTime: '13:00', currentBookings: 0, maxBookings: 5 }
+                );
+            }
+
+            // Afternoon slots: Every day
+            slots.push(
+                { id: idCounter++, day, startTime: '14:00', endTime: '15:30', currentBookings: 0, maxBookings: 5 },
+                { id: idCounter++, day, startTime: '15:30', endTime: '17:00', currentBookings: 0, maxBookings: 5 },
+                { id: idCounter++, day, startTime: '17:00', endTime: '18:30', currentBookings: 0, maxBookings: 5 }
+            );
+        });
+
+        return slots;
+    }
 
     bookSlot(slotId: number) {
         this.slots.update(slots =>

@@ -2,26 +2,30 @@
     <h2>Gestionar Reservas</h2>
     <p class="subtitle">Selecciona una franja horaria para reservar tu clase de Agility.</p>
 
-    <div class="slots-grid">
-        <div *ngFor="let slot of slots()" class="slot-card" [class.full]="slot.currentBookings >= slot.maxBookings">
-            <div class="slot-time">
-                <span class="day">{{ slot.day }}</span>
-                <span class="time">{{ slot.time }}</span>
-            </div>
-
-            <div class="slot-status">
-                <div class="crowdedness">
-                    <span class="label">Disponibilidad:</span>
-                    <span class="value">{{ slot.currentBookings }} / {{ slot.maxBookings }}</span>
+    <div *ngFor="let group of groupedSlots()">
+        <h3 class="day-header">{{ group.day }}</h3>
+        <div class="slots-grid">
+            <div *ngFor="let slot of group.slots" class="slot-card"
+                [class.full]="slot.currentBookings >= slot.maxBookings">
+                <div class="slot-time">
+                    <span class="time">{{ slot.startTime }} - {{ slot.endTime }}</span>
                 </div>
-                <div class="progress-bar">
-                    <div class="fill" [style.width.%]="(slot.currentBookings / slot.maxBookings) * 100"></div>
-                </div>
-            </div>
 
-            <button class="book-btn" [disabled]="slot.currentBookings >= slot.maxBookings" (click)="bookSlot(slot.id)">
-                {{ slot.currentBookings >= slot.maxBookings ? 'Completo' : 'Reservar' }}
-            </button>
+                <div class="slot-status">
+                    <div class="crowdedness">
+                        <span class="label">Disponibilidad:</span>
+                        <span class="value">{{ slot.currentBookings }} / {{ slot.maxBookings }}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="fill" [style.width.%]="(slot.currentBookings / slot.maxBookings) * 100"></div>
+                    </div>
+                </div>
+
+                <button class="book-btn" [disabled]="slot.currentBookings >= slot.maxBookings"
+                    (click)="bookSlot(slot.id)">
+                    {{ slot.currentBookings >= slot.maxBookings ? 'Completo' : 'Reservar' }}
+                </button>
+            </div>
         </div>
     </div>
 </div>

@@ -18,7 +18,17 @@ h2 {
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
     max-width: 900px;
-    margin: 0 auto;
+    margin: 0 auto 2rem auto;
+    /* Added bottom margin */
+}
+
+.day-header {
+    max-width: 900px;
+    margin: 2rem auto 1rem auto;
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+    border-bottom: 2px solid var(--secondary-yellow);
+    padding-bottom: 0.5rem;
 }
 
 .slot-card {

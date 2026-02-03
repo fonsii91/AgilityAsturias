@@ -4,10 +4,12 @@ import { HomeComponent } from './components/home/home.component';
 import { GestionarReservasComponent } from './reservas/gestionar-reservas/gestionar-reservas.component';
 import { ContactoComponent } from './components/contacto/contacto.component';
 import { GaleriaComponent } from './components/galeria/galeria.component';
+import { CalendarioComponent } from './components/calendario/calendario.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'reservas', component: GestionarReservasComponent },
     { path: 'contacto', component: ContactoComponent },
-    { path: 'galeria', component: GaleriaComponent }
+    { path: 'galeria', component: GaleriaComponent },
+    { path: 'calendario', component: CalendarioComponent }
 ];

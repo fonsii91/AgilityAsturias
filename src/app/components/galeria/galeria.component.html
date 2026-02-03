@@ -1,6 +1,6 @@
 <div class="gallery-container">
     <h2>Galería</h2>
-    <p class="subtitle">Momentos destacados de nuestros equipos.</p>
+    <p class="subtitle">Momentos destacados de nuestro equipo.</p>
 
     <div class="gallery-masonry" [@listAnimation]="images().length">
         <div *ngFor="let image of images(); let i = index" class="gallery-item" (click)="openLightbox(i)">
