@@ -1,0 +1,91 @@
+{
+  "configVersion": 1,
+  "timestamp": 1770122923487,
+  "index": "/AgilityAsturias/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/AgilityAsturias/favicon.ico",
+        "/AgilityAsturias/index.html",
+        "/AgilityAsturias/main-KH7NE46T.js",
+        "/AgilityAsturias/manifest.webmanifest",
+        "/AgilityAsturias/styles-MADIGNQW.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "/AgilityAsturias/Images/AgilityAsturias_logo.jpg",
+        "/AgilityAsturias/Images/Agility_Asturias_logo.jpg",
+        "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-53-23.jpg",
+        "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-53-34.jpg",
+        "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-53-39.jpg",
+        "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-53-46.jpg",
+        "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-54-00.jpg",
+        "/AgilityAsturias/icons/icon-128x128.png",
+        "/AgilityAsturias/icons/icon-144x144.png",
+        "/AgilityAsturias/icons/icon-152x152.png",
+        "/AgilityAsturias/icons/icon-192x192.png",
+        "/AgilityAsturias/icons/icon-384x384.png",
+        "/AgilityAsturias/icons/icon-512x512.png",
+        "/AgilityAsturias/icons/icon-72x72.png",
+        "/AgilityAsturias/icons/icon-96x96.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "/AgilityAsturias/Images/AgilityAsturias_logo.jpg": "42a5f723b10e6dfb5d5732859d451326cddead63",
+    "/AgilityAsturias/Images/Agility_Asturias_logo.jpg": "298f1a725aecc852d8dd6cdf02a852a5266e3295",
+    "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-53-23.jpg": "471e8ed6ee8bd29f8dc4d76fa3033e97edf5e07e",
+    "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-53-34.jpg": "df0c01b0453aa7e9b3ce0c00e5525b8aecf13849",
+    "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-53-39.jpg": "9e8cad1af2e04a5851d8aab1cd0f31de472ea01f",
+    "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-53-46.jpg": "3d9dd8493e1412e7086f5345f5305c5af01b8257",
+    "/AgilityAsturias/Images/ImagenesDeTelegram/photo_2026-02-03_12-54-00.jpg": "7701eaef6d65ccd29c59879189b43ebec6efbe60",
+    "/AgilityAsturias/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
+    "/AgilityAsturias/icons/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
+    "/AgilityAsturias/icons/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
+    "/AgilityAsturias/icons/icon-152x152.png": "eae6e0f0c8afb8aaae339e2a569b43e9238e5e6c",
+    "/AgilityAsturias/icons/icon-192x192.png": "15c4180454633880d98674aa7394656196c91584",
+    "/AgilityAsturias/icons/icon-384x384.png": "94a915751ef6c9282df9aea405ad679230631814",
+    "/AgilityAsturias/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
+    "/AgilityAsturias/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
+    "/AgilityAsturias/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
+    "/AgilityAsturias/index.html": "83bed04c31e9a7cb42d7f7436774f58db2ddfadf",
+    "/AgilityAsturias/main-KH7NE46T.js": "b0772ed162ddab45fe4de02459c521c9b2c66deb",
+    "/AgilityAsturias/manifest.webmanifest": "b9156f204b6adcc95cf18506ee0d5e2ec591fe8b",
+    "/AgilityAsturias/styles-MADIGNQW.css": "49f90f66361f1bf3502af7c4539cffe1285092b4"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
