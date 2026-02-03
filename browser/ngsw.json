@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1770122923487,
+  "timestamp": 1770123984960,
   "index": "/AgilityAsturias/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/AgilityAsturias/favicon.ico",
         "/AgilityAsturias/index.html",
-        "/AgilityAsturias/main-KH7NE46T.js",
+        "/AgilityAsturias/main-MGNCAGQ6.js",
         "/AgilityAsturias/manifest.webmanifest",
         "/AgilityAsturias/styles-MADIGNQW.css"
       ],
@@ -64,8 +64,8 @@
     "/AgilityAsturias/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/AgilityAsturias/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
     "/AgilityAsturias/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
-    "/AgilityAsturias/index.html": "83bed04c31e9a7cb42d7f7436774f58db2ddfadf",
-    "/AgilityAsturias/main-KH7NE46T.js": "b0772ed162ddab45fe4de02459c521c9b2c66deb",
+    "/AgilityAsturias/index.html": "ce39c9c75731c5558f9fcd7d577300452306277c",
+    "/AgilityAsturias/main-MGNCAGQ6.js": "1583d188adf2b8c03c4e028163cdcdb8c28deed7",
     "/AgilityAsturias/manifest.webmanifest": "b9156f204b6adcc95cf18506ee0d5e2ec591fe8b",
     "/AgilityAsturias/styles-MADIGNQW.css": "49f90f66361f1bf3502af7c4539cffe1285092b4"
   },
