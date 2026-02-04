@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1770165470576,
+  "timestamp": 1770165678409,
   "index": "/AgilityAsturias/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/AgilityAsturias/favicon.ico",
         "/AgilityAsturias/index.html",
-        "/AgilityAsturias/main-GMKRDMVR.js",
+        "/AgilityAsturias/main-3JNMEYAY.js",
         "/AgilityAsturias/manifest.webmanifest",
         "/AgilityAsturias/styles-MADIGNQW.css"
       ],
@@ -38,6 +38,7 @@
         "/AgilityAsturias/Images/Perros/Helena y Pumba.jpeg",
         "/AgilityAsturias/Images/Perros/Jesús y Ginebra.jpeg",
         "/AgilityAsturias/Images/Perros/Kinder.jpeg",
+        "/AgilityAsturias/Images/Perros/Leah.jpeg",
         "/AgilityAsturias/Images/Perros/Lyan y Boo.jpeg",
         "/AgilityAsturias/Images/Perros/Lyan y Shaggy.jpeg",
         "/AgilityAsturias/Images/Perros/Magda y Balto.jpeg",
@@ -49,6 +50,8 @@
         "/AgilityAsturias/Images/Perros/Pompa.jpeg",
         "/AgilityAsturias/Images/Perros/Pumba.jpeg",
         "/AgilityAsturias/Images/Perros/Raylee.jpeg",
+        "/AgilityAsturias/Images/Perros/Sami H.jpeg",
+        "/AgilityAsturias/Images/Perros/Sami.jpeg",
         "/AgilityAsturias/icons/icon-128x128.png",
         "/AgilityAsturias/icons/icon-144x144.png",
         "/AgilityAsturias/icons/icon-152x152.png",
@@ -74,6 +77,7 @@
     "/AgilityAsturias/Images/Perros/Helena y Pumba.jpeg": "bb90c713d517bfa00f3c0ac5e2f46a56ed5c9ff7",
     "/AgilityAsturias/Images/Perros/Jesús y Ginebra.jpeg": "d315567cd5c1b13924de085e7be218172d3a0b3c",
     "/AgilityAsturias/Images/Perros/Kinder.jpeg": "97976126273612f4cfaf00953611f0c16d1c6156",
+    "/AgilityAsturias/Images/Perros/Leah.jpeg": "e2e594e823b718378129d87da351df5ae2c13b09",
     "/AgilityAsturias/Images/Perros/Lyan y Boo.jpeg": "7ab3da435ad5a541a2c78840ca7c9ab5293690fe",
     "/AgilityAsturias/Images/Perros/Lyan y Shaggy.jpeg": "428717a7c665d2f02a79945f2c1caef13fa83dc2",
     "/AgilityAsturias/Images/Perros/Magda y Balto.jpeg": "d85580f78d2a33d5d100180bff08c67e173a305d",
@@ -85,6 +89,8 @@
     "/AgilityAsturias/Images/Perros/Pompa.jpeg": "fd46259d8dd6a53404d68c7e18aa11308654ec3a",
     "/AgilityAsturias/Images/Perros/Pumba.jpeg": "a9b17cfb9fb88a8d3797e49c4608ce8d0d7fca30",
     "/AgilityAsturias/Images/Perros/Raylee.jpeg": "7b173b53be6dc8f790b10a06f0ebc457c397b951",
+    "/AgilityAsturias/Images/Perros/Sami H.jpeg": "7a65f2e59f09976a423e06a15527fe0830490ab2",
+    "/AgilityAsturias/Images/Perros/Sami.jpeg": "b6b274de4cbd92be13623083a3a649f06c3ec08e",
     "/AgilityAsturias/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
     "/AgilityAsturias/icons/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
     "/AgilityAsturias/icons/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
@@ -94,8 +100,8 @@
     "/AgilityAsturias/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/AgilityAsturias/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
     "/AgilityAsturias/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
-    "/AgilityAsturias/index.html": "bde5ad3a2519399ee1ebbd0a31a619d699fc221c",
-    "/AgilityAsturias/main-GMKRDMVR.js": "5ab0cf7a49da93e2293b3fefb54219e1c43264e5",
+    "/AgilityAsturias/index.html": "58cbe64746d45fc691a43859ade93f3d434bcaaf",
+    "/AgilityAsturias/main-3JNMEYAY.js": "cf1f3989ac362efad8e88aed124be160631c1a70",
     "/AgilityAsturias/manifest.webmanifest": "b9156f204b6adcc95cf18506ee0d5e2ec591fe8b",
     "/AgilityAsturias/styles-MADIGNQW.css": "49f90f66361f1bf3502af7c4539cffe1285092b4"
   },
