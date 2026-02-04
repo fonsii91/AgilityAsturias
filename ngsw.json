@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1770164796615,
+  "timestamp": 1770164866088,
   "index": "/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "/favicon.ico",
         "/index.html",
-        "/main-SAXC7766.js",
+        "/main-HOZUPE2P.js",
         "/manifest.webmanifest",
         "/styles-MADIGNQW.css"
       ],
@@ -94,8 +94,8 @@
     "/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
     "/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
-    "/index.html": "51b41067a557d77c06f2c4f72fc627bdb901c5bf",
-    "/main-SAXC7766.js": "d2bcaddbf39d0bf317627aa6c370a0c854e9b74e",
+    "/index.html": "0b1c7f17fd531b0c3c8c63c64b2a4d84a62a3c70",
+    "/main-HOZUPE2P.js": "b8027a726f9650d00411372331757c457747a17b",
     "/manifest.webmanifest": "b9156f204b6adcc95cf18506ee0d5e2ec591fe8b",
     "/styles-MADIGNQW.css": "49f90f66361f1bf3502af7c4539cffe1285092b4"
   },
