@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1770235467750,
+  "timestamp": 1770235651358,
   "index": "https://fonsii91.github.io/AgilityAsturias/index.html",
   "assetGroups": [
     {
@@ -13,7 +13,7 @@
       "urls": [
         "https://fonsii91.github.io/AgilityAsturias/favicon.ico",
         "https://fonsii91.github.io/AgilityAsturias/index.html",
-        "https://fonsii91.github.io/AgilityAsturias/main-7FKPJO6B.js",
+        "https://fonsii91.github.io/AgilityAsturias/main-FKWNQ2DG.js",
         "https://fonsii91.github.io/AgilityAsturias/manifest.webmanifest",
         "https://fonsii91.github.io/AgilityAsturias/styles-MADIGNQW.css"
       ],
@@ -100,8 +100,8 @@
     "https://fonsii91.github.io/AgilityAsturias/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "https://fonsii91.github.io/AgilityAsturias/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
     "https://fonsii91.github.io/AgilityAsturias/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
-    "https://fonsii91.github.io/AgilityAsturias/index.html": "ea919477adc839139259049f94e3af29ffbdbc4f",
-    "https://fonsii91.github.io/AgilityAsturias/main-7FKPJO6B.js": "6a1b09c9cb0d4cda2f472ad22bece77060b5fab7",
+    "https://fonsii91.github.io/AgilityAsturias/index.html": "59ab38f605f033cf5da54d96b283820931c9cbe7",
+    "https://fonsii91.github.io/AgilityAsturias/main-FKWNQ2DG.js": "e20739b673777ec7815e9bdab5044da74a11e903",
     "https://fonsii91.github.io/AgilityAsturias/manifest.webmanifest": "b9156f204b6adcc95cf18506ee0d5e2ec591fe8b",
     "https://fonsii91.github.io/AgilityAsturias/styles-MADIGNQW.css": "49f90f66361f1bf3502af7c4539cffe1285092b4"
   },
