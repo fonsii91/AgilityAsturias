@@ -1,0 +1,127 @@
+{
+  "configVersion": 1,
+  "timestamp": 1770234617123,
+  "index": "https://fonsii91.github.io/AgilityAsturias/index.html",
+  "assetGroups": [
+    {
+      "name": "app",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "https://fonsii91.github.io/AgilityAsturias/favicon.ico",
+        "https://fonsii91.github.io/AgilityAsturias/index.html",
+        "https://fonsii91.github.io/AgilityAsturias/main-KUL7HPGN.js",
+        "https://fonsii91.github.io/AgilityAsturias/manifest.webmanifest",
+        "https://fonsii91.github.io/AgilityAsturias/styles-MADIGNQW.css"
+      ],
+      "patterns": []
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "cacheQueryOptions": {
+        "ignoreVary": true
+      },
+      "urls": [
+        "https://fonsii91.github.io/AgilityAsturias/Images/AgilityAsturias_logo.jpg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Agility_Asturias_logo.jpg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Ana y Pompa.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Carysse.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Cris y Peca.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Diego Tuco y Ponga.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Fitiño y Fits.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Golti.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Helena y Pumba.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Jesús y Ginebra.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Kinder.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Leah.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Lyan y Boo.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Lyan y Shaggy.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Magda y Balto.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Marina-Chris Dafne.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Merle y Noly.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Moka.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Nala y Rosa.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Narcea.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Pompa.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Pumba.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Raylee.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Sami H.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Sami.jpeg",
+        "https://fonsii91.github.io/AgilityAsturias/icons/icon-128x128.png",
+        "https://fonsii91.github.io/AgilityAsturias/icons/icon-144x144.png",
+        "https://fonsii91.github.io/AgilityAsturias/icons/icon-152x152.png",
+        "https://fonsii91.github.io/AgilityAsturias/icons/icon-192x192.png",
+        "https://fonsii91.github.io/AgilityAsturias/icons/icon-384x384.png",
+        "https://fonsii91.github.io/AgilityAsturias/icons/icon-512x512.png",
+        "https://fonsii91.github.io/AgilityAsturias/icons/icon-72x72.png",
+        "https://fonsii91.github.io/AgilityAsturias/icons/icon-96x96.png"
+      ],
+      "patterns": []
+    }
+  ],
+  "dataGroups": [],
+  "hashTable": {
+    "https://fonsii91.github.io/AgilityAsturias/Images/AgilityAsturias_logo.jpg": "42a5f723b10e6dfb5d5732859d451326cddead63",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Agility_Asturias_logo.jpg": "298f1a725aecc852d8dd6cdf02a852a5266e3295",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Ana y Pompa.jpeg": "d00636a28c01754c7f7b6d82d36e1788677e357a",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Carysse.jpeg": "d30bf328e7569d7c946c7da214bbc108ee4969f1",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Cris y Peca.jpeg": "bc99b0fd1e3af95e7e52c826035f9bfd5bb05ed6",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Diego Tuco y Ponga.jpeg": "76cf926c6fc5d52fdacd3bcea2f1c7c995358543",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Fitiño y Fits.jpeg": "df478a26412469dc1d564cf3358b6085088071c5",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Golti.jpeg": "bbcba67740e07397a2d72ac6408e7dcb185541aa",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Helena y Pumba.jpeg": "bb90c713d517bfa00f3c0ac5e2f46a56ed5c9ff7",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Jesús y Ginebra.jpeg": "d315567cd5c1b13924de085e7be218172d3a0b3c",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Kinder.jpeg": "97976126273612f4cfaf00953611f0c16d1c6156",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Leah.jpeg": "e2e594e823b718378129d87da351df5ae2c13b09",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Lyan y Boo.jpeg": "7ab3da435ad5a541a2c78840ca7c9ab5293690fe",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Lyan y Shaggy.jpeg": "428717a7c665d2f02a79945f2c1caef13fa83dc2",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Magda y Balto.jpeg": "d85580f78d2a33d5d100180bff08c67e173a305d",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Marina-Chris Dafne.jpeg": "0d21523163149604f3d6bef4b34ef7b758013733",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Merle y Noly.jpeg": "f4eb686265b3945b592e3d12c3dbb4fd0d5c6c19",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Moka.jpeg": "7c07bf2e891d9f7a077b91de64efa544c8f7cd70",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Nala y Rosa.jpeg": "338c92265c0872d0b288a1fd1215042e7991da41",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Narcea.jpeg": "77c0a476daf7158a952e92ee2c344e5bbe5e7745",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Pompa.jpeg": "fd46259d8dd6a53404d68c7e18aa11308654ec3a",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Pumba.jpeg": "a9b17cfb9fb88a8d3797e49c4608ce8d0d7fca30",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Raylee.jpeg": "7b173b53be6dc8f790b10a06f0ebc457c397b951",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Sami H.jpeg": "7a65f2e59f09976a423e06a15527fe0830490ab2",
+    "https://fonsii91.github.io/AgilityAsturias/Images/Perros/Sami.jpeg": "b6b274de4cbd92be13623083a3a649f06c3ec08e",
+    "https://fonsii91.github.io/AgilityAsturias/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
+    "https://fonsii91.github.io/AgilityAsturias/icons/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
+    "https://fonsii91.github.io/AgilityAsturias/icons/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
+    "https://fonsii91.github.io/AgilityAsturias/icons/icon-152x152.png": "eae6e0f0c8afb8aaae339e2a569b43e9238e5e6c",
+    "https://fonsii91.github.io/AgilityAsturias/icons/icon-192x192.png": "15c4180454633880d98674aa7394656196c91584",
+    "https://fonsii91.github.io/AgilityAsturias/icons/icon-384x384.png": "94a915751ef6c9282df9aea405ad679230631814",
+    "https://fonsii91.github.io/AgilityAsturias/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
+    "https://fonsii91.github.io/AgilityAsturias/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
+    "https://fonsii91.github.io/AgilityAsturias/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
+    "https://fonsii91.github.io/AgilityAsturias/index.html": "1eb9807752c8ff8574ed601cedf389e21722f317",
+    "https://fonsii91.github.io/AgilityAsturias/main-KUL7HPGN.js": "b00fac0d3889879544aaf5cc69c0e4b52c453ff2",
+    "https://fonsii91.github.io/AgilityAsturias/manifest.webmanifest": "b9156f204b6adcc95cf18506ee0d5e2ec591fe8b",
+    "https://fonsii91.github.io/AgilityAsturias/styles-MADIGNQW.css": "49f90f66361f1bf3502af7c4539cffe1285092b4"
+  },
+  "navigationUrls": [
+    {
+      "positive": true,
+      "regex": "^\\/.*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*\\.[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*$"
+    },
+    {
+      "positive": false,
+      "regex": "^\\/(?:.+\\/)?[^/]*__[^/]*\\/.*$"
+    }
+  ],
+  "navigationRequestStrategy": "performance"
+}
