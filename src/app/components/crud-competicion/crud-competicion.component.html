@@ -1,0 +1,120 @@
+<div class="crud-container">
+    <div class="header">
+        <h2>Gestión de Competiciones</h2>
+        <button class="btn btn-primary" (click)="initNewCompetition()" *ngIf="!showForm()">
+            <span>+</span> Nueva Competición
+        </button>
+        <button class="btn btn-secondary" (click)="toggleView()" *ngIf="showForm()">
+            ← Volver al Listado
+        </button>
+    </div>
+
+    <!-- LIST VIEW -->
+    <div class="list-view" *ngIf="!showForm()">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Lugar</th>
+                        <th>Fecha Evento</th>
+                        <th>Cierre Inscripción</th>
+                        <th style="width: 150px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let comp of competitions()">
+                        <td><strong>{{ comp.lugar }}</strong></td>
+                        <td>{{ comp.fechaEvento | date:'dd/MM/yyyy' }}</td>
+                        <td>{{ comp.fechaLimite | date:'dd/MM/yyyy' }}</td>
+                        <td class="actions">
+                            <button class="btn-icon edit" (click)="editCompetition(comp)" title="Editar">
+                                Editar
+                            </button>
+                            <button class="btn-icon delete" (click)="deleteCompetition(comp.id)" title="Eliminar">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                    <tr *ngIf="competitions().length === 0">
+                        <td colspan="4" class="empty-msg">
+                            No hay competiciones registradas actualmente.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- FORM VIEW -->
+    <div class="form-view" *ngIf="showForm()">
+        <h3 class="form-header">{{ isEditing() ? 'Editar Competición' : 'Nueva Competición' }}</h3>
+
+        <form [formGroup]="competitionForm" (ngSubmit)="onSubmit()">
+
+            <div class="form-group">
+                <label for="lugar">Lugar del Evento</label>
+                <input type="text" id="lugar" formControlName="lugar" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f['lugar'].errors }" placeholder="Ej: Polideportivo Gijón">
+                <div *ngIf="submitted && f['lugar'].errors" class="invalid-feedback">
+                    El lugar del evento es requerido.
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col">
+                    <label for="fechaEvento">Fecha Evento</label>
+                    <input type="date" id="fechaEvento" formControlName="fechaEvento" class="form-control"
+                        [ngClass]="{ 'is-invalid': submitted && f['fechaEvento'].errors }">
+                    <div *ngIf="submitted && f['fechaEvento'].errors" class="invalid-feedback">
+                        La fecha del evento es requerida.
+                    </div>
+                </div>
+                <div class="form-group col">
+                    <label for="fechaLimite">Fecha Límite</label>
+                    <input type="date" id="fechaLimite" formControlName="fechaLimite" class="form-control"
+                        [ngClass]="{ 'is-invalid': submitted && f['fechaLimite'].errors }">
+                    <div *ngIf="submitted && f['fechaLimite'].errors" class="invalid-feedback">
+                        La fecha límite es requerida.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="formaPago">Forma de Pago</label>
+                <textarea id="formaPago" formControlName="formaPago" class="form-control" rows="3"
+                    [ngClass]="{ 'is-invalid': submitted && f['formaPago'].errors }"
+                    placeholder="Instrucciones de pago..."></textarea>
+                <div *ngIf="submitted && f['formaPago'].errors" class="invalid-feedback">
+                    La forma de pago es requerida.
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="enlace">Enlace Inscripción</label>
+                <input type="url" id="enlace" formControlName="enlace" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f['enlace'].errors }" placeholder="https://...">
+                <div *ngIf="submitted && f['enlace'].errors" class="invalid-feedback">
+                    Se requiere una URL válida (http:// o https://).
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cartel">Cartel (Imagen)</label>
+                <input type="file" id="cartel" (change)="onFileSelected($event)" accept="image/*" class="form-control">
+                <div *ngIf="f['cartel'].value" class="mt-2">
+                    <img [src]="f['cartel'].value" alt="Preview"
+                        style="max-height: 150px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">
+                    {{ isEditing() ? 'Guardar Cambios' : 'Crear Competición' }}
+                </button>
+                <button type="button" class="btn btn-cancel" (click)="toggleView()">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

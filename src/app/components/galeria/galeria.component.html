@@ -6,7 +6,7 @@
         <div *ngFor="let image of images(); let i = index" class="gallery-item" (click)="openLightbox(i)">
             <img [src]="image.url" [alt]="image.alt" loading="lazy">
             <div class="overlay">
-                <span>Ver entera</span>
+                <span>Ver</span>
             </div>
         </div>
     </div>

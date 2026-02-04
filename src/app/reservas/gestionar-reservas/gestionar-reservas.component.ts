@@ -26,6 +26,7 @@ export class GestionarReservasComponent {
 
         const groups = daysOrder.map(day => ({
             day,
+            period: (day === 'Lunes' || day === 'Jueves') ? 'Mañana' : 'Tarde',
             slots: slots.filter(s => s.day === day)
         })).filter(group => group.slots.length > 0);
 
@@ -38,20 +39,22 @@ export class GestionarReservasComponent {
         let idCounter = 1;
 
         days.forEach(day => {
-            // Morning slots: Only Monday and Thursday
+            // Lunes y Jueves (10:00 - 15:00 approx)
             if (day === 'Lunes' || day === 'Jueves') {
                 slots.push(
                     { id: idCounter++, day, startTime: '10:00', endTime: '11:30', currentBookings: 0, maxBookings: 5 },
-                    { id: idCounter++, day, startTime: '11:30', endTime: '13:00', currentBookings: 0, maxBookings: 5 }
+                    { id: idCounter++, day, startTime: '11:30', endTime: '13:00', currentBookings: 0, maxBookings: 5 },
+                    { id: idCounter++, day, startTime: '13:00', endTime: '14:30', currentBookings: 0, maxBookings: 5 }
                 );
             }
-
-            // Afternoon slots: Every day
-            slots.push(
-                { id: idCounter++, day, startTime: '14:00', endTime: '15:30', currentBookings: 0, maxBookings: 5 },
-                { id: idCounter++, day, startTime: '15:30', endTime: '17:00', currentBookings: 0, maxBookings: 5 },
-                { id: idCounter++, day, startTime: '17:00', endTime: '18:30', currentBookings: 0, maxBookings: 5 }
-            );
+            // Martes, Miércoles y Viernes
+            else if (['Martes', 'Miércoles', 'Viernes'].includes(day)) {
+                slots.push(
+                    { id: idCounter++, day, startTime: '16:30', endTime: '18:00', currentBookings: 0, maxBookings: 7 },
+                    { id: idCounter++, day, startTime: '18:00', endTime: '19:30', currentBookings: 0, maxBookings: 5 },
+                    { id: idCounter++, day, startTime: '19:30', endTime: '21:00', currentBookings: 0, maxBookings: 6 }
+                );
+            }
         });
 
         return slots;

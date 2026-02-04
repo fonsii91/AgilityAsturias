@@ -2,11 +2,11 @@
     padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
+    text-align: center;
 }
 
 h1 {
-    text-align: center;
-    color: #333;
+    color: #003366;
     margin-bottom: 2rem;
 }
 
@@ -19,29 +19,29 @@ h1 {
 .month-card {
     background: white;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .month-card h2 {
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 0;
+    color: #003366;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
 }
 
 .weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    text-align: center;
-    font-weight: bold;
     margin-bottom: 0.5rem;
+    font-weight: bold;
     color: #666;
 }
 
 .days-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 2px;
 }
 
 .day {
@@ -51,33 +51,193 @@ h1 {
     justify-content: center;
     border-radius: 4px;
     font-size: 0.9rem;
-}
-
-.day.other-month {
-    background: transparent;
-}
-
-.day.weekend {
-    background-color: #f8f9fa;
-    color: #666;
-}
-
-.day.competition {
-    background-color: #e74c3c;
-    color: white;
-    font-weight: bold;
     position: relative;
-    cursor: pointer;
 }
 
-.day.competition::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 4px;
+.day:not(.other-month):hover {
+    background-color: #f0f0f0;
+}
+
+.other-month {
+    color: #ccc;
+}
+
+.weekend {
+    background-color: #fff3cd;
+}
+
+.competition {
+    background-color: #003366;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.competition:hover {
+    background-color: #004080;
+    transform: scale(1.1);
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.competition.weekend {
+    background-color: #003366;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
     background: white;
-    border-radius: 50%;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: left;
+    animation: slideUp 0.3s ease-out;
+}
+
+.close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    color: #666;
+    z-index: 10;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+
+.competition-details h3 {
+    color: #003366;
+    margin-top: 0;
+    border-bottom: 2px solid #FFCC00;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.detail-row {
+    margin-bottom: 1rem;
+}
+
+.detail-row strong {
+    display: block;
+    color: #555;
+    margin-bottom: 0.25rem;
+}
+
+.payment-info {
+    margin: 0;
+    white-space: pre-wrap;
+    background: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.modal-poster {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: zoom-in;
+    /* Indicate it is clickable */
+    transition: transform 0.2s;
+}
+
+.modal-poster:hover {
+    transform: scale(1.02);
+}
+
+/* Image Expansion Overlay */
+.image-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 2000;
+    /* Higher than modal */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: zoom-out;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.image-wrapper img {
+    max-width: 95vw;
+    max-height: 95vh;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+}
+
+.modal-actions {
+    margin-top: 2rem;
+    text-align: center;
+}
+
+.btn-register {
+    display: inline-block;
+    background: #003366;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.btn-register:hover {
+    background: #004080;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

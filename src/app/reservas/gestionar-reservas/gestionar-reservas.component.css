@@ -13,22 +13,49 @@ h2 {
     margin-bottom: 3rem;
 }
 
+.header-container {
+    max-width: 900px;
+    margin: 2rem auto 1rem auto;
+    border-bottom: 2px solid var(--secondary-yellow);
+    padding-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.day-header {
+    margin: 0;
+    color: var(--primary-blue);
+    font-size: 1.5rem;
+}
+
+.period-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.period-badge.morning {
+    background-color: #fff3e0;
+    color: #f57c00;
+    border: 1px solid #ffe0b2;
+}
+
+.period-badge.afternoon {
+    background-color: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
 .slots-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
     max-width: 900px;
     margin: 0 auto 2rem auto;
-    /* Added bottom margin */
-}
-
-.day-header {
-    max-width: 900px;
-    margin: 2rem auto 1rem auto;
-    color: var(--primary-blue);
-    font-size: 1.5rem;
-    border-bottom: 2px solid var(--secondary-yellow);
-    padding-bottom: 0.5rem;
 }
 
 .slot-card {
@@ -88,7 +115,6 @@ h2 {
 
 .slot-card.full .fill {
     background-color: #e57373;
-    /* Red for full */
 }
 
 .book-btn {

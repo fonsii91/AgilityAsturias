@@ -3,7 +3,13 @@
     <p class="subtitle">Selecciona una franja horaria para reservar tu clase de Agility.</p>
 
     <div *ngFor="let group of groupedSlots()">
-        <h3 class="day-header">{{ group.day }}</h3>
+        <div class="header-container">
+            <h3 class="day-header">{{ group.day }}</h3>
+            <span class="period-badge" [class.morning]="group.period === 'Mañana'"
+                [class.afternoon]="group.period === 'Tarde'">
+                {{ group.period }}
+            </span>
+        </div>
         <div class="slots-grid">
             <div *ngFor="let slot of group.slots" class="slot-card"
                 [class.full]="slot.currentBookings >= slot.maxBookings">

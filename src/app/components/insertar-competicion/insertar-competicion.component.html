@@ -1,0 +1,73 @@
+<div class="form-container">
+    <h2>Añadir Nueva Competición</h2>
+    <p class="subtitle">Introduce los detalles de la próxima competición.</p>
+
+    <form [formGroup]="competitionForm" (ngSubmit)="onSubmit()">
+
+        <!-- Lugar -->
+        <div class="form-group">
+            <label for="lugar">Lugar del Evento</label>
+            <input type="text" id="lugar" formControlName="lugar" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && f['lugar'].errors }"
+                placeholder="Ej: Polideportivo Municipal, Gijón">
+            <div *ngIf="submitted && f['lugar'].errors" class="invalid-feedback">
+                <div *ngIf="f['lugar'].errors['required']">El lugar es obligatorio.</div>
+            </div>
+        </div>
+
+        <!-- Fechas -->
+        <div class="form-row">
+            <div class="form-group col">
+                <label for="fechaEvento">Fecha del Evento</label>
+                <input type="date" id="fechaEvento" formControlName="fechaEvento" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f['fechaEvento'].errors }">
+                <div *ngIf="submitted && f['fechaEvento'].errors" class="invalid-feedback">
+                    <div *ngIf="f['fechaEvento'].errors['required']">La fecha del evento es obligatoria.</div>
+                </div>
+            </div>
+
+            <div class="form-group col">
+                <label for="fechaLimite">Fecha Límite Inscripción</label>
+                <input type="date" id="fechaLimite" formControlName="fechaLimite" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f['fechaLimite'].errors }">
+                <div *ngIf="submitted && f['fechaLimite'].errors" class="invalid-feedback">
+                    <div *ngIf="f['fechaLimite'].errors['required']">La fecha límite es obligatoria.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Forma de Pago -->
+        <div class="form-group">
+            <label for="formaPago">Forma de Pago</label>
+            <textarea id="formaPago" formControlName="formaPago" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && f['formaPago'].errors }" rows="3"
+                placeholder="Ej: Transferencia bancaria a..."></textarea>
+            <div *ngIf="submitted && f['formaPago'].errors" class="invalid-feedback">
+                <div *ngIf="f['formaPago'].errors['required']">La forma de pago es obligatoria.</div>
+            </div>
+        </div>
+
+        <!-- Cartel -->
+        <div class="form-group">
+            <label for="cartel">Imagen del Cartel</label>
+            <input type="file" id="cartel" (change)="onFileChange($event)" class="form-control-file"
+                [ngClass]="{ 'is-invalid': submitted && f['cartel'].errors }">
+            <div *ngIf="submitted && f['cartel'].errors" class="invalid-feedback">
+                <div *ngIf="f['cartel'].errors['required']">Debes subir una imagen del cartel.</div>
+            </div>
+        </div>
+
+        <!-- Enlace -->
+        <div class="form-group">
+            <label for="enlace">Enlace para Apuntarse</label>
+            <input type="url" id="enlace" formControlName="enlace" class="form-control"
+                [ngClass]="{ 'is-invalid': submitted && f['enlace'].errors }" placeholder="https://...">
+            <div *ngIf="submitted && f['enlace'].errors" class="invalid-feedback">
+                <div *ngIf="f['enlace'].errors['required']">El enlace es obligatorio.</div>
+                <div *ngIf="f['enlace'].errors['pattern']">Introduce una URL válida (http/https).</div>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-btn">Añadir Competición</button>
+    </form>
+</div>

@@ -29,27 +29,26 @@ interface GalleryImage {
 export class GaleriaComponent {
     // Real images extracted from agilityasturias.com
     images = signal<GalleryImage[]>([
-        { url: 'https://files.123inventatuweb.com/8b/0b/8b0b3c88-427e-4a88-91cf-fe85bc7c29c2.jpeg', alt: 'Agility Asturias' },
-        { url: 'https://files.123inventatuweb.com/51/81/5181677e-0b5d-40be-a5c7-9fc856e082ee.jpg', alt: 'Agility Dog Jumping' },
-        { url: 'https://imagecdn.123inventatuweb.com/36/52/36524045-e7dd-4758-bdea-2dd5b062b94a.jpeg', alt: 'Dog Agility Course' },
-        { url: 'https://imagecdn.123inventatuweb.com/05/a3/05a394a4-0f1d-470c-ba3d-4c5326c0f40f.jpeg', alt: 'Agility Training' },
-        { url: 'https://imagecdn.123inventatuweb.com/6a/f0/6af0de33-7414-4478-9f8e-335624167e93.jpeg', alt: 'Competition Day' },
-        { url: 'https://imagecdn.123inventatuweb.com/1c/af/1cafe345-7080-49d7-bc1e-767ad3c18251.jpeg', alt: 'Agility Action' },
-        { url: 'https://imagecdn.123inventatuweb.com/85/0a/850a6c51-0138-4b6f-b5c7-c0240fdbab05.jpeg', alt: 'Agility Jump' },
-        { url: 'https://files.123inventatuweb.com/d1/37/d137b7c8-4901-4933-bda0-5924d440b920.jpeg', alt: 'Agility Practice' },
-        { url: 'https://files.123inventatuweb.com/67/6d/676dee79-7a27-4b44-bb97-4938d27035d7.jpeg', alt: 'Dog Speed' },
-        { url: 'https://files.123inventatuweb.com/ad/c7/adc7219c-9425-4af2-b565-8f1307a62c78.jpeg', alt: 'Agility Fun' },
-        { url: 'https://files.123inventatuweb.com/bb/cd/bbcdfa94-9b9f-4a36-97e8-e1091fbe96af.jpeg', alt: 'Agility Team' },
-        { url: 'https://files.123inventatuweb.com/44/b9/44b951db-d935-4123-a681-60467b0988dc.jpeg', alt: 'Agility Competition' },
-        { url: 'https://files.123inventatuweb.com/19/ed/19ed0a5f-0c21-4d37-9ebf-97ab3913f13c.jpeg', alt: 'Agility Dogs' },
-        { url: 'https://files.123inventatuweb.com/ac/f7/acf7e249-fea5-4222-adbc-5d56e631427d.jpeg', alt: 'Agility Hurdle' },
-        { url: 'https://files.123inventatuweb.com/56/82/5682f92e-f72a-46c8-8b12-d0660490fbe5.jpeg', alt: 'Agility Tunnel' },
-        { url: 'https://files.123inventatuweb.com/60/03/600393ee-e7e8-49d3-a807-f75b45a0a9a0.jpeg', alt: 'Agility Weave Poles' },
-        { url: 'https://files.123inventatuweb.com/64/77/647766a5-efdd-4e68-8904-c35b80c0038a.jpeg', alt: 'Agility Fun Day' },
-        { url: 'https://files.123inventatuweb.com/4f/bb/4fbb8265-8d07-4e4e-8861-f2888b77dc19.jpeg', alt: 'Agility Training Session' },
-        { url: 'https://files.123inventatuweb.com/2b/b2/2bb2c824-afdb-4c9a-b930-73b1d0774ae5.jpeg', alt: 'Agility Outdoors' },
-        { url: 'https://files.123inventatuweb.com/6b/f4/6bf452a8-a35c-40ea-b3c0-3ebcc799ab62.jpeg', alt: 'Agility Club' },
-        { url: 'https://files.123inventatuweb.com/9c/10/9c1098c7-70ee-4ffd-84aa-b61ac8516f97.jpeg', alt: 'Agility Moments' }
+        { url: '/Images/Perros/Ana y Pompa.jpeg', alt: 'Ana y Pompa' },
+        { url: '/Images/Perros/Carysse.jpeg', alt: 'Carysse' },
+        { url: '/Images/Perros/Cris y Peca.jpeg', alt: 'Cris y Peca' },
+        { url: '/Images/Perros/Diego Tuco y Ponga.jpeg', alt: 'Diego Tuco y Ponga' },
+        { url: '/Images/Perros/Fitiño y Fits.jpeg', alt: 'Fitiño y Fits' },
+        { url: '/Images/Perros/Golti.jpeg', alt: 'Golti' },
+        { url: '/Images/Perros/Helena y Pumba.jpeg', alt: 'Helena y Pumba' },
+        { url: '/Images/Perros/Jesús y Ginebra.jpeg', alt: 'Jesús y Ginebra' },
+        { url: '/Images/Perros/Kinder.jpeg', alt: 'Kinder' },
+        { url: '/Images/Perros/Lyan y Boo.jpeg', alt: 'Lyan y Boo' },
+        { url: '/Images/Perros/Lyan y Shaggy.jpeg', alt: 'Lyan y Shaggy' },
+        { url: '/Images/Perros/Magda y Balto.jpeg', alt: 'Magda y Balto' },
+        { url: '/Images/Perros/Marina-Chris Dafne.jpeg', alt: 'Marina-Chris Dafne' },
+        { url: '/Images/Perros/Merle y Noly.jpeg', alt: 'Merle y Noly' },
+        { url: '/Images/Perros/Moka.jpeg', alt: 'Moka' },
+        { url: '/Images/Perros/Nala y Rosa.jpeg', alt: 'Nala y Rosa' },
+        { url: '/Images/Perros/Narcea.jpeg', alt: 'Narcea' },
+        { url: '/Images/Perros/Pompa.jpeg', alt: 'Pompa' },
+        { url: '/Images/Perros/Pumba.jpeg', alt: 'Pumba' },
+        { url: '/Images/Perros/Raylee.jpeg', alt: 'Raylee' }
     ]);
 
     lightboxOpen = signal(false);

@@ -5,11 +5,13 @@ import { GestionarReservasComponent } from './reservas/gestionar-reservas/gestio
 import { ContactoComponent } from './components/contacto/contacto.component';
 import { GaleriaComponent } from './components/galeria/galeria.component';
 import { CalendarioComponent } from './components/calendario/calendario.component';
+import { CrudCompeticionComponent } from './components/crud-competicion/crud-competicion.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'reservas', component: GestionarReservasComponent },
     { path: 'contacto', component: ContactoComponent },
     { path: 'galeria', component: GaleriaComponent },
-    { path: 'calendario', component: CalendarioComponent }
+    { path: 'calendario', component: CalendarioComponent },
+    { path: 'gestionar-competiciones', component: CrudCompeticionComponent }
 ];
