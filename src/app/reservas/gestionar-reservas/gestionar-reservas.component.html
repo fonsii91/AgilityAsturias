@@ -27,10 +27,16 @@
                     </div>
                 </div>
 
-                <button class="book-btn" [disabled]="slot.currentBookings >= slot.maxBookings"
-                    (click)="bookSlot(slot.id)">
-                    {{ slot.currentBookings >= slot.maxBookings ? 'Completo' : 'Reservar' }}
-                </button>
+                <div class="actions">
+                    <button class="book-btn cancel-btn" [disabled]="slot.currentBookings === 0"
+                        (click)="cancelSlot(slot.id)">
+                        Cancelar
+                    </button>
+                    <button class="book-btn" [disabled]="slot.currentBookings >= slot.maxBookings"
+                        (click)="bookSlot(slot.id)">
+                        {{ slot.currentBookings >= slot.maxBookings ? 'Completo' : 'Reservar' }}
+                    </button>
+                </div>
             </div>
         </div>
     </div>

@@ -57,6 +57,19 @@ export class GaleriaComponent {
     lightboxOpen = signal(false);
     currentImageIndex = signal(0);
 
+    constructor() {
+        this.shuffleImages();
+    }
+
+    private shuffleImages() {
+        const images = this.images();
+        for (let i = images.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [images[i], images[j]] = [images[j], images[i]];
+        }
+        this.images.set([...images]);
+    }
+
     openLightbox(index: number) {
         this.currentImageIndex.set(index);
         this.lightboxOpen.set(true);

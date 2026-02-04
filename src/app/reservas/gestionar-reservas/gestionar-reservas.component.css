@@ -117,7 +117,14 @@ h2 {
     background-color: #e57373;
 }
 
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .book-btn {
+    flex: 1;
     background-color: var(--primary-blue);
     color: var(--white);
     border: none;
@@ -135,4 +142,13 @@ h2 {
 .book-btn[disabled] {
     background-color: #ccc;
     cursor: not-allowed;
+}
+
+.cancel-btn {
+    background-color: #ef5350;
+    /* Red color */
+}
+
+.cancel-btn:hover:not([disabled]) {
+    background-color: #d32f2f;
 }

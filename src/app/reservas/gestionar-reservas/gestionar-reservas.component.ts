@@ -70,4 +70,15 @@ export class GestionarReservasComponent {
             })
         );
     }
+
+    cancelSlot(slotId: number) {
+        this.slots.update(slots =>
+            slots.map(slot => {
+                if (slot.id === slotId && slot.currentBookings > 0) {
+                    return { ...slot, currentBookings: slot.currentBookings - 1 };
+                }
+                return slot;
+            })
+        );
+    }
 }
