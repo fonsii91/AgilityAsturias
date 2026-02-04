@@ -2,62 +2,78 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: calc(100vh - 200px);
-    /* Adjust based on header/footer */
-    background-color: var(--background-color);
+    min-height: 80vh;
+    padding: 20px;
 }
 
 .login-card {
-    background-color: var(--white);
-    padding: 3rem;
+    background: white;
+    padding: 2rem;
     border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     max-width: 400px;
     width: 100%;
-}
-
-.login-card h2 {
-    color: var(--primary-blue);
-    margin-bottom: 1rem;
-}
-
-.login-card p {
-    color: var(--text-light);
-    margin-bottom: 2rem;
+    text-align: center;
 }
 
 .google-btn-wrapper {
+    margin: 20px 0;
     display: flex;
     justify-content: center;
-    margin-bottom: 1rem;
+}
+
+.btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: white;
+    color: #444;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    width: 100%;
+}
+
+.btn-google:hover {
+    background-color: #f8f8f8;
+}
+
+.btn-google img {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-logout {
+    margin-top: 10px;
+    padding: 6px 12px;
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-logout:hover {
+    background-color: #cc0000;
 }
 
 .user-info {
-    margin-top: 2rem;
+    text-align: center;
+    margin-top: 20px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 1rem;
-    text-align: left;
-    background: var(--background-light);
-    padding: 1rem;
-    border-radius: 8px;
 }
 
 .user-info img {
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
-}
-
-.user-info .name {
-    color: var(--text-main);
-    font-weight: 600;
-    margin: 0;
-}
-
-.user-info .email {
-    color: var(--text-light);
-    font-size: 0.875rem;
-    margin: 0;
+    margin-bottom: 10px;
 }

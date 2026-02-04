@@ -1,7 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Competition, CompetitionService } from '../../services/competition.service';
+import { CompetitionService } from '../../services/competition.service';
+import { Competition } from '../../models/competition.model';
 
 @Component({
     selector: 'app-crud-competicion',
@@ -19,7 +20,7 @@ export class CrudCompeticionComponent {
 
     competitionForm: FormGroup;
     submitted = false;
-    currentCompetitionId: number | null = null;
+    currentCompetitionId: string | null = null;
 
     constructor(
         private fb: FormBuilder,
@@ -52,7 +53,7 @@ export class CrudCompeticionComponent {
     }
 
     // Used to hold the existing cartel when editing, if no new file is selected
-    private existingCartel: string | File | null = null;
+    private existingCartel: string | null = null;
 
     editCompetition(comp: Competition) {
         this.currentCompetitionId = comp.id;
@@ -71,7 +72,7 @@ export class CrudCompeticionComponent {
         this.isEditing.set(true);
     }
 
-    deleteCompetition(id: number) {
+    deleteCompetition(id: string) {
         if (confirm('¿Estás seguro de que quieres eliminar esta competición?')) {
             this.competitionService.deleteCompetition(id);
         }
@@ -103,7 +104,7 @@ export class CrudCompeticionComponent {
         this.onFileSelected(event);
     }
 
-    onSubmit() {
+    async onSubmit() {
         this.submitted = true;
 
         if (this.competitionForm.invalid) {
@@ -122,13 +123,13 @@ export class CrudCompeticionComponent {
         };
 
         if (this.isEditing() && this.currentCompetitionId) {
-            this.competitionService.updateCompetition({
+            await this.competitionService.updateCompetition({
                 id: this.currentCompetitionId,
                 ...competitionData
             });
             alert('Competición actualizada');
         } else {
-            this.competitionService.addCompetition(competitionData);
+            await this.competitionService.addCompetition(competitionData);
             alert('Competición creada');
         }
 

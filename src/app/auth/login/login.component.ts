@@ -1,28 +1,29 @@
-import { Component } from '@angular/core';
-import { SocialAuthService, GoogleSigninButtonModule, SocialUser } from '@abacritt/angularx-social-login';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, GoogleSigninButtonModule],
+    imports: [CommonModule],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css'
 })
 export class LoginComponent {
-    user: SocialUser | null = null;
-    loggedIn: boolean = false;
+    authService = inject(AuthService);
 
-    constructor(private authService: SocialAuthService) { }
+    constructor() { }
 
-    ngOnInit() {
-        this.authService.authState.subscribe((user) => {
-            this.user = user;
-            this.loggedIn = (user != null);
-            if (this.loggedIn) {
-                console.log('User logged in:', user);
-                // Here you would typically redirect or store the user state
-            }
-        });
+    async login() {
+        try {
+            await this.authService.loginWithGoogle();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    async logout() {
+        await this.authService.logout();
     }
 }
+

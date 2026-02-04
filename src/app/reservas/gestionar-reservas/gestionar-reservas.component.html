@@ -2,9 +2,21 @@
     <h2>Gestionar Reservas</h2>
     <p class="subtitle">Selecciona una franja horaria para reservar tu clase de Agility.</p>
 
+    <div class="week-selector">
+        <button [class.active]="selectedWeek() === 'current'" (click)="toggleWeek('current')">
+            Semana Actual
+        </button>
+        <button [class.active]="selectedWeek() === 'next'" (click)="toggleWeek('next')">
+            Semana Siguiente
+        </button>
+    </div>
+
     <div *ngFor="let group of groupedSlots()">
         <div class="header-container">
-            <h3 class="day-header">{{ group.day }}</h3>
+            <h3 class="day-header">
+                {{ group.day }}
+                <span class="date-label">{{ group.slots[0].date | date:'dd/MM' }}</span>
+            </h3>
             <span class="period-badge" [class.morning]="group.period === 'Mañana'"
                 [class.afternoon]="group.period === 'Tarde'">
                 {{ group.period }}
@@ -27,17 +39,77 @@
                     </div>
                 </div>
 
-                <div class="actions">
-                    <button class="book-btn cancel-btn" [disabled]="slot.currentBookings === 0"
-                        (click)="cancelSlot(slot.id)">
-                        Cancelar
+                <!-- Attendees Toggle & List -->
+                <div class="attendees-section" *ngIf="slot.reservations && slot.reservations.length > 0">
+                    <button class="toggle-attendees-btn" (click)="toggleAttendees(slot.id)">
+                        <span>Ver asistentes ({{ slot.reservations.length }})</span>
+                        <span class="chevron" [class.open]="expandedSlots().has(slot.id)">▼</span>
                     </button>
-                    <button class="book-btn" [disabled]="slot.currentBookings >= slot.maxBookings"
-                        (click)="bookSlot(slot.id)">
+
+                    <div class="attendees-list" *ngIf="expandedSlots().has(slot.id)">
+                        <!-- <p class="attendees-title">Asistentes:</p> Title redundant if button says it -->
+                        <ul>
+                            <li *ngFor="let res of slot.reservations" class="attendee-item">
+                                <span class="attendee-name">{{ res.userName }}</span>
+                                <div class="attendee-dogs-container"
+                                    *ngIf="res.selectedDogs && res.selectedDogs.length">
+                                    <div *ngFor="let dog of res.selectedDogs" class="attendee-dog-single">
+                                        🐾 {{ dog }}
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <!-- Show Cancel button ONLY if booked by current user -->
+                    <button *ngIf="slot.isBookedByCurrentUser" class="book-btn cancel-btn" (click)="cancelSlot(slot)">
+                        Cancelar Reserva
+                    </button>
+
+                    <!-- Show Book button if NOT booked by user (even if full, to show 'Completo' state, but disabled) -->
+                    <button *ngIf="!slot.isBookedByCurrentUser" class="book-btn"
+                        [disabled]="slot.currentBookings >= slot.maxBookings" (click)="bookSlot(slot)">
                         {{ slot.currentBookings >= slot.maxBookings ? 'Completo' : 'Reservar' }}
                     </button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Booking Modal -->
+<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>Confirmar Reserva</h3>
+        <p>¿Qué día? <strong>{{ selectedSlotForBooking?.day }}</strong> a las <strong>{{
+                selectedSlotForBooking?.startTime }}</strong></p>
+
+        <div class="dog-selection">
+            <p>Selecciona los perretes que vendrán:</p>
+
+            <div *ngIf="myDogs().length === 0" class="no-dogs-warning">
+                <p>⚠️ No tienes perros registrados.</p>
+                <a routerLink="/perfil" (click)="closeModal()">Ir a mi perfil para añadir uno</a>
+            </div>
+
+            <div class="dog-checkboxes">
+                <label *ngFor="let dog of myDogs()" class="dog-checkbox">
+                    <input type="checkbox" [checked]="selectedDogIds.has(dog.name)"
+                        (change)="toggleDogSelection(dog.name)">
+                    <span class="checkmark"></span>
+                    <span class="dog-label">{{ dog.name }}</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+            <button class="btn-confirm" (click)="confirmBooking()"
+                [disabled]="myDogs().length > 0 && selectedDogIds.size === 0">
+                Confirmar
+            </button>
         </div>
     </div>
 </div>

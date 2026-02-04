@@ -10,7 +10,38 @@ h2 {
 .subtitle {
     text-align: center;
     color: var(--text-light);
+    margin-bottom: 2rem;
+}
+
+.week-selector {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
     margin-bottom: 3rem;
+}
+
+.week-selector button {
+    background: none;
+    border: 2px solid var(--primary-blue);
+    color: var(--primary-blue);
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.week-selector button.active,
+.week-selector button:hover {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+.date-label {
+    font-size: 1rem;
+    color: #666;
+    margin-left: 10px;
+    font-weight: normal;
 }
 
 .header-container {
@@ -151,4 +182,218 @@ h2 {
 
 .cancel-btn:hover:not([disabled]) {
     background-color: #d32f2f;
+}
+
+/* Attendees List */
+/* Attendees Section */
+.attendees-section {
+    margin: 10px 0;
+}
+
+.toggle-attendees-btn {
+    width: 100%;
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #555;
+    background-color: #fafafa;
+    transition: background 0.2s;
+}
+
+.toggle-attendees-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.chevron {
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.chevron.open {
+    transform: rotate(180deg);
+}
+
+.attendees-list {
+    margin-top: 5px;
+    padding: 10px;
+    background-color: #f5f7fa;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    border: 1px solid #eee;
+}
+
+.attendees-title {
+    margin: 0 0 5px 0;
+    font-weight: 600;
+    color: #555;
+    font-size: 0.85rem;
+}
+
+.attendees-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.attendee-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+    border-bottom: 1px dotted #ddd;
+    padding-bottom: 2px;
+}
+
+.attendee-item:last-child {
+    border-bottom: none;
+}
+
+.attendee-name {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 2px;
+}
+
+.attendee-dogs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 10px;
+}
+
+.attendee-dog-single {
+    font-size: 0.85rem;
+    color: #444;
+    background-color: #e8f5e9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    width: fit-content;
+}
+
+/* Modal Styles */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(3px);
+}
+
+.modal-content {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: var(--primary-blue);
+}
+
+.dog-selection {
+    margin: 20px 0;
+}
+
+.dog-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.dog-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    background-color: #f0f0f0;
+    padding: 8px 12px;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.dog-checkbox:hover {
+    background-color: #e0e0e0;
+}
+
+.dog-checkbox input {
+    margin-right: 8px;
+}
+
+/* Checked styling via pseudo-class assuming browser support or simplistic indication */
+.dog-checkbox:has(input:checked) {
+    background-color: var(--primary-blue);
+    color: white;
+}
+
+/* Fallback for older browsers if needed, but :has is widely supported now on latest Chrome/Edge which user likely has */
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-cancel {
+    background: none;
+    border: 1px solid #ddd;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-confirm {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-confirm:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.no-dogs-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+}
+
+.no-dogs-warning a {
+    color: #856404;
+    text-decoration: underline;
 }

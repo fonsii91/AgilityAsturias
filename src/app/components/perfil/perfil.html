@@ -1,0 +1,35 @@
+<div class="perfil-container" *ngIf="authService.currentUserSignal() as user">
+    <div class="profile-header">
+        <img [src]="user.photoURL || 'assets/default-user.png'" alt="Avatar" class="profile-avatar">
+        <div class="profile-info">
+            <h2>{{ user.displayName }}</h2>
+            <p>{{ user.email }}</p>
+        </div>
+    </div>
+
+    <div class="dogs-section">
+        <h3>🐶 Mis Perretes</h3>
+        <p class="section-desc">Añade aquí a tus compañeros de Agility.</p>
+
+        <div class="add-dog-form">
+            <input type="text" [(ngModel)]="newDogName" placeholder="Nombre de tu perro..." (keyup.enter)="addDog()">
+            <button class="btn-add" (click)="addDog()" [disabled]="!newDogName().trim()">
+                Añadir Perro
+            </button>
+        </div>
+
+        <div class="dogs-list">
+            <div *ngIf="dogs().length === 0" class="empty-state">
+                <p>Aún no has añadido ningún perro.</p>
+            </div>
+
+            <div class="dog-card" *ngFor="let dog of dogs()">
+                <div class="dog-icon">🐕</div>
+                <div class="dog-info">
+                    <span class="dog-name">{{ dog.name }}</span>
+                </div>
+                <button class="btn-delete" (click)="deleteDog(dog.id)" title="Eliminar">🗑️</button>
+            </div>
+        </div>
+    </div>
+</div>

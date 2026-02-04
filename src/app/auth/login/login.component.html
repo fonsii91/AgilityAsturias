@@ -1,21 +1,24 @@
 <div class="login-container">
     <div class="login-card">
         <div class="logo-area">
-            <!-- Placeholder for logo if needed, or just text -->
-            <h2>Sign In</h2>
+            <h2>Iniciar Sesión</h2>
         </div>
 
-        <p>Welcome to Agility Asturias. Please sign in to continue.</p>
+        <p *ngIf="!authService.currentUserSignal()">Bienvenido a Agility Asturias. Inicia sesión para gestionar tus reservas.</p>
 
-        <div class="google-btn-wrapper">
-            <asl-google-signin-button type='standard' size='large'></asl-google-signin-button>
+        <div class="google-btn-wrapper" *ngIf="!authService.currentUserSignal()">
+            <button class="btn-google" (click)="login()">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo">
+                Continuar con Google
+            </button>
         </div>
 
-        <div *ngIf="user" class="user-info">
-            <img [src]="user.photoUrl" alt="User photo">
+        <div *ngIf="authService.currentUserSignal() as user" class="user-info">
+            <img [src]="user.photoURL" alt="User photo">
             <div>
-                <p class="name">{{ user.name }}</p>
+                <p class="name">{{ user.displayName }}</p>
                 <p class="email">{{ user.email }}</p>
+                <button class="btn-logout" (click)="logout()">Cerrar Sesión</button>
             </div>
         </div>
     </div>

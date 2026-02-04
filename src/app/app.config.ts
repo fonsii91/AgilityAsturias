@@ -2,15 +2,28 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode } from
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { SocialAuthServiceConfig, GoogleLoginProvider } from '@abacritt/angularx-social-login';
+import { provideServiceWorker } from '@angular/service-worker';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getStorage, provideStorage } from '@angular/fire/storage';
 
 import { routes } from './app.routes';
-import { provideServiceWorker } from '@angular/service-worker';
+import { environment } from '../environments/environment';
+
+// Initialize Firebase immediately to ensure SDK availability for services using getApp()
+initializeApp(environment.firebase);
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideAnimations(),
     provideRouter(routes),
+    // We keep these for other AngularFire features if needed, but the main app is already init.
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
+    provideAuth(() => getAuth()),
+    provideStorage(() => getStorage()),
     {
       provide: 'SocialAuthServiceConfig',
       useValue: {
@@ -28,8 +41,8 @@ export const appConfig: ApplicationConfig = {
         }
       } as SocialAuthServiceConfig,
     }, provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
-          })
+      enabled: !isDevMode(),
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ]
 };

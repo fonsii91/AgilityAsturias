@@ -11,11 +11,51 @@
     <nav>
         <ul [class.active]="isMenuOpen">
             <li><a routerLink="/" (click)="closeMenu()">Home</a></li>
-            <li><a routerLink="/reservas" (click)="closeMenu()">Reservas</a></li>
+            <li *ngIf="authService.currentUserSignal()"><a routerLink="/reservas" (click)="closeMenu()">Reservas</a>
+            </li>
             <li><a routerLink="/galeria" (click)="closeMenu()">Galería</a></li>
-            <li><a routerLink="/calendario" (click)="closeMenu()">Calendario</a></li>
-            <li><a routerLink="/gestionar-competiciones" (click)="closeMenu()">Competiciones</a></li>
+            <li *ngIf="authService.currentUserSignal()"><a routerLink="/calendario" (click)="closeMenu()">Calendario</a>
+            </li>
+            <li *ngIf="authService.currentUserSignal()"><a routerLink="/gestionar-competiciones"
+                    (click)="closeMenu()">Competiciones</a></li>
             <li><a routerLink="/contacto" (click)="closeMenu()">Contacto</a></li>
+
+            <!-- User Section -->
+            <li class="auth-item">
+                <!-- Login Button -->
+                <a *ngIf="!authService.currentUserSignal()" routerLink="/login" (click)="closeMenu()" class="login-btn">
+                    Iniciar Sesión
+                </a>
+
+                <!-- Logged In User Dropdown -->
+                <div class="user-dropdown-container" *ngIf="authService.currentUserSignal() as user">
+                    <button class="user-avatar-btn" (click)="toggleUserMenu($event)">
+                        <img *ngIf="user.photoURL; else defaultAvatar" [src]="user.photoURL" alt="User"
+                            class="nav-user-img" referrerpolicy="no-referrer">
+                        <ng-template #defaultAvatar>
+                            <div class="nav-user-img default-avatar-placeholder">
+                                {{ user.displayName?.charAt(0) || 'U' }}
+                            </div>
+                        </ng-template>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div class="user-dropdown-menu" [class.show]="isUserMenuOpen">
+                        <div class="user-header">
+                            <p class="name">{{ user.displayName }}</p>
+                            <p class="email">{{ user.email }}</p>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item">🐶 Mis Perretes</a>
+                        <a routerLink="/reservas" (click)="closeMenu()" class="dropdown-item">📅 Mis Reservas</a>
+                        <button (click)="logout()" class="dropdown-item logout-item">🚪 Cerrar Sesión</button>
+                    </div>
+
+                    <!-- Backdrop to close menu when clicking outside -->
+                    <div class="dropdown-backdrop" *ngIf="isUserMenuOpen" (click)="closeMenu()"></div>
+                </div>
+            </li>
         </ul>
     </nav>
 </header>

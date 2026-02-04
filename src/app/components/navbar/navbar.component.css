@@ -35,17 +35,179 @@
     margin: 0;
     display: flex;
     gap: 1.5rem;
+    align-items: center;
+    /* Vertically align items */
 }
 
 .app-header nav a {
     color: var(--white);
     font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.app-header nav a:hover {
+    color: #ffd700;
+    /* Gold color on hover */
+}
+
+/* Auth Item Specifics */
+.auth-item {
+    margin-left: 20px;
+    position: relative;
+}
+
+.login-btn {
+    background-color: rgba(255, 255, 255, 0.15);
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.2s;
+}
+
+.login-btn:hover {
+    background-color: var(--white);
+    color: var(--primary-blue) !important;
+}
+
+/* User Dropdown */
+.user-dropdown-container {
+    position: relative;
+}
+
+.user-avatar-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-user-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
+}
+
+.default-avatar-placeholder {
+    background-color: var(--accent-orange);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+
+.dropdown-arrow {
+    color: white;
+    font-size: 10px;
+}
+
+/* Dropdown Menu */
+.user-dropdown-menu {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    background: white;
+    color: #333;
+    min-width: 200px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 8px 0;
+    display: none;
+    flex-direction: column;
+    z-index: 1001;
+    animation: fadeIn 0.1s ease-out;
+}
+
+.user-dropdown-menu.show {
+    display: flex;
+}
+
+.user-header {
+    padding: 12px 16px;
+    background-color: #f8f9fa;
+}
+
+.user-header .name {
+    font-weight: bold;
+    margin: 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.user-header .email {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background-color: #eee;
+    margin: 4px 0;
+}
+
+.dropdown-item {
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+    color: #444 !important;
+    /* Force color override */
+    font-size: 14px;
+    transition: background 0.2s;
+    display: block;
+    box-sizing: border-box;
+}
+
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+    color: var(--primary-blue) !important;
+}
+
+.logout-item {
+    color: #dc3545 !important;
+}
+
+.logout-item:hover {
+    background-color: #fff1f2;
+    color: #dc3545 !important;
+}
+
+/* Invisible backdrop to close menu */
+.dropdown-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Mobile Menu Button */
 .mobile-menu-btn {
     display: none;
-    /* Hidden on desktop */
     flex-direction: column;
     justify-content: space-between;
     width: 30px;
@@ -80,25 +242,20 @@
 
 @media (max-width: 768px) {
     .app-header {
-        /* position: relative; Removed to keep sticky */
-        /* Keep header compact on mobile */
         padding: 1rem;
     }
 
     .logo-area {
         width: 100%;
         justify-content: space-between;
-        /* Space between hamburger and logo/title */
     }
 
     .mobile-menu-btn {
         display: flex;
-        /* Show on mobile */
     }
 
     .app-header nav ul {
         display: none;
-        /* Hide default menu */
         flex-direction: column;
         width: 100%;
         position: absolute;
@@ -108,11 +265,12 @@
         padding: 1rem 0;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 9;
+        align-items: stretch;
+        /* Stretch items to full width */
     }
 
     .app-header nav ul.active {
         display: flex;
-        /* Show when active */
     }
 
     .app-header nav a {
@@ -123,5 +281,39 @@
 
     .app-header nav a:hover {
         background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Mobile Auth specific adjustments */
+    .auth-item {
+        margin: 10px 0 0 0;
+        padding: 10px 2rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .login-btn {
+        display: block;
+        text-align: center;
+        width: 100%;
+    }
+
+    /* On mobile, dont use dropdown, just show content inline or simplified */
+    .user-dropdown-menu {
+        position: static;
+        display: none;
+        /* Can be toggled */
+        width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+        margin-top: 10px;
+    }
+
+    .user-dropdown-menu.show {
+        display: flex;
+    }
+
+    .user-avatar-btn {
+        width: 100%;
+        justify-content: flex-start;
+        color: white;
     }
 }
