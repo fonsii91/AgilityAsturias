@@ -8,14 +8,21 @@ import { CalendarioComponent } from './components/calendario/calendario.componen
 import { CrudCompeticionComponent } from './components/crud-competicion/crud-competicion.component';
 import { Perfil } from './components/perfil/perfil';
 import { authGuard } from './guards/auth.guard';
+import { staffGuard } from './guards/staff.guard';
+import { adminGuard } from './guards/admin.guard';
+import { memberGuard } from './guards/member.guard';
+import { AdminUsuariosComponent } from './components/admin-usuarios/admin-usuarios';
+import { GestionarMiembrosComponent } from './components/gestionar-miembros/gestionar-miembros';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
-    { path: 'reservas', component: GestionarReservasComponent, canActivate: [authGuard] },
+    { path: 'reservas', component: GestionarReservasComponent, canActivate: [memberGuard] },
     { path: 'contacto', component: ContactoComponent },
     { path: 'galeria', component: GaleriaComponent },
-    { path: 'calendario', component: CalendarioComponent, canActivate: [authGuard] },
-    { path: 'gestionar-competiciones', component: CrudCompeticionComponent, canActivate: [authGuard] },
+    { path: 'calendario', component: CalendarioComponent, canActivate: [memberGuard] },
+    { path: 'gestionar-competiciones', component: CrudCompeticionComponent, canActivate: [staffGuard] },
+    { path: 'gestionar-miembros', component: GestionarMiembrosComponent, canActivate: [staffGuard] },
     { path: 'perfil', component: Perfil, canActivate: [authGuard] },
+    { path: 'admin/usuarios', component: AdminUsuariosComponent, canActivate: [adminGuard] },
     { path: 'login', component: LoginComponent }
 ];

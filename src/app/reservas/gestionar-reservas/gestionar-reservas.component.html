@@ -107,8 +107,8 @@
         <div class="modal-actions">
             <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
             <button class="btn-confirm" (click)="confirmBooking()"
-                [disabled]="myDogs().length > 0 && selectedDogIds.size === 0">
-                Confirmar
+                [disabled]="(myDogs().length > 0 && selectedDogIds.size === 0) || isSubmitting()">
+                {{ isSubmitting() ? 'Reservando...' : 'Confirmar' }}
             </button>
         </div>
     </div>

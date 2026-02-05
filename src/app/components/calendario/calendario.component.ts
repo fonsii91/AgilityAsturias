@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, Signal, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CompetitionService } from '../../services/competition.service';
 
@@ -7,6 +7,7 @@ interface CalendarDay {
     isCompetition: boolean;
     isWeekend: boolean;
     isOtherMonth: boolean;
+    isToday: boolean;
     competitionDetails?: any;
 }
 
@@ -17,17 +18,34 @@ interface CalendarDay {
     templateUrl: './calendario.component.html',
     styleUrls: ['./calendario.component.css']
 })
-export class CalendarioComponent implements OnInit {
-    currentYear = 2026;
-    months: { name: string; days: CalendarDay[] }[] = [];
+export class CalendarioComponent {
+    currentYear = signal(new Date().getFullYear());
     monthNames = [
         'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
 
-    // Signals are available if needed, but for now accessing the array directly in getDaysInMonth
-    // Note: If competitions change dynamically, we might need an effect to regenerate the calendar.
-    private competitions: any;
+    private competitions: Signal<any[]>;
+
+    // Computed signal for calendar data
+    months = computed(() => {
+        const monthsData = [];
+        // Tracks competitions signal
+        const comps = this.competitions();
+        const year = this.currentYear();
+
+        for (let i = 0; i < 12; i++) {
+            monthsData.push({
+                name: this.monthNames[i],
+                days: this.getDaysInMonth(i, year, comps)
+            });
+        }
+        return monthsData;
+    });
+
+    changeYear(offset: number) {
+        this.currentYear.update(y => y + offset);
+    }
 
     // Modal state
     selectedCompetition: any = null;
@@ -37,32 +55,20 @@ export class CalendarioComponent implements OnInit {
         this.competitions = this.competitionService.getCompetitions();
     }
 
-    ngOnInit() {
-        this.generateCalendar();
-    }
-
-    generateCalendar() {
-        this.months = []; // Clear
-        for (let i = 0; i < 12; i++) {
-            this.months.push({
-                name: this.monthNames[i],
-                days: this.getDaysInMonth(i)
-            });
-        }
-    }
-
-    getDaysInMonth(monthIndex: number): CalendarDay[] {
+    getDaysInMonth(monthIndex: number, year: number, competitions: any[]): CalendarDay[] {
         const days: CalendarDay[] = [];
-        const date = new Date(this.currentYear, monthIndex, 1);
+        const date = new Date(year, monthIndex, 1);
         const firstDayIndex = (date.getDay() + 6) % 7; // 0 = Mon, 6 = Sun
+        const today = new Date();
 
         // Previous month padding
         for (let i = 0; i < firstDayIndex; i++) {
             days.push({
-                date: new Date(this.currentYear, monthIndex, -i),
+                date: new Date(year, monthIndex, -i),
                 isCompetition: false,
                 isWeekend: false,
-                isOtherMonth: true
+                isOtherMonth: true,
+                isToday: false
             });
         }
 
@@ -71,22 +77,24 @@ export class CalendarioComponent implements OnInit {
             const dayOfWeek = date.getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-            // Check if there is a competition on this date
-            // Format date to YYYY-MM-DD to match the service format
-            // Note: date.getMonth() is 0-indexed, so we add 1.
             const year = date.getFullYear();
             const month = (date.getMonth() + 1).toString().padStart(2, '0');
             const day = date.getDate().toString().padStart(2, '0');
             const dateString = `${year}-${month}-${day}`;
 
-            const competition = this.competitions().find((c: any) => c.fechaEvento === dateString);
+            const competition = competitions.find((c: any) => c.fechaEvento === dateString);
             const isCompetition = !!competition;
+
+            const isToday = date.getDate() === today.getDate() &&
+                date.getMonth() === today.getMonth() &&
+                date.getFullYear() === today.getFullYear();
 
             days.push({
                 date: new Date(date),
                 isCompetition: isCompetition,
                 isWeekend: isWeekend,
                 isOtherMonth: false,
+                isToday: isToday,
                 competitionDetails: competition
             });
             date.setDate(date.getDate() + 1);

@@ -1,0 +1,49 @@
+<div class="admin-container">
+    <div class="header">
+        <h1>Gestión de Usuarios</h1>
+        <div class="stats">
+            <span>Total: {{ users().length }}</span>
+        </div>
+    </div>
+
+    <div class="table-container glass-effect" *ngIf="!loading(); else loader">
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Rol Actual</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of users()">
+                    <td class="user-cell">
+                        <img [src]="user.photoURL || 'assets/default-avatar.png'" alt="Avatar" class="avatar">
+                        <span>{{ user.displayName }}</span>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge" [class]="user.role">{{ user.role }}</span>
+                    </td>
+                    <td>
+                        <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
+                            class="role-select">
+                            <option value="user">Usuario</option>
+                            <option value="member">Miembro</option>
+                            <option value="staff">Staff</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <ng-template #loader>
+        <div class="loader-container">
+            <div class="spinner"></div>
+            <p>Cargando usuarios...</p>
+        </div>
+    </ng-template>
+</div>

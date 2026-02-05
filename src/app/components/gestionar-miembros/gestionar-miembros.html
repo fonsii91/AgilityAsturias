@@ -1,0 +1,85 @@
+<div class="admin-container">
+    <div class="header">
+        <h1>Gestión de Miembros</h1>
+        <div class="stats">
+            <span>Usuarios: {{ displayUsers().length }}</span>
+        </div>
+    </div>
+
+    <div class="info-banner">
+        <p>ℹ️ Aquí puedes gestionar quién tiene acceso como "Miembro" (y por tanto, al calendario y reservas).</p>
+    </div>
+
+    <div class="table-container glass-effect" *ngIf="!loading(); else loader">
+        <div *ngIf="displayUsers().length === 0" class="empty-state">
+            No hay usuarios registrados (excepto staff).
+        </div>
+
+        <table *ngIf="displayUsers().length > 0">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Email</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let user of displayUsers()">
+                    <td class="user-cell">
+                        <img [src]="user.photoURL || 'assets/default-avatar.png'" alt="Avatar" class="avatar">
+                        <span>{{ user.displayName }}</span>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge" [class]="user.role">
+                            {{ user.role === 'member' ? 'Miembro' : 'Usuario' }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="action-btn" [class.promote]="user.role !== 'member'"
+                            [class.revoke]="user.role === 'member'" (click)="initiateToggleMember(user)">
+                            {{ user.role === 'member' ? '⬇️ Quitar Miembro' : '⬆️ Hacer Miembro' }}
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
+        <div class="modal-content glass-effect" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>{{ confirmationAction === 'promote' ? '¿Ascender Usuario?' : '¿Revocar Membresía?' }}</h3>
+                <button class="close-btn" (click)="closeModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <p *ngIf="confirmationAction === 'promote'">
+                    ¿Estás seguro de que quieres hacer miembro a <strong>{{ selectedUser?.displayName }}</strong>?
+                    <br><span class="note">Esto le dará acceso a Reservas y Calendario.</span>
+                </p>
+                <p *ngIf="confirmationAction === 'revoke'">
+                    ¿Estás seguro de que quieres quitarle la membresía a <strong>{{ selectedUser?.displayName
+                        }}</strong>?
+                    <br><span class="note warning">Perderá el acceso a Reservas y Calendario.</span>
+                </p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+                <button class="btn-confirm" [class.btn-promote]="confirmationAction === 'promote'"
+                    [class.btn-revoke]="confirmationAction === 'revoke'" (click)="confirmToggle()">
+                    {{ confirmationAction === 'promote' ? 'Sí, Hacer Miembro' : 'Sí, Revocar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #loader>
+        <div class="loader-container">
+            <div class="spinner"></div>
+            <p>Cargando usuarios...</p>
+        </div>
+    </ng-template>
+</div>

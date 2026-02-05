@@ -1,6 +1,6 @@
 /* Hero Section */
 .hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/Images/Agility_Asturias_logo.jpg');
+    /* background image set in component */
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

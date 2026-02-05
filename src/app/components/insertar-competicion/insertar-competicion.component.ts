@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
     selector: 'app-insertar-competicion',
@@ -10,6 +11,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
     styleUrl: './insertar-competicion.component.css'
 })
 export class InsertarCompeticionComponent {
+    private toastService = inject(ToastService);
     competitionForm: FormGroup;
     submitted = false;
 
@@ -44,7 +46,7 @@ export class InsertarCompeticionComponent {
 
         // Here you would typically call a service to save the data
         console.log('Competición enviada:', this.competitionForm.value);
-        alert('¡Competición añadida con éxito! (Simulación)');
+        this.toastService.success('¡Competición añadida con éxito! (Simulación)');
         this.submitted = false;
         this.competitionForm.reset();
     }

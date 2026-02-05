@@ -11,12 +11,12 @@
     <nav>
         <ul [class.active]="isMenuOpen">
             <li><a routerLink="/" (click)="closeMenu()">Home</a></li>
-            <li *ngIf="authService.currentUserSignal()"><a routerLink="/reservas" (click)="closeMenu()">Reservas</a>
+            <li *ngIf="authService.isMember()"><a routerLink="/reservas" (click)="closeMenu()">Reservas</a>
             </li>
             <li><a routerLink="/galeria" (click)="closeMenu()">Galería</a></li>
-            <li *ngIf="authService.currentUserSignal()"><a routerLink="/calendario" (click)="closeMenu()">Calendario</a>
+            <li *ngIf="authService.isMember()"><a routerLink="/calendario" (click)="closeMenu()">Calendario</a>
             </li>
-            <li *ngIf="authService.currentUserSignal()"><a routerLink="/gestionar-competiciones"
+            <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones"
                     (click)="closeMenu()">Competiciones</a></li>
             <li><a routerLink="/contacto" (click)="closeMenu()">Contacto</a></li>
 
@@ -48,7 +48,20 @@
                         </div>
                         <div class="dropdown-divider"></div>
                         <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item">🐶 Mis Perretes</a>
-                        <a routerLink="/reservas" (click)="closeMenu()" class="dropdown-item">📅 Mis Reservas</a>
+                        <a *ngIf="authService.isMember()" routerLink="/reservas" (click)="closeMenu()"
+                            class="dropdown-item">📅 Mis Reservas</a>
+
+                        <div class="dropdown-divider" *ngIf="authService.isStaff()"></div>
+                        <a *ngIf="authService.isStaff()" routerLink="/gestionar-miembros" (click)="closeMenu()"
+                            class="dropdown-item staff-item">
+                            👥 Gestión de Miembros
+                        </a>
+
+                        <div class="dropdown-divider" *ngIf="authService.isAdmin()"></div>
+                        <a *ngIf="authService.isAdmin()" routerLink="/admin/usuarios" (click)="closeMenu()"
+                            class="dropdown-item admin-item">
+                            🔧 Administrar Sistema
+                        </a>
                         <button (click)="logout()" class="dropdown-item logout-item">🚪 Cerrar Sesión</button>
                     </div>
 

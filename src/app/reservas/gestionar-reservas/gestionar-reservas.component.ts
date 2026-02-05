@@ -19,6 +19,8 @@ interface TimeSlot {
     date?: string; // Add date field
 }
 
+import { ToastService } from '../../services/toast.service';
+
 @Component({
     selector: 'app-gestionar-reservas',
     standalone: true,
@@ -30,6 +32,7 @@ export class GestionarReservasComponent {
     authService = inject(AuthService);
     reservationService = inject(ReservationService);
     dogService = inject(DogService);
+    toastService = inject(ToastService);
 
     // Modal state
     isModalOpen = false;
@@ -106,7 +109,14 @@ export class GestionarReservasComponent {
         const weekOffset = week === 'current' ? 0 : 1;
         const weekDates = this.getDatesForWeek(weekOffset);
 
-        return this.staticSlots.map(slot => {
+        // Calculate today string for comparison
+        const now = new Date();
+        const yyyy = now.getFullYear();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const dd = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${yyyy}-${mm}-${dd}`;
+
+        const mappedSlots = this.staticSlots.map(slot => {
             const slotDate = weekDates[slot.day];
 
             // Filter reservations for this specific slot AND date
@@ -135,6 +145,9 @@ export class GestionarReservasComponent {
                 reservations: slotReservations
             } as TimeSlot & { date: string };
         });
+
+        // Filter out slots from past days
+        return mappedSlots.filter(s => s.date >= todayStr);
     });
 
     groupedSlots = computed(() => {
@@ -243,23 +256,24 @@ export class GestionarReservasComponent {
     bookSlot(slot: TimeSlot) {
         const user = this.authService.currentUserSignal();
         if (!user) {
-            alert('Debes iniciar sesión para reservar.');
+            this.toastService.warning('Debes iniciar sesión para reservar.');
             return;
         }
 
         if (slot.currentBookings >= slot.maxBookings) {
-            alert('Esta clase está completa.');
+            this.toastService.error('Esta clase está completa.');
             return;
         }
 
         if (slot.isBookedByCurrentUser) {
-            alert('Ya tienes una reserva en este horario.');
+            this.toastService.info('Ya tienes una reserva en este horario.');
             return;
         }
 
         // Open modal
         this.selectedSlotForBooking = slot;
         this.selectedDogIds.clear(); // Reset selection
+        this.isSubmitting.set(false); // Reset submission state
         this.isModalOpen = true;
     }
 
@@ -295,7 +309,7 @@ export class GestionarReservasComponent {
 
         // Validation: At least one dog
         if (this.selectedDogIds.size === 0) {
-            alert('Por favor, selecciona al menos un perro.');
+            this.toastService.warning('Por favor, selecciona al menos un perro.');
             return;
         }
 
@@ -307,7 +321,8 @@ export class GestionarReservasComponent {
         if (currentSlotState) {
             const dogsCount = this.selectedDogIds.size;
             if (currentSlotState.currentBookings + dogsCount > currentSlotState.maxBookings) {
-                alert(`No hay suficientes plazas. Intentas reservar para ${dogsCount} perro(s) pero solo quedan ${currentSlotState.maxBookings - currentSlotState.currentBookings} plazas.`);
+                const available = currentSlotState.maxBookings - currentSlotState.currentBookings;
+                this.toastService.error(`No hay suficientes plazas. Intentas reservar para ${dogsCount} perro(s) pero solo quedan ${available} plazas.`);
                 return;
             }
         }
@@ -329,10 +344,10 @@ export class GestionarReservasComponent {
                 createdAt: Date.now()
             });
             this.closeModal();
-            // alert('¡Reserva confirmada con éxito!'); 
+            this.toastService.success('¡Reserva confirmada con éxito!');
         } catch (error) {
             console.error('Error al reservar:', error);
-            alert('Hubo un error al realizar la reserva.');
+            this.toastService.error('Hubo un error al realizar la reserva.');
             this.isSubmitting.set(false);
         }
     }
@@ -343,9 +358,10 @@ export class GestionarReservasComponent {
         if (confirm('¿Quieres cancelar tu reserva para esta clase?')) {
             try {
                 await this.reservationService.deleteReservation(slot.userReservationId);
+                this.toastService.success('Reserva cancelada correctamente.');
             } catch (error) {
                 console.error(error);
-                alert('Error al cancelar.');
+                this.toastService.error('Error al cancelar.');
             }
         }
     }

@@ -1,8 +1,10 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CompetitionService } from '../../services/competition.service';
 import { Competition } from '../../models/competition.model';
+
+import { ToastService } from '../../services/toast.service';
 
 @Component({
     selector: 'app-crud-competicion',
@@ -12,6 +14,7 @@ import { Competition } from '../../models/competition.model';
     styleUrl: './crud-competicion.component.css'
 })
 export class CrudCompeticionComponent {
+    private toastService = inject(ToastService);
     competitions: any; // Initialized in constructor to avoid "used before initialization" error
 
     // View state
@@ -21,6 +24,10 @@ export class CrudCompeticionComponent {
     competitionForm: FormGroup;
     submitted = false;
     currentCompetitionId: string | null = null;
+
+    // Delete Modal State
+    showDeleteModal = signal(false);
+    competitionToDeleteId: string | null = null;
 
     constructor(
         private fb: FormBuilder,
@@ -73,30 +80,97 @@ export class CrudCompeticionComponent {
     }
 
     deleteCompetition(id: string) {
-        if (confirm('¿Estás seguro de que quieres eliminar esta competición?')) {
-            this.competitionService.deleteCompetition(id);
+        this.competitionToDeleteId = id;
+        this.showDeleteModal.set(true);
+    }
+
+    confirmDelete() {
+        if (this.competitionToDeleteId) {
+            this.competitionService.deleteCompetition(this.competitionToDeleteId)
+                .then(() => {
+                    this.toastService.success('Competición eliminada correctamente');
+                    this.cancelDelete();
+                })
+                .catch(error => {
+                    console.error(error);
+                    this.toastService.error('Error al eliminar la competición');
+                    this.cancelDelete();
+                });
         }
     }
 
-    onFileSelected(event: any) {
+    cancelDelete() {
+        this.showDeleteModal.set(false);
+        this.competitionToDeleteId = null;
+    }
+
+    async onFileSelected(event: any) {
         const file = event.target.files[0];
         if (file) {
-            if (file.size > 500000) { // 500KB limit
-                alert('La imagen es demasiado grande. Por favor sube una imagen menor de 500KB.');
-                // clear the input?
-                event.target.value = '';
-                return;
-            }
+            try {
+                const compressedImage = await this.compressImage(file);
 
-            const reader = new FileReader();
-            reader.onload = () => {
-                // Store the base64 string in the form control
+                // Firestore document limit is 1MB. We leave some buffer.
+                // Base64 string length is approximately the size in bytes.
+                if (compressedImage.length > 800 * 1024) {
+                    this.toastService.warning('La imagen sigue siendo demasiado pesada incluso despues de comprimir. Por favor, elige otra.');
+                    return;
+                }
+
                 this.competitionForm.patchValue({
-                    cartel: reader.result
+                    cartel: compressedImage
                 });
-            };
-            reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Error handling image:', error);
+                this.toastService.error('Hubo un error al procesar la imagen.');
+            }
         }
+    }
+
+    compressImage(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event: any) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    if (ctx) {
+                        ctx.drawImage(img, 0, 0, width, height);
+                        // Compress to JPEG with 0.7 quality
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        resolve(dataUrl);
+                    } else {
+                        reject(new Error('Could not get canvas context'));
+                    }
+                };
+                img.onerror = (error) => reject(error);
+            };
+            reader.onerror = (error) => reject(error);
+        });
     }
 
     // Kept for compatibility if template uses onFileChange
@@ -127,10 +201,10 @@ export class CrudCompeticionComponent {
                 id: this.currentCompetitionId,
                 ...competitionData
             });
-            alert('Competición actualizada');
+            this.toastService.success('Competición actualizada');
         } else {
             await this.competitionService.addCompetition(competitionData);
-            alert('Competición creada');
+            this.toastService.success('Competición creada');
         }
 
         this.toggleView();
