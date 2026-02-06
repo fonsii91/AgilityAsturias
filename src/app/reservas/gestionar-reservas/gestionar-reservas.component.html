@@ -82,12 +82,13 @@
 <!-- Booking Modal -->
 <div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-        <h3>Confirmar Reserva</h3>
-        <p>¿Qué día? <strong>{{ selectedSlotForBooking?.day }}</strong> a las <strong>{{
-                selectedSlotForBooking?.startTime }}</strong></p>
+        <h3>📅 Confirmar Reserva</h3>
+
+        <p>¿Quieres reservar plaza para el <strong>{{ selectedSlotForBooking?.day }}</strong> a las <strong>{{
+                selectedSlotForBooking?.startTime }}</strong>?</p>
 
         <div class="dog-selection">
-            <p>Selecciona los perretes que vendrán:</p>
+            <p style="margin: 0 0 1rem 0; font-weight: 600; color: #555;">Selecciona los perretes que vendrán:</p>
 
             <div *ngIf="myDogs().length === 0" class="no-dogs-warning">
                 <p>⚠️ No tienes perros registrados.</p>
@@ -98,8 +99,7 @@
                 <label *ngFor="let dog of myDogs()" class="dog-checkbox">
                     <input type="checkbox" [checked]="selectedDogIds.has(dog.name)"
                         (change)="toggleDogSelection(dog.name)">
-                    <span class="checkmark"></span>
-                    <span class="dog-label">{{ dog.name }}</span>
+                    <span class="dog-label">🐾 {{ dog.name }}</span>
                 </label>
             </div>
         </div>
@@ -108,7 +108,7 @@
             <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
             <button class="btn-confirm" (click)="confirmBooking()"
                 [disabled]="(myDogs().length > 0 && selectedDogIds.size === 0) || isSubmitting()">
-                {{ isSubmitting() ? 'Reservando...' : 'Confirmar' }}
+                {{ isSubmitting() ? 'Reservando...' : 'Confirmar Reserva' }}
             </button>
         </div>
     </div>

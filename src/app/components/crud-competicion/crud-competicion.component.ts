@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CompetitionService } from '../../services/competition.service';
@@ -15,7 +15,7 @@ import { ToastService } from '../../services/toast.service';
 })
 export class CrudCompeticionComponent {
     private toastService = inject(ToastService);
-    competitions: any; // Initialized in constructor to avoid "used before initialization" error
+    competitions: any;
 
     // View state
     isEditing = signal(false);
@@ -33,11 +33,19 @@ export class CrudCompeticionComponent {
         private fb: FormBuilder,
         private competitionService: CompetitionService
     ) {
-        this.competitions = this.competitionService.getCompetitions();
+        // Create a computed signal to sort competitions by date
+        const rawCompetitions = this.competitionService.getCompetitions();
+        this.competitions = computed(() => {
+            return [...rawCompetitions()].sort((a, b) => {
+                return new Date(a.fechaEvento).getTime() - new Date(b.fechaEvento).getTime();
+            });
+        });
+
         this.competitionForm = this.fb.group({
             nombre: ['', Validators.required],
             lugar: [''],
             fechaEvento: ['', Validators.required],
+            fechaFinEvento: [''], // Optional end date
             fechaLimite: [''],
             formaPago: [''],
             enlace: ['', [Validators.pattern('https?://.+')]],
@@ -72,6 +80,7 @@ export class CrudCompeticionComponent {
             nombre: comp.nombre || '', // Handle missing name in old records
             lugar: comp.lugar,
             fechaEvento: comp.fechaEvento,
+            fechaFinEvento: comp.fechaFinEvento || '',
             fechaLimite: comp.fechaLimite,
             formaPago: comp.formaPago,
             enlace: comp.enlace,

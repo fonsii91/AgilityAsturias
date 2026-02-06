@@ -29,7 +29,12 @@
                             <div *ngIf="comp.nombre && comp.lugar"
                                 style="font-size: 0.85em; color: #666; font-weight: normal;">{{ comp.lugar }}</div>
                         </td>
-                        <td>{{ comp.fechaEvento | date:'dd/MM/yyyy' }}</td>
+                        <td>
+                            {{ comp.fechaEvento | date:'dd/MM/yyyy' }}
+                            <span *ngIf="comp.fechaFinEvento && comp.fechaFinEvento !== comp.fechaEvento">
+                                - {{ comp.fechaFinEvento | date:'dd/MM/yyyy' }}
+                            </span>
+                        </td>
                         <td>{{ comp.fechaLimite | date:'dd/MM/yyyy' }}</td>
                         <td class="actions">
                             <button class="btn-icon edit" (click)="editCompetition(comp)" title="Editar">
@@ -82,13 +87,21 @@
 
             <div class="form-row">
                 <div class="form-group col">
-                    <label for="fechaEvento">Fecha Evento</label>
+                    <label for="fechaEvento">Fecha Inicio</label>
                     <input type="date" id="fechaEvento" formControlName="fechaEvento" class="form-control"
                         [ngClass]="{ 'is-invalid': submitted && f['fechaEvento'].errors }">
                     <div *ngIf="submitted && f['fechaEvento'].errors" class="invalid-feedback">
-                        La fecha del evento es requerida.
+                        La fecha de inicio es requerida.
                     </div>
                 </div>
+                <div class="form-group col">
+                    <label for="fechaFinEvento">Fecha Fin</label>
+                    <input type="date" id="fechaFinEvento" formControlName="fechaFinEvento" class="form-control"
+                        placeholder="Opcional">
+                </div>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group col">
                     <label for="fechaLimite">Fecha Límite de Inscripción</label>
                     <input type="date" id="fechaLimite" formControlName="fechaLimite" class="form-control">
@@ -121,7 +134,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-success">
-                    {{ isEditing() ? 'Guardar Cambios' : 'Crear Competición' }}
+                    {{ isEditing() ? 'Guardar Cambios' : 'Crear Evento' }}
                 </button>
                 <button type="button" class="btn btn-cancel" (click)="toggleView()">
                     Cancelar
@@ -137,10 +150,8 @@
         <h3>Eliminar Competición</h3>
         <p>¿Estás seguro de que deseas eliminar esta competición? Esta acción no se puede deshacer.</p>
         <div class="modal-actions">
-            <button class="btn btn-secondary" (click)="cancelDelete()">Cancelar</button>
-            <button class="btn btn-icon delete"
-                style="background:#f8d7da; color:#721c24; border-color:#f5c6cb; padding: 0.75rem 1.5rem;"
-                (click)="confirmDelete()">Eliminar</button>
+            <button class="btn-cancel-modal" (click)="cancelDelete()">Cancelar</button>
+            <button class="btn-delete-confirm" (click)="confirmDelete()">Eliminar</button>
         </div>
     </div>
 </div>

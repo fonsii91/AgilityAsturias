@@ -2,6 +2,7 @@ export interface Competition {
     id: string;
     lugar: string;
     fechaEvento: string;
+    fechaFinEvento?: string; // Optional for multi-day events
     fechaLimite: string;
     formaPago: string;
     cartel: string | null;

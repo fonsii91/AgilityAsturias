@@ -1,7 +1,18 @@
 /* Main Container */
+:host {
+    display: block;
+    min-height: 100vh;
+    padding-top: 80px;
+    /* Ensure space for navbar */
+    padding-bottom: 3rem;
+    /* Extra space at bottom for scrolling on mobile */
+    background-color: var(--background-color, #f5f9fc);
+}
+
 .crud-container {
     max-width: 1000px;
-    margin: 2rem auto;
+    margin: 0 auto;
+    /* Margin handled by host padding */
     padding: 2.5rem;
     background: #ffffff;
     border-radius: 12px;
@@ -282,8 +293,13 @@ textarea.form-control {
 /* Responsive */
 @media (max-width: 768px) {
     .crud-container {
-        padding: 1.5rem;
-        margin: 1rem;
+        padding: 1rem;
+        margin: 0 1rem;
+        width: auto;
+    }
+
+    .form-view {
+        padding: 1rem;
     }
 
     .form-row {
@@ -331,27 +347,58 @@ textarea.form-control {
     animation: fadeIn 0.2s ease-out;
 }
 
+/* Delete Modal Enhanced */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
 .modal-content {
     background: white;
-    padding: 2rem;
-    border-radius: 12px;
+    padding: 2.5rem 2rem;
+    border-radius: 16px;
     width: 90%;
-    max-width: 400px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 420px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
     text-align: center;
     position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: none;
+    animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-content h3 {
-    color: #dc3545;
+    color: #e63946;
     margin-top: 0;
+    font-size: 1.6rem;
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-content h3::before {
+    content: '🗑️';
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    display: block;
 }
 
 .modal-content p {
-    color: #495057;
+    color: #555;
     margin-bottom: 2rem;
-    line-height: 1.5;
+    line-height: 1.6;
+    font-size: 1rem;
 }
 
 .modal-actions {
@@ -361,7 +408,57 @@ textarea.form-control {
 }
 
 .modal-actions button {
-    min-width: 100px;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-width: 120px;
+}
+
+.btn-cancel-modal {
+    background-color: #f1f3f5;
+    color: #495057;
+}
+
+.btn-cancel-modal:hover {
+    background-color: #e9ecef;
+}
+
+.btn-delete-confirm {
+    background-color: #e63946;
+    color: white;
+    box-shadow: 0 4px 10px rgba(230, 57, 70, 0.3);
+}
+
+.btn-delete-confirm:hover {
+    background-color: #d62828;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(230, 57, 70, 0.4);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Event Type Indicators in Table */

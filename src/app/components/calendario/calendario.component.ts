@@ -9,7 +9,9 @@ interface CalendarDay {
     isWeekend: boolean;
     isOtherMonth: boolean;
     isToday: boolean;
-    competitionDetails?: any;
+    deadlines: any[];
+    competitions: any[]; // List of all competitions on this day
+    competitionDetails?: any; // Primary/First competition for backward compat
 }
 
 @Component({
@@ -50,10 +52,37 @@ export class CalendarioComponent {
 
     // Modal state
     selectedCompetition: any = null;
+    selectedCompetitions: any[] = []; // List to show in modal if multiple
+    selectedDeadlines: any[] = [];
     isModalOpen = false;
 
     constructor(private competitionService: CompetitionService) {
         this.competitions = this.competitionService.getCompetitions();
+    }
+
+    openModal(day: CalendarDay) {
+        this.selectedCompetitions = day.competitions || [];
+        this.selectedDeadlines = day.deadlines || [];
+
+        if (this.selectedCompetitions.length === 1) {
+            this.selectedCompetition = this.selectedCompetitions[0];
+        } else {
+            this.selectedCompetition = null; // Show list if multiple or none
+        }
+
+        // Only open if there is something to show
+        if (this.selectedCompetitions.length > 0 || this.selectedDeadlines.length > 0) {
+            this.isModalOpen = true;
+            document.body.style.overflow = 'hidden';
+        }
+    }
+
+    selectCompetitionFromList(comp: any) {
+        this.selectedCompetition = comp;
+    }
+
+    backToList() {
+        this.selectedCompetition = null;
     }
 
     getDaysInMonth(monthIndex: number, year: number, competitions: any[]): CalendarDay[] {
@@ -70,7 +99,9 @@ export class CalendarioComponent {
                 isOtherEvent: false,
                 isWeekend: false,
                 isOtherMonth: true,
-                isToday: false
+                isToday: false,
+                deadlines: [],
+                competitions: []
             });
         }
 
@@ -84,16 +115,24 @@ export class CalendarioComponent {
             const day = date.getDate().toString().padStart(2, '0');
             const dateString = `${year}-${month}-${day}`;
 
-            const competition = competitions.find((c: any) => c.fechaEvento === dateString);
+            // Find ALL competitions for this day
+            const dailyCompetitions = competitions.filter((c: any) => {
+                const start = c.fechaEvento;
+                const end = c.fechaFinEvento || c.fechaEvento; // Fallback to single day
+                return dateString >= start && dateString <= end;
+            });
 
-            // Check type. Default to 'competicion' if undefined for backward compatibility
-            const type = competition?.tipo || 'competicion';
-            const isCompetition = !!competition && type === 'competicion';
-            const isOtherEvent = !!competition && type === 'otros';
+            // Determine indicators
+            // Default type is 'competicion'
+            const isCompetition = dailyCompetitions.some((c: any) => !c.tipo || c.tipo === 'competicion');
+            const isOtherEvent = dailyCompetitions.some((c: any) => c.tipo === 'otros');
 
             const isToday = date.getDate() === today.getDate() &&
                 date.getMonth() === today.getMonth() &&
                 date.getFullYear() === today.getFullYear();
+
+            // Check if this day is a registration deadline for any event(s)
+            const deadlines = competitions.filter((c: any) => c.fechaLimite === dateString);
 
             days.push({
                 date: new Date(date),
@@ -102,7 +141,9 @@ export class CalendarioComponent {
                 isWeekend: isWeekend,
                 isOtherMonth: false,
                 isToday: isToday,
-                competitionDetails: competition
+                deadlines: deadlines,
+                competitions: dailyCompetitions,
+                competitionDetails: dailyCompetitions[0] // Fallback
             });
             date.setDate(date.getDate() + 1);
         }
@@ -110,17 +151,10 @@ export class CalendarioComponent {
         return days;
     }
 
-    openModal(competition: any) {
-        if (competition) {
-            this.selectedCompetition = competition;
-            this.isModalOpen = true;
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
     closeModal() {
         this.isModalOpen = false;
         this.selectedCompetition = null;
+        this.selectedCompetitions = [];
         this.isImageExpanded = false; // Reset expansion
         document.body.style.overflow = 'auto';
     }

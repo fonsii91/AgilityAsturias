@@ -36,19 +36,51 @@
                 <div *ngFor="let day of month.days" class="day" [class.other-month]="day.isOtherMonth"
                     [class.weekend]="day.isWeekend" [class.competition]="day.isCompetition"
                     [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
-                    (click)="(day.isCompetition || day.isOtherEvent) && openModal(day.competitionDetails)">
+                    (click)="(day.competitions.length > 0 || day.deadlines.length > 0) && openModal(day)">
                     <span *ngIf="!day.isOtherMonth">{{ day.date | date:'d' }}</span>
+
+                    <!-- Deadline Indicator with Tooltip -->
+                    <div *ngIf="day.deadlines.length > 0 && !day.isOtherMonth" class="deadline-dot">
+                        <div class="deadline-tooltip">
+                            <div *ngFor="let dl of day.deadlines">
+                                ⚠️ Cierre: {{ dl.nombre || dl.lugar }}
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Competition Details Modal -->
+    <!-- Details Modal -->
     <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
         <div class="modal-content glass-effect" (click)="$event.stopPropagation()">
             <button class="close-btn" (click)="closeModal()">&times;</button>
 
+            <!-- List of Competitions (if multiple) -->
+            <div *ngIf="!selectedCompetition && selectedCompetitions.length > 0" class="competition-list-view">
+                <h3>📅 Eventos del Día</h3>
+                <div class="events-list">
+                    <div *ngFor="let comp of selectedCompetitions" class="event-card-preview"
+                        (click)="selectCompetitionFromList(comp)"
+                        [style.border-left]="comp.tipo === 'otros' ? '4px solid var(--other-bg)' : '4px solid var(--accent-color)'">
+                        <div class="event-preview-header">
+                            <span class="event-name">{{ comp.nombre || comp.lugar }}</span>
+                            <span class="event-type-badge" [class.type-other]="comp.tipo === 'otros'">
+                                {{ comp.tipo === 'otros' ? 'Otro' : 'Competición' }}
+                            </span>
+                        </div>
+                        <div class="event-preview-location">📍 {{ comp.lugar }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competition Details -->
             <div *ngIf="selectedCompetition" class="competition-details">
+                <button *ngIf="selectedCompetitions.length > 1" class="back-btn" (click)="backToList()">
+                    &larr; Volver al listado
+                </button>
+
                 <div class="modal-header">
                     <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
                     <p *ngIf="selectedCompetition.nombre && selectedCompetition.lugar"
@@ -59,16 +91,20 @@
                         [style.background]="selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)'"
                         [style.color]="selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)'">
                         {{ selectedCompetition.fechaEvento | date:'d MMM' }}
+                        <span
+                            *ngIf="selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !== selectedCompetition.fechaEvento">
+                            - {{ selectedCompetition.fechaFinEvento | date:'d MMM' }}
+                        </span>
                     </div>
                 </div>
 
                 <div class="modal-body">
-                    <div class="info-grid">
-                        <div class="info-item">
+                    <div class="info-grid" *ngIf="selectedCompetition.fechaLimite || selectedCompetition.formaPago">
+                        <div class="info-item" *ngIf="selectedCompetition.fechaLimite">
                             <span class="label">Cierre Inscripción</span>
                             <span class="value">{{ selectedCompetition.fechaLimite | date:'shortDate' }}</span>
                         </div>
-                        <div class="info-item full-width">
+                        <div class="info-item full-width" *ngIf="selectedCompetition.formaPago">
                             <span class="label">Forma de Pago</span>
                             <div class="payment-info">{{ selectedCompetition.formaPago }}</div>
                         </div>
@@ -81,10 +117,26 @@
                     </div>
                 </div>
 
-                <div class="modal-actions">
+                <div class="modal-actions" *ngIf="selectedCompetition.enlace">
                     <a [href]="selectedCompetition.enlace" target="_blank" class="btn-register">
                         Inscribirse Ahora
                     </a>
+                </div>
+            </div>
+
+            <!-- Deadlines Section -->
+            <div class="deadlines-section" *ngIf="selectedDeadlines.length > 0 && !selectedCompetition">
+                <div class="deadlines-title">
+                    ⚠️ Fin de Plazo de Inscripción
+                </div>
+                <div class="deadlines-list-item" *ngFor="let dl of selectedDeadlines">
+                    <div class="deadline-info">
+                        {{ dl.fechaLimite | date:'dd/MM/yyyy' }}: Último día para <strong>{{ dl.nombre || dl.lugar
+                            }}</strong>
+                    </div>
+                    <button class="view-event-btn" (click)="selectCompetitionFromList(dl)">
+                        Ver Evento
+                    </button>
                 </div>
             </div>
         </div>
