@@ -11,9 +11,9 @@
             <thead>
                 <tr>
                     <th>Usuario</th>
+                    <th>Acciones</th>
                     <th>Email</th>
                     <th>Rol Actual</th>
-                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,10 +23,6 @@
                             referrerpolicy="no-referrer">
                         <span>{{ user.displayName }}</span>
                     </td>
-                    <td>{{ user.email }}</td>
-                    <td>
-                        <span class="badge" [class]="user.role">{{ user.role }}</span>
-                    </td>
                     <td>
                         <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
                             class="role-select">
@@ -35,6 +31,10 @@
                             <option value="staff">Staff</option>
                             <option value="admin">Admin</option>
                         </select>
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        <span class="badge" [class]="user.role">{{ user.role }}</span>
                     </td>
                 </tr>
             </tbody>

@@ -1,30 +1,72 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './auth/login/login.component';
 import { HomeComponent } from './components/home/home.component';
-import { GestionarReservasComponent } from './reservas/gestionar-reservas/gestionar-reservas.component';
-import { ContactoComponent } from './components/contacto/contacto.component';
-import { GaleriaComponent } from './components/galeria/galeria.component';
-import { CalendarioComponent } from './components/calendario/calendario.component';
-import { CrudCompeticionComponent } from './components/crud-competicion/crud-competicion.component';
-import { Perfil } from './components/perfil/perfil';
 import { authGuard } from './guards/auth.guard';
 import { staffGuard } from './guards/staff.guard';
 import { adminGuard } from './guards/admin.guard';
 import { memberGuard } from './guards/member.guard';
-import { AdminUsuariosComponent } from './components/admin-usuarios/admin-usuarios';
-import { GestionarMiembrosComponent } from './components/gestionar-miembros/gestionar-miembros';
-import { InfoReservasComponent } from './components/info-reservas/info-reservas.component';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent },
-    { path: 'reservas', component: GestionarReservasComponent, canActivate: [memberGuard] },
-    { path: 'contacto', component: ContactoComponent },
-    { path: 'galeria', component: GaleriaComponent },
-    { path: 'calendario', component: CalendarioComponent, canActivate: [memberGuard] },
-    { path: 'gestionar-competiciones', component: CrudCompeticionComponent, canActivate: [staffGuard] },
-    { path: 'gestionar-miembros', component: GestionarMiembrosComponent, canActivate: [staffGuard] },
-    { path: 'info-reservas', component: InfoReservasComponent, canActivate: [staffGuard] },
-    { path: 'perfil', component: Perfil, canActivate: [authGuard] },
-    { path: 'admin/usuarios', component: AdminUsuariosComponent, canActivate: [adminGuard] },
-    { path: 'login', component: LoginComponent }
+    {
+        path: '',
+        component: HomeComponent,
+        title: 'Inicio | Agility Asturias'
+    },
+    {
+        path: 'reservas',
+        loadComponent: () => import('./reservas/gestionar-reservas/gestionar-reservas.component').then(m => m.GestionarReservasComponent),
+        canActivate: [memberGuard],
+        title: 'Reservas | Agility Asturias'
+    },
+    {
+        path: 'contacto',
+        loadComponent: () => import('./components/contacto/contacto.component').then(m => m.ContactoComponent),
+        title: 'Contacto | Agility Asturias'
+    },
+    {
+        path: 'galeria',
+        loadComponent: () => import('./components/galeria/galeria.component').then(m => m.GaleriaComponent),
+        title: 'Galería | Agility Asturias'
+    },
+    {
+        path: 'calendario',
+        loadComponent: () => import('./components/calendario/calendario.component').then(m => m.CalendarioComponent),
+        canActivate: [memberGuard],
+        title: 'Calendario | Agility Asturias'
+    },
+    {
+        path: 'gestionar-competiciones',
+        loadComponent: () => import('./components/crud-competicion/crud-competicion.component').then(m => m.CrudCompeticionComponent),
+        canActivate: [staffGuard],
+        title: 'Gestión Competiciones | Agility Asturias'
+    },
+    {
+        path: 'gestionar-miembros',
+        loadComponent: () => import('./components/gestionar-miembros/gestionar-miembros').then(m => m.GestionarMiembrosComponent),
+        canActivate: [staffGuard],
+        title: 'Gestión Miembros | Agility Asturias'
+    },
+    {
+        path: 'info-reservas',
+        loadComponent: () => import('./components/info-reservas/info-reservas.component').then(m => m.InfoReservasComponent),
+        canActivate: [staffGuard],
+        title: 'Info Reservas | Agility Asturias'
+    },
+    {
+        path: 'perfil',
+        loadComponent: () => import('./components/perfil/perfil').then(m => m.Perfil),
+        canActivate: [authGuard],
+        title: 'Mi Perfil | Agility Asturias'
+    },
+    {
+        path: 'admin/usuarios',
+        loadComponent: () => import('./components/admin-usuarios/admin-usuarios').then(m => m.AdminUsuariosComponent),
+        canActivate: [adminGuard],
+        title: 'Admin Usuarios | Agility Asturias'
+    },
+    {
+        path: 'login',
+        component: LoginComponent,
+        title: 'Iniciar Sesión | Agility Asturias'
+    }
 ];

@@ -1,5 +1,7 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners, isDevMode, LOCALE_ID } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { errorInterceptor } from './core/interceptors/error-interceptor';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { SocialAuthServiceConfig, GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { provideServiceWorker } from '@angular/service-worker';
@@ -24,6 +26,7 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideAnimations(),
     provideRouter(routes),
+    provideHttpClient(withInterceptors([errorInterceptor])),
     { provide: LOCALE_ID, useValue: 'es' },
     // We keep these for other AngularFire features if needed, but the main app is already init.
     provideFirebaseApp(() => initializeApp(environment.firebase)),
