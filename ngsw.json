@@ -1,6 +1,6 @@
 {
   "configVersion": 1,
-  "timestamp": 1770306705560,
+  "timestamp": 1770394757547,
   "index": "/AgilityAsturias/index.html",
   "assetGroups": [
     {
@@ -11,9 +11,11 @@
         "ignoreVary": true
       },
       "urls": [
+        "/AgilityAsturias/chunk-2NGJIF3X.js",
+        "/AgilityAsturias/chunk-3FBQDIHY.js",
         "/AgilityAsturias/favicon.ico",
         "/AgilityAsturias/index.html",
-        "/AgilityAsturias/main-CIDNDNVX.js",
+        "/AgilityAsturias/main-TNG3OFV4.js",
         "/AgilityAsturias/manifest.webmanifest",
         "/AgilityAsturias/styles-MADIGNQW.css"
       ],
@@ -91,6 +93,8 @@
     "/AgilityAsturias/Images/Perros/Raylee.jpeg": "7b173b53be6dc8f790b10a06f0ebc457c397b951",
     "/AgilityAsturias/Images/Perros/Sami H.jpeg": "7a65f2e59f09976a423e06a15527fe0830490ab2",
     "/AgilityAsturias/Images/Perros/Sami.jpeg": "b6b274de4cbd92be13623083a3a649f06c3ec08e",
+    "/AgilityAsturias/chunk-2NGJIF3X.js": "cad847e043b39e4f0a289506be2daa2b912bfdb1",
+    "/AgilityAsturias/chunk-3FBQDIHY.js": "00b12c673dc7253ff8a83849bc989c57536a9613",
     "/AgilityAsturias/favicon.ico": "9c39f434fe1261f68c5e3eefdf734630d99c5670",
     "/AgilityAsturias/icons/icon-128x128.png": "f912963bdc6d5a38d8f1dd0afbaab2ce8d657acb",
     "/AgilityAsturias/icons/icon-144x144.png": "b155fd5f2fd5d2ea7760721063003c4cd95fd783",
@@ -100,8 +104,8 @@
     "/AgilityAsturias/icons/icon-512x512.png": "1de182f76f7329dfa8f9fcdd1fdcdd695bea6a99",
     "/AgilityAsturias/icons/icon-72x72.png": "aa88a6096bd973be7f6d7a5489bfa6bc2463f8c4",
     "/AgilityAsturias/icons/icon-96x96.png": "7fb8f59c30ce2ff12c700321a0b39e14b3dc8f95",
-    "/AgilityAsturias/index.html": "3212e5c34ec36c8007e8592a4af79f4157551faa",
-    "/AgilityAsturias/main-CIDNDNVX.js": "fc6bf1bebfab316f77d179cc550a64e7c59ccc2a",
+    "/AgilityAsturias/index.html": "04dc1e257fb0bdb4f4922c74135e86f1df1664de",
+    "/AgilityAsturias/main-TNG3OFV4.js": "b0e5c2dfed4561f885729fdde8854b1789ddcfb4",
     "/AgilityAsturias/manifest.webmanifest": "b9156f204b6adcc95cf18506ee0d5e2ec591fe8b",
     "/AgilityAsturias/styles-MADIGNQW.css": "49f90f66361f1bf3502af7c4539cffe1285092b4"
   },
