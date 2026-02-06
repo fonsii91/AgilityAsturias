@@ -7,7 +7,7 @@
     </div>
 
     <div class="info-banner">
-        <p>ℹ️ Aquí puedes gestionar quién tiene acceso como "Miembro" (y por tanto, al calendario y reservas).</p>
+        <p>ℹ️ Aquí puedes gestionar quién tiene acceso como "Miembro" (y por tanto, a las funciones de miembro).</p>
     </div>
 
     <div class="table-container glass-effect" *ngIf="!loading(); else loader">
@@ -27,7 +27,8 @@
             <tbody>
                 <tr *ngFor="let user of displayUsers()">
                     <td class="user-cell">
-                        <img [src]="user.photoURL || 'assets/default-avatar.png'" alt="Avatar" class="avatar">
+                        <img [src]="user.photoURL || 'assets/default-avatar.png'" alt="Avatar" class="avatar"
+                            referrerpolicy="no-referrer">
                         <span>{{ user.displayName }}</span>
                     </td>
                     <td>{{ user.email }}</td>
@@ -57,12 +58,12 @@
             <div class="modal-body">
                 <p *ngIf="confirmationAction === 'promote'">
                     ¿Estás seguro de que quieres hacer miembro a <strong>{{ selectedUser?.displayName }}</strong>?
-                    <br><span class="note">Esto le dará acceso a Reservas y Calendario.</span>
+                    <br><span class="note">Esto le dará acceso a las funciones de miembro.</span>
                 </p>
                 <p *ngIf="confirmationAction === 'revoke'">
                     ¿Estás seguro de que quieres quitarle la membresía a <strong>{{ selectedUser?.displayName
                         }}</strong>?
-                    <br><span class="note warning">Perderá el acceso a Reservas y Calendario.</span>
+                    <br><span class="note warning">Perderá el acceso a las funciones de miembro.</span>
                 </p>
             </div>
 

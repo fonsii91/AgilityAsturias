@@ -10,6 +10,7 @@
     --card-bg: #ffffff;
     --weekend-bg: #f8f9fa;
     --competition-bg: linear-gradient(135deg, #003366 0%, #00509e 100%);
+    --other-bg: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
     --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -202,6 +203,24 @@
     transform: scale(1.15);
     z-index: 2;
     box-shadow: 0 6px 12px rgba(0, 51, 102, 0.4);
+}
+
+.other-event {
+    background: var(--other-bg);
+    color: white;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(46, 125, 50, 0.3);
+}
+
+.other-event:hover {
+    transform: scale(1.15);
+    z-index: 2;
+    box-shadow: 0 6px 12px rgba(46, 125, 50, 0.4);
+}
+
+.other-dot {
+    background: var(--other-bg);
 }
 
 /* Modal Styles */

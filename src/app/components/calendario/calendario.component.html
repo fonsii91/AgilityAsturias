@@ -16,6 +16,10 @@
                 <span>Competición</span>
             </div>
             <div class="legend-item">
+                <span class="dot other-dot"></span>
+                <span>Otros Eventos</span>
+            </div>
+            <div class="legend-item">
                 <span class="dot today-dot"></span>
                 <span>Hoy</span>
             </div>
@@ -30,8 +34,9 @@
             </div>
             <div class="days-grid">
                 <div *ngFor="let day of month.days" class="day" [class.other-month]="day.isOtherMonth"
-                    [class.weekend]="day.isWeekend" [class.competition]="day.isCompetition" [class.today]="day.isToday"
-                    (click)="day.isCompetition && openModal(day.competitionDetails)">
+                    [class.weekend]="day.isWeekend" [class.competition]="day.isCompetition"
+                    [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
+                    (click)="(day.isCompetition || day.isOtherEvent) && openModal(day.competitionDetails)">
                     <span *ngIf="!day.isOtherMonth">{{ day.date | date:'d' }}</span>
                 </div>
             </div>
@@ -45,8 +50,14 @@
 
             <div *ngIf="selectedCompetition" class="competition-details">
                 <div class="modal-header">
-                    <h3>{{ selectedCompetition.lugar }}</h3>
-                    <div class="modal-date-badge">
+                    <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
+                    <p *ngIf="selectedCompetition.nombre && selectedCompetition.lugar"
+                        style="margin: 5px 0 10px 0; color: #555; font-size: 1rem; display: flex; align-items: center; gap: 5px;">
+                        📍 {{ selectedCompetition.lugar }}
+                    </p>
+                    <div class="modal-date-badge"
+                        [style.background]="selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)'"
+                        [style.color]="selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)'">
                         {{ selectedCompetition.fechaEvento | date:'d MMM' }}
                     </div>
                 </div>

@@ -145,26 +145,44 @@
 }
 
 .btn-icon {
-    padding: 0.4rem 0.8rem;
-    border: 1px solid #dee2e6;
-    background: white;
-    border-radius: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #f1f3f5;
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 0.85rem;
-    transition: all 0.2s;
+    font-size: 1.1rem;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
     color: #495057;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.btn-icon:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon.edit {
+    color: #003366;
+    background-color: #e3f2fd;
 }
 
 .btn-icon.edit:hover {
-    background: #fff3cd;
-    color: #856404;
-    border-color: #ffeeba;
+    background-color: #003366;
+    color: white;
+}
+
+.btn-icon.delete {
+    color: #d32f2f;
+    background-color: #ffebee;
 }
 
 .btn-icon.delete:hover {
-    background: #f8d7da;
-    color: #721c24;
-    border-color: #f5c6cb;
+    background-color: #d32f2f;
+    color: white;
 }
 
 /* Form Styles */
@@ -344,4 +362,15 @@ textarea.form-control {
 
 .modal-actions button {
     min-width: 100px;
+}
+
+/* Event Type Indicators in Table */
+.border-comp {
+    border-left: 5px solid #003366 !important;
+    padding-left: 15px !important;
+}
+
+.border-other {
+    border-left: 5px solid #2e7d32 !important;
+    padding-left: 15px !important;
 }

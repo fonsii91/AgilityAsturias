@@ -6,4 +6,6 @@ export interface Competition {
     formaPago: string;
     cartel: string | null;
     enlace: string;
+    tipo: 'competicion' | 'otros';
+    nombre?: string; // Optional for backward compatibility with existing records
 }

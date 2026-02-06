@@ -316,6 +316,9 @@ export class GestionarReservasComponent {
         const user = this.authService.currentUserSignal();
         if (!user) return;
 
+        const userProfile = this.authService.userProfileSignal();
+        if (!user || !userProfile) return;
+
         // Validation: Check capacity with latest state
         const currentSlotState = this.slots().find(s => s.id === this.selectedSlotForBooking!.id);
         if (currentSlotState) {
@@ -335,7 +338,7 @@ export class GestionarReservasComponent {
             await this.reservationService.addReservation({
                 slotId: this.selectedSlotForBooking.id,
                 userId: user.uid,
-                userName: user.displayName || 'Usuario',
+                userName: userProfile.displayName || 'Usuario',
                 userEmail: user.email || '',
                 day: this.selectedSlotForBooking.day,
                 startTime: this.selectedSlotForBooking.startTime,

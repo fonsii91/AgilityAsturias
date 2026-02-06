@@ -19,7 +19,8 @@
             <tbody>
                 <tr *ngFor="let user of users()">
                     <td class="user-cell">
-                        <img [src]="user.photoURL || 'assets/default-avatar.png'" alt="Avatar" class="avatar">
+                        <img [src]="user.photoURL || 'assets/default-avatar.png'" alt="Avatar" class="avatar"
+                            referrerpolicy="no-referrer">
                         <span>{{ user.displayName }}</span>
                     </td>
                     <td>{{ user.email }}</td>

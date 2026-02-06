@@ -32,11 +32,99 @@
     /* Prevent long names breaking layout */
 }
 
+/* Name Editing */
+.name-edit-container {
+    margin-bottom: 5px;
+}
+
+.name-display {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-icon-edit {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    padding: 5px;
+}
+
+.btn-icon-edit:hover {
+    opacity: 1;
+}
+
+.name-input-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-name-input {
+    padding: 6px 10px;
+    border: 1px solid var(--primary-blue);
+    border-radius: 6px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+    width: 200px;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-check,
+.btn-cancel-edit {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px;
+    transition: transform 0.1s;
+}
+
+.btn-check:hover,
+.btn-cancel-edit:hover {
+    transform: scale(1.2);
+}
+
 .profile-info p {
     margin: 5px 0 0;
     color: #666;
     word-break: break-all;
     /* Prevent long emails breaking layout */
+}
+
+.role-badge {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #eee;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.role-badge.admin {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.role-badge.staff {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.role-badge.member {
+    background-color: #e8f5e9;
+    color: #2e7d32;
 }
 
 /* Dogs Section */
@@ -165,6 +253,146 @@
     font-style: italic;
     background-color: #f9f9f9;
     border-radius: 8px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 450px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #333;
+    font-size: 1.4rem;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+.modal-body {
+    margin-bottom: 2rem;
+    color: #444;
+    line-height: 1.6;
+    font-size: 1.05rem;
+}
+
+.note {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-style: italic;
+    background-color: #fff1f2;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+.note.warning {
+    color: #d32f2f;
+    border-left: 4px solid #d32f2f;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btn-cancel {
+    background: #f0f0f0;
+    color: #666;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #e0e0e0;
+}
+
+.btn-confirm {
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-delete-action {
+    background: #dc3545;
+    /* Red for delete */
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+}
+
+.btn-delete-action:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(220, 53, 69, 0.4);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Mobile Responsive Breakpoint */

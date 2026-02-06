@@ -1,0 +1,292 @@
+.reservas-container {
+    max-width: 800px;
+    margin: 1rem auto;
+    padding: 1rem;
+    padding-bottom: 4rem;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.header h1 {
+    font-size: 1.8rem;
+    margin: 0;
+    color: var(--primary-blue);
+}
+
+.header p {
+    color: #666;
+    margin: 5px 0 0 0;
+}
+
+/* Dashboard Stats */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #eee;
+}
+
+.stat-card.blue {
+    border-bottom: 4px solid var(--primary-blue);
+}
+
+.stat-card.orange {
+    border-bottom: 4px solid var(--accent-orange);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.blue .stat-value {
+    color: var(--primary-blue);
+}
+
+.orange .stat-value {
+    color: var(--accent-orange);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Section Titles */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 1rem;
+}
+
+.section-title h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #333;
+}
+
+.date-badge {
+    background-color: #333;
+    color: white;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    text-transform: capitalize;
+}
+
+.future-title {
+    margin-top: 3rem;
+    opacity: 0.7;
+}
+
+/* Today Styles - Prominent */
+.today-list {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    /* More glow */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.today-card {
+    display: flex;
+    align-items: center;
+    padding: 1.2rem;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+}
+
+.today-card:hover {
+    background-color: #fcfcfc;
+}
+
+.time-slot-large {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 2rem;
+    /* Increased from 1.2rem */
+    min-width: 100px;
+    /* Increased from 80px */
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ... */
+
+.small-card .time {
+    color: #666;
+    font-weight: bold;
+    font-size: 0.95rem;
+    min-width: 80px;
+    /* Clarified width */
+    margin-right: 20px;
+    /* Added margin explicitly */
+    display: block;
+}
+
+.card-content {
+    flex: 1;
+}
+
+.user-main {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.user-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #222;
+}
+
+.dogs-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.dog-chip {
+    background-color: #fff4e6;
+    /* Light orange bg */
+    color: #d97706;
+    /* Darker orange text */
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Future Styles - Compact */
+.day-group {
+    background: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.date-header {
+    background-color: #f0f4f8;
+    /* Light gray-blue */
+    color: #444;
+    padding: 8px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.date-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    text-transform: capitalize;
+}
+
+.small-card {
+    display: flex;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+}
+
+.small-card:last-child {
+    border-bottom: none;
+}
+
+.small-card .time {
+    color: #666;
+    font-weight: bold;
+    font-size: 0.95rem;
+    width: 60px;
+}
+
+.user-name-small {
+    font-weight: 600;
+    color: #333;
+    margin-right: 10px;
+}
+
+.dogs-text-small {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+/* Future / Small Card Adjustments */
+.users-list-small {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+}
+
+.user-row-small {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.empty-state {
+    padding: 2rem;
+    text-align: center;
+    color: #999;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+    .today-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .time-slot-large {
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-right: 0;
+        margin-bottom: 10px;
+        padding: 8px 15px;
+        box-sizing: border-box;
+    }
+
+    .slot-count {
+        margin-top: 0;
+        font-size: 0.9rem;
+    }
+
+    .user-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+}

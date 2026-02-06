@@ -1,8 +1,8 @@
 <div class="crud-container">
     <div class="header">
-        <h2>Gestión de Competiciones</h2>
+        <h2>Gestión de Eventos</h2>
         <button class="btn btn-primary" (click)="initNewCompetition()" *ngIf="!showForm()">
-            <span>+</span> Nueva Competición
+            <span>+</span> Nuevo Evento
         </button>
         <button class="btn btn-secondary" (click)="toggleView()" *ngIf="showForm()">
             ← Volver al Listado
@@ -23,21 +23,26 @@
                 </thead>
                 <tbody>
                     <tr *ngFor="let comp of competitions()">
-                        <td><strong>{{ comp.lugar }}</strong></td>
+                        <td [class.border-comp]="!comp.tipo || comp.tipo === 'competicion'"
+                            [class.border-other]="comp.tipo === 'otros'">
+                            <strong>{{ comp.nombre || comp.lugar }}</strong>
+                            <div *ngIf="comp.nombre && comp.lugar"
+                                style="font-size: 0.85em; color: #666; font-weight: normal;">{{ comp.lugar }}</div>
+                        </td>
                         <td>{{ comp.fechaEvento | date:'dd/MM/yyyy' }}</td>
                         <td>{{ comp.fechaLimite | date:'dd/MM/yyyy' }}</td>
                         <td class="actions">
                             <button class="btn-icon edit" (click)="editCompetition(comp)" title="Editar">
-                                Editar
+                                ✏️
                             </button>
                             <button class="btn-icon delete" (click)="deleteCompetition(comp.id)" title="Eliminar">
-                                Eliminar
+                                🗑️
                             </button>
                         </td>
                     </tr>
                     <tr *ngIf="competitions().length === 0">
-                        <td colspan="4" class="empty-msg">
-                            No hay competiciones registradas actualmente.
+                        <td colspan="5" class="empty-msg">
+                            No hay eventos registrados actualmente.
                         </td>
                     </tr>
                 </tbody>
@@ -47,17 +52,32 @@
 
     <!-- FORM VIEW -->
     <div class="form-view" *ngIf="showForm()">
-        <h3 class="form-header">{{ isEditing() ? 'Editar Competición' : 'Nueva Competición' }}</h3>
+        <h3 class="form-header">{{ isEditing() ? 'Editar Evento' : 'Nuevo Evento' }}</h3>
 
         <form [formGroup]="competitionForm" (ngSubmit)="onSubmit()">
 
             <div class="form-group">
+                <label for="tipo">Tipo de Evento</label>
+                <select id="tipo" formControlName="tipo" class="form-control">
+                    <option value="competicion">Competición Agility</option>
+                    <option value="otros">Otro Evento</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="nombre">Nombre del Evento</label>
+                <input type="text" id="nombre" formControlName="nombre" class="form-control"
+                    [ngClass]="{ 'is-invalid': submitted && f['nombre'].errors }"
+                    placeholder="Ej: Competición Regional Agility">
+                <div *ngIf="submitted && f['nombre'].errors" class="invalid-feedback">
+                    El nombre del evento es requerido.
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="lugar">Lugar del Evento</label>
                 <input type="text" id="lugar" formControlName="lugar" class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && f['lugar'].errors }" placeholder="Ej: Polideportivo Gijón">
-                <div *ngIf="submitted && f['lugar'].errors" class="invalid-feedback">
-                    El lugar del evento es requerido.
-                </div>
+                    placeholder="Ej: Polideportivo Gijón">
             </div>
 
             <div class="form-row">
@@ -71,29 +91,21 @@
                 </div>
                 <div class="form-group col">
                     <label for="fechaLimite">Fecha Límite de Inscripción</label>
-                    <input type="date" id="fechaLimite" formControlName="fechaLimite" class="form-control"
-                        [ngClass]="{ 'is-invalid': submitted && f['fechaLimite'].errors }">
-                    <div *ngIf="submitted && f['fechaLimite'].errors" class="invalid-feedback">
-                        La fecha límite es requerida.
-                    </div>
+                    <input type="date" id="fechaLimite" formControlName="fechaLimite" class="form-control">
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="formaPago">Forma de Pago</label>
                 <textarea id="formaPago" formControlName="formaPago" class="form-control" rows="3"
-                    [ngClass]="{ 'is-invalid': submitted && f['formaPago'].errors }"
                     placeholder="Instrucciones de pago..."></textarea>
-                <div *ngIf="submitted && f['formaPago'].errors" class="invalid-feedback">
-                    La forma de pago es requerida.
-                </div>
             </div>
 
             <div class="form-group">
                 <label for="enlace">Enlace Inscripción</label>
                 <input type="url" id="enlace" formControlName="enlace" class="form-control"
                     [ngClass]="{ 'is-invalid': submitted && f['enlace'].errors }" placeholder="https://...">
-                <div *ngIf="submitted && f['enlace'].errors" class="invalid-feedback">
+                <div *ngIf="submitted && f['enlace'].errors?.['pattern']" class="invalid-feedback">
                     Se requiere una URL válida (http:// o https://).
                 </div>
             </div>

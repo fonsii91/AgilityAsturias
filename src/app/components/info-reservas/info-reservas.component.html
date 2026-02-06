@@ -1,0 +1,88 @@
+<div class="reservas-container">
+    <div class="header">
+        <h1>📅 Monitor de Reservas</h1>
+        <p>Vista rápida de actividad diaria</p>
+    </div>
+
+    <!-- Quick Stats Dashboard -->
+    <div class="dashboard-stats">
+        <div class="stat-card blue">
+            <span class="stat-value">{{ statsHoje().totalReservas }}</span>
+            <span class="stat-label">Reservas Hoy</span>
+        </div>
+        <div class="stat-card orange">
+            <span class="stat-value">{{ statsHoje().totalPerros }}</span>
+            <span class="stat-label">Perros Hoy</span>
+        </div>
+    </div>
+
+    <!-- SECTION: TODAY (Highlighted) -->
+    <div class="section-title">
+        <h2>🔥 Hoy</h2>
+        <span class="date-badge">{{ todayStr | date:'EEEE, d MMMM' : '' : 'es-ES' }}</span>
+    </div>
+
+    <div *ngIf="todayTimeSlots().length === 0" class="empty-state glass-effect today-empty">
+        <p>No hay reservas para hoy. ¡Día tranquilo! 😴</p>
+    </div>
+
+    <div *ngIf="todayTimeSlots().length > 0" class="reservations-list today-list glass-effect">
+        <div *ngFor="let slot of todayTimeSlots()" class="res-card today-card">
+            <!-- Time Column (Aggregated) -->
+            <div class="time-slot-large">
+                <span class="time">{{ slot.time }}</span>
+                <span class="slot-count">{{ slot.reservations.length }} pers.</span>
+            </div>
+
+            <!-- Users Column -->
+            <div class="card-content">
+                <div class="users-list">
+                    <div *ngFor="let res of slot.reservations" class="user-row">
+                        <span class="user-name">{{ res.userName }}</span>
+                        <div class="dogs-chips">
+                            <span *ngFor="let dog of res.selectedDogs" class="dog-chip">🐕 {{ dog }}</span>
+                            <span *ngIf="!res.selectedDogs?.length" class="no-dogs">Sin perros</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SECTION: FUTURE (Upcoming) -->
+    <div class="section-title future-title">
+        <h2>📅 Próximos Días</h2>
+    </div>
+
+    <div *ngIf="futureReservationsGrouped().length === 0" class="empty-state">
+        <p>No hay más reservas a la vista.</p>
+    </div>
+
+    <div class="reservations-timeline">
+        <div *ngFor="let group of futureReservationsGrouped()" class="day-group glass-effect">
+            <div class="date-header">
+                <h3>{{ group.date | date:'EEEE, d MMMM' : '' : 'es-ES' }}</h3>
+                <span class="count-badge">{{ group.totalCount }}</span>
+            </div>
+
+            <div class="reservations-list">
+                <!-- Iterate Time Slots for Future -->
+                <div *ngFor="let slot of group.timeSlots" class="res-card small-card">
+                    <div class="time-slot">
+                        <span class="time">{{ slot.time }}</span>
+                    </div>
+
+                    <div class="users-list-small">
+                        <div *ngFor="let res of slot.reservations" class="user-row-small">
+                            <span class="user-name-small">{{ res.userName }}</span>
+                            <span class="dogs-text-small">
+                                {{ res.selectedDogs?.join(', ') || 'Sin perros' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

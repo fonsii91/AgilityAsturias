@@ -5,6 +5,7 @@ import { CompetitionService } from '../../services/competition.service';
 interface CalendarDay {
     date: Date;
     isCompetition: boolean;
+    isOtherEvent: boolean;
     isWeekend: boolean;
     isOtherMonth: boolean;
     isToday: boolean;
@@ -66,6 +67,7 @@ export class CalendarioComponent {
             days.push({
                 date: new Date(year, monthIndex, -i),
                 isCompetition: false,
+                isOtherEvent: false,
                 isWeekend: false,
                 isOtherMonth: true,
                 isToday: false
@@ -83,7 +85,11 @@ export class CalendarioComponent {
             const dateString = `${year}-${month}-${day}`;
 
             const competition = competitions.find((c: any) => c.fechaEvento === dateString);
-            const isCompetition = !!competition;
+
+            // Check type. Default to 'competicion' if undefined for backward compatibility
+            const type = competition?.tipo || 'competicion';
+            const isCompetition = !!competition && type === 'competicion';
+            const isOtherEvent = !!competition && type === 'otros';
 
             const isToday = date.getDate() === today.getDate() &&
                 date.getMonth() === today.getMonth() &&
@@ -92,6 +98,7 @@ export class CalendarioComponent {
             days.push({
                 date: new Date(date),
                 isCompetition: isCompetition,
+                isOtherEvent: isOtherEvent,
                 isWeekend: isWeekend,
                 isOtherMonth: false,
                 isToday: isToday,

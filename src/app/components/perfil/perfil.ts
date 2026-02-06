@@ -19,13 +19,46 @@ export class Perfil {
   newDogName = signal('');
   dogs = this.dogService.getDogs();
 
+  deleteModalOpen = signal(false);
+  dogToDelete = signal<{ id: string, name: string } | null>(null);
+
+  // Name editing state
+  isEditingName = signal(false);
+  editedName = signal('');
+
   constructor() {
     effect(() => {
       const user = this.authService.currentUserSignal();
       if (user) {
         this.dogService.subscribeToUserDogs(user.uid);
       }
+
+      // Sync editedName with profile name 
+      const profile = this.authService.userProfileSignal();
+      if (profile) {
+        this.editedName.set(profile.displayName);
+      }
     });
+  }
+
+  toggleEditName() {
+    this.isEditingName.set(!this.isEditingName());
+    if (this.isEditingName()) {
+      const profile = this.authService.userProfileSignal();
+      if (profile) this.editedName.set(profile.displayName);
+    }
+  }
+
+  async saveName() {
+    if (!this.editedName().trim()) return;
+
+    try {
+      await this.authService.updateDisplayName(this.editedName());
+      this.isEditingName.set(false);
+    } catch (error) {
+      console.error('Error updating name:', error);
+      alert('Error al actualizar el nombre');
+    }
   }
 
   async addDog() {
@@ -46,9 +79,22 @@ export class Perfil {
     }
   }
 
-  async deleteDog(id: string) {
-    if (confirm('¿Seguro que quieres eliminar a este perrete?')) {
-      await this.dogService.deleteDog(id);
+  // Open the modal instead of window.confirm
+  deleteDog(id: string, name: string) {
+    this.dogToDelete.set({ id, name });
+    this.deleteModalOpen.set(true);
+  }
+
+  closeDeleteModal() {
+    this.deleteModalOpen.set(false);
+    this.dogToDelete.set(null);
+  }
+
+  async confirmDelete() {
+    const dog = this.dogToDelete();
+    if (dog) {
+      await this.dogService.deleteDog(dog.id);
+      this.closeDeleteModal();
     }
   }
 }

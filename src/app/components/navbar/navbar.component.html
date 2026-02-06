@@ -10,65 +10,69 @@
     </div>
     <nav>
         <ul [class.active]="isMenuOpen">
-            <li><a routerLink="/" (click)="closeMenu()">Home</a></li>
+            <li><a routerLink="/" (click)="closeMenu()">Bienvenido</a></li>
             <li *ngIf="authService.isMember()"><a routerLink="/reservas" (click)="closeMenu()">Reservas</a>
             </li>
             <li><a routerLink="/galeria" (click)="closeMenu()">Galería</a></li>
             <li *ngIf="authService.isMember()"><a routerLink="/calendario" (click)="closeMenu()">Calendario</a>
             </li>
-            <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones"
-                    (click)="closeMenu()">Competiciones</a></li>
-            <li><a routerLink="/contacto" (click)="closeMenu()">Contacto</a></li>
-
-            <!-- User Section -->
-            <li class="auth-item">
-                <!-- Login Button -->
-                <a *ngIf="!authService.currentUserSignal()" routerLink="/login" (click)="closeMenu()" class="login-btn">
-                    Iniciar Sesión
-                </a>
-
-                <!-- Logged In User Dropdown -->
-                <div class="user-dropdown-container" *ngIf="authService.currentUserSignal() as user">
-                    <button class="user-avatar-btn" (click)="toggleUserMenu($event)">
-                        <img *ngIf="user.photoURL; else defaultAvatar" [src]="user.photoURL" alt="User"
-                            class="nav-user-img" referrerpolicy="no-referrer">
-                        <ng-template #defaultAvatar>
-                            <div class="nav-user-img default-avatar-placeholder">
-                                {{ user.displayName?.charAt(0) || 'U' }}
-                            </div>
-                        </ng-template>
-                        <span class="dropdown-arrow">▼</span>
-                    </button>
-
-                    <!-- Dropdown Menu -->
-                    <div class="user-dropdown-menu" [class.show]="isUserMenuOpen">
-                        <div class="user-header">
-                            <p class="name">{{ user.displayName }}</p>
-                            <p class="email">{{ user.email }}</p>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item">🐶 Mis Perretes</a>
-                        <a *ngIf="authService.isMember()" routerLink="/reservas" (click)="closeMenu()"
-                            class="dropdown-item">📅 Mis Reservas</a>
-
-                        <div class="dropdown-divider" *ngIf="authService.isStaff()"></div>
-                        <a *ngIf="authService.isStaff()" routerLink="/gestionar-miembros" (click)="closeMenu()"
-                            class="dropdown-item staff-item">
-                            👥 Gestión de Miembros
-                        </a>
-
-                        <div class="dropdown-divider" *ngIf="authService.isAdmin()"></div>
-                        <a *ngIf="authService.isAdmin()" routerLink="/admin/usuarios" (click)="closeMenu()"
-                            class="dropdown-item admin-item">
-                            🔧 Administrar Sistema
-                        </a>
-                        <button (click)="logout()" class="dropdown-item logout-item">🚪 Cerrar Sesión</button>
-                    </div>
-
-                    <!-- Backdrop to close menu when clicking outside -->
-                    <div class="dropdown-backdrop" *ngIf="isUserMenuOpen" (click)="closeMenu()"></div>
-                </div>
+            <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones" (click)="closeMenu()">Eventos</a>
             </li>
+            <li><a routerLink="/contacto" (click)="closeMenu()">Contacto</a></li>
         </ul>
     </nav>
+
+    <!-- User Section -->
+    <div class="auth-section">
+        <!-- Login Button -->
+        <a *ngIf="!authService.userProfileSignal()" routerLink="/login" (click)="closeMenu()" class="login-btn">
+            Iniciar Sesión
+        </a>
+
+        <!-- Logged In User Dropdown -->
+        <div class="user-dropdown-container" *ngIf="authService.userProfileSignal() as user">
+            <button class="user-avatar-btn" (click)="toggleUserMenu($event)">
+                <img *ngIf="user.photoURL; else defaultAvatar" [src]="user.photoURL" alt="User" class="nav-user-img"
+                    referrerpolicy="no-referrer">
+                <ng-template #defaultAvatar>
+                    <div class="nav-user-img default-avatar-placeholder">
+                        {{ user.displayName?.charAt(0) || 'U' }}
+                    </div>
+                </ng-template>
+                <span class="dropdown-arrow">▼</span>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div class="user-dropdown-menu" [class.show]="isUserMenuOpen">
+                <div class="user-header">
+                    <p class="name">{{ user.displayName }}</p>
+                    <p class="email">{{ user.email }}</p>
+                </div>
+                <div class="dropdown-divider"></div>
+                <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item">🐶 Mis Perretes</a>
+                <a *ngIf="authService.isMember()" routerLink="/reservas" (click)="closeMenu()" class="dropdown-item">📅
+                    Mis Reservas</a>
+
+                <div class="dropdown-divider" *ngIf="authService.isStaff()"></div>
+                <a *ngIf="authService.isStaff()" routerLink="/gestionar-miembros" (click)="closeMenu()"
+                    class="dropdown-item staff-item">
+                    👥 Gestión de Miembros
+                </a>
+                <a *ngIf="authService.isStaff()" routerLink="/info-reservas" (click)="closeMenu()"
+                    class="dropdown-item staff-item">
+                    👀 Monitor Reservas
+                </a>
+
+                <div class="dropdown-divider" *ngIf="authService.isAdmin()"></div>
+                <a *ngIf="authService.isAdmin()" routerLink="/admin/usuarios" (click)="closeMenu()"
+                    class="dropdown-item admin-item">
+                    🔧 Administrar Sistema
+                </a>
+                <button (click)="logout()" class="dropdown-item logout-item">🚪 Cerrar Sesión</button>
+            </div>
+
+            <!-- Backdrop to close menu when clicking outside -->
+            <div class="dropdown-backdrop" *ngIf="isUserMenuOpen" (click)="closeMenu()"></div>
+        </div>
+    </div>
 </header>

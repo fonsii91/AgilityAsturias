@@ -135,4 +135,28 @@ export class AuthService {
             }
         }
     }
+
+    async updateDisplayName(newName: string) {
+        const user = this.auth.currentUser;
+        if (!user) throw new Error('No user logged in');
+
+        // 1. Update Firestore
+        const userRef = doc(this.firestore, 'users', user.uid);
+        await updateDoc(userRef, { displayName: newName });
+
+        // 2. Update Firebase Auth Profile (so currentUserSignal eventually reflects it, though we might need to reload)
+        // Note: we need to import updateProfile from firebase/auth
+        await import('firebase/auth').then(m => m.updateProfile(user, { displayName: newName }));
+
+        // 3. Update local signals immediately for UI responsiveness
+        const currentProfile = this.userProfileSignal();
+        if (currentProfile) {
+            this.userProfileSignal.set({ ...currentProfile, displayName: newName });
+        }
+
+        // Force signal update for currentUser if needed, or just let it be. 
+        // Typically updateProfile doesn't trigger onAuthStateChanged immediately. 
+        // We can manually emit a new value if we want strict consistency, 
+        // but easier to rely on userProfileSignal for UI.
+    }
 }

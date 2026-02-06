@@ -1,38 +1,102 @@
 <section class="hero" [style.backgroundImage]="heroBackground">
+    <div class="hero-overlay"></div>
     <div class="hero-content">
-        <h2>Bienvenido a Agility Asturias</h2>
-        <p class="subtitle">Perretes y agility en Asturias.</p>
+        <span class="hero-badge">Club Deportivo</span>
+        <h1>Agility Asturias</h1>
+        <p class="subtitle">Más que un deporte, una conexión única con tu perro.</p>
+        <div class="hero-btns">
+            <a routerLink="/contacto" class="btn btn-primary">¡Ven a probar!</a>
+            <a routerLink="/galeria" class="btn btn-outline">Ver Galería</a>
+        </div>
+    </div>
+    <div class="scroll-indicator">
+        <span>Descubre más</span>
+        <div class="arrow">↓</div>
+    </div>
+</section>
+
+<!-- Features / Values Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="feature-card fade-in">
+            <div class="icon-wrapper">🐕</div>
+            <h3>Vínculo</h3>
+            <p>Refuerza la relación con tu perro a través del trabajo en equipo y la diversión compartida.</p>
+        </div>
+        <div class="feature-card fade-in delay-1">
+            <div class="icon-wrapper">🏆</div>
+            <h3>Competición</h3>
+            <p>Participa en eventos locales y nacionales con el apoyo de nuestros entrenadores expertos.</p>
+        </div>
+        <div class="feature-card fade-in delay-2">
+            <div class="icon-wrapper">🌳</div>
+            <h3>Naturaleza</h3>
+            <p>Disfruta de nuestras instalaciones al aire libre en un entorno perfecto para el deporte.</p>
+        </div>
     </div>
 </section>
 
 <section class="history-section">
     <div class="container">
         <h3>Historia del Agility</h3>
+        <p class="section-intro">De entretenimiento en descansos a deporte mundial.</p>
 
-        <div class="history-text">
-            <p>El Agility es un deporte canino que se originó en el Reino Unido a finales de la década de 1970 y
-                principios de la década de 1980. El primer evento de Agility tuvo lugar en 1978 en el Crufts Dog Show,
-                uno de los mayores eventos de perros en el mundo.</p>
+        <div class="timeline">
+            <!-- Item 1: Origen -->
+            <div class="timeline-item left">
+                <div class="timeline-icon">🏁</div>
+                <div class="timeline-content">
+                    <span class="date">1978 - El Origen</span>
+                    <h4>Crufts Dog Show</h4>
+                    <p>El Agility nació en el Reino Unido de la mano de <strong>John Varley</strong>, entrenador en el
+                        prestigioso Crufts Dog Show. Buscaba una forma original de entretener a la audiencia durante los
+                        descansos de las pruebas de obediencia, inspirándose en los concursos hípicos de salto.</p>
+                </div>
+            </div>
 
-            <p>El creador del Agility fue John Varley, quien trabajaba como entrenador de perros en el Crufts Dog Show.
-                Varley estaba buscando una forma de entretener a la audiencia durante los descansos entre las
-                competiciones de obediencia y decidió crear un curso de obstáculos para perros.</p>
+            <!-- Item 2: Los Inicios -->
+            <div class="timeline-item right">
+                <div class="timeline-icon">🚧</div>
+                <div class="timeline-content">
+                    <span class="date">El Primer Circuito</span>
+                    <h4>Velocidad y Agilidad</h4>
+                    <p>El circuito original constaba de saltos, túneles y aros diseñados para poner a prueba la
+                        agilidad. La primera demostración fue un éxito tan rotundo entre participantes y público que
+                        rápidamente se convirtió en una disciplina propia.</p>
+                </div>
+            </div>
 
-            <p>El curso de obstáculos original constaba de saltos, túneles y aros, y estaba diseñado para poner a prueba
-                la agilidad y la velocidad de los perros. La primera competición de agility se llevó a cabo en 1978 en
-                el Crufts Dog Show y fue un gran éxito entre los participantes y el público.</p>
+            <!-- Item 3: Expansión -->
+            <div class="timeline-item left">
+                <div class="timeline-icon">🌍</div>
+                <div class="timeline-content">
+                    <span class="date">Años 80 - Expansión</span>
+                    <h4>Organización Mundial</h4>
+                    <p>El deporte creció rápidamente. Se fundaron organizaciones clave como el <strong>Kennel
+                            Club</strong> en Reino Unido y la <strong>USDAA</strong> en Estados Unidos, estableciendo
+                        reglamentos y estandarizando la competición a nivel global.</p>
+                </div>
+            </div>
 
-            <p>A medida que el deporte creció en popularidad, se establecieron organizaciones de agility en todo el
-                mundo, incluyendo el Kennel Club en el Reino Unido y la United States Dog Agility Association en los
-                Estados Unidos.</p>
-
-            <p>El agility se convirtió rápidamente en uno de los deportes caninos más populares del mundo, con miles de
-                perros y sus dueños compitiendo en eventos y competiciones en todo el mundo. El deporte se ha
-                diversificado en diferentes modalidades, como el jumping y la agilidad por equipos.</p>
-
-            <p>Hoy en día, el agility es un deporte altamente competitivo que requiere una gran cantidad de
-                entrenamiento y habilidades tanto por parte del perro como del manejador. A pesar de su naturaleza
-                competitiva, también es un deporte muy divertido y emocionante para perros y dueños por igual.</p>
+            <!-- Item 4: Actualidad -->
+            <div class="timeline-item right">
+                <div class="timeline-icon">🚀</div>
+                <div class="timeline-content">
+                    <span class="date">Actualidad</span>
+                    <h4>Deporte de Élite y Diversión</h4>
+                    <p>Hoy es uno de los deportes caninos más populares, con modalidades como <em>Jumping</em> o
+                        agilidad por equipos. Requiere un gran entrenamiento y compenetración, pero sobre todo, sigue
+                        siendo una actividad divertida y emocionante para disfrutar con tu perro.</p>
+                </div>
+            </div>
         </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="cta-content">
+        <h2>¿Listo para empezar?</h2>
+        <p>Únete a Agility Asturias y descubre todo lo que tu perro y tú podéis lograr juntos.</p>
+        <a routerLink="/contacto" class="btn btn-large">Contactar Ahora</a>
     </div>
 </section>

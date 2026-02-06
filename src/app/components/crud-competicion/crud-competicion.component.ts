@@ -35,11 +35,13 @@ export class CrudCompeticionComponent {
     ) {
         this.competitions = this.competitionService.getCompetitions();
         this.competitionForm = this.fb.group({
-            lugar: ['', Validators.required],
+            nombre: ['', Validators.required],
+            lugar: [''],
             fechaEvento: ['', Validators.required],
-            fechaLimite: ['', Validators.required],
-            formaPago: ['', Validators.required],
-            enlace: ['', [Validators.required, Validators.pattern('https?://.+')]],
+            fechaLimite: [''],
+            formaPago: [''],
+            enlace: ['', [Validators.pattern('https?://.+')]],
+            tipo: ['competicion', Validators.required], // Default to 'competicion'
             cartel: [null] // Validation handled manually if needed, or required only on creation
         });
     }
@@ -67,11 +69,13 @@ export class CrudCompeticionComponent {
         this.existingCartel = comp.cartel;
 
         this.competitionForm.patchValue({
+            nombre: comp.nombre || '', // Handle missing name in old records
             lugar: comp.lugar,
             fechaEvento: comp.fechaEvento,
             fechaLimite: comp.fechaLimite,
             formaPago: comp.formaPago,
             enlace: comp.enlace,
+            tipo: comp.tipo || 'competicion',
             // Don't patch cartel with the file object/string directly as file input is read-only
             // We handle preservation via existingCartel
         });
@@ -214,6 +218,8 @@ export class CrudCompeticionComponent {
         this.submitted = false;
         this.currentCompetitionId = null;
         this.existingCartel = null;
-        this.competitionForm.reset();
+        this.competitionForm.reset({
+            tipo: 'competicion'
+        });
     }
 }

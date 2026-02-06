@@ -1,9 +1,24 @@
-<div class="perfil-container" *ngIf="authService.currentUserSignal() as user">
+<div class="perfil-container" *ngIf="authService.userProfileSignal() as user">
     <div class="profile-header">
-        <img [src]="user.photoURL || 'assets/default-user.png'" alt="Avatar" class="profile-avatar">
+        <img [src]="user.photoURL || 'assets/default-user.png'" alt="Avatar" class="profile-avatar"
+            referrerpolicy="no-referrer">
         <div class="profile-info">
-            <h2>{{ user.displayName }}</h2>
+            <div class="name-edit-container">
+                <div *ngIf="!isEditingName()" class="name-display">
+                    <h2>{{ user.displayName }}</h2>
+                    <button class="btn-icon-edit" (click)="toggleEditName()" title="Editar nombre">✏️</button>
+                </div>
+
+                <div *ngIf="isEditingName()" class="name-input-group">
+                    <input type="text" [(ngModel)]="editedName" (keyup.enter)="saveName()" class="edit-name-input">
+                    <div class="edit-actions">
+                        <button class="btn-check" (click)="saveName()">✅</button>
+                        <button class="btn-cancel-edit" (click)="toggleEditName()">❌</button>
+                    </div>
+                </div>
+            </div>
             <p>{{ user.email }}</p>
+            <span class="role-badge" [ngClass]="user.role">{{ user.role | titlecase }}</span>
         </div>
     </div>
 
@@ -28,7 +43,31 @@
                 <div class="dog-info">
                     <span class="dog-name">{{ dog.name }}</span>
                 </div>
-                <button class="btn-delete" (click)="deleteDog(dog.id)" title="Eliminar">🗑️</button>
+                <button class="btn-delete" (click)="deleteDog(dog.id, dog.name)" title="Eliminar">🗑️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" *ngIf="deleteModalOpen()" (click)="closeDeleteModal()">
+        <div class="modal-content glass-effect" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+                <h3>¿Jubilar a tu perrete? 😢</h3>
+                <button class="close-btn" (click)="closeDeleteModal()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <p>
+                    ¿Estás seguro de que quieres jubilar a <strong>{{ dogToDelete()?.name }}</strong> de tu perfil?
+                </p>
+                <p class="note warning">Esta acción no se puede deshacer y perderás su historial.</p>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" (click)="closeDeleteModal()">Cancelar</button>
+                <button class="btn-confirm btn-delete-action" (click)="confirmDelete()">
+                    Sí, Eliminar
+                </button>
             </div>
         </div>
     </div>
