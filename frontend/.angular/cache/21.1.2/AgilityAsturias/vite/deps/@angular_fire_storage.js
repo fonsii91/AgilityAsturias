@@ -1,8 +1,18 @@
 import {
   AppCheckInstances,
   AuthInstances
-} from "./chunk-QTPKM4UX.js";
+} from "./chunk-DUT4PVTS.js";
 import "./chunk-WBVCFQRW.js";
+import {
+  Component as Component2,
+  FirebaseError as FirebaseError2,
+  SDK_VERSION as SDK_VERSION2,
+  _isFirebaseServerApp as _isFirebaseServerApp2,
+  _registerComponent as _registerComponent2,
+  registerVersion as registerVersion2
+} from "./chunk-2V6ZLEE2.js";
+import "./chunk-O7C6OZII.js";
+import "./chunk-4XITVS7W.js";
 import {
   Component,
   FirebaseApp,
@@ -25,25 +35,15 @@ import {
   ɵgetAllInstancesOf,
   ɵgetDefaultInstanceOf,
   ɵzoneWrap
-} from "./chunk-644D2MIT.js";
-import "./chunk-R2K7LO7V.js";
-import {
-  Component as Component2,
-  FirebaseError as FirebaseError2,
-  SDK_VERSION as SDK_VERSION2,
-  _isFirebaseServerApp as _isFirebaseServerApp2,
-  _registerComponent as _registerComponent2,
-  registerVersion as registerVersion2
-} from "./chunk-2V6ZLEE2.js";
+} from "./chunk-5E2EDTME.js";
 import "./chunk-JS7UPFDT.js";
-import "./chunk-3WXZYSZB.js";
-import "./chunk-TBYDLLSN.js";
 import {
   NgModule,
   Optional,
   setClassMetadata,
   ɵɵdefineNgModule
 } from "./chunk-WXAPHVGX.js";
+import "./chunk-R2K7LO7V.js";
 import {
   InjectionToken,
   Injector,

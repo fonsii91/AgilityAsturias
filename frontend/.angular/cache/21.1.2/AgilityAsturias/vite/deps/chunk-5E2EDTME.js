@@ -1,7 +1,4 @@
 import {
-  pendingUntilEvent
-} from "./chunk-R2K7LO7V.js";
-import {
   openDB
 } from "./chunk-JS7UPFDT.js";
 import {
@@ -14,6 +11,9 @@ import {
   setClassMetadata,
   ɵɵdefineNgModule
 } from "./chunk-WXAPHVGX.js";
+import {
+  pendingUntilEvent
+} from "./chunk-R2K7LO7V.js";
 import {
   EnvironmentInjector,
   InjectionToken,
@@ -2473,4 +2473,4 @@ export {
   registerVersion2,
   setLogLevel3 as setLogLevel
 };
-//# sourceMappingURL=chunk-644D2MIT.js.map
+//# sourceMappingURL=chunk-5E2EDTME.js.map

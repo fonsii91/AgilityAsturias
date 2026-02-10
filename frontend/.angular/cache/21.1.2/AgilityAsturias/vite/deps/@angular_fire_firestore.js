@@ -1,8 +1,16 @@
 import {
   AppCheckInstances,
   AuthInstances
-} from "./chunk-QTPKM4UX.js";
+} from "./chunk-DUT4PVTS.js";
 import "./chunk-WBVCFQRW.js";
+import {
+  getCountFromServer,
+  onSnapshot,
+  refEqual
+} from "./chunk-MHK4G3MV.js";
+import "./chunk-2V6ZLEE2.js";
+import "./chunk-O7C6OZII.js";
+import "./chunk-4XITVS7W.js";
 import {
   Component,
   FirebaseApp,
@@ -34,23 +42,15 @@ import {
   ɵgetAllInstancesOf,
   ɵgetDefaultInstanceOf,
   ɵzoneWrap
-} from "./chunk-644D2MIT.js";
-import "./chunk-R2K7LO7V.js";
-import {
-  getCountFromServer,
-  onSnapshot,
-  refEqual
-} from "./chunk-MHK4G3MV.js";
-import "./chunk-2V6ZLEE2.js";
+} from "./chunk-5E2EDTME.js";
 import "./chunk-JS7UPFDT.js";
-import "./chunk-3WXZYSZB.js";
-import "./chunk-TBYDLLSN.js";
 import {
   NgModule,
   Optional,
   setClassMetadata,
   ɵɵdefineNgModule
 } from "./chunk-WXAPHVGX.js";
+import "./chunk-R2K7LO7V.js";
 import {
   InjectionToken,
   Injector,
