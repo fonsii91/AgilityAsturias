@@ -1,7 +1,7 @@
 import {
   CommonModule
-} from "./chunk-O7C6OZII.js";
-import "./chunk-4XITVS7W.js";
+} from "./chunk-ABI5EH5J.js";
+import "./chunk-WQHXGJNA.js";
 import {
   Directive,
   ElementRef,
@@ -11,7 +11,7 @@ import {
   setClassMetadata,
   ɵɵdefineDirective,
   ɵɵdefineNgModule
-} from "./chunk-WXAPHVGX.js";
+} from "./chunk-GYSCVIKI.js";
 import {
   EventEmitter,
   InjectionToken,
@@ -20,7 +20,7 @@ import {
   inject,
   ɵɵdefineInjectable,
   ɵɵdefineInjector
-} from "./chunk-BJVIUSHZ.js";
+} from "./chunk-MTB57I3S.js";
 import {
   AsyncSubject,
   BehaviorSubject,
@@ -29,12 +29,12 @@ import {
   isObservable,
   skip,
   take
-} from "./chunk-JI2ZN7O6.js";
+} from "./chunk-QLD5UN5Y.js";
 import {
   __spreadValues
 } from "./chunk-GOMI4DH3.js";
 
-// node_modules/@abacritt/angularx-social-login/fesm2022/abacritt-angularx-social-login.mjs
+// ../node_modules/@abacritt/angularx-social-login/fesm2022/abacritt-angularx-social-login.mjs
 var BaseLoginProvider = class {
   constructor() {
   }

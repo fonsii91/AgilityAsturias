@@ -1,7 +1,7 @@
 import {
   BrowserModule,
   DomRendererFactory2
-} from "./chunk-MWAZUU6V.js";
+} from "./chunk-QG2RF7KU.js";
 import {
   AUTO_STYLE,
   AnimationGroupPlayer,
@@ -10,9 +10,9 @@ import {
   sequence,
   style,
   ɵPRE_STYLE
-} from "./chunk-ONQMKHCI.js";
-import "./chunk-O7C6OZII.js";
-import "./chunk-4XITVS7W.js";
+} from "./chunk-ZDFVFERW.js";
+import "./chunk-ABI5EH5J.js";
+import "./chunk-WQHXGJNA.js";
 import {
   ANIMATION_MODULE_TYPE,
   Inject,
@@ -22,7 +22,7 @@ import {
   performanceMarkFeature,
   setClassMetadata,
   ɵɵdefineNgModule
-} from "./chunk-WXAPHVGX.js";
+} from "./chunk-GYSCVIKI.js";
 import {
   DOCUMENT,
   NgZone,
@@ -31,14 +31,14 @@ import {
   ɵɵdefineInjectable,
   ɵɵdefineInjector,
   ɵɵinject
-} from "./chunk-BJVIUSHZ.js";
-import "./chunk-JI2ZN7O6.js";
+} from "./chunk-MTB57I3S.js";
+import "./chunk-QLD5UN5Y.js";
 import {
   __objRest,
   __spreadValues
 } from "./chunk-GOMI4DH3.js";
 
-// node_modules/@angular/animations/fesm2022/_util-chunk.mjs
+// ../node_modules/@angular/animations/fesm2022/_util-chunk.mjs
 var LINE_START = "\n - ";
 function invalidTimingValue(exp) {
   return new RuntimeError(3e3, ngDevMode && `The provided timing value "${exp}" is invalid.`);
@@ -494,7 +494,7 @@ function computeStyle(element, prop) {
   return window.getComputedStyle(element)[prop];
 }
 
-// node_modules/@angular/animations/fesm2022/browser.mjs
+// ../node_modules/@angular/animations/fesm2022/browser.mjs
 var NoopAnimationDriver = class _NoopAnimationDriver {
   validateStyleProperty(prop) {
     return validateStyleProperty(prop);
@@ -4021,7 +4021,7 @@ var AnimationRendererFactory = class {
   }
 };
 
-// node_modules/@angular/platform-browser/fesm2022/animations.mjs
+// ../node_modules/@angular/platform-browser/fesm2022/animations.mjs
 var InjectableAnimationEngine = class _InjectableAnimationEngine extends AnimationEngine {
   constructor(doc, driver, normalizer) {
     super(doc, driver, normalizer);
