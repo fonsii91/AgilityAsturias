@@ -1,43 +1,28 @@
-import { Injectable, signal, OnDestroy } from '@angular/core';
-import { initializeApp, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, doc, deleteDoc, updateDoc, onSnapshot, Unsubscribe, Firestore } from 'firebase/firestore';
+import { Injectable, signal, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Competition } from '../models/competition.model';
 import { environment } from '../../environments/environment';
 
 @Injectable({
     providedIn: 'root'
 })
-export class CompetitionService implements OnDestroy {
-    private firestore: Firestore;
+export class CompetitionService {
+    private http = inject(HttpClient);
+    private apiUrl = `${environment.apiUrl}/competitions`;
     private competitionsSignal = signal<Competition[]>([]);
-    private unsubscribe: Unsubscribe | null = null;
 
     constructor() {
-        let app;
-        try {
-            app = getApp();
-        } catch (e) {
-            app = initializeApp(environment.firebase);
-        }
-        this.firestore = getFirestore(app);
-
-        const colRef = collection(this.firestore, 'competitions');
-        // Subscribe to real-time updates
-        this.unsubscribe = onSnapshot(colRef, (snapshot) => {
-            const comps = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            })) as Competition[];
-            this.competitionsSignal.set(comps);
-        }, (error) => {
-            console.error("Error reading competitions:", error);
-        });
+        this.fetchCompetitions();
     }
 
-    ngOnDestroy() {
-        if (this.unsubscribe) {
-            this.unsubscribe();
-        }
+    fetchCompetitions() {
+        this.http.get<any[]>(this.apiUrl).subscribe({
+            next: (comps) => {
+                const mapped = comps.map(c => this.mapFromBackend(c));
+                this.competitionsSignal.set(mapped);
+            },
+            error: (err) => console.error('Error loading competitions:', err)
+        });
     }
 
     getCompetitions() {
@@ -45,18 +30,72 @@ export class CompetitionService implements OnDestroy {
     }
 
     addCompetition(comp: Omit<Competition, 'id'>) {
-        const colRef = collection(this.firestore, 'competitions');
-        return addDoc(colRef, comp);
+        const payload = this.mapToBackend(comp);
+        return new Promise<Competition>((resolve, reject) => {
+            this.http.post<any>(this.apiUrl, payload).subscribe({
+                next: (newCompData) => {
+                    const newComp = this.mapFromBackend(newCompData);
+                    this.competitionsSignal.update(list => [...list, newComp]);
+                    resolve(newComp);
+                },
+                error: (err) => reject(err)
+            });
+        });
     }
 
     updateCompetition(updatedComp: Competition) {
-        const compDoc = doc(this.firestore, `competitions/${updatedComp.id}`);
-        const { id, ...data } = updatedComp;
-        return updateDoc(compDoc, data as any);
+        const payload = this.mapToBackend(updatedComp);
+        return new Promise<Competition>((resolve, reject) => {
+            this.http.put<any>(`${this.apiUrl}/${updatedComp.id}`, payload).subscribe({
+                next: (savedCompData) => {
+                    const savedComp = this.mapFromBackend(savedCompData);
+                    this.competitionsSignal.update(list => list.map(c => c.id === savedComp.id ? savedComp : c));
+                    resolve(savedComp);
+                },
+                error: (err) => reject(err)
+            });
+        });
     }
 
-    deleteCompetition(id: string) {
-        const compDoc = doc(this.firestore, `competitions/${id}`);
-        return deleteDoc(compDoc);
+    deleteCompetition(id: number) {
+        return new Promise<void>((resolve, reject) => {
+            this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+                next: () => {
+                    this.competitionsSignal.update(list => list.filter(c => c.id !== id));
+                    resolve();
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    // Mapper methods
+    private mapToBackend(comp: Partial<Competition>): any {
+        return {
+            nombre: comp.nombre,
+            lugar: comp.lugar,
+            fecha_evento: comp.fechaEvento,
+            fecha_fin_evento: comp.fechaFinEvento,
+            fecha_limite: comp.fechaLimite,
+            forma_pago: comp.formaPago,
+            enlace: comp.enlace,
+            tipo: comp.tipo,
+            cartel: comp.cartel
+        };
+    }
+
+    private mapFromBackend(data: any): Competition {
+        return {
+            id: data.id,
+            nombre: data.nombre,
+            lugar: data.lugar,
+            fechaEvento: data.fecha_evento,
+            fechaFinEvento: data.fecha_fin_evento,
+            fechaLimite: data.fecha_limite,
+            formaPago: data.forma_pago,
+            enlace: data.enlace,
+            tipo: data.tipo,
+            cartel: data.cartel
+        };
     }
 }

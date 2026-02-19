@@ -6,7 +6,6 @@ export const authGuard: CanActivateFn = async (route, state) => {
     const authService = inject(AuthService);
     const router = inject(Router);
 
-    // Wait for Firebase to initialize and get the current user
     const user = await authService.getAuthState();
 
     if (user) {

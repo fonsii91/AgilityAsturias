@@ -1,8 +1,9 @@
 export interface Dog {
-    id: string;
-    userId: string;
+    id: number;
+    userId: number;
     name: string;
     breed?: string; // Raza opcional
     age?: number;
-    createdAt: number;
+    createdAt?: string; // Laravel uses timestamps, string
+    updatedAt?: string;
 }

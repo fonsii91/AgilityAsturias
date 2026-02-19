@@ -16,6 +16,11 @@
     margin-bottom: 2rem;
 }
 
+.avatar-container {
+    position: relative;
+    display: inline-block;
+}
+
 .profile-avatar {
     width: 80px;
     height: 80px;
@@ -23,6 +28,30 @@
     object-fit: cover;
     border: 3px solid var(--accent-orange);
     flex-shrink: 0;
+}
+
+.camera-btn {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--primary-blue);
+    color: white;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s;
+}
+
+.camera-btn:hover {
+    transform: scale(1.1);
+    background-color: #004494;
 }
 
 .profile-info h2 {

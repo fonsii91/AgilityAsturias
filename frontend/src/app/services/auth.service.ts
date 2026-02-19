@@ -1,162 +1,205 @@
-import { Injectable, signal, computed } from '@angular/core';
-import { initializeApp, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, User, onAuthStateChanged, Auth } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, Firestore, collection, getDocs, updateDoc } from 'firebase/firestore';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
+import { tap, catchError, of, Observable, firstValueFrom, map } from 'rxjs';
+import { Router } from '@angular/router';
 
-export interface UserProfile {
-    uid: string;
+export interface User {
+    id: number;
+    name: string;
     email: string;
-    displayName: string;
-    photoURL: string;
     role: 'user' | 'member' | 'staff' | 'admin';
+    photo_url?: string;
+    google_id?: string;
+    email_verified_at?: string;
+    created_at?: string;
+    updated_at?: string;
+    // Compatibility fields
+    uid?: number; // alias for id
+    displayName?: string; // alias for name
+    photoURL?: string; // alias for photo_url
+}
+
+export type UserProfile = User;
+
+export interface AuthResponse {
+    access_token: string;
+    token_type: string;
+    user: User;
 }
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    private auth: Auth;
-    private firestore: Firestore;
+    private http = inject(HttpClient);
+    private router = inject(Router);
+    private apiUrl = environment.apiUrl;
 
     currentUserSignal = signal<User | null>(null);
-    userProfileSignal = signal<UserProfile | null>(null);
+    isLoading = signal<boolean>(false);
     checkAuthLoading = signal<boolean>(true);
 
+    // Compatibility Signal
+    userProfileSignal = computed(() => this.currentUserSignal());
+
     constructor() {
-        let app;
-        try {
-            app = getApp();
-        } catch (e) {
-            app = initializeApp(environment.firebase);
-        }
-        this.auth = getAuth(app);
-        this.firestore = getFirestore(app);
-
-        // Listen for auth state changes
-        onAuthStateChanged(this.auth, async (user) => {
-            this.currentUserSignal.set(user);
-
-            if (user) {
-                await this.fetchUserProfile(user);
-            } else {
-                this.userProfileSignal.set(null);
-            }
-
-            this.checkAuthLoading.set(false);
-        });
+        this.checkAuth();
     }
 
-    private async fetchUserProfile(user: User) {
-        const userRef = doc(this.firestore, 'users', user.uid);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            this.userProfileSignal.set(userSnap.data() as UserProfile);
+    private checkAuth() {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            this.fetchUser().subscribe({
+                next: () => this.checkAuthLoading.set(false),
+                error: () => this.checkAuthLoading.set(false)
+            });
         } else {
-            // Create default profile for new user
-            const newProfile: UserProfile = {
-                uid: user.uid,
-                email: user.email || '',
-                displayName: user.displayName || '',
-                photoURL: user.photoURL || '',
-                role: 'user' // Default role
-            };
-            await setDoc(userRef, newProfile);
-            this.userProfileSignal.set(newProfile);
+            this.checkAuthLoading.set(false);
         }
+    }
+
+    login(credentials: { email: string, password: string }): Observable<AuthResponse> {
+        this.isLoading.set(true);
+        return this.http.post<AuthResponse>(`${this.apiUrl}/login`, credentials).pipe(
+            tap(response => {
+                this.handleAuthSuccess(response);
+            }),
+            catchError(error => {
+                this.isLoading.set(false);
+                throw error;
+            })
+        );
+    }
+
+    register(data: { name: string, email: string, password: string }): Observable<AuthResponse> {
+        this.isLoading.set(true);
+        return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data).pipe(
+            tap(response => {
+                this.handleAuthSuccess(response);
+            }),
+            catchError(error => {
+                this.isLoading.set(false);
+                throw error;
+            })
+        );
+    }
+
+    logout(): Promise<void> {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            this.http.post(`${this.apiUrl}/logout`, {}, {
+                headers: new HttpHeaders({
+                    'Authorization': `Bearer ${token}`
+                })
+            }).subscribe();
+        }
+
+        this.handleAuthLogout();
+        this.router.navigate(['/login']);
+        return Promise.resolve();
+    }
+
+    private fetchUser(): Observable<User> {
+        const token = localStorage.getItem('access_token');
+        const headers = new HttpHeaders({
+            'Authorization': `Bearer ${token}`
+        });
+
+        return this.http.get<User>(`${this.apiUrl}/user`, { headers }).pipe(
+            map(user => this.mapUser(user)),
+            tap(user => {
+                this.currentUserSignal.set(user);
+                this.isLoading.set(false);
+            }),
+            catchError(error => {
+                this.handleAuthLogout();
+                this.isLoading.set(false);
+                return of(null as any);
+            })
+        );
+    }
+
+    // Add compatibility mapping
+    private mapUser(user: User): User {
+        return {
+            ...user,
+            uid: user.id,
+            displayName: user.name,
+            photoURL: user.photo_url
+        };
+    }
+
+    private handleAuthSuccess(response: AuthResponse) {
+        localStorage.setItem('access_token', response.access_token);
+        const mappedUser = this.mapUser(response.user);
+        this.currentUserSignal.set(mappedUser);
+        this.isLoading.set(false);
+        this.router.navigate(['/']);
+    }
+
+    private handleAuthLogout() {
+        localStorage.removeItem('access_token');
+        this.currentUserSignal.set(null);
+    }
+
+    // Admin / Member management methods
+    getAllUsers(): Promise<User[]> {
+        return firstValueFrom(this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
+            map(users => users.map(u => this.mapUser(u)))
+        ));
+    }
+
+    updateUserRole(userId: number, role: string): Promise<any> {
+        return firstValueFrom(this.http.put(`${this.apiUrl}/users/${userId}/role`, { role }));
+    }
+
+    async updateProfile(name: string, photo?: File): Promise<void> {
+        const formData = new FormData();
+        formData.append('name', name);
+        if (photo) {
+            formData.append('photo', photo);
+        }
+
+        // Use _method: PUT trick if Laravel has issues with multipart PUT, 
+        // but typically POST with _method=PUT is safer for file uploads in some server configs.
+        // Let's try direct POST with _method field if we use PUT route, or change route to POST.
+        // Actually, Laravel's PUT support for multipart/form-data can be tricky with PHP.
+        // Standard workaround: send POST with _method=PUT.
+        formData.append('_method', 'PUT');
+
+        await firstValueFrom(this.http.post(`${this.apiUrl}/user/profile`, formData));
+        // Refresh user
+        this.fetchUser().subscribe();
+    }
+
+    // Deprecated alias, kept for compatibility if needed, but redirected to new method
+    async updateDisplayName(name: string): Promise<void> {
+        return this.updateProfile(name);
     }
 
     getAuthState(): Promise<User | null> {
         return new Promise((resolve) => {
-            const unsubscribe = onAuthStateChanged(this.auth, (user) => {
-                unsubscribe();
-                resolve(user);
-            });
+            // If loading, wait? Or just return current logic?
+            // Simple version:
+            resolve(this.currentUserSignal());
         });
-    }
-
-    async loginWithGoogle() {
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(this.auth, provider);
-            return result.user;
-        } catch (error) {
-            console.error('Error logging in with Google', error);
-            throw error;
-        }
-    }
-
-    async logout() {
-        try {
-            await signOut(this.auth);
-            this.currentUserSignal.set(null);
-            this.userProfileSignal.set(null);
-        } catch (error) {
-            console.error('Error logging out', error);
-            throw error;
-        }
     }
 
     isLoggedIn = computed(() => !!this.currentUserSignal());
 
     isMember = computed(() => {
-        const profile = this.userProfileSignal();
-        return ['member', 'staff', 'admin'].includes(profile?.role || '');
+        const user = this.currentUserSignal();
+        return ['member', 'staff', 'admin'].includes(user?.role || '');
     });
 
     isStaff = computed(() => {
-        const profile = this.userProfileSignal();
-        return ['staff', 'admin'].includes(profile?.role || '');
+        const user = this.currentUserSignal();
+        return ['staff', 'admin'].includes(user?.role || '');
     });
 
     isAdmin = computed(() => {
-        const profile = this.userProfileSignal();
-        return profile?.role === 'admin';
+        const user = this.currentUserSignal();
+        return user?.role === 'admin';
     });
-
-    async getAllUsers(): Promise<UserProfile[]> {
-        // Warning: This reads ALL users. In a large app, you'd want pagination.
-        const usersRef = collection(this.firestore, 'users');
-        const snapshot = await getDocs(usersRef);
-        return snapshot.docs.map(doc => doc.data() as UserProfile);
-    }
-
-    async updateUserRole(uid: string, newRole: 'user' | 'member' | 'staff' | 'admin') {
-        const userRef = doc(this.firestore, 'users', uid);
-        await updateDoc(userRef, { role: newRole });
-
-        // If updating self, update local signal
-        const currentUser = this.currentUserSignal();
-        if (currentUser && currentUser.uid === uid) {
-            const currentProfile = this.userProfileSignal();
-            if (currentProfile) {
-                this.userProfileSignal.set({ ...currentProfile, role: newRole });
-            }
-        }
-    }
-
-    async updateDisplayName(newName: string) {
-        const user = this.auth.currentUser;
-        if (!user) throw new Error('No user logged in');
-
-        // 1. Update Firestore
-        const userRef = doc(this.firestore, 'users', user.uid);
-        await updateDoc(userRef, { displayName: newName });
-
-        // 2. Update Firebase Auth Profile (so currentUserSignal eventually reflects it, though we might need to reload)
-        // Note: we need to import updateProfile from firebase/auth
-        await import('firebase/auth').then(m => m.updateProfile(user, { displayName: newName }));
-
-        // 3. Update local signals immediately for UI responsiveness
-        const currentProfile = this.userProfileSignal();
-        if (currentProfile) {
-            this.userProfileSignal.set({ ...currentProfile, displayName: newName });
-        }
-
-        // Force signal update for currentUser if needed, or just let it be. 
-        // Typically updateProfile doesn't trigger onAuthStateChanged immediately. 
-        // We can manually emit a new value if we want strict consistency, 
-        // but easier to rely on userProfileSignal for UI.
-    }
 }

@@ -4,20 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ReservationService } from '../../services/reservation.service';
 import { DogService } from '../../services/dog.service';
+import { TimeSlotService } from '../../services/time-slot.service';
 import { Reservation } from '../../models/reservation.model';
-
-interface TimeSlot {
-    id: number;
-    day: string;
-    startTime: string;
-    endTime: string;
-    currentBookings: number;
-    maxBookings: number;
-    isBookedByCurrentUser: boolean;
-    userReservationId?: string;
-    reservations?: Reservation[];
-    date?: string; // Add date field
-}
+import { TimeSlot } from '../../models/time-slot.model';
 
 import { ToastService } from '../../services/toast.service';
 
@@ -32,6 +21,7 @@ export class GestionarReservasComponent {
     authService = inject(AuthService);
     reservationService = inject(ReservationService);
     dogService = inject(DogService);
+    timeSlotService = inject(TimeSlotService);
     toastService = inject(ToastService);
 
     // Modal state
@@ -47,14 +37,24 @@ export class GestionarReservasComponent {
     // Week State
     selectedWeek = signal<'current' | 'next'>('current');
 
-    // Static definition of slots
-    private staticSlots = this.generateSlotsDefinition();
+    // Dynamic definition of slots
+    timeSlots = this.timeSlotService.getTimeSlots();
+
+    // Management Modal State
+    isManageModalOpen = false;
+    editingSlot: TimeSlot | null = null; // null means creating new
+    slotForm = {
+        day: 'Lunes',
+        startTime: '10:00',
+        endTime: '11:00',
+        maxBookings: 5
+    };
 
     constructor() {
         effect(() => {
             const user = this.authService.currentUserSignal();
             if (user) {
-                this.dogService.subscribeToUserDogs(user.uid);
+                this.dogService.loadUserDogs();
             }
         });
     }
@@ -66,24 +66,8 @@ export class GestionarReservasComponent {
 
     private getDatesForWeek(weekOffset: number): Record<string, string> {
         const dates: Record<string, string> = {};
-        const today = new Date();
-        const firstDay = today.getDate() - (today.getDay() || 7) + 1 + (weekOffset * 7);
-
         const daysMap = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(today.setDate(firstDay + i));
-            const yyyy = d.getFullYear();
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const dd = String(d.getDate()).padStart(2, '0');
-            dates[daysMap[i]] = `${yyyy}-${mm}-${dd}`;
-
-            // Reset today for next iteration based on mutation, wait. 
-            // Better to instantiate new Date from a fixed point.
-            // Let's retry safer logic inside the loop
-        }
-
-        // Safer implementation
         const startOfWeek = new Date();
         const currentDay = startOfWeek.getDay() || 7; // 1 (Mon) - 7 (Sun)
         startOfWeek.setDate(startOfWeek.getDate() - currentDay + 1 + (weekOffset * 7));
@@ -104,6 +88,7 @@ export class GestionarReservasComponent {
     // Computed signal that merges static slots with live reservations
     slots = computed(() => {
         const reservations = this.reservationService.getReservations()();
+        const availability = this.reservationService.getAvailability()(); // New data source
         const currentUser = this.authService.currentUserSignal();
         const week = this.selectedWeek();
         const weekOffset = week === 'current' ? 0 : 1;
@@ -116,33 +101,52 @@ export class GestionarReservasComponent {
         const dd = String(now.getDate()).padStart(2, '0');
         const todayStr = `${yyyy}-${mm}-${dd}`;
 
-        const mappedSlots = this.staticSlots.map(slot => {
+        const mappedSlots = this.timeSlots().map(slot => {
             const slotDate = weekDates[slot.day];
 
-            // Filter reservations for this specific slot AND date
-            const slotReservations = reservations.filter(r =>
-                r.slotId === slot.id &&
-                (r.date === slotDate) // Only show bookings for this specific date
+            // 1. Find My Reservations (for "isBookedByCurrentUser" and attendees list if admin/self)
+            const slotMyReservations = reservations.filter(r => {
+                const isSameSlot = r.slotId == slot.id; // Loose equality for safety
+                const isSameDate = r.date === slotDate;
+                return isSameSlot && isSameDate;
+            });
+
+            // 2. Find Global Availability (for "currentBookings")
+            const slotAvailability = availability.find(a =>
+                a.slot_id === slot.id &&
+                a.date === slotDate
             );
 
-            // Calculate total booked spots (sum of dogs)
-            const totalBookedSpots = slotReservations.reduce((acc, r) => {
-                const dogsCount = r.selectedDogs?.length || 1;
-                return acc + dogsCount;
-            }, 0);
+            // Use availability count and attendees
+            let totalBookedSpots = slotAvailability ? slotAvailability.count : 0;
+
+            // Map attendees from availability if present
+            let allAttendees: any[] = [];
+
+            if (slotAvailability && slotAvailability.attendees) {
+                allAttendees = slotAvailability.attendees.map(a => ({
+                    userName: a.user_name,
+                    selectedDogs: a.dogs
+                }));
+            } else {
+                allAttendees = slotMyReservations;
+            }
 
             // Check if current user has a reservation here
             const myReservation = currentUser
-                ? slotReservations.find(r => r.userId === currentUser.uid)
+                ? slotMyReservations.find(r => {
+                    const sameUser = String(r.userId) === String(currentUser.id);
+                    return sameUser;
+                })
                 : undefined;
 
             return {
                 ...slot,
-                date: slotDate, // Add date to slot for booking usage
+                date: slotDate,
                 currentBookings: totalBookedSpots,
                 isBookedByCurrentUser: !!myReservation,
                 userReservationId: myReservation?.id,
-                reservations: slotReservations
+                reservations: allAttendees
             } as TimeSlot & { date: string };
         });
 
@@ -161,7 +165,7 @@ export class GestionarReservasComponent {
 
             // Determine period based on the first slot's start time
             // Example assumption: if first slot starts before 16:00, it's mainly Morning/Day
-            const firstSlotStart = parseInt(daySlots[0].startTime.split(':')[0]);
+            const firstSlotStart = parseInt(daySlots[0].start_time.split(':')[0]);
             const period = firstSlotStart < 16 ? 'Mañana' : 'Tarde';
 
             return {
@@ -172,85 +176,68 @@ export class GestionarReservasComponent {
         }).filter(g => g !== null);
     });
 
-    generateSlotsDefinition() {
-        const slots: TimeSlot[] = [];
-        let idCounter = 1;
+    openManageModal() {
+        this.isManageModalOpen = true;
+        this.editingSlot = null;
+        this.slotForm = {
+            day: 'Lunes',
+            startTime: '10:00',
+            endTime: '11:00',
+            maxBookings: 5
+        };
+    }
 
-        // 1. Lunes y Jueves
-        // Horario de 10:00 a 14:30 (aprox 15:00), clases de 1h 30min
-        const monThu = ['Lunes', 'Jueves'];
-        monThu.forEach(day => {
-            // Slot 1: 10:00 - 11:30
-            slots.push({
-                id: idCounter++,
-                day,
-                startTime: '10:00',
-                endTime: '11:30',
-                currentBookings: 0,
-                maxBookings: 5,
-                isBookedByCurrentUser: false
-            });
-            // Slot 2: 11:30 - 13:00
-            slots.push({
-                id: idCounter++,
-                day,
-                startTime: '11:30',
-                endTime: '13:00',
-                currentBookings: 0,
-                maxBookings: 5,
-                isBookedByCurrentUser: false
-            });
-            // Slot 3: 13:00 - 14:30
-            slots.push({
-                id: idCounter++,
-                day,
-                startTime: '13:00',
-                endTime: '14:30',
-                currentBookings: 0,
-                maxBookings: 5,
-                isBookedByCurrentUser: false
-            });
-        });
+    editSlot(slot: TimeSlot) {
+        this.isManageModalOpen = true;
+        this.editingSlot = slot;
+        this.slotForm = {
+            day: slot.day,
+            startTime: slot.start_time, // Backend uses snake_case
+            endTime: slot.end_time,
+            maxBookings: slot.max_bookings
+        };
+    }
 
-        // 2. Martes, Miércoles y Viernes
-        // 16:30 - 18:00 (7 plazas)
-        // 18:00 - 19:30 (5 plazas)
-        // 19:30 - 21:00 (6 plazas)
-        const tueWedFri = ['Martes', 'Miércoles', 'Viernes'];
-        tueWedFri.forEach(day => {
-            // Slot 1
-            slots.push({
-                id: idCounter++,
-                day,
-                startTime: '16:30',
-                endTime: '18:00',
-                currentBookings: 0,
-                maxBookings: 7,
-                isBookedByCurrentUser: false
-            });
-            // Slot 2
-            slots.push({
-                id: idCounter++,
-                day,
-                startTime: '18:00',
-                endTime: '19:30',
-                currentBookings: 0,
-                maxBookings: 5,
-                isBookedByCurrentUser: false
-            });
-            // Slot 3
-            slots.push({
-                id: idCounter++,
-                day,
-                startTime: '19:30',
-                endTime: '21:00',
-                currentBookings: 0,
-                maxBookings: 6,
-                isBookedByCurrentUser: false
-            });
-        });
+    closeManageModal() {
+        this.isManageModalOpen = false;
+        this.editingSlot = null;
+    }
 
-        return slots;
+    async deleteSlot(id: number) {
+        if (confirm('¿Estás seguro de eliminar este horario? Se perderán las reservas asociadas.')) {
+            try {
+                await this.timeSlotService.deleteTimeSlot(id);
+                this.timeSlotService.fetchTimeSlots(); // Refresh
+                this.toastService.success('Horario eliminado.');
+            } catch (error) {
+                console.error(error);
+                this.toastService.error('Error al eliminar.');
+            }
+        }
+    }
+
+    async saveSlot() {
+        try {
+            const slotData = {
+                day: this.slotForm.day,
+                start_time: this.slotForm.startTime,
+                end_time: this.slotForm.endTime,
+                max_bookings: this.slotForm.maxBookings
+            };
+
+            if (this.editingSlot) {
+                await this.timeSlotService.updateTimeSlot(this.editingSlot.id, slotData);
+                this.toastService.success('Horario actualizado.');
+            } else {
+                await this.timeSlotService.addTimeSlot(slotData as any);
+                this.toastService.success('Horario creado.');
+            }
+            this.timeSlotService.fetchTimeSlots(); // Refresh
+            this.closeManageModal();
+        } catch (error) {
+            console.error(error);
+            this.toastService.error('Error al guardar.');
+        }
     }
 
     bookSlot(slot: TimeSlot) {
@@ -260,7 +247,7 @@ export class GestionarReservasComponent {
             return;
         }
 
-        if (slot.currentBookings >= slot.maxBookings) {
+        if (slot.currentBookings! >= slot.max_bookings) {
             this.toastService.error('Esta clase está completa.');
             return;
         }
@@ -288,7 +275,6 @@ export class GestionarReservasComponent {
     }
 
     toggleDogSelection(dogName: string) {
-        // Create a new Set to force change detection
         const newSet = new Set(this.selectedDogIds);
         if (newSet.has(dogName)) {
             newSet.delete(dogName);
@@ -307,7 +293,6 @@ export class GestionarReservasComponent {
     async confirmBooking() {
         if (!this.selectedSlotForBooking || this.isSubmitting()) return;
 
-        // Validation: At least one dog
         if (this.selectedDogIds.size === 0) {
             this.toastService.warning('Por favor, selecciona al menos un perro.');
             return;
@@ -316,15 +301,13 @@ export class GestionarReservasComponent {
         const user = this.authService.currentUserSignal();
         if (!user) return;
 
-        const userProfile = this.authService.userProfileSignal();
-        if (!user || !userProfile) return;
+        const userName = user.name || 'Usuario';
 
-        // Validation: Check capacity with latest state
         const currentSlotState = this.slots().find(s => s.id === this.selectedSlotForBooking!.id);
         if (currentSlotState) {
             const dogsCount = this.selectedDogIds.size;
-            if (currentSlotState.currentBookings + dogsCount > currentSlotState.maxBookings) {
-                const available = currentSlotState.maxBookings - currentSlotState.currentBookings;
+            if (currentSlotState.currentBookings! + dogsCount > currentSlotState.max_bookings) {
+                const available = currentSlotState.max_bookings - currentSlotState.currentBookings!;
                 this.toastService.error(`No hay suficientes plazas. Intentas reservar para ${dogsCount} perro(s) pero solo quedan ${available} plazas.`);
                 return;
             }
@@ -337,14 +320,13 @@ export class GestionarReservasComponent {
 
             await this.reservationService.addReservation({
                 slotId: this.selectedSlotForBooking.id,
-                userId: user.uid,
-                userName: userProfile.displayName || 'Usuario',
+                userId: user.id,
+                userName: userName,
                 userEmail: user.email || '',
                 day: this.selectedSlotForBooking.day,
-                startTime: this.selectedSlotForBooking.startTime,
-                date: this.selectedSlotForBooking.date, // Add specific date
-                selectedDogs: selectedDogsList,
-                createdAt: Date.now()
+                start_time: this.selectedSlotForBooking.start_time,
+                date: this.selectedSlotForBooking.date,
+                selectedDogs: selectedDogsList
             });
             this.closeModal();
             this.toastService.success('¡Reserva confirmada con éxito!');

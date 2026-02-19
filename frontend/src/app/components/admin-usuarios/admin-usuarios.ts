@@ -39,7 +39,7 @@ export class AdminUsuariosComponent implements OnInit {
 
     try {
       const role = newRole as 'user' | 'member' | 'staff' | 'admin';
-      await this.authService.updateUserRole(user.uid, role);
+      await this.authService.updateUserRole(user.id, role);
 
       this.users.update(users =>
         users.map(u => u.uid === user.uid ? { ...u, role: role } : u)

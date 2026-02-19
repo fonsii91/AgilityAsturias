@@ -1,7 +1,13 @@
 <div class="perfil-container" *ngIf="authService.userProfileSignal() as user">
     <div class="profile-header">
-        <img [src]="user.photoURL || 'assets/default-user.png'" alt="Avatar" class="profile-avatar"
-            referrerpolicy="no-referrer">
+        <div class="avatar-container">
+            <img [src]="previewUrl || user.photoURL || 'assets/default-user.png'" alt="Avatar" class="profile-avatar"
+                referrerpolicy="no-referrer">
+            <label class="camera-btn" title="Cambiar foto">
+                📷
+                <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+            </label>
+        </div>
         <div class="profile-info">
             <div class="name-edit-container">
                 <div *ngIf="!isEditingName()" class="name-display">

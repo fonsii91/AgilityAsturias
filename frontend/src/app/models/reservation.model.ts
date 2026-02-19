@@ -1,12 +1,12 @@
 export interface Reservation {
-    id: string;
+    id: number;
     slotId: number;
-    userId: string;
+    userId: number;
     userName: string;
     userEmail: string;
     day: string;
-    startTime: string;
+    start_time: string;
     date?: string; // YYYY-MM-DD to handle weeks
-    createdAt: number;
+    createdAt?: string;
     selectedDogs?: string[]; // Names of the dogs
 }

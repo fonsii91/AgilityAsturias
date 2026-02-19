@@ -31,7 +31,7 @@ export class InfoReservasComponent {
         const map = new Map<string, Reservation[]>();
 
         raw.forEach(r => {
-            const time = r.startTime || 'Unknown';
+            const time = r.start_time || 'Unknown';
             if (!map.has(time)) map.set(time, []);
             map.get(time)!.push(r);
         });
@@ -64,7 +64,7 @@ export class InfoReservasComponent {
                 // Group this day's reservations by time
                 const timeMap = new Map<string, Reservation[]>();
                 dayReservations.forEach(r => {
-                    const time = r.startTime || 'Unknown';
+                    const time = r.start_time || 'Unknown';
                     if (!timeMap.has(time)) timeMap.set(time, []);
                     timeMap.get(time)!.push(r);
                 });

@@ -68,5 +68,10 @@ export const routes: Routes = [
         path: 'login',
         component: LoginComponent,
         title: 'Iniciar Sesión | Agility Asturias'
+    },
+    {
+        path: 'register',
+        loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent),
+        title: 'Registrarse | Agility Asturias'
     }
 ];

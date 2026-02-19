@@ -36,7 +36,7 @@
                     referrerpolicy="no-referrer">
                 <ng-template #defaultAvatar>
                     <div class="nav-user-img default-avatar-placeholder">
-                        {{ user.displayName.charAt(0) || 'U' }}
+                        {{ user.name.charAt(0) || 'U' }}
                     </div>
                 </ng-template>
                 <span class="dropdown-arrow">▼</span>
@@ -49,7 +49,7 @@
                     <p class="email">{{ user.email }}</p>
                 </div>
                 <div class="dropdown-divider"></div>
-                <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item">🐶 Mis Perretes</a>
+                <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item">🐶 Mi Perfil</a>
                 <a *ngIf="authService.isMember()" routerLink="/reservas" (click)="closeMenu()" class="dropdown-item">📅
                     Mis Reservas</a>
 

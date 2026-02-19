@@ -68,7 +68,7 @@ export class GestionarMiembrosComponent implements OnInit {
     this.closeModal();
 
     try {
-      await this.authService.updateUserRole(user.uid, newRole);
+      await this.authService.updateUserRole(user.id, newRole);
 
       this.users.update(users =>
         users.map(u => u.uid === user.uid ? { ...u, role: newRole } : u)

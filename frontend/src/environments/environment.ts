@@ -8,5 +8,6 @@ export const environment = {
         messagingSenderId: "898271086134",
         appId: "1:898271086134:web:10e005442180b8d2943a97",
         measurementId: "G-N6SP2XNR7Q"
-    }
+    },
+    apiUrl: 'http://agility_back.test/api'
 };

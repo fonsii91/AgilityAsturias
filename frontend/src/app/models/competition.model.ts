@@ -1,5 +1,5 @@
 export interface Competition {
-    id: string;
+    id: number;
     lugar: string;
     fechaEvento: string;
     fechaFinEvento?: string; // Optional for multi-day events
