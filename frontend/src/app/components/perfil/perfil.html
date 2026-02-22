@@ -45,7 +45,15 @@
             </div>
 
             <div class="dog-card" *ngFor="let dog of dogs()">
-                <div class="dog-icon">🐕</div>
+                <div class="dog-icon-container">
+                    <img *ngIf="dog.photo_url" [src]="dog.photo_url" alt="{{ dog.name }}" class="dog-avatar"
+                        referrerpolicy="no-referrer">
+                    <div *ngIf="!dog.photo_url" class="dog-icon">🐕</div>
+                    <label class="camera-btn-dog" title="Cambiar foto">
+                        📷
+                        <input type="file" (change)="onDogFileSelected($event, dog.id)" accept="image/*" hidden>
+                    </label>
+                </div>
                 <div class="dog-info">
                     <span class="dog-name">{{ dog.name }}</span>
                 </div>

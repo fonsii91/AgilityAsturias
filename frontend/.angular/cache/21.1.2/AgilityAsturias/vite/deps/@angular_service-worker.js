@@ -5,7 +5,7 @@ import {
   provideAppInitializer,
   setClassMetadata,
   ɵɵdefineNgModule
-} from "./chunk-GYSCVIKI.js";
+} from "./chunk-R6GDVNLI.js";
 import {
   InjectionToken,
   Injector,
@@ -17,7 +17,7 @@ import {
   ɵɵdefineInjectable,
   ɵɵdefineInjector,
   ɵɵinject
-} from "./chunk-MTB57I3S.js";
+} from "./chunk-LOKY7SF2.js";
 import {
   NEVER,
   Observable,
@@ -26,12 +26,12 @@ import {
   map,
   switchMap,
   take
-} from "./chunk-QLD5UN5Y.js";
+} from "./chunk-RSS3ODKE.js";
 import {
   __spreadValues
 } from "./chunk-GOMI4DH3.js";
 
-// ../node_modules/@angular/service-worker/fesm2022/service-worker.mjs
+// node_modules/@angular/service-worker/fesm2022/service-worker.mjs
 var ERR_SW_NOT_SUPPORTED = "Service workers are disabled or not supported by this browser";
 var NgswCommChannel = class {
   serviceWorker;

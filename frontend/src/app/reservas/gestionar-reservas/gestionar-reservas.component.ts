@@ -27,9 +27,9 @@ export class GestionarReservasComponent {
     // Modal state
     isModalOpen = false;
     isSubmitting = signal(false);
-    selectedSlotForBooking: TimeSlot | null = null;
+    selectedSlotForBooking: (TimeSlot & { date: string }) | null = null;
     myDogs = this.dogService.getDogs();
-    selectedDogIds: Set<string> = new Set(); // Store Dog NAMES
+    selectedDogIds: Set<number> = new Set(); // Store Dog IDs
 
     // UI State for expanding attendees
     expandedSlots = signal<Set<number>>(new Set());
@@ -240,7 +240,7 @@ export class GestionarReservasComponent {
         }
     }
 
-    bookSlot(slot: TimeSlot) {
+    bookSlot(slot: TimeSlot & { date: string }) {
         const user = this.authService.currentUserSignal();
         if (!user) {
             this.toastService.warning('Debes iniciar sesión para reservar.');
@@ -274,12 +274,12 @@ export class GestionarReservasComponent {
         this.expandedSlots.set(currentSet);
     }
 
-    toggleDogSelection(dogName: string) {
+    toggleDogSelection(dogId: number) {
         const newSet = new Set(this.selectedDogIds);
-        if (newSet.has(dogName)) {
-            newSet.delete(dogName);
+        if (newSet.has(dogId)) {
+            newSet.delete(dogId);
         } else {
-            newSet.add(dogName);
+            newSet.add(dogId);
         }
         this.selectedDogIds = newSet;
     }
@@ -303,6 +303,7 @@ export class GestionarReservasComponent {
 
         const userName = user.name || 'Usuario';
 
+        // 1. Find the current slot state in the computed "slots()"
         const currentSlotState = this.slots().find(s => s.id === this.selectedSlotForBooking!.id);
         if (currentSlotState) {
             const dogsCount = this.selectedDogIds.size;
@@ -321,33 +322,55 @@ export class GestionarReservasComponent {
             await this.reservationService.addReservation({
                 slotId: this.selectedSlotForBooking.id,
                 userId: user.id,
-                userName: userName,
-                userEmail: user.email || '',
-                day: this.selectedSlotForBooking.day,
-                start_time: this.selectedSlotForBooking.start_time,
                 date: this.selectedSlotForBooking.date,
-                selectedDogs: selectedDogsList
+                dogIds: selectedDogsList
             });
             this.closeModal();
             this.toastService.success('¡Reserva confirmada con éxito!');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error al reservar:', error);
-            this.toastService.error('Hubo un error al realizar la reserva.');
+            // Handle specific backend error message
+            if (error.error && error.error.message) {
+                this.toastService.error(error.error.message);
+            } else {
+                this.toastService.error('Hubo un error al realizar la reserva.');
+            }
             this.isSubmitting.set(false);
         }
     }
 
-    async cancelSlot(slot: TimeSlot) {
-        if (!slot.userReservationId) return;
+    // Cancellation Modal State
+    isCancelModalOpen = false;
+    selectedSlotForCancellation: TimeSlot | null = null;
 
-        if (confirm('¿Quieres cancelar tu reserva para esta clase?')) {
-            try {
-                await this.reservationService.deleteReservation(slot.userReservationId);
-                this.toastService.success('Reserva cancelada correctamente.');
-            } catch (error) {
-                console.error(error);
-                this.toastService.error('Error al cancelar.');
-            }
+    openCancelModal(slot: TimeSlot & { date: string }) {
+        if (!slot.isBookedByCurrentUser) return;
+        this.selectedSlotForCancellation = slot;
+        this.isCancelModalOpen = true;
+    }
+
+    closeCancelModal() {
+        this.isCancelModalOpen = false;
+        this.selectedSlotForCancellation = null;
+    }
+
+    async confirmCancellation() {
+        // Now using slot_id and date to cancel all my reservations for this block
+        if (!this.selectedSlotForCancellation) return;
+
+        this.isSubmitting.set(true);
+        try {
+            await this.reservationService.deleteBlock(
+                this.selectedSlotForCancellation.id,
+                (this.selectedSlotForCancellation as any).date
+            );
+            this.toastService.success('Reserva cancelada correctamente.');
+            this.closeCancelModal();
+        } catch (error) {
+            console.error(error);
+            this.toastService.error('Error al cancelar.');
+        } finally {
+            this.isSubmitting.set(false);
         }
     }
 }

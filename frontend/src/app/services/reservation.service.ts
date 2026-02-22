@@ -49,16 +49,21 @@ export class ReservationService {
         return this.availabilitySignal;
     }
 
-    addReservation(res: Omit<Reservation, 'id'>) {
-        const payload = this.mapToBackend(res);
-        return new Promise<Reservation>((resolve, reject) => {
-            this.http.post<any>(this.apiUrl, payload).subscribe({
-                next: (newResData) => {
-                    const newRes = this.mapFromBackend(newResData);
-                    this.reservationsSignal.update(list => [...list, newRes]);
+    addReservation(payload: { slotId: number, userId: number, date: string, dogIds: number[] }) {
+        const backendPayload = {
+            slot_id: payload.slotId,
+            user_id: payload.userId,
+            date: payload.date,
+            dog_ids: payload.dogIds
+        };
+        return new Promise<Reservation[]>((resolve, reject) => {
+            this.http.post<any[]>(this.apiUrl, backendPayload).subscribe({
+                next: (newResDataArray) => {
+                    const newReservations = newResDataArray.map(item => this.mapFromBackend(item));
+                    this.reservationsSignal.update(list => [...list, ...newReservations]);
                     // Refresh availability after booking
                     this.fetchAvailability();
-                    resolve(newRes);
+                    resolve(newReservations);
                 },
                 error: (err) => reject(err)
             });
@@ -79,22 +84,44 @@ export class ReservationService {
         });
     }
 
+    deleteBlock(slotId: number, date: string) {
+        return new Promise<void>((resolve, reject) => {
+            this.http.delete(`${this.apiUrl}/block?slot_id=${slotId}&date=${date}`).subscribe({
+                next: () => {
+                    this.fetchReservations();
+                    this.fetchAvailability();
+                    resolve();
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    // Attendance Verification (Admin/Staff)
+    getPendingAttendance() {
+        return this.http.get<any[]>(`${environment.apiUrl}/admin/attendance/pending`);
+    }
+
+    confirmAttendance(data: { date: string, slot_id: number, attended_ids: number[] }) {
+        return this.http.post(`${environment.apiUrl}/admin/attendance/confirm`, data);
+    }
+
+    // Ranking
+    getRanking() {
+        return this.http.get<any[]>(`${environment.apiUrl}/ranking`);
+    }
+
     // Mapper methods
     private mapToBackend(res: Omit<Reservation, 'id'>): any {
         return {
             slot_id: res.slotId,
             user_id: res.userId,
-            user_name: res.userName,
-            user_email: res.userEmail,
-            day: res.day,
-            start_time: res.start_time,
-            date: res.date,
-            selected_dogs: res.selectedDogs
+            date: res.date
+            // dogIds handled separately in addReservation
         };
     }
 
     private mapFromBackend(data: any): Reservation {
-        // Ensure date is YYYY-MM-DD
         const dateStr = data.date && typeof data.date === 'string'
             ? data.date.substring(0, 10)
             : data.date;
@@ -103,13 +130,20 @@ export class ReservationService {
             id: data.id,
             slotId: data.slot_id,
             userId: data.user_id,
-            userName: data.user_name,
-            userEmail: data.user_email,
-            day: data.day,
-            start_time: data.start_time,
             date: dateStr,
-            selectedDogs: data.selected_dogs,
-            createdAt: data.created_at
+            dogId: data.dog_id,
+            dog: data.dog,
+            status: data.status,
+            createdAt: data.created_at,
+
+            // Map relationships
+            user: data.user,
+            timeSlot: data.time_slot || data.timeSlot, // Handle camelCase if converted or snake_case
+
+            // Flatten for compatibility with existing component logic
+            userName: data.user?.name || 'Usuario',
+            day: data.time_slot?.day || '',
+            startTime: data.time_slot?.start_time || ''
         };
     }
 }

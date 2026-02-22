@@ -50,4 +50,19 @@ export class DogService {
             });
         });
     }
+
+    updateDogPhoto(dogId: number, photo: File) {
+        return new Promise<Dog>((resolve, reject) => {
+            const formData = new FormData();
+            formData.append('photo', photo);
+
+            this.http.post<Dog>(`${this.apiUrl}/${dogId}/photo`, formData).subscribe({
+                next: (updatedDog) => {
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? updatedDog : d));
+                    resolve(updatedDog);
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
 }

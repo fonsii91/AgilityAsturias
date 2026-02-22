@@ -2,11 +2,30 @@ export interface Reservation {
     id: number;
     slotId: number;
     userId: number;
-    userName: string;
-    userEmail: string;
-    day: string;
-    start_time: string;
-    date?: string; // YYYY-MM-DD to handle weeks
+    date?: string; // YYYY-MM-DD
     createdAt?: string;
-    selectedDogs?: string[]; // Names of the dogs
+    dogId?: number;
+    status?: 'active' | 'cancelled';
+
+    // Relationships
+    dog?: {
+        name: string;
+        photo_url?: string;
+    };
+
+    // Relationships
+    user?: {
+        name: string;
+        email: string;
+    };
+    timeSlot?: {
+        day: string;
+        start_time: string;
+        end_time: string;
+    };
+
+    // Flattened properties for easier access in components (mapped)
+    userName?: string;
+    day?: string;
+    startTime?: string;
 }

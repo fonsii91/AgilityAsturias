@@ -31,14 +31,23 @@ export class InfoReservasComponent {
         const map = new Map<string, Reservation[]>();
 
         raw.forEach(r => {
-            const time = r.start_time || 'Unknown';
+            const time = r.startTime || 'Unknown';
             if (!map.has(time)) map.set(time, []);
             map.get(time)!.push(r);
         });
 
         return Array.from(map.entries())
             .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([time, reservations]) => ({ time, reservations }));
+            .map(([time, reservations]) => {
+                const userMap = new Map<string, string[]>();
+                reservations.forEach(r => {
+                    const uName = r.userName || 'Usuario';
+                    if (!userMap.has(uName)) userMap.set(uName, []);
+                    if (r.dog?.name) userMap.get(uName)!.push(r.dog.name);
+                });
+                const groupedUsers = Array.from(userMap.entries()).map(([userName, dogs]) => ({ userName, selectedDogs: dogs }));
+                return { time, reservations: groupedUsers, rawCount: reservations.length };
+            });
     });
 
     // Compute future reservations (Tomorrow onwards)
@@ -64,14 +73,23 @@ export class InfoReservasComponent {
                 // Group this day's reservations by time
                 const timeMap = new Map<string, Reservation[]>();
                 dayReservations.forEach(r => {
-                    const time = r.start_time || 'Unknown';
+                    const time = r.startTime || 'Unknown';
                     if (!timeMap.has(time)) timeMap.set(time, []);
                     timeMap.get(time)!.push(r);
                 });
 
                 const timeSlots = Array.from(timeMap.entries())
                     .sort((a, b) => a[0].localeCompare(b[0]))
-                    .map(([time, reservations]) => ({ time, reservations }));
+                    .map(([time, reservations]) => {
+                        const userMap = new Map<string, string[]>();
+                        reservations.forEach(r => {
+                            const uName = r.userName || 'Usuario';
+                            if (!userMap.has(uName)) userMap.set(uName, []);
+                            if (r.dog?.name) userMap.get(uName)!.push(r.dog.name);
+                        });
+                        const groupedUsers = Array.from(userMap.entries()).map(([userName, dogs]) => ({ userName, selectedDogs: dogs }));
+                        return { time, reservations: groupedUsers };
+                    });
 
                 return {
                     date,
@@ -83,8 +101,10 @@ export class InfoReservasComponent {
 
     // Stats
     statsHoje = computed(() => ({
-        totalReservas: this.todayReservationsRaw().length,
-        totalPerros: this.todayReservationsRaw().reduce((acc, curr) => acc + (curr.selectedDogs?.length || 0), 0)
+        // Number of unique families
+        totalReservas: new Set(this.todayReservationsRaw().map(r => r.userId)).size,
+        // Number of dogs
+        totalPerros: this.todayReservationsRaw().length
     }));
 
     constructor() { }

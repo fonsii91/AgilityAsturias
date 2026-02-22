@@ -1,24 +1,35 @@
-<header class="app-header">
+<mat-toolbar class="app-toolbar">
     <div class="logo-area">
-        <button class="mobile-menu-btn" (click)="toggleMenu()" [class.active]="isMenuOpen">
+        <button class="mobile-menu-btn" (click)="toggleMenu()">
             <span class="bar"></span>
             <span class="bar"></span>
             <span class="bar"></span>
         </button>
         <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo" class="nav-logo">
-        <h1>Agility Asturias</h1>
+        <h1 class="nav-title">Agility Asturias</h1>
     </div>
-    <nav>
-        <ul [class.active]="isMenuOpen">
-            <li><a routerLink="/" (click)="closeMenu()">Bienvenido</a></li>
-            <li *ngIf="authService.isMember()"><a routerLink="/reservas" (click)="closeMenu()">Reservas</a>
+
+    <!-- Spacer to push items to the right -->
+    <span class="toolbar-spacer"></span>
+
+    <nav class="desktop-nav">
+        <ul>
+            <li><a routerLink="/"><span class="material-icons">home</span> Bienvenido</a></li>
+            <li *ngIf="authService.isMember()"><a routerLink="/reservas"><span class="material-icons">event</span>
+                    Reservas</a>
             </li>
-            <li><a routerLink="/galeria" (click)="closeMenu()">Galería</a></li>
-            <li *ngIf="authService.isMember()"><a routerLink="/calendario" (click)="closeMenu()">Calendario</a>
+            <li *ngIf="authService.isMember()"><a routerLink="/ranking"><span class="material-icons">emoji_events</span>
+                    Clasificación</a></li>
+            <li><a routerLink="/galeria"><span class="material-icons">photo_library</span>
+                    Galería</a></li>
+            <li *ngIf="authService.isMember()"><a routerLink="/calendario"><span
+                        class="material-icons">calendar_month</span> Calendario</a>
             </li>
-            <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones" (click)="closeMenu()">Eventos</a>
+            <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones"><span
+                        class="material-icons">sports_score</span> Eventos</a>
             </li>
-            <li><a routerLink="/contacto" (click)="closeMenu()">Contacto</a></li>
+            <li><a routerLink="/contacto"><span class="material-icons">contact_support</span>
+                    Contacto</a></li>
         </ul>
     </nav>
 
@@ -28,6 +39,52 @@
         <a *ngIf="!authService.userProfileSignal()" routerLink="/login" (click)="closeMenu()" class="login-btn">
             Iniciar Sesión
         </a>
+
+        <!-- Notifications Dropdown -->
+        <div class="notification-container" *ngIf="authService.userProfileSignal()">
+            <button class="notification-btn" (click)="toggleNotifications($event)">
+                <span class="material-icons">notifications</span>
+                <span class="badge" *ngIf="notificationService.unreadCountSignal() > 0">
+                    {{notificationService.unreadCountSignal()}}
+                </span>
+            </button>
+            <div class="notification-menu" [class.show]="isNotificationsOpen">
+                <div class="notification-header">
+                    <p>Notificaciones</p>
+                    <button class="mark-all-btn" (click)="markAllAsRead()"
+                        *ngIf="notificationService.unreadCountSignal() > 0">
+                        Marcar todas leídas
+                    </button>
+                </div>
+                <div class="notification-list">
+                    <div class="notification-item" *ngFor="let notif of notificationService.notificationsSignal()"
+                        (click)="handleNotificationClick(notif)">
+
+                        <div class="notif-icon-container" [ngClass]="{
+                                'event-icon': notif.type.includes('NewEventNotification') || notif.data.type === 'new_event', 
+                                'point-icon': notif.type.includes('DogPointNotification') || notif.data.type === 'dog_point',
+                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && notif.data.type !== 'dog_point'
+                            }">
+                            <span class="material-icons"
+                                *ngIf="notif.type.includes('NewEventNotification') || notif.data.type === 'new_event'">event_available</span>
+                            <span class="material-icons"
+                                *ngIf="notif.type.includes('DogPointNotification') || notif.data.type === 'dog_point'">emoji_events</span>
+                            <span class="material-icons"
+                                *ngIf="!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && notif.data.type !== 'dog_point'">notifications</span>
+                        </div>
+
+                        <div class="notif-content">
+                            <p class="notif-message">{{ notif.data.message }}</p>
+                            <span class="notif-time"><span class="material-icons time-icon">schedule</span> {{
+                                notif.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
+                        </div>
+                    </div>
+                    <div class="notification-empty" *ngIf="notificationService.notificationsSignal().length === 0">
+                        No tienes notificaciones nuevas
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Logged In User Dropdown -->
         <div class="user-dropdown-container" *ngIf="authService.userProfileSignal() as user">
@@ -49,30 +106,34 @@
                     <p class="email">{{ user.email }}</p>
                 </div>
                 <div class="dropdown-divider"></div>
-                <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item">🐶 Mi Perfil</a>
-                <a *ngIf="authService.isMember()" routerLink="/reservas" (click)="closeMenu()" class="dropdown-item">📅
-                    Mis Reservas</a>
+                <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item"><span
+                        class="material-icons">pets</span> Mi Perfil</a>
+                <a *ngIf="authService.isMember()" routerLink="/reservas" (click)="closeMenu()"
+                    class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
 
                 <div class="dropdown-divider" *ngIf="authService.isStaff()"></div>
+                <a *ngIf="authService.isStaff()" routerLink="/admin/asistencia" (click)="closeMenu()"
+                    class="dropdown-item staff-item">
+                    <span class="material-icons">fact_check</span> Verificar Asistencia
+                </a>
                 <a *ngIf="authService.isStaff()" routerLink="/gestionar-miembros" (click)="closeMenu()"
                     class="dropdown-item staff-item">
-                    👥 Gestión de Miembros
+                    <span class="material-icons">people</span> Gestión de Miembros
                 </a>
                 <a *ngIf="authService.isStaff()" routerLink="/info-reservas" (click)="closeMenu()"
                     class="dropdown-item staff-item">
-                    👀 Monitor Reservas
+                    <span class="material-icons">visibility</span> Monitor Reservas
                 </a>
 
                 <div class="dropdown-divider" *ngIf="authService.isAdmin()"></div>
                 <a *ngIf="authService.isAdmin()" routerLink="/admin/usuarios" (click)="closeMenu()"
                     class="dropdown-item admin-item">
-                    🔧 Administrar Sistema
+                    <span class="material-icons">admin_panel_settings</span> Administrar Sistema
                 </a>
-                <button (click)="logout()" class="dropdown-item logout-item">🚪 Cerrar Sesión</button>
+                <button (click)="logout()" class="dropdown-item logout-item"><span class="material-icons">logout</span>
+                    Cerrar Sesión</button>
             </div>
-
-            <!-- Backdrop to close menu when clicking outside -->
-            <div class="dropdown-backdrop" *ngIf="isUserMenuOpen" (click)="closeMenu()"></div>
+            <div class="dropdown-backdrop" *ngIf="isUserMenuOpen || isNotificationsOpen" (click)="closeMenu()"></div>
         </div>
     </div>
-</header>
+</mat-toolbar>

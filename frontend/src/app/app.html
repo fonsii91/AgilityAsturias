@@ -1,13 +1,42 @@
 <div class="app-container">
-  <app-navbar></app-navbar>
+  <app-navbar (toggleSidenav)="sidenav.toggle()"></app-navbar>
 
-  <main>
-    <router-outlet />
-  </main>
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav mode="over" class="mobile-sidenav" position="start"
+      [attr.role]="(authService.isMember() ? 'navigation' : 'dialog')">
+      <!-- Mobile Navigation Links -->
+      <nav class="mobile-nav">
+        <ul>
+          <li><a routerLink="/" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenido</a></li>
+          <li *ngIf="authService.isMember()"><a routerLink="/reservas" (click)="sidenav.close()"><span
+                class="material-icons">event</span> Reservas</a>
+          </li>
+          <li *ngIf="authService.isMember()"><a routerLink="/ranking" (click)="sidenav.close()"><span
+                class="material-icons">emoji_events</span> Clasificación</a></li>
+          <li><a routerLink="/galeria" (click)="sidenav.close()"><span class="material-icons">photo_library</span>
+              Galería</a></li>
+          <li *ngIf="authService.isMember()"><a routerLink="/calendario" (click)="sidenav.close()"><span
+                class="material-icons">calendar_month</span> Calendario</a>
+          </li>
+          <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones" (click)="sidenav.close()"><span
+                class="material-icons">sports_score</span> Eventos</a>
+          </li>
+          <li><a routerLink="/contacto" (click)="sidenav.close()"><span class="material-icons">contact_support</span>
+              Contacto</a></li>
+        </ul>
+      </nav>
+    </mat-sidenav>
 
-  <footer>
-    <p>&copy; 2026 Agility Asturias</p>
-  </footer>
+    <mat-sidenav-content>
+      <main>
+        <router-outlet />
+      </main>
+
+      <footer>
+        <p>&copy; 2026 Agility Asturias</p>
+      </footer>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 
   <app-toast />
 </div>

@@ -1,0 +1,64 @@
+<div class="ranking-container">
+    <div class="header">
+        <h1>🏆 Clasificación de Perretes</h1>
+        <p>¡Asiste a los entrenamientos y gana puntos!</p>
+    </div>
+
+    <div *ngIf="isLoading()" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando clasificación...</p>
+    </div>
+
+    <div *ngIf="!isLoading() && ranking().length === 0" class="empty-state">
+        <p>Aún no hay puntos registrados. ¡Sé el primero!</p>
+    </div>
+
+    <div *ngIf="!isLoading() && ranking().length > 0" class="ranking-content">
+        <div class="ranking-list glass-effect">
+            <div *ngFor="let dog of ranking(); let i = index" class="ranking-row" [class.top-rank]="i < 3">
+                <div class="rank-position">
+                    <span class="medal-icon" *ngIf="i === 0">🥇</span>
+                    <span class="medal-icon" *ngIf="i === 1">🥈</span>
+                    <span class="medal-icon" *ngIf="i === 2">🥉</span>
+                    <span class="number" *ngIf="i > 2">{{ i + 1 }}</span>
+                </div>
+
+                <div class="user-avatar-small" (click)="openLightbox(dog.photo_url)"
+                    [style.cursor]="dog.photo_url ? 'pointer' : 'default'">
+                    <!-- Standard size for everyone -->
+                    <img [src]="dog.photo_url || 'Images/Agility_Asturias_logo.jpg'" alt="Dog"
+                        onError="this.src='Images/Agility_Asturias_logo.jpg'">
+                </div>
+
+                <div class="user-info">
+                    <div class="name-container">
+                        <span class="user-name" [class.bold]="i < 3">{{ dog.name }}</span>
+                        <div class="weekly-badge" *ngIf="dog.weekly_points > 0" title="Puntos conseguidos esta semana">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20"
+                                fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span>+{{ dog.weekly_points }}</span>
+                        </div>
+                    </div>
+                    <span class="owner-name" *ngIf="dog.user">de {{ dog.user.name }}</span>
+                </div>
+
+                <div class="points-badge">
+                    <span class="points">{{ dog.points }}</span>
+                    <span class="label">pts</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" *ngIf="lightboxOpen()" (click)="closeLightbox()">
+        <button class="close-btn" (click)="closeLightbox()">&times;</button>
+        <div class="lightbox-content" (click)="$event.stopPropagation()">
+            <img [src]="currentImage()" alt="Dog Preview">
+        </div>
+    </div>
+</div>

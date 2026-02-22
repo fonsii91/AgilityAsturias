@@ -97,7 +97,8 @@
 
                 <div class="actions">
                     <!-- Show Cancel button ONLY if booked by current user -->
-                    <button *ngIf="slot.isBookedByCurrentUser" class="btn-action btn-cancel" (click)="cancelSlot(slot)">
+                    <button *ngIf="slot.isBookedByCurrentUser" class="btn-action btn-cancel-card"
+                        (click)="openCancelModal(slot)">
                         Cancelar Reserva
                     </button>
 
@@ -130,18 +131,39 @@
 
             <div class="dog-checkboxes">
                 <label *ngFor="let dog of myDogs()" class="dog-checkbox">
-                    <input type="checkbox" [checked]="selectedDogIds.has(dog.name)"
-                        (change)="toggleDogSelection(dog.name)">
+                    <input type="checkbox" [checked]="selectedDogIds.has(dog.id)" (change)="toggleDogSelection(dog.id)">
                     <span class="dog-label">🐾 {{ dog.name }}</span>
                 </label>
             </div>
         </div>
 
         <div class="modal-actions">
-            <button class="btn-cancel" (click)="closeModal()">Cancelar</button>
+            <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
             <button class="btn-confirm" (click)="confirmBooking()"
                 [disabled]="(myDogs().length > 0 && selectedDogIds.size === 0) || isSubmitting()">
                 {{ isSubmitting() ? 'Reservando...' : 'Confirmar Reserva' }}
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Cancellation Modal -->
+<div class="modal-backdrop" *ngIf="isCancelModalOpen" (click)="closeCancelModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>😢 Cancelar Reserva</h3>
+
+        <div class="modal-body">
+            <p class="confirm-message">¿Estás seguro de que quieres cancelar tu reserva para el <strong>{{
+                    selectedSlotForCancellation?.day }}</strong> a las <strong>{{
+                    selectedSlotForCancellation?.start_time }}</strong>?</p>
+
+            <p class="note warning">Esta acción liberará tu plaza inmediatamente.</p>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="closeCancelModal()">No, mantener</button>
+            <button class="btn-confirm btn-delete-action" (click)="confirmCancellation()" [disabled]="isSubmitting()">
+                {{ isSubmitting() ? 'Cancelando...' : 'Sí, cancelar reserva' }}
             </button>
         </div>
     </div>

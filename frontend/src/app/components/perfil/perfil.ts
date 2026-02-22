@@ -83,6 +83,27 @@ export class Perfil {
     }
   }
 
+  async onDogFileSelected(event: any, dogId: number) {
+    const file = event.target.files[0];
+    if (file) {
+      this.imageCompressor.compress(file).then(compressedFile => {
+        this.uploadDogPhoto(dogId, compressedFile);
+      }).catch(error => {
+        console.error('Error compressing dog image:', error);
+        alert('Error al procesar la imagen del perro.');
+      });
+    }
+  }
+
+  async uploadDogPhoto(dogId: number, file: File) {
+    try {
+      await this.dogService.updateDogPhoto(dogId, file);
+    } catch (error) {
+      console.error('Error uploading dog photo:', error);
+      alert('Error al subir la foto del perro');
+    }
+  }
+
   async saveName() {
     if (!this.editedName().trim()) return;
 

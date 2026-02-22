@@ -65,6 +65,18 @@ export const routes: Routes = [
         title: 'Admin Usuarios | Agility Asturias'
     },
     {
+        path: 'ranking',
+        loadComponent: () => import('./components/ranking/ranking.component').then(m => m.RankingComponent),
+        canActivate: [memberGuard],
+        title: 'Ranking | Agility Asturias'
+    },
+    {
+        path: 'admin/asistencia',
+        loadComponent: () => import('./components/attendance-verification/attendance-verification.component').then(m => m.AttendanceVerificationComponent),
+        canActivate: [staffGuard],
+        title: 'Verificar Asistencia | Agility Asturias'
+    },
+    {
         path: 'login',
         component: LoginComponent,
         title: 'Iniciar Sesión | Agility Asturias'

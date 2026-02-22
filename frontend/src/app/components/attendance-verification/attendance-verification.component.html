@@ -1,0 +1,79 @@
+<div class="attendance-container">
+    <div class="header">
+        <h1>✅ Verificación de Asistencia</h1>
+        <p>Confirma quién asistió para asignar puntos.</p>
+    </div>
+
+    <div *ngIf="isLoading()" class="loading-state">
+        <div class="spinner"></div>
+        <p>Cargando sesiones pendientes...</p>
+    </div>
+
+    <div *ngIf="!isLoading() && pendingSessions().length === 0" class="empty-state">
+        <div class="icon-check">✨</div>
+        <h3>¡Todo al día!</h3>
+        <p>No hay entrenamientos pendientes de revisión.</p>
+    </div>
+
+    <div *ngIf="!isLoading() && pendingSessions().length > 0" class="sessions-list">
+        <div *ngFor="let session of pendingSessions()" class="session-card">
+            <div class="session-header">
+                <div class="date-info">
+                    <span class="date">{{ session.date | date:'EEEE, d MMMM' : '' : 'es-ES' }}</span>
+                    <span class="time">{{ session.slot.start_time }} - {{ session.slot.end_time }}</span>
+                </div>
+                <div class="count-badge">
+                    {{ session.reservations.length }} reservas
+                </div>
+            </div>
+
+            <div class="attendees-list">
+                <div *ngFor="let res of session.reservations" class="attendee-row"
+                    [class.unchecked]="!isChecked(session, res.id)" (click)="toggleCheck(session, res.id)">
+
+                    <div class="checkbox-custom">
+                        <span class="material-icons" *ngIf="isChecked(session, res.id)">check_circle</span>
+                        <span class="material-icons unchecked-icon"
+                            *ngIf="!isChecked(session, res.id)">radio_button_unchecked</span>
+                    </div>
+
+                    <div class="attendee-info">
+                        <span class="attendee-name">🐶 {{ res.dog?.name || 'Perro Desconocido' }}</span>
+                        <span class="attendee-dogs">Dueño: {{ res.user?.name || 'Usuario' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <button class="btn-confirm" (click)="openConfirmModal(session)">
+                    Confirmar Asistencia
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal-overlay" *ngIf="isConfirmModalOpen" (click)="closeConfirmModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h2>Confirmar Asistencia</h2>
+            <button class="close-btn" (click)="closeConfirmModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+            <p>Vas a confirmar la asistencia de <strong>{{ attendeesCountFn }}</strong> perros.</p>
+            <p class="subtext">Se asignará +1 punto al ranking de cada perrete confirmado.</p>
+
+            <div class="info-box">
+                <span class="material-icons info-icon">info</span>
+                <p>Las personas no marcadas se registrarán como "No Asistido" y no recibirán puntos.</p>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" (click)="closeConfirmModal()">Cancelar</button>
+            <button class="btn-confirm-modal" (click)="executeConfirm()">Confirmar y Asignar Puntos</button>
+        </div>
+    </div>
+</div>

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GestionarMiembros } from './gestionar-miembros';
+import { GestionarMiembrosComponent } from './gestionar-miembros';
 
-describe('GestionarMiembros', () => {
-  let component: GestionarMiembros;
-  let fixture: ComponentFixture<GestionarMiembros>;
+describe('GestionarMiembrosComponent', () => {
+  let component: GestionarMiembrosComponent;
+  let fixture: ComponentFixture<GestionarMiembrosComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GestionarMiembros]
+      imports: [GestionarMiembrosComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(GestionarMiembros);
+    fixture = TestBed.createComponent(GestionarMiembrosComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

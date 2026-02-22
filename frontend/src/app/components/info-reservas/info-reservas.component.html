@@ -77,7 +77,7 @@
                         <div *ngFor="let res of slot.reservations" class="user-row-small">
                             <span class="user-name-small">{{ res.userName }}</span>
                             <span class="dogs-text-small">
-                                {{ res.selectedDogs?.join(', ') || 'Sin perros' }}
+                                {{ res.selectedDogs.join(', ') || 'Sin perros' }}
                             </span>
                         </div>
                     </div>
