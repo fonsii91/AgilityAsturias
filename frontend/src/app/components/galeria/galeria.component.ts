@@ -1,11 +1,9 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
-
-interface GalleryImage {
-    url: string;
-    alt: string;
-}
+import { GalleryService, GalleryPhoto } from '../../services/gallery.service';
+import { AuthService } from '../../services/auth.service';
+import { ImageCompressorService } from '../../services/image-compressor.service';
 
 @Component({
     selector: 'app-galeria',
@@ -26,45 +24,76 @@ interface GalleryImage {
         ])
     ]
 })
-export class GaleriaComponent {
-    // Real images extracted from agilityasturias.com
-    images = signal<GalleryImage[]>([
-        { url: 'Images/Perros/Ana y Pompa.jpeg', alt: 'Ana y Pompa' },
-        { url: 'Images/Perros/Carysse.jpeg', alt: 'Carysse' },
-        { url: 'Images/Perros/Cris y Peca.jpeg', alt: 'Cris y Peca' },
-        { url: 'Images/Perros/Diego Tuco y Ponga.jpeg', alt: 'Diego Tuco y Ponga' },
-        { url: 'Images/Perros/Golti.jpeg', alt: 'Golti' },
-        { url: 'Images/Perros/Helena y Pumba.jpeg', alt: 'Helena y Pumba' },
-        { url: 'Images/Perros/Jesús y Ginebra.jpeg', alt: 'Jesús y Ginebra' },
-        { url: 'Images/Perros/Kinder.jpeg', alt: 'Kinder' },
-        { url: 'Images/Perros/Leah.jpeg', alt: 'Leah' },
-        { url: 'Images/Perros/Lyan y Boo.jpeg', alt: 'Lyan y Boo' },
-        { url: 'Images/Perros/Lyan y Shaggy.jpeg', alt: 'Lyan y Shaggy' },
-        { url: 'Images/Perros/Magda y Balto.jpeg', alt: 'Magda y Balto' },
-        { url: 'Images/Perros/Merle y Noly.jpeg', alt: 'Merle y Noly' },
-        { url: 'Images/Perros/Nala y Rosa.jpeg', alt: 'Nala y Rosa' },
-        { url: 'Images/Perros/Narcea.jpeg', alt: 'Narcea' },
-        { url: 'Images/Perros/Pompa.jpeg', alt: 'Pompa' },
-        { url: 'Images/Perros/Pumba.jpeg', alt: 'Pumba' },
-        { url: 'Images/Perros/Raylee.jpeg', alt: 'Raylee' },
-        { url: 'Images/Perros/Sami.jpeg', alt: 'Sami' },
-        { url: 'Images/Perros/Sami H.jpeg', alt: 'Sami H' }
-    ]);
+export class GaleriaComponent implements OnInit {
+    images = signal<GalleryPhoto[]>([]);
 
     lightboxOpen = signal(false);
     currentImageIndex = signal(0);
+    isUploading = signal(false);
 
-    constructor() {
-        this.shuffleImages();
+    private galleryService = inject(GalleryService);
+    private authService = inject(AuthService);
+    private imageCompressor = inject(ImageCompressorService);
+
+    isStaff = this.authService.isStaff;
+
+    ngOnInit() {
+        this.loadPhotos();
     }
 
-    private shuffleImages() {
-        const images = this.images();
-        for (let i = images.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [images[i], images[j]] = [images[j], images[i]];
+    private loadPhotos() {
+        this.galleryService.getPhotos().subscribe({
+            next: (photos) => {
+                this.images.set(photos);
+            },
+            error: (err) => console.error('Error loading gallery photos', err)
+        });
+    }
+
+    async onFileSelected(event: any) {
+        const file: File = event.target.files?.[0];
+        if (file) {
+            this.isUploading.set(true);
+            try {
+                const compressedFile = await this.imageCompressor.compress(file);
+                const altText = prompt('Introduce un título alternativo para la foto (opcional):') || 'Foto de galería';
+
+                this.galleryService.uploadPhoto(compressedFile, altText).subscribe({
+                    next: (photo) => {
+                        this.images.update(current => [photo, ...current]);
+                        this.isUploading.set(false);
+                    },
+                    error: (err) => {
+                        console.error('Error uploading photo', err);
+                        this.isUploading.set(false);
+                        alert('Error al subir la foto');
+                    }
+                });
+            } catch (err) {
+                console.error('Compression error', err);
+                this.isUploading.set(false);
+                alert('Error al comprimir la foto');
+            }
         }
-        this.images.set([...images]);
+        event.target.value = '';
+    }
+
+    deletePhoto(id: number, event: Event) {
+        event.stopPropagation();
+        if (confirm('¿Estás seguro de que deseas eliminar esta foto destacada?')) {
+            this.galleryService.deletePhoto(id).subscribe({
+                next: () => {
+                    this.images.update(current => current.filter(img => img.id !== id));
+                    if (this.lightboxOpen()) {
+                        this.closeLightbox();
+                    }
+                },
+                error: (err) => {
+                    console.error('Error deleting photo', err);
+                    alert('Error al eliminar la foto');
+                }
+            });
+        }
     }
 
     openLightbox(index: number) {

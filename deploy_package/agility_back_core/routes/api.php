@@ -8,6 +8,7 @@ use App\Http\Controllers\TimeSlotController;
 use App\Http\Controllers\RankingController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\GalleryController;
 use Illuminate\Http\Request; // Added for the closure route
 
 /*
@@ -22,6 +23,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
+
+Route::get('/gallery', [GalleryController::class, 'index']);
 
 Route::get('/time-slots', [TimeSlotController::class, 'index']);
 
@@ -40,6 +43,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/competitions', [CompetitionController::class, 'store']);
         Route::put('/competitions/{id}', [CompetitionController::class, 'update']);
         Route::delete('/competitions/{id}', [CompetitionController::class, 'destroy']);
+
+        // Gallery
+        Route::post('/gallery', [GalleryController::class, 'store']);
+        Route::delete('/gallery/{id}', [GalleryController::class, 'destroy']);
 
         // Ranking moved to general authenticated routes
 
