@@ -19,8 +19,14 @@
             <tbody>
                 <tr *ngFor="let user of users()">
                     <td class="user-cell">
-                        <img [src]="user.photoURL || 'assets/default-avatar.png'" alt="Avatar" class="avatar"
-                            referrerpolicy="no-referrer">
+                        <ng-container *ngIf="user.photoURL; else defaultAvatar">
+                            <img [src]="user.photoURL" alt="Avatar" class="avatar" referrerpolicy="no-referrer">
+                        </ng-container>
+                        <ng-template #defaultAvatar>
+                            <div class="avatar default-avatar-placeholder">
+                                {{ (user.displayName || 'U').charAt(0) }}
+                            </div>
+                        </ng-template>
                         <span>{{ user.displayName }}</span>
                     </td>
                     <td>

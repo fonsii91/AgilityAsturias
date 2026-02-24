@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { DogService } from '../../services/dog.service';
 import { ImageCompressorService } from '../../services/image-compressor.service';
+import { ToastService } from '../../services/toast.service';
 import { Dog } from '../../models/dog.model';
 
 @Component({
@@ -17,6 +18,7 @@ export class Perfil {
   authService = inject(AuthService);
   dogService = inject(DogService);
   imageCompressor = inject(ImageCompressorService);
+  toastService = inject(ToastService);
 
   newDogName = signal('');
   dogs = this.dogService.getDogs();
@@ -65,7 +67,7 @@ export class Perfil {
         this.uploadPhoto(compressedFile);
       }).catch(error => {
         console.error('Error compressing image:', error);
-        alert('Error al procesar la imagen.');
+        this.toastService.error('Error al procesar la imagen.');
       });
     }
   }
@@ -76,10 +78,19 @@ export class Perfil {
       if (!user) return;
 
       await this.authService.updateProfile(user.name, file);
-      // Toast success (if we had one)
-    } catch (error) {
+      this.toastService.success('Foto de perfil actualizada correctamente');
+    } catch (error: any) {
       console.error('Error uploading photo:', error);
-      alert('Error al subir la foto');
+      let errorMsg = 'Error al subir la foto';
+      if (error.error) {
+        if (error.status === 422 && error.error.errors) {
+          const firstErrorKey = Object.keys(error.error.errors)[0];
+          errorMsg = error.error.errors[firstErrorKey][0];
+        } else if (error.error.message) {
+          errorMsg = error.error.message;
+        }
+      }
+      this.toastService.error(errorMsg);
     }
   }
 
@@ -90,7 +101,7 @@ export class Perfil {
         this.uploadDogPhoto(dogId, compressedFile);
       }).catch(error => {
         console.error('Error compressing dog image:', error);
-        alert('Error al procesar la imagen del perro.');
+        this.toastService.error('Error al procesar la imagen del perro.');
       });
     }
   }
@@ -98,9 +109,9 @@ export class Perfil {
   async uploadDogPhoto(dogId: number, file: File) {
     try {
       await this.dogService.updateDogPhoto(dogId, file);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading dog photo:', error);
-      alert('Error al subir la foto del perro');
+      this.toastService.error('Error al subir la foto del perro');
     }
   }
 
@@ -110,9 +121,14 @@ export class Perfil {
     try {
       await this.authService.updateProfile(this.editedName());
       this.isEditingName.set(false);
-    } catch (error) {
+      this.toastService.success('Nombre actualizado correctamente');
+    } catch (error: any) {
       console.error('Error updating name:', error);
-      alert('Error al actualizar el nombre');
+      let errorMsg = 'Error al actualizar el nombre';
+      if (error.error && error.error.message) {
+        errorMsg = error.error.message;
+      }
+      this.toastService.error(errorMsg);
     }
   }
 

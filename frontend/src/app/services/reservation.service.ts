@@ -72,7 +72,7 @@ export class ReservationService {
 
     deleteReservation(id: number) {
         return new Promise<void>((resolve, reject) => {
-            this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+            this.http.post<void>(`${this.apiUrl}/${id}`, { _method: 'DELETE' }).subscribe({
                 next: () => {
                     this.reservationsSignal.update(list => list.filter(r => r.id !== id));
                     // Refresh availability after deletion
@@ -86,7 +86,7 @@ export class ReservationService {
 
     deleteBlock(slotId: number, date: string) {
         return new Promise<void>((resolve, reject) => {
-            this.http.delete(`${this.apiUrl}/block?slot_id=${slotId}&date=${date}`).subscribe({
+            this.http.post<void>(`${this.apiUrl}/block?slot_id=${slotId}&date=${date}`, { _method: 'DELETE' }).subscribe({
                 next: () => {
                     this.fetchReservations();
                     this.fetchAvailability();

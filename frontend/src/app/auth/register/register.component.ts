@@ -49,8 +49,18 @@ export class RegisterComponent {
             error: (err) => {
                 console.error(err);
                 this.isLoading.set(false);
-                if (err.status === 422) {
-                    this.errorMessage.set('El email ya está registrado o los datos son inválidos.');
+
+                if (err.error && err.error.message) {
+                    // Si el backend devuelve detalles de validación
+                    if (err.status === 422 && err.error.errors) {
+                        // Obtén el primer mensaje de error de validación
+                        const firstErrorKey = Object.keys(err.error.errors)[0];
+                        const firstErrorMessage = err.error.errors[firstErrorKey][0];
+                        this.errorMessage.set(firstErrorMessage);
+                    } else {
+                        // Mensaje general del backend
+                        this.errorMessage.set(err.error.message);
+                    }
                 } else {
                     this.errorMessage.set('Error al registrar. Inténtalo de nuevo.');
                 }

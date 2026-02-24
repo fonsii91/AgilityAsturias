@@ -46,7 +46,7 @@ export class CompetitionService {
     updateCompetition(updatedComp: Competition) {
         const payload = this.mapToBackend(updatedComp);
         return new Promise<Competition>((resolve, reject) => {
-            this.http.put<any>(`${this.apiUrl}/${updatedComp.id}`, payload).subscribe({
+            this.http.post<any>(`${this.apiUrl}/${updatedComp.id}`, { ...payload, _method: 'PUT' }).subscribe({
                 next: (savedCompData) => {
                     const savedComp = this.mapFromBackend(savedCompData);
                     this.competitionsSignal.update(list => list.map(c => c.id === savedComp.id ? savedComp : c));
@@ -59,7 +59,7 @@ export class CompetitionService {
 
     deleteCompetition(id: number) {
         return new Promise<void>((resolve, reject) => {
-            this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+            this.http.post<void>(`${this.apiUrl}/${id}`, { _method: 'DELETE' }).subscribe({
                 next: () => {
                     this.competitionsSignal.update(list => list.filter(c => c.id !== id));
                     resolve();

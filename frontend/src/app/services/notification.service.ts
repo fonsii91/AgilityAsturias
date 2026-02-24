@@ -37,12 +37,18 @@ export class NotificationService {
                 this.notificationsSignal.set(data);
                 this.unreadCountSignal.set(data.length);
             },
-            error: (err) => console.error('Error fetching notifications:', err)
+            error: (err) => {
+                // If it's a 403 Forbidden, it just means the user doesn't have permissions (e.g. they are a basic rule 'user')
+                // We shouldn't show a console error for this, we just ignore it.
+                if (err.status !== 403) {
+                    console.error('Error fetching notifications:', err);
+                }
+            }
         });
     }
 
     markAsRead(id: string): Observable<any> {
-        return this.http.put(`${this.apiUrl}/${id}/read`, {}).pipe(
+        return this.http.post(`${this.apiUrl}/${id}/read`, { _method: 'PUT' }).pipe(
             tap(() => {
                 const currentList = this.notificationsSignal().filter(n => n.id !== id);
                 this.notificationsSignal.set(currentList);
@@ -52,7 +58,7 @@ export class NotificationService {
     }
 
     markAllAsRead(): Observable<any> {
-        return this.http.put(`${this.apiUrl}/mark-all-read`, {}).pipe(
+        return this.http.post(`${this.apiUrl}/mark-all-read`, { _method: 'PUT' }).pipe(
             tap(() => {
                 this.notificationsSignal.set([]);
                 this.unreadCountSignal.set(0);

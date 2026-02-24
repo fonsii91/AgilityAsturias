@@ -19,7 +19,11 @@ export class DogService {
     loadUserDogs() {
         this.http.get<Dog[]>(this.apiUrl).subscribe({
             next: (dogs) => this.dogsSignal.set(dogs),
-            error: (err) => console.error('Error loading dogs:', err)
+            error: (err) => {
+                if (err.status !== 403) {
+                    console.error('Error loading dogs:', err);
+                }
+            }
         });
     }
 
@@ -41,7 +45,7 @@ export class DogService {
 
     deleteDog(id: number) {
         return new Promise<void>((resolve, reject) => {
-            this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+            this.http.post<void>(`${this.apiUrl}/${id}`, { _method: 'DELETE' }).subscribe({
                 next: () => {
                     this.dogsSignal.update(list => list.filter(d => d.id !== id));
                     resolve();

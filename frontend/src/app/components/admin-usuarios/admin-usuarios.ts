@@ -46,9 +46,14 @@ export class AdminUsuariosComponent implements OnInit {
       );
 
       this.toastService.success(`Rol de ${user.displayName} actualizado a ${role}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating role', error);
-      this.toastService.error('Error al actualizar rol');
+
+      let errorMsg = 'Error al actualizar rol';
+      if (error.error && error.error.message) {
+        errorMsg = error.error.message;
+      }
+      this.toastService.error(errorMsg);
     }
   }
 }

@@ -42,7 +42,13 @@ export class LoginComponent {
             error: (err) => {
                 console.error(err);
                 this.isLoading.set(false);
-                this.errorMessage.set('Email o contraseña incorrectos.');
+
+                // Extract custom error message from backend if available
+                if (err.error && err.error.message) {
+                    this.errorMessage.set(err.error.message);
+                } else {
+                    this.errorMessage.set('Email o contraseña incorrectos o error en el servidor.');
+                }
             }
         });
     }

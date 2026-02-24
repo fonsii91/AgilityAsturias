@@ -151,7 +151,7 @@ export class AuthService {
     }
 
     updateUserRole(userId: number, role: string): Promise<any> {
-        return firstValueFrom(this.http.put(`${this.apiUrl}/users/${userId}/role`, { role }));
+        return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/role`, { role, _method: 'PUT' }));
     }
 
     async updateProfile(name: string, photo?: File): Promise<void> {
