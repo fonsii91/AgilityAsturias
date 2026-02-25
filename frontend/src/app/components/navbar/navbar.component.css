@@ -17,6 +17,8 @@
     display: flex;
     align-items: center;
     gap: 1rem;
+    margin: 0;
+    padding: 0;
     margin-right: auto;
     /* Pushes nav and auth to the right */
 }
@@ -492,6 +494,8 @@ nav.desktop-nav a:hover {
 
     .logo-area {
         width: auto;
+        margin: 0;
+        padding: 0;
         /* Changed from 100% to auto */
         /* justify-content: space-between; Removed */
     }

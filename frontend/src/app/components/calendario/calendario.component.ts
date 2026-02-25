@@ -1,4 +1,4 @@
-import { Component, computed, Signal, signal, inject } from '@angular/core';
+import { Component, computed, Signal, signal, inject, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CompetitionService } from '../../services/competition.service';
 import { AuthService } from '../../services/auth.service';
@@ -57,6 +57,7 @@ export class CalendarioComponent {
     selectedCompetitions: any[] = []; // List to show in modal if multiple
     selectedDeadlines: any[] = [];
     isModalOpen = false;
+    activeModalTab: 'info' | 'asistencia' = 'info'; // Tab state
 
     // Attendance state
     authService = inject(AuthService);
@@ -67,6 +68,8 @@ export class CalendarioComponent {
     attendees: any[] = [];
     isLoadingAttendees = false;
     userDogs = this.dogService.getDogs();
+    cdr = inject(ChangeDetectorRef);
+    ngZone = inject(NgZone);
 
     constructor(private competitionService: CompetitionService) {
         this.competitions = this.competitionService.getCompetitions();
@@ -76,15 +79,20 @@ export class CalendarioComponent {
         this.selectedCompetitions = day.competitions || [];
         this.selectedDeadlines = day.deadlines || [];
 
-        if (this.selectedCompetitions.length === 1) {
-            this.selectedCompetition = this.selectedCompetitions[0];
+        const totalItems = this.selectedCompetitions.length + this.selectedDeadlines.length;
+
+        if (totalItems === 1) {
+            this.selectedCompetition = this.selectedCompetitions.length === 1
+                ? this.selectedCompetitions[0]
+                : this.selectedDeadlines[0];
+            this.activeModalTab = 'info';
             this.resetAttendanceState();
         } else {
-            this.selectedCompetition = null; // Show list if multiple or none
+            this.selectedCompetition = null; // Show list if multiple items
         }
 
         // Only open if there is something to show
-        if (this.selectedCompetitions.length > 0 || this.selectedDeadlines.length > 0) {
+        if (totalItems > 0) {
             this.isModalOpen = true;
             document.body.style.overflow = 'hidden';
             if (this.authService.currentUserSignal()) {
@@ -95,6 +103,7 @@ export class CalendarioComponent {
 
     selectCompetitionFromList(comp: any) {
         this.selectedCompetition = comp;
+        this.activeModalTab = 'info';
         this.resetAttendanceState();
     }
 
@@ -106,6 +115,10 @@ export class CalendarioComponent {
         if (this.selectedCompetition?.attendingDogIds) {
             this.selectedDogIds = new Set(this.selectedCompetition.attendingDogIds);
         }
+    }
+
+    switchTab(tab: 'info' | 'asistencia') {
+        this.activeModalTab = tab;
     }
 
     backToList() {
@@ -183,6 +196,7 @@ export class CalendarioComponent {
         this.selectedCompetition = null;
         this.selectedCompetitions = [];
         this.isImageExpanded = false; // Reset expansion
+        this.activeModalTab = 'info';
 
         this.isConfirmingAttendance = false;
         this.viewingAttendees = false;
@@ -257,12 +271,20 @@ export class CalendarioComponent {
 
     async loadAttendees() {
         this.isLoadingAttendees = true;
+        this.cdr.detectChanges();
         try {
-            this.attendees = await this.competitionService.getAttendees(this.selectedCompetition.id);
+            const result = await this.competitionService.getAttendees(this.selectedCompetition.id);
+            this.ngZone.run(() => {
+                this.attendees = result;
+                this.isLoadingAttendees = false;
+                this.cdr.detectChanges();
+            });
         } catch (e) {
             console.error('Error fetching attendees', e);
-        } finally {
-            this.isLoadingAttendees = false;
+            this.ngZone.run(() => {
+                this.isLoadingAttendees = false;
+                this.cdr.detectChanges();
+            });
         }
     }
 

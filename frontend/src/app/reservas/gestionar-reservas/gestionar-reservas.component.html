@@ -181,22 +181,32 @@
 <!-- Management Modal (Admin/Staff) -->
 <div class="modal-backdrop" *ngIf="isManageModalOpen" (click)="closeManageModal()">
     <div class="modal-content large-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-            <h3>⚙️ Gestión de Horarios</h3>
-            <button class="btn-icon close-btn" (click)="closeManageModal()">
+        <div class="modal-header header-light">
+            <h3>
+                <span class="material-icons header-icon">calendar_month</span>
+                Gestión de Horarios
+            </h3>
+            <button class="btn-icon close-btn" (click)="closeManageModal()" title="Cerrar">
                 <span class="material-icons">close</span>
             </button>
         </div>
 
         <div class="management-body">
             <!-- Form Section -->
-            <div class="management-form-card">
-                <h4 class="section-title">{{ editingSlot ? '✏️ Editar Horario' : '➕ Nuevo Horario' }}</h4>
+            <div class="management-form-card" [class.editing-mode]="editingSlot">
+                <div class="form-header-row">
+                    <h4 class="section-title card-title">
+                        <span class="material-icons indicator-icon">{{ editingSlot ? 'edit_calendar' : 'add_circle'
+                            }}</span>
+                        {{ editingSlot ? 'Editar Horario Existente' : 'Programar Nuevo Horario' }}
+                    </h4>
+                    <span class="status-badge" *ngIf="editingSlot">Modo Edición</span>
+                </div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Día de la semana</label>
                         <div class="select-wrapper">
-                            <select [(ngModel)]="slotForm.day">
+                            <select [(ngModel)]="slotForm.day" class="modern-input">
                                 <option value="Lunes">Lunes</option>
                                 <option value="Martes">Martes</option>
                                 <option value="Miércoles">Miércoles</option>
@@ -211,26 +221,38 @@
 
                     <div class="form-group">
                         <label>Hora Inicio</label>
-                        <input type="time" [(ngModel)]="slotForm.startTime" class="modern-input">
+                        <div class="input-with-icon">
+                            <span class="material-icons input-icon">schedule</span>
+                            <input type="time" [(ngModel)]="slotForm.startTime" class="modern-input with-icon">
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label>Hora Fin</label>
-                        <input type="time" [(ngModel)]="slotForm.endTime" class="modern-input">
+                        <div class="input-with-icon">
+                            <span class="material-icons input-icon">update</span>
+                            <input type="time" [(ngModel)]="slotForm.endTime" class="modern-input with-icon">
+                        </div>
                     </div>
 
                     <div class="form-group">
                         <label>Plazas Máx.</label>
-                        <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input" min="1">
+                        <div class="input-with-icon">
+                            <span class="material-icons input-icon">group</span>
+                            <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input with-icon"
+                                min="1">
+                        </div>
                     </div>
                 </div>
 
                 <div class="form-actions-row">
                     <button *ngIf="editingSlot" class="btn-text"
                         (click)="editingSlot = null; slotForm = {day: 'Lunes', startTime:'10:00', endTime:'11:00', maxBookings:5}">
-                        Cancelar Edición
+                        <span class="material-icons btn-icon-small">cancel</span>
+                        Cancelar
                     </button>
-                    <button class="btn-primary-action" (click)="saveSlot()">
+                    <button class="btn-primary-action" [class.btn-edit]="editingSlot" (click)="saveSlot()">
+                        <span class="material-icons btn-icon-small">{{ editingSlot ? 'save' : 'add' }}</span>
                         {{ editingSlot ? 'Guardar Cambios' : 'Añadir Horario' }}
                     </button>
                 </div>
@@ -240,25 +262,35 @@
 
             <!-- List Section -->
             <div class="slots-list-section">
-                <h4 class="section-title">📅 Horarios Actuales</h4>
+                <div class="list-header">
+                    <h4 class="section-title card-title">
+                        <span class="material-icons indicator-icon">view_list</span>
+                        Horarios Configurados
+                    </h4>
+                    <span class="count-badge">{{ timeSlots().length }} horarios</span>
+                </div>
+
                 <div class="slots-list-container">
-                    <div *ngFor="let slot of timeSlots()" class="admin-slot-card">
-                        <div class="slot-info-main">
-                            <span class="day-badge">{{ slot.day.substring(0, 3) }}</span>
-                            <span class="time-range">{{ slot.start_time }} - {{ slot.end_time }}</span>
-                        </div>
-                        <div class="slot-details">
-                            <span class="capacity-badge">
-                                <span class="material-icons icon-tiny">group</span>
-                                {{ slot.max_bookings }} plazas
-                            </span>
+                    <div *ngFor="let slot of timeSlots()" class="admin-slot-card"
+                        [class.highlighted]="editingSlot?.id === slot.id">
+                        <div class="slot-card-left">
+                            <div class="day-badge-container">
+                                <span class="day-badge">{{ slot.day.substring(0, 3) }}</span>
+                            </div>
+                            <div class="slot-info-main">
+                                <span class="time-range">{{ slot.start_time }} - {{ slot.end_time }}</span>
+                                <span class="capacity-badge">
+                                    <span class="material-icons icon-tiny">person</span>
+                                    {{ slot.max_bookings }} plazas max.
+                                </span>
+                            </div>
                         </div>
                         <div class="slot-actions">
                             <button class="btn-icon-action edit" (click)="editSlot(slot)" title="Editar">
                                 <span class="material-icons">edit</span>
                             </button>
                             <button class="btn-icon-action delete" (click)="deleteSlot(slot.id)" title="Eliminar">
-                                <span class="material-icons">delete</span>
+                                <span class="material-icons">delete_outline</span>
                             </button>
                         </div>
                     </div>

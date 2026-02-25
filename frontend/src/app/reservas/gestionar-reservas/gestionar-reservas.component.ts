@@ -374,6 +374,27 @@ export class GestionarReservasComponent {
 
     openCancelModal(slot: TimeSlot & { date: string }) {
         if (!slot.isBookedByCurrentUser) return;
+
+        const user = this.authService.currentUserSignal();
+        if (!user) return;
+
+        const isAdminOrStaff = ['admin', 'staff'].includes(user.role || '');
+
+        if (!isAdminOrStaff) {
+            // Check 24 hour rule
+            const slotDateTime = new Date(`${slot.date}T${slot.start_time}`);
+            const now = new Date();
+
+            // Difference in milliseconds
+            const diffMs = slotDateTime.getTime() - now.getTime();
+            const diffHours = diffMs / (1000 * 60 * 60);
+
+            if (diffHours < 24) {
+                this.toastService.warning('No puedes cancelar tu reserva con menos de 24 horas de antelación. Contacta con administración en caso de urgencia.');
+                return; // Block opening the modal
+            }
+        }
+
         this.selectedSlotForCancellation = slot;
         this.isCancelModalOpen = true;
     }

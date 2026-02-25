@@ -57,8 +57,9 @@
         <div class="modal-content glass-effect" (click)="$event.stopPropagation()">
             <button class="close-btn" (click)="closeModal()">&times;</button>
 
-            <!-- List of Competitions (if multiple) -->
-            <div *ngIf="!selectedCompetition && selectedCompetitions.length > 0" class="competition-list-view">
+            <!-- List of Competitions and Deadlines (if multiple/mixed items) -->
+            <div *ngIf="!selectedCompetition && (selectedCompetitions.length > 0 || selectedDeadlines.length > 0)"
+                class="competition-list-view">
                 <h3>📅 Eventos del Día</h3>
                 <div class="events-list">
                     <div *ngFor="let comp of selectedCompetitions" class="event-card-preview"
@@ -72,6 +73,18 @@
                         </div>
                         <div class="event-preview-location">📍 {{ comp.lugar }}</div>
                     </div>
+
+                    <!-- Deadlines integrated as list items -->
+                    <div *ngFor="let dl of selectedDeadlines" class="event-card-preview deadline-preview"
+                        (click)="selectCompetitionFromList(dl)"
+                        style="border-left: 4px solid #d32f2f; background: #fff5f5;">
+                        <div class="event-preview-header" style="justify-content: flex-start; gap: 0.5rem;">
+                            <span class="material-icons-outlined"
+                                style="color: #d32f2f; font-size: 1.2rem;">warning</span>
+                            <span class="event-name" style="color: #d32f2f; font-weight: 600;">Cierre inscripción: {{
+                                dl.nombre || dl.lugar }}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -82,148 +95,189 @@
                 </button>
 
                 <div class="modal-header">
-                    <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
-                    <p *ngIf="selectedCompetition.nombre && selectedCompetition.lugar"
-                        style="margin: 5px 0 10px 0; color: #555; font-size: 1rem; display: flex; align-items: center; gap: 5px;">
-                        📍 {{ selectedCompetition.lugar }}
-                    </p>
-                    <div class="modal-date-badge"
-                        [style.background]="selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)'"
-                        [style.color]="selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)'">
-                        {{ selectedCompetition.fechaEvento | date:'d MMM' }}
-                        <span
-                            *ngIf="selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !== selectedCompetition.fechaEvento">
-                            - {{ selectedCompetition.fechaFinEvento | date:'d MMM' }}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="modal-body">
-                    <div class="info-grid" *ngIf="selectedCompetition.fechaLimite || selectedCompetition.formaPago">
-                        <div class="info-item" *ngIf="selectedCompetition.fechaLimite">
-                            <span class="label">Cierre Inscripción</span>
-                            <span class="value">{{ selectedCompetition.fechaLimite | date:'shortDate' }}</span>
-                        </div>
-                        <div class="info-item full-width" *ngIf="selectedCompetition.formaPago">
-                            <span class="label">Forma de Pago</span>
-                            <div class="payment-info">{{ selectedCompetition.formaPago }}</div>
-                        </div>
-                    </div>
-
-                    <div class="poster-container" *ngIf="selectedCompetition.cartel">
-                        <img [src]="selectedCompetition.cartel" alt="Cartel" class="modal-poster"
-                            (click)="expandImage()" title="Click para ampliar">
-                        <div class="expand-hint">Click para ampliar</div>
-                    </div>
-                </div>
-
-                <div class="modal-actions" *ngIf="selectedCompetition.enlace">
-                    <a [href]="selectedCompetition.enlace" target="_blank" class="event-link">
-                        <span class="material-icons-outlined"
-                            style="font-size: 1.2rem; vertical-align: middle;">open_in_new</span>
-                        Ir a la inscripción
-                    </a>
-                </div>
-
-                <!-- Attendance Section -->
-                <div class="attendance-section" *ngIf="authService.currentUserSignal()">
-                    <hr class="section-divider">
-
-                    <!-- Action Buttons -->
-                    <div class="attendance-actions" *ngIf="!isConfirmingAttendance">
-                        <button *ngIf="!selectedCompetition.isAttending" class="btn-attend" (click)="startAttendance()">
-                            <span class="material-icons-outlined">event_available</span> Asistiré
-                        </button>
-                        <button *ngIf="selectedCompetition.isAttending" class="btn-edit-attendance"
-                            (click)="startAttendance()">
-                            <span class="material-icons-outlined">edit_calendar</span> Modificar Asistencia
-                        </button>
-                        <button *ngIf="selectedCompetition.isAttending" class="btn-unattend"
-                            (click)="removeAttendance()">
-                            <span class="material-icons-outlined">event_busy</span> No Asistiré
-                        </button>
-                    </div>
-
-                    <!-- Confirm Attendance Form -->
-                    <div class="attendance-form" *ngIf="isConfirmingAttendance">
-                        <h4>¿Con qué perretes asistirás?</h4>
-                        <div class="dogs-selection-list" *ngIf="userDogs() && userDogs().length > 0">
-                            <label class="dog-checkbox" *ngFor="let dog of userDogs()">
-                                <input type="checkbox" [checked]="selectedDogIds.has(dog.id)"
-                                    (change)="toggleDog(dog.id)">
-                                <img *ngIf="dog.photo_url" [src]="dog.photo_url" class="small-avatar" alt="dog"
-                                    referrerpolicy="no-referrer">
-                                <div *ngIf="!dog.photo_url" class="small-avatar default-icon">🐕</div>
-                                {{ dog.name }}
-                            </label>
-                        </div>
-                        <p *ngIf="!userDogs() || userDogs().length === 0" class="no-dogs-msg">No tienes perros
-                            registrados.</p>
-
-                        <div class="form-actions-inline">
-                            <button class="btn-cancel-inline" (click)="cancelAttendanceForm()">Cancelar</button>
-                            <button class="btn-confirm-inline" (click)="confirmAttendance()">Guardar</button>
-                        </div>
-                    </div>
-
-                    <!-- Attendees List Toggle -->
-                    <div class="attendees-toggle-container">
-                        <button class="btn-view-attendees" (click)="toggleAttendeesView()">
-                            <span class="material-icons-outlined">groups</span>
-                            {{ viewingAttendees ? 'Ocultar Asistentes' : 'Ver Asistentes' }}
-                        </button>
-                    </div>
-
-                    <!-- Attendees List -->
-                    <div class="attendees-list" *ngIf="viewingAttendees">
-                        <div *ngIf="isLoadingAttendees" class="loading-state">
-                            <div class="spinner"></div> Cargando asistentes...
-                        </div>
-                        <div *ngIf="!isLoadingAttendees && attendees.length === 0" class="empty-state">
-                            Aún no hay asistentes confirmados.
-                        </div>
-                        <div class="attendee-card" *ngFor="let attendee of attendees">
-                            <div class="attendee-user">
-                                <img [src]="attendee.photo_url || 'assets/default-user.png'" class="avatar"
-                                    referrerpolicy="no-referrer">
-                                <span>{{ attendee.name }}</span>
-                            </div>
-                            <div class="attendee-dogs" *ngIf="attendee.dogs?.length > 0">
-                                <span class="dog-badge" *ngFor="let dog of attendee.dogs">
-                                    <img *ngIf="dog.photo_url" [src]="dog.photo_url" class="micro-avatar"
-                                        referrerpolicy="no-referrer">
-                                    <div *ngIf="!dog.photo_url" class="micro-avatar default-icon">🐕</div>
-                                    {{ dog.name }}
-                                </span>
-                            </div>
+                    <div class="modal-title-row">
+                        <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
+                        <div class="modal-date-badge"
+                            [style.background]="selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)'"
+                            [style.color]="selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)'">
+                            {{ selectedCompetition.fechaEvento | date:'d MMM' }}
+                            <span
+                                *ngIf="selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !== selectedCompetition.fechaEvento">
+                                - {{ selectedCompetition.fechaFinEvento | date:'d MMM' }}
+                            </span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Deadlines Section -->
-            <div class="deadlines-section" *ngIf="selectedDeadlines.length > 0 && !selectedCompetition">
-                <div class="deadlines-title">
-                    ⚠️ Fin de Plazo de Inscripción
-                </div>
-                <div class="deadlines-list-item" *ngFor="let dl of selectedDeadlines">
-                    <div class="deadline-info">
-                        {{ dl.fechaLimite | date:'dd/MM/yyyy' }}: Último día para <strong>{{ dl.nombre || dl.lugar
-                            }}</strong>
-                    </div>
-                    <button class="view-event-btn" (click)="selectCompetitionFromList(dl)">
-                        Ver Evento
+                <div class="modal-tabs" *ngIf="authService.currentUserSignal()">
+                    <button class="modal-tab" [class.active]="activeModalTab === 'info'" (click)="switchTab('info')">
+                        <span class="material-icons-outlined">info</span> Info
+                    </button>
+                    <button class="modal-tab" [class.active]="activeModalTab === 'asistencia'"
+                        (click)="switchTab('asistencia')">
+                        <span class="material-icons-outlined">how_to_reg</span> Asistencia
                     </button>
                 </div>
+
+                <!-- Info Tab Content -->
+                <div class="tab-content" *ngIf="activeModalTab === 'info'">
+                    <div class="modal-body">
+                        <div class="info-grid">
+                            <div class="info-item full-width" *ngIf="selectedCompetition.lugar">
+                                <span class="label">Ubicación</span>
+                                <div class="location-value">
+                                    <span class="material-icons-outlined"
+                                        style="color: #e53935; font-size: 1.2rem; vertical-align: middle;">location_on</span>
+                                    <span style="vertical-align: middle;">{{ selectedCompetition.lugar }}</span>
+                                </div>
+                            </div>
+                            <div class="info-item" *ngIf="selectedCompetition.fechaLimite">
+                                <span class="label">Cierre Inscripción</span>
+                                <span class="value">{{ selectedCompetition.fechaLimite | date:'shortDate' }}</span>
+                            </div>
+                            <div class="info-item full-width" *ngIf="selectedCompetition.formaPago">
+                                <span class="label">Forma de Pago</span>
+                                <div class="payment-info">{{ selectedCompetition.formaPago }}</div>
+                            </div>
+                        </div>
+
+                        <div class="poster-container" *ngIf="selectedCompetition.cartel">
+                            <img [src]="selectedCompetition.cartel" alt="Cartel" class="modal-poster"
+                                (click)="expandImage()" title="Click para ampliar">
+                            <div class="expand-hint">Click para ampliar</div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions" *ngIf="selectedCompetition.enlace">
+                        <a [href]="selectedCompetition.enlace" target="_blank" class="event-link">
+                            <span class="material-icons-outlined"
+                                style="font-size: 1.2rem; vertical-align: middle;">open_in_new</span>
+                            Ir a la inscripción
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attendance Tab Content -->
+            <div class="tab-content" *ngIf="activeModalTab === 'asistencia' && authService.currentUserSignal()">
+                <!-- Premium Attendance Section -->
+                <div class="attendance-section">
+                    <div class="attendance-card">
+                        <!-- State 1: Not attending -->
+                        <div class="attendance-prompt"
+                            *ngIf="!isConfirmingAttendance && !selectedCompetition.isAttending">
+                            <div class="attendance-icon">
+                                <span class="material-icons-outlined">celebration</span>
+                            </div>
+                            <h4>¿Te apuntas?</h4>
+                            <p>Únete a este evento y hazle saber a los demás que vas a ir.</p>
+                            <button class="btn-primary-action" (click)="startAttendance()">
+                                <span class="material-icons-outlined">how_to_reg</span> ¡Asistiré!
+                            </button>
+                        </div>
+
+                        <!-- State 2: Attending (but not editing) -->
+                        <div class="attendance-confirmed"
+                            *ngIf="!isConfirmingAttendance && selectedCompetition.isAttending">
+                            <div class="success-banner">
+                                <span class="material-icons-outlined">check_circle</span>
+                                <div>
+                                    <strong>¡Confirmado!</strong>
+                                    <span>Vas a ir a este evento.</span>
+                                </div>
+                            </div>
+                            <div class="attendance-secondary-actions">
+                                <button class="btn-outline-action" (click)="startAttendance()">
+                                    <span class="material-icons-outlined">edit_calendar</span> Modificar perretes
+                                </button>
+                                <button class="btn-danger-action" (click)="removeAttendance()">
+                                    <span class="material-icons-outlined">event_busy</span> Cancelar asistencia
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- State 3: Editing/Confirming Form -->
+                        <div class="attendance-form-premium" *ngIf="isConfirmingAttendance">
+                            <h4>¿Quiénes te acompañan?</h4>
+                            <p class="subtitle">Selecciona los perros que irán contigo:</p>
+
+                            <div class="dogs-grid" *ngIf="userDogs() && userDogs().length > 0">
+                                <div class="dog-card" *ngFor="let dog of userDogs()"
+                                    [class.selected]="selectedDogIds.has(dog.id)" (click)="toggleDog(dog.id)">
+                                    <div class="dog-card-avatar">
+                                        <img *ngIf="dog.photo_url" [src]="dog.photo_url" referrerpolicy="no-referrer">
+                                        <div *ngIf="!dog.photo_url" class="default-dog-icon">🐕</div>
+                                        <div class="check-overlay" *ngIf="selectedDogIds.has(dog.id)">
+                                            <span class="material-icons-outlined">check</span>
+                                        </div>
+                                    </div>
+                                    <span class="dog-name">{{ dog.name }}</span>
+                                </div>
+                            </div>
+                            <p *ngIf="!userDogs() || userDogs().length === 0" class="no-dogs-msg">No tienes perros
+                                registrados.</p>
+
+                            <div class="form-actions-premium">
+                                <button class="btn-cancel" (click)="cancelAttendanceForm()">Cancelar</button>
+                                <button class="btn-save" (click)="confirmAttendance()">Guardar Asistencia</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendees Viewer Accordion -->
+                    <div class="attendees-container">
+                        <div class="attendees-header" (click)="toggleAttendeesView()">
+                            <div class="attendees-title">
+                                <span class="material-icons-outlined">groups</span>
+                                <span>Asistentes al evento</span>
+                            </div>
+                            <span class="material-icons-outlined chevron" [class.open]="viewingAttendees">
+                                expand_more
+                            </span>
+                        </div>
+
+                        <div class="attendees-content" *ngIf="viewingAttendees">
+                            <div *ngIf="isLoadingAttendees" class="loading-state-premium">
+                                <div class="spinner"></div> <span>Cargando asistentes...</span>
+                            </div>
+
+                            <div *ngIf="!isLoadingAttendees && attendees.length === 0" class="empty-state-premium">
+                                <div class="empty-icon">👻</div>
+                                <p>Aún no hay nadie apuntado.</p>
+                                <span>¡Sé el primero en confirmar tu asistencia!</span>
+                            </div>
+
+                            <div class="attendees-list-premium" *ngIf="!isLoadingAttendees && attendees.length > 0">
+                                <div class="attendee-row" *ngFor="let attendee of attendees">
+                                    <div class="attendee-info">
+                                        <img [src]="attendee.photo_url || 'assets/default-user.png'"
+                                            class="attendee-avatar" referrerpolicy="no-referrer">
+                                        <span class="attendee-name">{{ attendee.name }}</span>
+                                    </div>
+                                    <div class="attendee-dogs-list" *ngIf="attendee.attending_dogs?.length > 0">
+                                        <div class="dog-chip" *ngFor="let dog of attendee.attending_dogs">
+                                            <img *ngIf="dog.photo_url" [src]="dog.photo_url"
+                                                referrerpolicy="no-referrer">
+                                            <div *ngIf="!dog.photo_url" class="chip-default-icon">🐕</div>
+                                            <span>{{ dog.name }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Expanded Image Overlay -->
-    <div class="image-overlay" *ngIf="isImageExpanded" (click)="closeImage()">
-        <button class="close-overlay-btn">&times;</button>
-        <div class="image-wrapper">
-            <img [src]="selectedCompetition.cartel" alt="Cartel Ampliado">
-        </div>
+
+    </div>
+</div>
+
+<!-- Expanded Image Overlay -->
+<div class="image-overlay" *ngIf="isImageExpanded" (click)="closeImage()">
+    <button class="close-overlay-btn">&times;</button>
+    <div class="image-wrapper">
+        <img [src]="selectedCompetition.cartel" alt="Cartel Ampliado">
     </div>
 </div>
