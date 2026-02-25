@@ -1,54 +1,3 @@
-import {
-  isPlatformBrowser
-} from "./chunk-MTU2WV7Q.js";
-import {
-  Injectable,
-  PLATFORM_ID,
-  setClassMetadata
-} from "./chunk-R6GDVNLI.js";
-import {
-  inject,
-  ɵɵdefineInjectable
-} from "./chunk-LOKY7SF2.js";
-
-// node_modules/@angular/cdk/fesm2022/_platform-chunk.mjs
-var hasV8BreakIterator;
-try {
-  hasV8BreakIterator = typeof Intl !== "undefined" && Intl.v8BreakIterator;
-} catch {
-  hasV8BreakIterator = false;
-}
-var Platform = class _Platform {
-  _platformId = inject(PLATFORM_ID);
-  isBrowser = this._platformId ? isPlatformBrowser(this._platformId) : typeof document === "object" && !!document;
-  EDGE = this.isBrowser && /(edge)/i.test(navigator.userAgent);
-  TRIDENT = this.isBrowser && /(msie|trident)/i.test(navigator.userAgent);
-  BLINK = this.isBrowser && !!(window.chrome || hasV8BreakIterator) && typeof CSS !== "undefined" && !this.EDGE && !this.TRIDENT;
-  WEBKIT = this.isBrowser && /AppleWebKit/i.test(navigator.userAgent) && !this.BLINK && !this.EDGE && !this.TRIDENT;
-  IOS = this.isBrowser && /iPad|iPhone|iPod/.test(navigator.userAgent) && !("MSStream" in window);
-  FIREFOX = this.isBrowser && /(firefox|minefield)/i.test(navigator.userAgent);
-  ANDROID = this.isBrowser && /android/i.test(navigator.userAgent) && !this.TRIDENT;
-  SAFARI = this.isBrowser && /safari/i.test(navigator.userAgent) && this.WEBKIT;
-  constructor() {
-  }
-  static ɵfac = function Platform_Factory(__ngFactoryType__) {
-    return new (__ngFactoryType__ || _Platform)();
-  };
-  static ɵprov = ɵɵdefineInjectable({
-    token: _Platform,
-    factory: _Platform.ɵfac,
-    providedIn: "root"
-  });
-};
-(() => {
-  (typeof ngDevMode === "undefined" || ngDevMode) && setClassMetadata(Platform, [{
-    type: Injectable,
-    args: [{
-      providedIn: "root"
-    }]
-  }], () => [], null);
-})();
-
 // node_modules/@angular/cdk/fesm2022/_scrolling-chunk.mjs
 var RtlScrollAxisType;
 (function(RtlScrollAxisType2) {
@@ -107,9 +56,8 @@ function getRtlScrollAxisType() {
 }
 
 export {
-  Platform,
   RtlScrollAxisType,
   supportsScrollBehavior,
   getRtlScrollAxisType
 };
-//# sourceMappingURL=chunk-LMVDGQLB.js.map
+//# sourceMappingURL=chunk-GUGIMSVJ.js.map

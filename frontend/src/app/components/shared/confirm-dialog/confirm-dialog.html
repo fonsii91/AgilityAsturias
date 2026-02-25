@@ -1,0 +1,15 @@
+<div class="dialog-header" [ngClass]="{'destructive': data.isDestructive, 'info': !data.isDestructive}">
+    <div class="icon-circle">
+        <mat-icon>{{ data.isDestructive ? 'warning' : 'info' }}</mat-icon>
+    </div>
+    <h2 mat-dialog-title class="dialog-title">{{ data.title }}</h2>
+</div>
+<mat-dialog-content class="dialog-content">
+    <p>{{ data.message }}</p>
+</mat-dialog-content>
+<mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button class="btn-cancel" (click)="onCancel()">{{ data.cancelText || 'Cancelar' }}</button>
+    <button mat-flat-button [color]="data.isDestructive ? 'warn' : 'primary'" class="btn-confirm" (click)="onConfirm()">
+        {{ data.confirmText || 'Confirmar' }}
+    </button>
+</mat-dialog-actions>

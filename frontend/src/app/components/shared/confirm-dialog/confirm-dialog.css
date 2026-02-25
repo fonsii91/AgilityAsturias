@@ -1,0 +1,68 @@
+.dialog-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px 16px;
+    text-align: center;
+}
+
+.icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin-bottom: 16px;
+}
+
+.icon-circle mat-icon {
+    font-size: 36px;
+    height: 36px;
+    width: 36px;
+}
+
+/* Info Variant */
+.dialog-header.info .icon-circle {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+/* Destructive Variant */
+.dialog-header.destructive .icon-circle {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.dialog-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.dialog-content {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #555;
+    padding: 0 32px 24px;
+    margin: 0;
+}
+
+.dialog-actions {
+    padding: 16px 24px;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-cancel {
+    border-radius: 20px;
+    padding: 0 24px;
+}
+
+.btn-confirm {
+    border-radius: 20px;
+    padding: 0 32px;
+    font-weight: 600;
+}
