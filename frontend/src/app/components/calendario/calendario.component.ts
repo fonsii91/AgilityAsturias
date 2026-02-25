@@ -1,6 +1,8 @@
-import { Component, computed, Signal, signal } from '@angular/core';
+import { Component, computed, Signal, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CompetitionService } from '../../services/competition.service';
+import { AuthService } from '../../services/auth.service';
+import { DogService } from '../../services/dog.service';
 
 interface CalendarDay {
     date: Date;
@@ -56,6 +58,16 @@ export class CalendarioComponent {
     selectedDeadlines: any[] = [];
     isModalOpen = false;
 
+    // Attendance state
+    authService = inject(AuthService);
+    dogService = inject(DogService);
+    isConfirmingAttendance = false;
+    selectedDogIds = new Set<number>();
+    viewingAttendees = false;
+    attendees: any[] = [];
+    isLoadingAttendees = false;
+    userDogs = this.dogService.getDogs();
+
     constructor(private competitionService: CompetitionService) {
         this.competitions = this.competitionService.getCompetitions();
     }
@@ -66,6 +78,7 @@ export class CalendarioComponent {
 
         if (this.selectedCompetitions.length === 1) {
             this.selectedCompetition = this.selectedCompetitions[0];
+            this.resetAttendanceState();
         } else {
             this.selectedCompetition = null; // Show list if multiple or none
         }
@@ -74,11 +87,25 @@ export class CalendarioComponent {
         if (this.selectedCompetitions.length > 0 || this.selectedDeadlines.length > 0) {
             this.isModalOpen = true;
             document.body.style.overflow = 'hidden';
+            if (this.authService.currentUserSignal()) {
+                this.dogService.loadUserDogs();
+            }
         }
     }
 
     selectCompetitionFromList(comp: any) {
         this.selectedCompetition = comp;
+        this.resetAttendanceState();
+    }
+
+    resetAttendanceState() {
+        this.isConfirmingAttendance = false;
+        this.viewingAttendees = false;
+        this.attendees = [];
+        this.selectedDogIds.clear();
+        if (this.selectedCompetition?.attendingDogIds) {
+            this.selectedDogIds = new Set(this.selectedCompetition.attendingDogIds);
+        }
     }
 
     backToList() {
@@ -156,7 +183,87 @@ export class CalendarioComponent {
         this.selectedCompetition = null;
         this.selectedCompetitions = [];
         this.isImageExpanded = false; // Reset expansion
+
+        this.isConfirmingAttendance = false;
+        this.viewingAttendees = false;
+        this.attendees = [];
+
         document.body.style.overflow = 'auto';
+    }
+
+    // Attendance Methods
+    startAttendance() {
+        this.isConfirmingAttendance = true;
+    }
+
+    cancelAttendanceForm() {
+        this.isConfirmingAttendance = false;
+        // Revert selected dogs to whatever was saved
+        this.selectedDogIds.clear();
+        if (this.selectedCompetition?.attendingDogIds) {
+            this.selectedDogIds = new Set(this.selectedCompetition.attendingDogIds);
+        }
+    }
+
+    toggleDog(dogId: number) {
+        if (this.selectedDogIds.has(dogId)) {
+            this.selectedDogIds.delete(dogId);
+        } else {
+            this.selectedDogIds.add(dogId);
+        }
+    }
+
+    async confirmAttendance() {
+        if (!this.selectedCompetition) return;
+        try {
+            const dogIdsArray = Array.from(this.selectedDogIds);
+            await this.competitionService.attendCompetition(this.selectedCompetition.id, dogIdsArray);
+
+            // Update local state temporarily, or rely on a fresh refetch
+            this.selectedCompetition.isAttending = true;
+            this.selectedCompetition.attendingDogIds = dogIdsArray;
+            this.isConfirmingAttendance = false;
+
+            if (this.viewingAttendees) {
+                this.loadAttendees();
+            }
+        } catch (e) {
+            console.error('Error confirming attendance', e);
+        }
+    }
+
+    async removeAttendance() {
+        if (!this.selectedCompetition) return;
+        try {
+            await this.competitionService.unattendCompetition(this.selectedCompetition.id);
+            this.selectedCompetition.isAttending = false;
+            this.selectedCompetition.attendingDogIds = [];
+            this.selectedDogIds.clear();
+
+            if (this.viewingAttendees) {
+                this.loadAttendees();
+            }
+        } catch (e) {
+            console.error('Error removing attendance', e);
+        }
+    }
+
+    toggleAttendeesView() {
+        this.viewingAttendees = !this.viewingAttendees;
+        if (this.viewingAttendees && this.selectedCompetition) {
+            this.loadAttendees();
+        }
+    }
+
+    async loadAttendees() {
+        this.isLoadingAttendees = true;
+        try {
+            this.attendees = await this.competitionService.getAttendees(this.selectedCompetition.id);
+        } catch (e) {
+            console.error('Error fetching attendees', e);
+        } finally {
+            this.isLoadingAttendees = false;
+        }
     }
 
     // Image Expansion

@@ -61,9 +61,10 @@ class ReservationController extends Controller
             $availability[$key]['count'] += 1;
 
             // Group attendees by user to match the frontend expected structure
-            // We want to combine dogs under the same user_name
             $userName = $reservation->user ? $reservation->user->name : 'Usuario';
+            $userImage = $reservation->user ? $reservation->user->photo_url : null;
             $dogName = $reservation->dog ? $reservation->dog->name : 'Perro Desconocido';
+            $dogPhoto = $reservation->dog ? $reservation->dog->photo_url : null;
 
             $foundUserIdx = -1;
             foreach ($availability[$key]['attendees'] as $idx => $attendee) {
@@ -76,10 +77,16 @@ class ReservationController extends Controller
             if ($foundUserIdx === -1) {
                 $availability[$key]['attendees'][] = [
                     'user_name' => $userName,
-                    'dogs' => [$dogName]
+                    'user_image' => $userImage,
+                    'dogs' => [
+                        ['name' => $dogName, 'image' => $dogPhoto]
+                    ]
                 ];
             } else {
-                $availability[$key]['attendees'][$foundUserIdx]['dogs'][] = $dogName;
+                $availability[$key]['attendees'][$foundUserIdx]['dogs'][] = [
+                    'name' => $dogName,
+                    'image' => $dogPhoto
+                ];
             }
         }
 

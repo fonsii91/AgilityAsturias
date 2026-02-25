@@ -61,8 +61,11 @@ class User extends Authenticatable
     /**
      * Get the reservations for the user.
      */
-    public function reservations()
+    /**
+     * Get the events/competitions the user is attending.
+     */
+    public function competitions()
     {
-        return $this->hasMany(Reservation::class);
+        return $this->belongsToMany(Competition::class);
     }
 }

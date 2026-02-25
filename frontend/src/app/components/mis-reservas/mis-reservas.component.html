@@ -1,0 +1,83 @@
+<div class="reservas-container">
+    <div class="header">
+        <h1>🐾 Mis Reservas</h1>
+        <p>Tu calendario de actividades en Agility Asturias</p>
+    </div>
+
+
+    <!-- SECTION: TODAY (Highlighted) -->
+    <div class="section-title">
+        <h2>🔥 Hoy</h2>
+        <span class="date-badge">{{ todayStr | date:'EEEE, d MMMM' : '' : 'es-ES' }}</span>
+    </div>
+
+    <div *ngIf="todayTimeSlots().length === 0" class="empty-state glass-effect today-empty">
+        <div class="empty-icon">😴</div>
+        <p>No tienes reservas para hoy.</p>
+        <p class="empty-sub">¡Aprovecha para descansar o haz una nueva reserva!</p>
+    </div>
+
+    <div *ngIf="todayTimeSlots().length > 0" class="reservations-timeline today-list">
+        <div *ngFor="let slot of todayTimeSlots()" class="day-group glass-effect highlight-today">
+            <div class="date-header today-header">
+                <h3><span class="material-icons">schedule</span> {{ slot.time }}</h3>
+                <span class="status-badge" [class]="slot.status">
+                    {{ slot.status === 'active' ? 'Confirmada' : slot.status }}
+                </span>
+            </div>
+
+            <div class="reservations-list">
+                <div class="res-card small-card my-card">
+                    <div class="users-list-small">
+                        <div class="user-row-small">
+                            <span class="user-name-small">Vas a asistir con:</span>
+                            <div class="dogs-chips">
+                                <span *ngFor="let dog of slot.dogs" class="dog-chip">🐕 {{ dog }}</span>
+                                <span *ngIf="!slot.dogs?.length" class="no-dogs">Sin perros</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SECTION: FUTURE (Upcoming) -->
+    <div class="section-title future-title">
+        <h2>📅 Próximas Reservas</h2>
+    </div>
+
+    <div *ngIf="futureReservationsGrouped().length === 0" class="empty-state glass-effect">
+        <div class="empty-icon">🐶</div>
+        <p>No hay reservas a la vista.</p>
+        <button class="btn-primary mt-3" routerLink="/reservas">Reservar Ahora</button>
+    </div>
+
+    <div class="reservations-timeline">
+        <div *ngFor="let group of futureReservationsGrouped()" class="day-group glass-effect future-card">
+            <div class="date-header">
+                <h3>{{ group.date | date:'EEEE, d MMMM' : '' : 'es-ES' }}</h3>
+                <span class="count-badge">{{ group.totalCount }} {{ group.totalCount === 1 ? 'perro' : 'perros'
+                    }}</span>
+            </div>
+
+            <div class="reservations-list mt-2">
+                <div *ngFor="let slot of group.timeSlots" class="res-card small-card my-future-card">
+                    <div class="time-slot future-time">
+                        <span class="material-icons time-icon">schedule</span>
+                        <span class="time">{{ slot.time }}</span>
+                    </div>
+
+                    <div class="users-list-small">
+                        <div class="user-row-small">
+                            <div class="dogs-chips">
+                                <span *ngFor="let dog of slot.dogs" class="dog-chip outline">🐕 {{ dog }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

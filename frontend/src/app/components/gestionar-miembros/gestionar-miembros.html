@@ -19,29 +19,23 @@
             <thead>
                 <tr>
                     <th>Usuario</th>
-                    <th>Email</th>
-                    <th>Estado</th>
                     <th>Acciones</th>
+                    <th>Estado</th>
+                    <th>Email</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let user of displayUsers()">
                     <td class="user-cell">
                         <ng-container *ngIf="user.photoURL; else defaultAvatarAdmin">
-                            <img [src]="user.photoURL" alt="Avatar" class="avatar" referrerpolicy="no-referrer">
+                            <img [src]="user.photoURL" alt="Avatar" class="avatar clickable-avatar"
+                                referrerpolicy="no-referrer" (click)="openImageZoom(user.photoURL)">
                         </ng-container>
                         <ng-template #defaultAvatarAdmin>
-                            <div class="avatar default-avatar-placeholder">
-                                {{ (user.displayName || user.name || 'U').charAt(0) }}
-                            </div>
+                            <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo"
+                                class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
                         </ng-template>
                         <span>{{ user.displayName }}</span>
-                    </td>
-                    <td>{{ user.email }}</td>
-                    <td>
-                        <span class="badge" [class]="user.role">
-                            {{ user.role === 'member' ? 'Miembro' : 'Usuario' }}
-                        </span>
                     </td>
                     <td>
                         <button class="action-btn" [class.promote]="user.role !== 'member'"
@@ -49,6 +43,12 @@
                             {{ user.role === 'member' ? '⬇️ Quitar Miembro' : '⬆️ Hacer Miembro' }}
                         </button>
                     </td>
+                    <td>
+                        <span class="badge" [class]="user.role">
+                            {{ user.role === 'member' ? 'Miembro' : 'Usuario' }}
+                        </span>
+                    </td>
+                    <td class="email-cell">{{ user.email }}</td>
                 </tr>
             </tbody>
         </table>
@@ -89,4 +89,12 @@
             <p>Cargando usuarios...</p>
         </div>
     </ng-template>
+
+    <!-- Image Zoom Modal -->
+    <div class="modal-overlay image-zoom-overlay" *ngIf="isZoomModalOpen" (click)="closeImageZoom()">
+        <div class="zoom-modal-content" (click)="$event.stopPropagation()">
+            <button class="close-zoom-btn" (click)="closeImageZoom()">&times;</button>
+            <img [src]="zoomedImageURL" alt="Zoomed Profile Foto">
+        </div>
+    </div>
 </div>

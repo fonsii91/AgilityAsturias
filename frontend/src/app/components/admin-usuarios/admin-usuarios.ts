@@ -56,4 +56,22 @@ export class AdminUsuariosComponent implements OnInit {
       this.toastService.error(errorMsg);
     }
   }
+
+  // Zoom Image State
+  zoomedImageURL: string | null = null;
+  isZoomModalOpen = false;
+
+  openImageZoom(url: string | null) {
+    if (!url) return;
+    this.zoomedImageURL = url;
+    this.isZoomModalOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeImageZoom() {
+    this.isZoomModalOpen = false;
+    this.zoomedImageURL = null;
+    document.body.style.overflow = 'auto';
+  }
 }
+

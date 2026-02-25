@@ -40,6 +40,9 @@ export class GestionarReservasComponent {
     // Dynamic definition of slots
     timeSlots = this.timeSlotService.getTimeSlots();
 
+    // Image Modal State
+    enlargedImageStr: string | null = null;
+
     // Management Modal State
     isManageModalOpen = false;
     editingSlot: TimeSlot | null = null; // null means creating new
@@ -124,12 +127,29 @@ export class GestionarReservasComponent {
             let allAttendees: any[] = [];
 
             if (slotAvailability && slotAvailability.attendees) {
-                allAttendees = slotAvailability.attendees.map(a => ({
+                allAttendees = slotAvailability.attendees.map((a: any) => ({
                     userName: a.user_name,
-                    selectedDogs: a.dogs
+                    userImage: a.user_image,
+                    selectedDogs: a.dogs // already an array of { name, image } from backend
                 }));
             } else {
-                allAttendees = slotMyReservations;
+                // Group my reservations manually
+                const myGroups = new Map<string, any>();
+                for (const r of slotMyReservations) {
+                    const uName = r.userName || 'Usuario';
+                    if (!myGroups.has(uName)) {
+                        myGroups.set(uName, {
+                            userName: uName,
+                            userImage: r.user?.photo_url || null, // Assuming user relationship has photo_url if loaded
+                            selectedDogs: []
+                        });
+                    }
+                    myGroups.get(uName).selectedDogs.push({
+                        name: r.dog?.name || 'Perro Desconocido',
+                        image: r.dog?.photo_url || null
+                    });
+                }
+                allAttendees = Array.from(myGroups.values());
             }
 
             // Check if current user has a reservation here
@@ -201,6 +221,15 @@ export class GestionarReservasComponent {
     closeManageModal() {
         this.isManageModalOpen = false;
         this.editingSlot = null;
+    }
+
+    enlargeImage(imgUrl: string | undefined | null) {
+        if (!imgUrl) return;
+        this.enlargedImageStr = imgUrl;
+    }
+
+    closeImage() {
+        this.enlargedImageStr = null;
     }
 
     async deleteSlot(id: number) {

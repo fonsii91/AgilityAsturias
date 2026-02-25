@@ -20,12 +20,12 @@
                 <tr *ngFor="let user of users()">
                     <td class="user-cell">
                         <ng-container *ngIf="user.photoURL; else defaultAvatar">
-                            <img [src]="user.photoURL" alt="Avatar" class="avatar" referrerpolicy="no-referrer">
+                            <img [src]="user.photoURL" alt="Avatar" class="avatar clickable-avatar"
+                                referrerpolicy="no-referrer" (click)="openImageZoom(user.photoURL)">
                         </ng-container>
                         <ng-template #defaultAvatar>
-                            <div class="avatar default-avatar-placeholder">
-                                {{ (user.displayName || 'U').charAt(0) }}
-                            </div>
+                            <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo"
+                                class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
                         </ng-template>
                         <span>{{ user.displayName }}</span>
                     </td>
@@ -53,4 +53,12 @@
             <p>Cargando usuarios...</p>
         </div>
     </ng-template>
+
+    <!-- Image Zoom Modal -->
+    <div class="modal-overlay image-zoom-overlay" *ngIf="isZoomModalOpen" (click)="closeImageZoom()">
+        <div class="zoom-modal-content" (click)="$event.stopPropagation()">
+            <button class="close-zoom-btn" (click)="closeImageZoom()">&times;</button>
+            <img [src]="zoomedImageURL" alt="Zoomed Profile Foto">
+        </div>
+    </div>
 </div>

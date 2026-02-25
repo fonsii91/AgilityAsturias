@@ -37,8 +37,8 @@
     background-color: var(--primary-blue);
     color: white;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -52,6 +52,10 @@
 .camera-btn:hover {
     transform: scale(1.1);
     background-color: #004494;
+}
+
+.camera-icon {
+    font-size: 18px;
 }
 
 .profile-info h2 {
@@ -253,8 +257,8 @@
     background-color: var(--primary-blue);
     color: white;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -268,6 +272,10 @@
 .camera-btn-dog:hover {
     transform: scale(1.1);
     background-color: #004494;
+}
+
+.camera-icon-small {
+    font-size: 16px;
 }
 
 .dog-icon {
@@ -320,6 +328,62 @@
     font-style: italic;
     background-color: #f9f9f9;
     border-radius: 8px;
+}
+
+.clickable-image {
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.clickable-image:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+.image-modal-overlay {
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.close-image-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2.5rem;
+    cursor: pointer;
+    z-index: 2001;
+    transition: color 0.2s;
+}
+
+.close-image-btn:hover {
+    color: var(--accent-orange, #ff6b35);
+}
+
+.full-size-image {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.95);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 /* Modal Styles */

@@ -26,6 +26,10 @@ export class Perfil {
   deleteModalOpen = signal(false);
   dogToDelete = signal<{ id: number, name: string } | null>(null);
 
+  // Image Modal state
+  imageModalOpen = signal(false);
+  selectedImage = signal<string | null>(null);
+
   // Name editing state
   isEditingName = signal(false);
   editedName = signal('');
@@ -159,6 +163,18 @@ export class Perfil {
   closeDeleteModal() {
     this.deleteModalOpen.set(false);
     this.dogToDelete.set(null);
+  }
+
+  openImageModal(imageUrl: string | null) {
+    if (imageUrl) {
+      this.selectedImage.set(imageUrl);
+      this.imageModalOpen.set(true);
+    }
+  }
+
+  closeImageModal() {
+    this.imageModalOpen.set(false);
+    this.selectedImage.set(null);
   }
 
   async confirmDelete() {

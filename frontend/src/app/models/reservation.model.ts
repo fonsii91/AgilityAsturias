@@ -17,6 +17,7 @@ export interface Reservation {
     user?: {
         name: string;
         email: string;
+        photo_url?: string;
     };
     timeSlot?: {
         day: string;
@@ -26,6 +27,8 @@ export interface Reservation {
 
     // Flattened properties for easier access in components (mapped)
     userName?: string;
+    userImage?: string;
     day?: string;
     startTime?: string;
+    selectedDogs?: { name: string, image?: string }[];
 }

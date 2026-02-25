@@ -9,4 +9,7 @@ export interface Competition {
     enlace: string;
     tipo: 'competicion' | 'otros';
     nombre?: string; // Optional for backward compatibility with existing records
+
+    isAttending?: boolean;
+    attendingDogIds?: number[];
 }

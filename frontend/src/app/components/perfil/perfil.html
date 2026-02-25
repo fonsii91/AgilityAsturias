@@ -1,10 +1,11 @@
 <div class="perfil-container" *ngIf="authService.userProfileSignal() as user">
     <div class="profile-header">
         <div class="avatar-container">
-            <img [src]="previewUrl || user.photoURL || 'assets/default-user.png'" alt="Avatar" class="profile-avatar"
-                referrerpolicy="no-referrer">
+            <img [src]="previewUrl || user.photoURL || 'assets/default-user.png'" alt="Avatar"
+                class="profile-avatar clickable-image" referrerpolicy="no-referrer"
+                (click)="openImageModal(previewUrl || user.photoURL || 'assets/default-user.png')">
             <label class="camera-btn" title="Cambiar foto">
-                📷
+                <span class="material-icons-outlined camera-icon">photo_camera</span>
                 <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
             </label>
         </div>
@@ -46,11 +47,12 @@
 
             <div class="dog-card" *ngFor="let dog of dogs()">
                 <div class="dog-icon-container">
-                    <img *ngIf="dog.photo_url" [src]="dog.photo_url" alt="{{ dog.name }}" class="dog-avatar"
-                        referrerpolicy="no-referrer">
+                    <img *ngIf="dog.photo_url" [src]="dog.photo_url" alt="{{ dog.name }}"
+                        class="dog-avatar clickable-image" referrerpolicy="no-referrer"
+                        (click)="openImageModal(dog.photo_url)">
                     <div *ngIf="!dog.photo_url" class="dog-icon">🐕</div>
                     <label class="camera-btn-dog" title="Cambiar foto">
-                        📷
+                        <span class="material-icons-outlined camera-icon-small">photo_camera</span>
                         <input type="file" (change)="onDogFileSelected($event, dog.id)" accept="image/*" hidden>
                     </label>
                 </div>
@@ -60,6 +62,12 @@
                 <button class="btn-delete" (click)="deleteDog(dog.id, dog.name)" title="Eliminar">🗑️</button>
             </div>
         </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="modal-overlay image-modal-overlay" *ngIf="imageModalOpen()" (click)="closeImageModal()">
+        <button class="close-image-btn" (click)="closeImageModal()">&times;</button>
+        <img *ngIf="selectedImage()" [src]="selectedImage()" class="full-size-image" (click)="$event.stopPropagation()">
     </div>
 
     <!-- Delete Confirmation Modal -->

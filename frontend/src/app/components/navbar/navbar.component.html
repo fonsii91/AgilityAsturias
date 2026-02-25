@@ -108,7 +108,7 @@
                 <div class="dropdown-divider"></div>
                 <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item"><span
                         class="material-icons">pets</span> Mi Perfil</a>
-                <a *ngIf="authService.isMember()" routerLink="/reservas" (click)="closeMenu()"
+                <a *ngIf="authService.isMember()" routerLink="/mis-reservas" (click)="closeMenu()"
                     class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
 
                 <div class="dropdown-divider" *ngIf="authService.isStaff()"></div>

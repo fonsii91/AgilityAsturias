@@ -29,4 +29,9 @@ class Dog extends Model
     {
         return $this->hasMany(Reservation::class);
     }
+
+    public function competitions()
+    {
+        return $this->belongsToMany(Competition::class);
+    }
 }

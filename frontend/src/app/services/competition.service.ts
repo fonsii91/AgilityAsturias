@@ -69,6 +69,33 @@ export class CompetitionService {
         });
     }
 
+    attendCompetition(id: number, dogIds: number[] = []) {
+        return new Promise<any>((resolve, reject) => {
+            this.http.post<any>(`${this.apiUrl}/${id}/attend`, { dog_ids: dogIds }).subscribe({
+                next: (res) => resolve(res),
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    unattendCompetition(id: number) {
+        return new Promise<any>((resolve, reject) => {
+            this.http.delete<any>(`${this.apiUrl}/${id}/attend`).subscribe({
+                next: (res) => resolve(res),
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    getAttendees(id: number) {
+        return new Promise<any[]>((resolve, reject) => {
+            this.http.get<any[]>(`${this.apiUrl}/${id}/attendees`).subscribe({
+                next: (res) => resolve(res),
+                error: (err) => reject(err)
+            });
+        });
+    }
+
     // Mapper methods
     private mapToBackend(comp: Partial<Competition>): any {
         return {
@@ -95,7 +122,9 @@ export class CompetitionService {
             formaPago: data.forma_pago,
             enlace: data.enlace,
             tipo: data.tipo,
-            cartel: data.cartel
+            cartel: data.cartel,
+            isAttending: !!data.is_attending,
+            attendingDogIds: data.attending_dog_ids || []
         };
     }
 }

@@ -118,9 +118,86 @@
                 </div>
 
                 <div class="modal-actions" *ngIf="selectedCompetition.enlace">
-                    <a [href]="selectedCompetition.enlace" target="_blank" class="btn-register">
-                        Inscribirse Ahora
+                    <a [href]="selectedCompetition.enlace" target="_blank" class="event-link">
+                        <span class="material-icons-outlined"
+                            style="font-size: 1.2rem; vertical-align: middle;">open_in_new</span>
+                        Ir a la inscripción
                     </a>
+                </div>
+
+                <!-- Attendance Section -->
+                <div class="attendance-section" *ngIf="authService.currentUserSignal()">
+                    <hr class="section-divider">
+
+                    <!-- Action Buttons -->
+                    <div class="attendance-actions" *ngIf="!isConfirmingAttendance">
+                        <button *ngIf="!selectedCompetition.isAttending" class="btn-attend" (click)="startAttendance()">
+                            <span class="material-icons-outlined">event_available</span> Asistiré
+                        </button>
+                        <button *ngIf="selectedCompetition.isAttending" class="btn-edit-attendance"
+                            (click)="startAttendance()">
+                            <span class="material-icons-outlined">edit_calendar</span> Modificar Asistencia
+                        </button>
+                        <button *ngIf="selectedCompetition.isAttending" class="btn-unattend"
+                            (click)="removeAttendance()">
+                            <span class="material-icons-outlined">event_busy</span> No Asistiré
+                        </button>
+                    </div>
+
+                    <!-- Confirm Attendance Form -->
+                    <div class="attendance-form" *ngIf="isConfirmingAttendance">
+                        <h4>¿Con qué perretes asistirás?</h4>
+                        <div class="dogs-selection-list" *ngIf="userDogs() && userDogs().length > 0">
+                            <label class="dog-checkbox" *ngFor="let dog of userDogs()">
+                                <input type="checkbox" [checked]="selectedDogIds.has(dog.id)"
+                                    (change)="toggleDog(dog.id)">
+                                <img *ngIf="dog.photo_url" [src]="dog.photo_url" class="small-avatar" alt="dog"
+                                    referrerpolicy="no-referrer">
+                                <div *ngIf="!dog.photo_url" class="small-avatar default-icon">🐕</div>
+                                {{ dog.name }}
+                            </label>
+                        </div>
+                        <p *ngIf="!userDogs() || userDogs().length === 0" class="no-dogs-msg">No tienes perros
+                            registrados.</p>
+
+                        <div class="form-actions-inline">
+                            <button class="btn-cancel-inline" (click)="cancelAttendanceForm()">Cancelar</button>
+                            <button class="btn-confirm-inline" (click)="confirmAttendance()">Guardar</button>
+                        </div>
+                    </div>
+
+                    <!-- Attendees List Toggle -->
+                    <div class="attendees-toggle-container">
+                        <button class="btn-view-attendees" (click)="toggleAttendeesView()">
+                            <span class="material-icons-outlined">groups</span>
+                            {{ viewingAttendees ? 'Ocultar Asistentes' : 'Ver Asistentes' }}
+                        </button>
+                    </div>
+
+                    <!-- Attendees List -->
+                    <div class="attendees-list" *ngIf="viewingAttendees">
+                        <div *ngIf="isLoadingAttendees" class="loading-state">
+                            <div class="spinner"></div> Cargando asistentes...
+                        </div>
+                        <div *ngIf="!isLoadingAttendees && attendees.length === 0" class="empty-state">
+                            Aún no hay asistentes confirmados.
+                        </div>
+                        <div class="attendee-card" *ngFor="let attendee of attendees">
+                            <div class="attendee-user">
+                                <img [src]="attendee.photo_url || 'assets/default-user.png'" class="avatar"
+                                    referrerpolicy="no-referrer">
+                                <span>{{ attendee.name }}</span>
+                            </div>
+                            <div class="attendee-dogs" *ngIf="attendee.dogs?.length > 0">
+                                <span class="dog-badge" *ngFor="let dog of attendee.dogs">
+                                    <img *ngIf="dog.photo_url" [src]="dog.photo_url" class="micro-avatar"
+                                        referrerpolicy="no-referrer">
+                                    <div *ngIf="!dog.photo_url" class="micro-avatar default-icon">🐕</div>
+                                    {{ dog.name }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

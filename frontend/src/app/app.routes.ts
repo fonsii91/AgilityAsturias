@@ -19,6 +19,12 @@ export const routes: Routes = [
         title: 'Reservas | Agility Asturias'
     },
     {
+        path: 'mis-reservas',
+        loadComponent: () => import('./components/mis-reservas/mis-reservas.component').then(m => m.MisReservasComponent),
+        canActivate: [memberGuard],
+        title: 'Mis Reservas | Agility Asturias'
+    },
+    {
         path: 'contacto',
         loadComponent: () => import('./components/contacto/contacto.component').then(m => m.ContactoComponent),
         title: 'Contacto | Agility Asturias'

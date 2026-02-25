@@ -79,14 +79,23 @@
                     <div class="attendees-list-wrapper" [class.expanded]="expandedSlots().has(slot.id)">
                         <div class="attendees-list">
                             <div *ngFor="let res of slot.reservations" class="attendee-card">
-                                <div class="attendee-avatar">
-                                    {{ res.userName.charAt(0).toUpperCase() }}
+                                <div class="attendee-avatar" [class.clickable]="res.userImage"
+                                    (click)="enlargeImage(res.userImage)">
+                                    <ng-container *ngIf="res.userImage; else defaultAvatar">
+                                        <img [src]="res.userImage" alt="User">
+                                    </ng-container>
+                                    <ng-template #defaultAvatar>
+                                        <img src="assets/images/logo.png" alt="Logo" class="default-logo">
+                                    </ng-template>
                                 </div>
                                 <div class="attendee-info">
                                     <span class="attendee-name">{{ res.userName }}</span>
                                     <div class="attendee-dogs">
                                         <span *ngFor="let dog of res.selectedDogs" class="dog-tag">
-                                            🐾 {{ dog }}
+                                            🐾
+                                            <span *ngIf="dog.image" class="dog-name-link"
+                                                (click)="enlargeImage(dog.image)">{{ dog.name }}</span>
+                                            <span *ngIf="!dog.image">{{ dog.name || dog }}</span>
                                         </span>
                                     </div>
                                 </div>
@@ -256,5 +265,15 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Image Modal -->
+<div class="modal-backdrop image-modal-backdrop" *ngIf="enlargedImageStr" (click)="closeImage()">
+    <div class="modal-content image-modal-content" (click)="closeImage()">
+        <button class="btn-icon close-btn" (click)="closeImage()">
+            <span class="material-icons">close</span>
+        </button>
+        <img [src]="enlargedImageStr" alt="Enlarged" class="enlarged-img" (click)="$event.stopPropagation()">
     </div>
 </div>

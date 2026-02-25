@@ -62,6 +62,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     });
 
+    // Event Attendance
+    Route::post('/competitions/{id}/attend', [CompetitionController::class, 'attend']);
+    Route::delete('/competitions/{id}/attend', [CompetitionController::class, 'unattend']);
+    Route::get('/competitions/{id}/attendees', [CompetitionController::class, 'getAttendees']);
+
     Route::middleware(['role:admin,staff,member'])->group(function () {
         // Ranking
         Route::get('/ranking', [RankingController::class, 'index']);
