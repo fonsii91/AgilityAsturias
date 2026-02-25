@@ -1,6 +1,6 @@
 import {
   isPlatformBrowser
-} from "./chunk-MTU2WV7Q.js";
+} from "./chunk-BB7WA5TK.js";
 import {
   Injectable,
   PLATFORM_ID,
@@ -52,4 +52,4 @@ var Platform = class _Platform {
 export {
   Platform
 };
-//# sourceMappingURL=chunk-2DHHI2YC.js.map
+//# sourceMappingURL=chunk-QCOR5IW4.js.map
