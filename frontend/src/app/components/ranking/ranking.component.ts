@@ -1,6 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReservationService } from '../../services/reservation.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
     selector: 'app-ranking',
@@ -11,6 +12,7 @@ import { ReservationService } from '../../services/reservation.service';
 })
 export class RankingComponent {
     private reservationService = inject(ReservationService);
+    authService = inject(AuthService);
 
     ranking = signal<any[]>([]);
     isLoading = signal(true);

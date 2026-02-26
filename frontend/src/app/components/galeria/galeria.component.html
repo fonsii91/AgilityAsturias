@@ -1,7 +1,5 @@
 <div class="gallery-container">
     <h2>Galería</h2>
-    <p class="subtitle">Momentos destacados de nuestro equipo.</p>
-
     <!-- Upload Button for Staff -->
     <div class="admin-actions" *ngIf="isStaff()">
         <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">

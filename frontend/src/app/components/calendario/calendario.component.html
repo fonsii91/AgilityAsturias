@@ -94,21 +94,6 @@
                     &larr; Volver al listado
                 </button>
 
-                <div class="modal-header">
-                    <div class="modal-title-row">
-                        <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
-                        <div class="modal-date-badge"
-                            [style.background]="selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)'"
-                            [style.color]="selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)'">
-                            {{ selectedCompetition.fechaEvento | date:'d MMM' }}
-                            <span
-                                *ngIf="selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !== selectedCompetition.fechaEvento">
-                                - {{ selectedCompetition.fechaFinEvento | date:'d MMM' }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="modal-tabs" *ngIf="authService.currentUserSignal()">
                     <button class="modal-tab" [class.active]="activeModalTab === 'info'" (click)="switchTab('info')">
                         <span class="material-icons-outlined">info</span> Info
@@ -121,6 +106,21 @@
 
                 <!-- Info Tab Content -->
                 <div class="tab-content" *ngIf="activeModalTab === 'info'">
+                    <div class="modal-header">
+                        <div class="modal-title-row">
+                            <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
+                            <div class="modal-date-badge"
+                                [style.background]="selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)'"
+                                [style.color]="selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)'">
+                                {{ selectedCompetition.fechaEvento | date:'d MMM' }}
+                                <span
+                                    *ngIf="selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !== selectedCompetition.fechaEvento">
+                                    - {{ selectedCompetition.fechaFinEvento | date:'d MMM' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="modal-body">
                         <div class="info-grid">
                             <div class="info-item full-width" *ngIf="selectedCompetition.lugar">

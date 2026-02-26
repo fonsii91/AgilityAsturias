@@ -1,7 +1,6 @@
 <div class="ranking-container">
     <div class="header">
-        <h1>🏆 Clasificación de Perretes</h1>
-        <p>¡Asiste a los entrenamientos y gana puntos!</p>
+        <h1>🏆 Clasificación</h1>
     </div>
 
     <div *ngIf="isLoading()" class="loading-state">
@@ -15,7 +14,8 @@
 
     <div *ngIf="!isLoading() && ranking().length > 0" class="ranking-content">
         <div class="ranking-list glass-effect">
-            <div *ngFor="let dog of ranking(); let i = index" class="ranking-row" [class.top-rank]="i < 3">
+            <div *ngFor="let dog of ranking(); let i = index" class="ranking-row" [class.top-rank]="i < 3"
+                [class.highlight-user-dog]="dog.user_id === authService.currentUserSignal()?.id">
                 <div class="rank-position">
                     <span class="medal-icon" *ngIf="i === 0">🥇</span>
                     <span class="medal-icon" *ngIf="i === 1">🥈</span>
@@ -33,14 +33,34 @@
                 <div class="user-info">
                     <div class="name-container">
                         <span class="user-name" [class.bold]="i < 3">{{ dog.name }}</span>
-                        <div class="weekly-badge" *ngIf="dog.weekly_points > 0" title="Puntos conseguidos esta semana">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path fill-rule="evenodd"
-                                    d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            <span>+{{ dog.weekly_points }}</span>
+                        <ng-container *ngIf="dog.position_change !== 0 && dog.position_change !== 'NEW'">
+                            <!-- Position Up -->
+                            <div class="position-badge position-up" *ngIf="dog.position_change > 0"
+                                title="Puestos subidos en los últimos 10 días">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <span>+{{ dog.position_change }}</span>
+                            </div>
+
+                            <!-- Position Down -->
+                            <div class="position-badge position-down" *ngIf="dog.position_change < 0"
+                                title="Puestos bajados en los últimos 10 días">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <span>{{ dog.position_change }}</span>
+                            </div>
+                        </ng-container>
+                        <div class="position-badge position-new" *ngIf="dog.position_change === 'NEW'"
+                            title="Nueva entrada en el ranking">
+                            <span>NUEVO</span>
                         </div>
                     </div>
                     <span class="owner-name" *ngIf="dog.user">de {{ dog.user.name }}</span>

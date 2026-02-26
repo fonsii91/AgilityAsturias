@@ -1,5 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { ReservationService } from '../../services/reservation.service';
 import { AuthService } from '../../services/auth.service';
 import { Reservation } from '../../models/reservation.model';
@@ -7,7 +8,7 @@ import { Reservation } from '../../models/reservation.model';
 @Component({
     selector: 'app-mis-reservas',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, RouterModule],
     templateUrl: './mis-reservas.component.html',
     styleUrls: ['./mis-reservas.component.css']
 })

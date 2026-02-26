@@ -19,33 +19,56 @@ class ReservationSeeder extends Seeder
             return;
 
         foreach ($users as $user) {
-            $dogs = $user->dogs->pluck('id')->toArray();
-            if (empty($dogs))
+            $dogs = $user->dogs;
+            if ($dogs->isEmpty())
                 continue;
 
-            $slot1 = $slots->random()->id;
-            $slot2 = $slots->random()->id;
-
             // Future reservation (only book 1 dog)
+            $slot1 = $slots->random()->id;
             \App\Models\Reservation::create([
                 'slot_id' => $slot1,
                 'user_id' => $user->id,
-                'dog_id' => $dogs[0],
+                'dog_id' => $dogs->first()->id,
                 'date' => now()->addDays(rand(1, 5))->toDateString(),
                 'status' => 'active',
                 'attendance_verified' => false
             ]);
 
-            // Past completed reservation (book all dogs)
-            foreach ($dogs as $dogId) {
-                \App\Models\Reservation::create([
-                    'slot_id' => $slot2,
-                    'user_id' => $user->id,
-                    'dog_id' => $dogId,
-                    'date' => now()->subDays(rand(1, 5))->toDateString(),
-                    'status' => 'completed',
-                    'attendance_verified' => true
-                ]);
+            // Simulate history for all dogs to generate rank changes
+            foreach ($dogs as $dog) {
+                // 1. Generate old reservations (more than 10 days ago)
+                $oldResCount = rand(0, 5); // 0 to 5 old reservations
+                for ($i = 0; $i < $oldResCount; $i++) {
+                    $pastDate = now()->subDays(rand(11, 30));
+                    \App\Models\Reservation::create([
+                        'slot_id' => $slots->random()->id,
+                        'user_id' => $user->id,
+                        'dog_id' => $dog->id,
+                        'date' => $pastDate->toDateString(),
+                        'status' => 'completed',
+                        'attendance_verified' => true,
+                        'created_at' => $pastDate,
+                        'updated_at' => $pastDate // Crucial for Ranking logic
+                    ]);
+                    $dog->increment('points');
+                }
+
+                // 2. Generate recent reservations (less than 10 days ago)
+                $newResCount = rand(0, 5); // 0 to 5 new reservations
+                for ($i = 0; $i < $newResCount; $i++) {
+                    $recentDate = now()->subDays(rand(1, 9));
+                    \App\Models\Reservation::create([
+                        'slot_id' => $slots->random()->id,
+                        'user_id' => $user->id,
+                        'dog_id' => $dog->id,
+                        'date' => $recentDate->toDateString(),
+                        'status' => 'completed',
+                        'attendance_verified' => true,
+                        'created_at' => $recentDate,
+                        'updated_at' => $recentDate // Crucial for Ranking logic
+                    ]);
+                    $dog->increment('points');
+                }
             }
         }
     }
