@@ -9,7 +9,7 @@ Route::get('/', function () {
 
 // Fallback route to serve storage files directly without symlink on Hostalia
 Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
-    if (!in_array($folder, ['profile_photos', 'dog_photos', 'competition_posters', 'competitions'])) {
+    if (!in_array($folder, ['profile_photos', 'dog_photos', 'competition_posters', 'competitions', 'gallery_photos'])) {
         abort(404);
     }
 

@@ -32,6 +32,6 @@ export class GalleryService {
     }
 
     deletePhoto(id: number): Observable<void> {
-        return this.http.delete<void>(`${this.apiUrl}/gallery/${id}`);
+        return this.http.post<void>(`${this.apiUrl}/gallery/${id}`, { _method: 'DELETE' });
     }
 }
