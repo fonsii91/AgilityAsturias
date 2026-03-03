@@ -88,6 +88,11 @@ export const routes: Routes = [
         title: 'Iniciar Sesión | Agility Asturias'
     },
     {
+        path: 'reset-password',
+        loadComponent: () => import('./components/reset-password/reset-password').then(m => m.ResetPasswordComponent),
+        title: 'Restablecer Contraseña | Agility Asturias'
+    },
+    {
         path: 'register',
         loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent),
         title: 'Registrarse | Agility Asturias'

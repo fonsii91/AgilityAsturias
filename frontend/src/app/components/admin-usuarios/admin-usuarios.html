@@ -37,6 +37,10 @@
                             <option value="staff">Staff</option>
                             <option value="admin">Admin</option>
                         </select>
+                        <button class="btn-icon" (click)="generateResetLink(user)"
+                            title="Generar Enlace de Recuperación">
+                            <span class="material-icons">vpn_key</span>
+                        </button>
                     </td>
                     <td>{{ user.email }}</td>
                     <td>

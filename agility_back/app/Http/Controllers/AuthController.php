@@ -224,4 +224,70 @@ class AuthController extends Controller
             ], 500);
         }
     }
+
+    public function generateResetLink(Request $request, $id)
+    {
+        $currentUser = $request->user();
+
+        if (!in_array($currentUser->role, ['admin', 'staff'])) {
+            return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
+        }
+
+        $targetUser = User::find($id);
+        if (!$targetUser) {
+            return response()->json(['message' => 'Usuario no encontrado.'], 404);
+        }
+
+        $token = \Illuminate\Support\Str::random(60);
+        $targetUser->reset_token = $token;
+        $targetUser->save();
+
+        // En frontend tendremos una ruta /reset-password?token=...
+        $frontendUrl = env('FRONTEND_URL', 'https://agilityasturias.com');
+        $resetLink = rtrim($frontendUrl, '/') . '/reset-password?token=' . $token;
+
+        return response()->json([
+            'message' => 'Enlace de recuperación generado',
+            'link' => $resetLink
+        ]);
+    }
+
+    public function resetPasswordWithToken(Request $request)
+    {
+        try {
+            $request->validate([
+                'token' => 'required|string',
+                'password' => 'required|string|min:6|confirmed',
+            ], [
+                'token.required' => 'El token es inválido o no existe.',
+                'password.required' => 'La contraseña es obligatoria.',
+                'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+                'password.confirmed' => 'Las contraseñas no coinciden.',
+            ]);
+
+            $user = User::where('reset_token', $request->token)->first();
+
+            if (!$user) {
+                return response()->json(['message' => 'El enlace de recuperación es inválido o ya ha sido utilizado.'], 400);
+            }
+
+            $user->password = Hash::make($request->password);
+            $user->reset_token = null; // Invalidate the token
+            $user->save();
+
+            return response()->json([
+                'message' => 'Contraseña actualizada correctamente. Ya puedes iniciar sesión.'
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Error de validación en los datos proporcionados.',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Ocurrió un error al restablecer la contraseña.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

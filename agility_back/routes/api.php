@@ -20,6 +20,7 @@ use Illuminate\Http\Request; // Added for the closure route
 // Public Routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/reset-password', [AuthController::class, 'resetPasswordWithToken']);
 
 Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
@@ -39,6 +40,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware(['role:admin,staff'])->group(function () {
         Route::get('/users', [AuthController::class, 'index']);
         Route::put('/users/{id}/role', [AuthController::class, 'updateRole']);
+        Route::post('/users/{id}/generate-reset-link', [AuthController::class, 'generateResetLink']);
 
         Route::post('/competitions', [CompetitionController::class, 'store']);
         Route::put('/competitions/{id}', [CompetitionController::class, 'update']);

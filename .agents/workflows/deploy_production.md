@@ -77,6 +77,15 @@ Set-Content -Path "c:\Users\Usuario\Desktop\AgilityAsturiass\create_final_zips.p
 php c:\Users\Usuario\Desktop\AgilityAsturiass\create_final_zips.php
 
 # 5. Limpiamos
-Remove-Item -Path "c:\Users\Usuario\Desktop\AgilityAsturiass\create_final_zips.php" -Force
+Remove-Item -Path "c:\Users\Fonsi\Desktop\AgilityAsturias\create_final_zips.php" -Force
 Write-Host "Paquetes de despliegue listos en la carpeta deploy_package."
 ```
+
+2. Subir los archivos generados por FTP al servidor de Hostalia:
+   - Sube el contenido de `deploy_package/agility_back_core.zip` a la RAIZ de tu hosting (fuera de `httpdocs`).
+   - Sube el contenido de `deploy_package/agilityasturias_com.zip` DENTRO de la carpeta `httpdocs` de tu hosting (o reemplaza la carpeta `backend` o lo que necesites).
+
+3. Ejecutar Migraciones (Si hay cambios en la Base de Datos):
+   - Abre tu navegador web y ve a la siguiente dirección: `https://agilityasturias.com/backend/run_migrations.php`
+   - Verás un mensaje por pantalla confirmando si se han ejecutado correctamente las migraciones con `--force` o si no había nada nuevo.
+   - **🔴 MUY IMPORTANTE:** Una vez lo hayas ejecutado, **BORRA** el archivo `backend/run_migrations.php` de tu servidor en Hostalia a través del FTP o Administrador de Archivos por seguridad.

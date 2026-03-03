@@ -1,47 +1,39 @@
 <?php
-/**
- * Script para ejecutar migraciones de Laravel en Hostalia sin acceso SSH.
- * Sube este archivo a tu carpeta httpdocs, accede a él desde el navegador:
- * https://tu-dominio.com/run_migrations.php
- * ¡BORRA ESTE ARCHIVO INMEDIATAMENTE DESPUÉS DE USARLO!
- */
 
-// Define the path to the Laravel core directory (adjust if needed)
-$basePath = __DIR__ . '/../agility_back_core'; // Assuming it's one level above httpdocs
-
-if (!file_exists($basePath . '/artisan')) {
-    die("Error: No se encuentra el archivo artisan en la ruta: $basePath. Ajusta la ruta en el script.");
-}
-
-echo "<h1>Ejecutando Migraciones...</h1>";
-echo "<pre>";
+// Mostrar errores para depuración (opcional, quitar en producción real)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 try {
-    // 1. Run migrations and capture output
-    $output = [];
-    $returnVar = 0;
+    // 1. Cargar el autoloader de Composer desde el core (fuera de httpdocs)
+    require __DIR__ . '/../../agility_back_core/vendor/autoload.php';
 
-    // We use absolute path to php if possible, but 'php' might work.
-    // In many shared hostings, you might need to specify the php version path e.g., /usr/bin/php8.1
-    // We will try standard 'php' first.
-    exec("php {$basePath}/artisan migrate --force 2>&1", $output, $returnVar);
+    // 2. Inicializar la aplicación de Laravel
+    $app = require_once __DIR__ . '/../../agility_back_core/bootstrap/app.php';
 
-    echo implode("\n", $output);
-    echo "\n\nCódigo de salida (Migrations): " . $returnVar . "\n";
+    // 3. Crear una instancia del Kernel de la consola para ejecutar comandos
+    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 
-    // 2. Run storage:link as well just in case
-    echo "\n\nEjecutando storage:link...\n";
-    $outputLink = [];
-    $returnVarLink = 0;
-    exec("php {$basePath}/artisan storage:link 2>&1", $outputLink, $returnVarLink);
+    // 4. Capturar la salida del comando
+    $output = new Symfony\Component\Console\Output\BufferedOutput();
 
-    echo implode("\n", $outputLink);
-    echo "\n\nCódigo de salida (Storage Link): " . $returnVarLink . "\n";
+    // 5. Ejecutar la migración con --force para entorno de producción
+    $kernel->handle(
+        new Symfony\Component\Console\Input\ArrayInput([
+            'command' => 'migrate',
+            '--force' => true,
+        ]),
+        $output
+    );
 
-} catch (Exception $e) {
-    echo "Error ejecutando el comando: " . $e->getMessage();
+    // 6. Mostrar el resultado
+    echo "<h1>Resultado de la Migración</h1>";
+    echo "<pre style='background:#f4f4f4; padding:15px; border-radius:5px;'>" . htmlspecialchars($output->fetch()) . "</pre>";
+    echo "<br><div style='color:red; font-size:18px;'><strong>⚠️ IMPORTANTE: ¡Borra este archivo (run_migrations.php) de tu servidor por seguridad para evitar ejecuciones accidentales!</strong></div>";
+
+} catch (\Exception $e) {
+    echo "<h1>Ocurrió un error</h1>";
+    echo "<p><strong>Mensaje:</strong> " . $e->getMessage() . "</p>";
+    echo "<p><strong>Archivo:</strong> " . $e->getFile() . " en la línea " . $e->getLine() . "</p>";
 }
-
-echo "</pre>";
-echo "<h2 style='color:red;'>¡IMPORTANTE: BORRA ESTE ARCHIVO AHORA MISMO POR SEGURIDAD!</h2>";
-?>

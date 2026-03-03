@@ -20,4 +20,14 @@ class Competition extends Model
         'tipo',
         'nombre',
     ];
+
+    public function attendees()
+    {
+        return $this->belongsToMany(User::class, 'competition_user')->withTimestamps();
+    }
+
+    public function attendingDogs()
+    {
+        return $this->belongsToMany(Dog::class, 'competition_dog')->withTimestamps();
+    }
 }

@@ -173,6 +173,14 @@ export class AuthService {
         this.fetchUser().subscribe();
     }
 
+    generateResetLink(userId: number): Promise<{ link: string, message: string }> {
+        return firstValueFrom(this.http.post<{ link: string, message: string }>(`${this.apiUrl}/users/${userId}/generate-reset-link`, {}));
+    }
+
+    resetPassword(data: { token: string, password: string, password_confirmation: string }): Promise<{ message: string }> {
+        return firstValueFrom(this.http.post<{ message: string }>(`${this.apiUrl}/reset-password`, data));
+    }
+
     // Deprecated alias, kept for compatibility if needed, but redirected to new method
     async updateDisplayName(name: string): Promise<void> {
         return this.updateProfile(name);

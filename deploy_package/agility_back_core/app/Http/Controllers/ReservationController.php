@@ -61,9 +61,10 @@ class ReservationController extends Controller
             $availability[$key]['count'] += 1;
 
             // Group attendees by user to match the frontend expected structure
-            // We want to combine dogs under the same user_name
             $userName = $reservation->user ? $reservation->user->name : 'Usuario';
+            $userImage = $reservation->user ? $reservation->user->photo_url : null;
             $dogName = $reservation->dog ? $reservation->dog->name : 'Perro Desconocido';
+            $dogPhoto = $reservation->dog ? $reservation->dog->photo_url : null;
 
             $foundUserIdx = -1;
             foreach ($availability[$key]['attendees'] as $idx => $attendee) {
@@ -76,10 +77,16 @@ class ReservationController extends Controller
             if ($foundUserIdx === -1) {
                 $availability[$key]['attendees'][] = [
                     'user_name' => $userName,
-                    'dogs' => [$dogName]
+                    'user_image' => $userImage,
+                    'dogs' => [
+                        ['name' => $dogName, 'image' => $dogPhoto]
+                    ]
                 ];
             } else {
-                $availability[$key]['attendees'][$foundUserIdx]['dogs'][] = $dogName;
+                $availability[$key]['attendees'][$foundUserIdx]['dogs'][] = [
+                    'name' => $dogName,
+                    'image' => $dogPhoto
+                ];
             }
         }
 
@@ -172,11 +179,24 @@ class ReservationController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        $reservation = Reservation::findOrFail($id);
+        $reservation = Reservation::with('timeSlot')->findOrFail($id);
+        $user = $request->user();
 
-        // Authorization
-        if ($request->user()->id !== $reservation->user_id && !in_array($request->user()->role, ['admin', 'staff'])) {
+        // Authorization check
+        $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
+        if ($user->id !== $reservation->user_id && !$isAdminOrStaff) {
             abort(403);
+        }
+
+        // 24-hour rule: Members cannot cancel within 24 hours of the starting time
+        if (!$isAdminOrStaff && $reservation->timeSlot && $reservation->date) {
+            $dateStr = is_string($reservation->date) ? $reservation->date : $reservation->date->format('Y-m-d');
+            $slotDateTime = \Carbon\Carbon::parse($dateStr . ' ' . $reservation->timeSlot->start_time);
+            if (now()->diffInHours($slotDateTime, false) < 24) {
+                return response()->json([
+                    'message' => 'No puedes cancelar una reserva con menos de 24 horas de antelación. Contacta con administración en caso de emergencia.'
+                ], 422);
+            }
         }
 
         $reservation->delete();
@@ -195,6 +215,23 @@ class ReservationController extends Controller
         ]);
 
         $user = $request->user();
+        $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
+
+        // 24-hour rule: Members cannot cancel within 24 hours of the starting time
+        if (!$isAdminOrStaff) {
+            $timeSlot = \App\Models\TimeSlot::find($request->slot_id);
+            if ($timeSlot) {
+                // Carbon parse combining the requested date and the timeslot's start time
+                $slotDateTime = \Carbon\Carbon::parse($request->date . ' ' . $timeSlot->start_time);
+
+                // diffInHours with false returns negative if $slotDateTime is in the past
+                if (now()->diffInHours($slotDateTime, false) < 24) {
+                    return response()->json([
+                        'message' => 'No puedes cancelar una reserva con menos de 24 horas de antelación. Contacta con administración en caso de emergencia.'
+                    ], 422);
+                }
+            }
+        }
 
         Reservation::where('user_id', $user->id)
             ->where('slot_id', $request->slot_id)
