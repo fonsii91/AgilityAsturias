@@ -17,9 +17,9 @@ export class GestionarMiembrosComponent implements OnInit {
   users = signal<UserProfile[]>([]);
   loading = signal<boolean>(true);
 
-  // Filter out admins and staff to prevent modification by regular staff
+  // Filter out admins to prevent modification by regular staff, but SHOW staff
   displayUsers = computed(() => {
-    return this.users().filter(u => u.role !== 'admin' && u.role !== 'staff');
+    return this.users().filter(u => u.role !== 'admin');
   });
 
   async ngOnInit() {
@@ -39,23 +39,53 @@ export class GestionarMiembrosComponent implements OnInit {
     }
   }
 
-  // Confirmation Modal State
-  selectedUser: UserProfile | null = null;
-  confirmationAction: 'promote' | 'revoke' | null = null;
-  isModalOpen = false;
+  async generateResetLink(user: UserProfile) {
+    try {
+      if (!confirm(`¿Generar enlace de recuperación para ${user.displayName}?`)) return;
+      const response = await this.authService.generateResetLink(user.uid!);
 
-  initiateToggleMember(user: UserProfile) {
-    this.selectedUser = user;
-    this.confirmationAction = user.role === 'member' ? 'revoke' : 'promote';
-    this.isModalOpen = true;
-    document.body.style.overflow = 'hidden';
+      // Copy to clipboard
+      await navigator.clipboard.writeText(response.link);
+
+      this.toastService.success('Enlace de recuperación copiado al portapapeles');
+    } catch (error: any) {
+      console.error('Error generating reset link', error);
+      let errorMsg = 'Error al generar el enlace';
+      if (error.error && error.error.message) {
+        errorMsg = error.error.message;
+      }
+      this.toastService.error(errorMsg);
+    }
   }
 
-  closeModal() {
-    this.isModalOpen = false;
-    this.selectedUser = null;
-    this.confirmationAction = null;
-    document.body.style.overflow = 'auto';
+  // Role Update Logic
+  async updateRole(user: UserProfile, newRole: string) {
+    if (user.role === newRole) return;
+
+    try {
+      const role = newRole as 'user' | 'member' | 'staff';
+      await this.authService.updateUserRole(user.id, role);
+
+      this.users.update(users =>
+        users.map(u => u.uid === user.uid ? { ...u, role: role } : u)
+      );
+
+      // Map roles to spanish for the toast
+      const roleMap: any = {
+        'user': 'Usuario',
+        'member': 'Miembro',
+        'staff': 'Staff'
+      };
+
+      this.toastService.success(`Rol de ${user.displayName} actualizado a ${roleMap[role]}`);
+    } catch (error: any) {
+      console.error('Error updating role', error);
+      let errorMsg = 'Error al actualizar rol';
+      if (error.error && error.error.message) {
+        errorMsg = error.error.message;
+      }
+      this.toastService.error(errorMsg);
+    }
   }
 
   // Zoom Image State
@@ -73,28 +103,5 @@ export class GestionarMiembrosComponent implements OnInit {
     this.isZoomModalOpen = false;
     this.zoomedImageURL = null;
     document.body.style.overflow = 'auto';
-  }
-
-  async confirmToggle() {
-    if (!this.selectedUser || !this.confirmationAction) return;
-
-    const user = this.selectedUser;
-    const newRole = this.confirmationAction === 'promote' ? 'member' : 'user';
-
-    // Close modal immediately and show loading or just process
-    this.closeModal();
-
-    try {
-      await this.authService.updateUserRole(user.id, newRole);
-
-      this.users.update(users =>
-        users.map(u => u.uid === user.uid ? { ...u, role: newRole } : u)
-      );
-
-      this.toastService.success(`Rol de ${user.displayName} actualizado a ${newRole === 'member' ? 'Miembro' : 'Usuario'}`);
-    } catch (error) {
-      console.error('Error updating role', error);
-      this.toastService.error('Error al cambiar rol');
-    }
   }
 }

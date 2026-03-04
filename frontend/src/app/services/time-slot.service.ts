@@ -40,7 +40,7 @@ export class TimeSlotService {
 
     updateTimeSlot(id: number, slot: Partial<TimeSlot>) {
         return new Promise<TimeSlot>((resolve, reject) => {
-            this.http.post<TimeSlot>(`${this.apiUrl}/${id}`, { ...slot, _method: 'PUT' }).subscribe({
+            this.http.post<TimeSlot>(`${this.apiUrl}/${id}`, slot).subscribe({
                 next: (updatedSlot) => {
                     this.timeSlotsSignal.update(list => list.map(s => s.id === id ? updatedSlot : s));
                     resolve(updatedSlot);
@@ -52,7 +52,7 @@ export class TimeSlotService {
 
     deleteTimeSlot(id: number) {
         return new Promise<void>((resolve, reject) => {
-            this.http.post<void>(`${this.apiUrl}/${id}`, { _method: 'DELETE' }).subscribe({
+            this.http.post<void>(`${this.apiUrl}/${id}/delete`, {}).subscribe({
                 next: () => {
                     this.timeSlotsSignal.update(list => list.filter(s => s.id !== id));
                     resolve();

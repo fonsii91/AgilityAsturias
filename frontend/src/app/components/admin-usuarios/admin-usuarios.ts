@@ -57,25 +57,6 @@ export class AdminUsuariosComponent implements OnInit {
     }
   }
 
-  async generateResetLink(user: UserProfile) {
-    try {
-      if (!confirm(`¿Generar enlace de recuperación para ${user.displayName}?`)) return;
-      const response = await this.authService.generateResetLink(user.uid!);
-
-      // Copy to clipboard
-      await navigator.clipboard.writeText(response.link);
-
-      this.toastService.success('Enlace de recuperación copiado al portapapeles');
-    } catch (error: any) {
-      console.error('Error generating reset link', error);
-      let errorMsg = 'Error al generar el enlace';
-      if (error.error && error.error.message) {
-        errorMsg = error.error.message;
-      }
-      this.toastService.error(errorMsg);
-    }
-  }
-
   // Zoom Image State
   zoomedImageURL: string | null = null;
   isZoomModalOpen = false;

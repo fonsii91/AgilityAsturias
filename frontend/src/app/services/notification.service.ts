@@ -48,7 +48,7 @@ export class NotificationService {
     }
 
     markAsRead(id: string): Observable<any> {
-        return this.http.post(`${this.apiUrl}/${id}/read`, { _method: 'PUT' }).pipe(
+        return this.http.post(`${this.apiUrl}/${id}/read`, {}).pipe(
             tap(() => {
                 const currentList = this.notificationsSignal().filter(n => n.id !== id);
                 this.notificationsSignal.set(currentList);
@@ -58,7 +58,7 @@ export class NotificationService {
     }
 
     markAllAsRead(): Observable<any> {
-        return this.http.post(`${this.apiUrl}/mark-all-read`, { _method: 'PUT' }).pipe(
+        return this.http.post(`${this.apiUrl}/mark-all-read`, {}).pipe(
             tap(() => {
                 this.notificationsSignal.set([]);
                 this.unreadCountSignal.set(0);

@@ -151,7 +151,7 @@ export class AuthService {
     }
 
     updateUserRole(userId: number, role: string): Promise<any> {
-        return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/role`, { role, _method: 'PUT' }));
+        return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/role`, { role }));
     }
 
     async updateProfile(name: string, photo?: File): Promise<void> {
@@ -161,12 +161,8 @@ export class AuthService {
             formData.append('photo', photo);
         }
 
-        // Use _method: PUT trick if Laravel has issues with multipart PUT, 
-        // but typically POST with _method=PUT is safer for file uploads in some server configs.
-        // Let's try direct POST with _method field if we use PUT route, or change route to POST.
-        // Actually, Laravel's PUT support for multipart/form-data can be tricky with PHP.
-        // Standard workaround: send POST with _method=PUT.
-        formData.append('_method', 'PUT');
+        // Hostalia server blocks PUT/DELETE, so the backend was updated to explicitly expect POST.
+        // We no longer need to spoof with _method=PUT.
 
         await firstValueFrom(this.http.post(`${this.apiUrl}/user/profile`, formData));
         // Refresh user

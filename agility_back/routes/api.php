@@ -34,21 +34,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // The original /user route is kept, as the instruction's /user route was a closure and might conflict.
     // If the intent was to replace, it should be specified. Keeping original for minimal change.
     Route::get('/user', [AuthController::class, 'user']);
-    Route::put('/user/profile', [AuthController::class, 'updateProfile']);
+    Route::post('/user/profile', [AuthController::class, 'updateProfile']);
 
     // Rutas protegidas por rol (admin, staff)
     Route::middleware(['role:admin,staff'])->group(function () {
         Route::get('/users', [AuthController::class, 'index']);
-        Route::put('/users/{id}/role', [AuthController::class, 'updateRole']);
+        Route::post('/users/{id}/role', [AuthController::class, 'updateRole']);
         Route::post('/users/{id}/generate-reset-link', [AuthController::class, 'generateResetLink']);
 
         Route::post('/competitions', [CompetitionController::class, 'store']);
-        Route::put('/competitions/{id}', [CompetitionController::class, 'update']);
-        Route::delete('/competitions/{id}', [CompetitionController::class, 'destroy']);
+        Route::post('/competitions/{id}', [CompetitionController::class, 'update']);
+        Route::post('/competitions/{id}/delete', [CompetitionController::class, 'destroy']);
 
         // Gallery
         Route::post('/gallery', [GalleryController::class, 'store']);
-        Route::delete('/gallery/{id}', [GalleryController::class, 'destroy']);
+        Route::post('/gallery/{id}/delete', [GalleryController::class, 'destroy']);
 
         // Ranking moved to general authenticated routes
 
@@ -59,14 +59,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Reservations index moved to general authenticated routes
 
         Route::post('/time-slots', [TimeSlotController::class, 'store']);
-        Route::put('/time-slots/{id}', [TimeSlotController::class, 'update']);
-        Route::delete('/time-slots/{id}', [TimeSlotController::class, 'destroy']);
+        Route::post('/time-slots/{id}', [TimeSlotController::class, 'update']);
+        Route::post('/time-slots/{id}/delete', [TimeSlotController::class, 'destroy']);
 
     });
 
     // Event Attendance
     Route::post('/competitions/{id}/attend', [CompetitionController::class, 'attend']);
-    Route::delete('/competitions/{id}/attend', [CompetitionController::class, 'unattend']);
+    Route::post('/competitions/{id}/unattend', [CompetitionController::class, 'unattend']);
     Route::get('/competitions/{id}/attendees', [CompetitionController::class, 'getAttendees']);
 
     Route::middleware(['role:admin,staff,member'])->group(function () {
@@ -81,20 +81,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/dogs/{id}', [DogController::class, 'show']);
         // Notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
-        Route::put('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
-        Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
-        Route::put('/dogs/{id}', [DogController::class, 'update']);
-        Route::delete('/dogs/{id}', [DogController::class, 'destroy']);
+        Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::post('/dogs/{id}', [DogController::class, 'update']);
+        Route::post('/dogs/{id}/delete', [DogController::class, 'destroy']);
         Route::post('/dogs/{id}/photo', [DogController::class, 'uploadPhoto']);
 
         Route::get('/availability', [ReservationController::class, 'availability']); // ???
 
         Route::get('/reservations/my', [ReservationController::class, 'myReservations']); // Necesitaríamos este endpoint
         Route::post('/reservations', [ReservationController::class, 'store']); // ???
-        Route::delete('/reservations/block', [ReservationController::class, 'destroyBlock']); // ???
+        Route::post('/reservations/block/delete', [ReservationController::class, 'destroyBlock']); // ???
         Route::get('/reservations/{id}', [ReservationController::class, 'show']);
-        Route::put('/reservations/{id}', [ReservationController::class, 'update']); // Solo su propia reserva
-        Route::delete('/reservations/{id}', [ReservationController::class, 'destroy']); // Solo su propia reserva
+        Route::post('/reservations/{id}', [ReservationController::class, 'update']); // Solo su propia reserva
+        Route::post('/reservations/{id}/delete', [ReservationController::class, 'destroy']); // Solo su propia reserva
     });
 
 

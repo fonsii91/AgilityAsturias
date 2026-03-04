@@ -45,7 +45,7 @@ export class DogService {
 
     deleteDog(id: number) {
         return new Promise<void>((resolve, reject) => {
-            this.http.post<void>(`${this.apiUrl}/${id}`, { _method: 'DELETE' }).subscribe({
+            this.http.post<void>(`${this.apiUrl}/${id}/delete`, {}).subscribe({
                 next: () => {
                     this.dogsSignal.update(list => list.filter(d => d.id !== id));
                     resolve();

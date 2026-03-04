@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -13,10 +13,10 @@ import { AuthService } from '../../services/auth.service';
 })
 export class ResetPasswordComponent implements OnInit {
   resetForm: FormGroup;
-  token: string = '';
-  isLoading = false;
-  errorMessage = '';
-  successMessage = '';
+  token = signal<string>('');
+  isLoading = signal<boolean>(false);
+  errorMessage = signal<string>('');
+  successMessage = signal<string>('');
 
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -32,9 +32,10 @@ export class ResetPasswordComponent implements OnInit {
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
-      this.token = params['token'];
-      if (!this.token) {
-        this.errorMessage = 'Token no encontrado en la URL. El enlace no es válido.';
+      if (params['token']) {
+        this.token.set(params['token']);
+      } else {
+        this.errorMessage.set('Token no encontrado en la URL. El enlace no es válido.');
       }
     });
   }
@@ -45,25 +46,25 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   async onSubmit() {
-    if (this.resetForm.invalid || !this.token) return;
+    if (this.resetForm.invalid || !this.token()) return;
 
-    this.isLoading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
+    this.isLoading.set(true);
+    this.errorMessage.set('');
+    this.successMessage.set('');
 
     try {
       const data = {
-        token: this.token,
+        token: this.token(),
         password: this.resetForm.value.password,
         password_confirmation: this.resetForm.value.password_confirmation
       };
 
       const res = await this.authService.resetPassword(data);
-      this.successMessage = res.message || 'Contraseña restablecida correctamente.';
+      this.successMessage.set(res.message || 'Contraseña restablecida correctamente.');
     } catch (error: any) {
-      this.errorMessage = error.error?.message || 'Error al restablecer la contraseña. El enlace puede haber caducado.';
+      this.errorMessage.set(error.error?.message || 'Error al restablecer la contraseña. El enlace puede haber caducado.');
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 }
