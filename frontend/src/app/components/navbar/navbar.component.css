@@ -27,6 +27,7 @@
     height: 40px;
     width: auto;
     border-radius: 4px;
+    cursor: pointer;
 }
 
 .nav-title {
@@ -35,6 +36,7 @@
     font-size: 1.25rem;
     /* Slightly smaller for a slimmer toolbar */
     font-weight: 500;
+    cursor: pointer;
 }
 
 nav.desktop-nav ul {

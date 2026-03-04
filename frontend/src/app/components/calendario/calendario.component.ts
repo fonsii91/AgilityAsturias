@@ -11,6 +11,7 @@ interface CalendarDay {
     isWeekend: boolean;
     isOtherMonth: boolean;
     isToday: boolean;
+    isAttending?: boolean;
     deadlines: any[];
     competitions: any[]; // List of all competitions on this day
     competitionDetails?: any; // Primary/First competition for backward compat
@@ -140,6 +141,7 @@ export class CalendarioComponent {
                 isWeekend: false,
                 isOtherMonth: true,
                 isToday: false,
+                isAttending: false,
                 deadlines: [],
                 competitions: []
             });
@@ -166,6 +168,7 @@ export class CalendarioComponent {
             // Default type is 'competicion'
             const isCompetition = dailyCompetitions.some((c: any) => !c.tipo || c.tipo === 'competicion');
             const isOtherEvent = dailyCompetitions.some((c: any) => c.tipo === 'otros');
+            const isAttending = dailyCompetitions.some((c: any) => c.isAttending);
 
             const isToday = date.getDate() === today.getDate() &&
                 date.getMonth() === today.getMonth() &&
@@ -181,6 +184,7 @@ export class CalendarioComponent {
                 isWeekend: isWeekend,
                 isOtherMonth: false,
                 isToday: isToday,
+                isAttending: isAttending,
                 deadlines: deadlines,
                 competitions: dailyCompetitions,
                 competitionDetails: dailyCompetitions[0] // Fallback

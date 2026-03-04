@@ -19,6 +19,10 @@
                 <span class="dot other-dot"></span>
                 <span>Otros Eventos</span>
             </div>
+            <div class="legend-item" *ngIf="authService.currentUserSignal()">
+                <span class="dot attending-dot"></span>
+                <span>Asistiré</span>
+            </div>
             <div class="legend-item">
                 <span class="dot today-dot"></span>
                 <span>Hoy</span>
@@ -36,8 +40,14 @@
                 <div *ngFor="let day of month.days" class="day" [class.other-month]="day.isOtherMonth"
                     [class.weekend]="day.isWeekend" [class.competition]="day.isCompetition"
                     [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
+                    [class.attending]="day.isAttending"
                     (click)="(day.competitions.length > 0 || day.deadlines.length > 0) && openModal(day)">
                     <span *ngIf="!day.isOtherMonth">{{ day.date | date:'d' }}</span>
+
+                    <!-- Attending Badge Indicator -->
+                    <div *ngIf="day.isAttending && !day.isOtherMonth" class="attending-badge" title="Asistiré">
+                        <span class="material-icons-outlined" style="font-size: 11px; font-weight: 900;">check</span>
+                    </div>
 
                     <!-- Deadline Indicator with Tooltip -->
                     <div *ngIf="day.deadlines.length > 0 && !day.isOtherMonth" class="deadline-dot">
@@ -64,12 +74,18 @@
                 <div class="events-list">
                     <div *ngFor="let comp of selectedCompetitions" class="event-card-preview"
                         (click)="selectCompetitionFromList(comp)"
-                        [style.border-left]="comp.tipo === 'otros' ? '4px solid var(--other-bg)' : '4px solid var(--accent-color)'">
+                        [style.border-left]="comp.isAttending ? '4px solid #e65100' : (comp.tipo === 'otros' ? '4px solid var(--other-bg)' : '4px solid var(--accent-color)')">
                         <div class="event-preview-header">
                             <span class="event-name">{{ comp.nombre || comp.lugar }}</span>
-                            <span class="event-type-badge" [class.type-other]="comp.tipo === 'otros'">
-                                {{ comp.tipo === 'otros' ? 'Otro' : 'Competición' }}
-                            </span>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <span class="event-type-badge" *ngIf="comp.isAttending"
+                                    style="background: linear-gradient(135deg, #e65100 0%, #ff9800 100%); color: white;">
+                                    Asistiré
+                                </span>
+                                <span class="event-type-badge" [class.type-other]="comp.tipo === 'otros'">
+                                    {{ comp.tipo === 'otros' ? 'Otro' : 'Competición' }}
+                                </span>
+                            </div>
                         </div>
                         <div class="event-preview-location">📍 {{ comp.lugar }}</div>
                     </div>
@@ -110,8 +126,8 @@
                         <div class="modal-title-row">
                             <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
                             <div class="modal-date-badge"
-                                [style.background]="selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)'"
-                                [style.color]="selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)'">
+                                [style.background]="selectedCompetition.isAttending ? 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)' : (selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)')"
+                                [style.color]="selectedCompetition.isAttending ? 'white' : (selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)')">
                                 {{ selectedCompetition.fechaEvento | date:'d MMM' }}
                                 <span
                                     *ngIf="selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !== selectedCompetition.fechaEvento">

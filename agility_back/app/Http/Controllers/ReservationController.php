@@ -192,7 +192,12 @@ class ReservationController extends Controller
         if (!$isAdminOrStaff && $reservation->timeSlot && $reservation->date) {
             $dateStr = is_string($reservation->date) ? $reservation->date : $reservation->date->format('Y-m-d');
             $slotDateTime = \Carbon\Carbon::parse($dateStr . ' ' . $reservation->timeSlot->start_time);
-            if (now()->diffInHours($slotDateTime, false) < 24) {
+
+            // 15-minute grace period
+            $gracePeriodEnd = $reservation->created_at->addMinutes(15);
+            $isWithinGracePeriod = now()->isBefore($gracePeriodEnd);
+
+            if (now()->diffInHours($slotDateTime, false) < 24 && !$isWithinGracePeriod) {
                 return response()->json([
                     'message' => 'No puedes cancelar una reserva con menos de 24 horas de antelación. Contacta con administración en caso de emergencia.'
                 ], 422);
@@ -217,8 +222,25 @@ class ReservationController extends Controller
         $user = $request->user();
         $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
 
+        $reservationsToDelete = Reservation::where('user_id', $user->id)
+            ->where('slot_id', $request->slot_id)
+            ->whereDate('date', $request->date)
+            ->get();
+
+        if ($reservationsToDelete->isEmpty()) {
+            return response()->noContent();
+        }
+
+        $isWithinGracePeriod = true;
+        foreach ($reservationsToDelete as $res) {
+            if (now()->isAfter($res->created_at->addMinutes(15))) {
+                $isWithinGracePeriod = false;
+                break;
+            }
+        }
+
         // 24-hour rule: Members cannot cancel within 24 hours of the starting time
-        if (!$isAdminOrStaff) {
+        if (!$isAdminOrStaff && !$isWithinGracePeriod) {
             $timeSlot = \App\Models\TimeSlot::find($request->slot_id);
             if ($timeSlot) {
                 // Carbon parse combining the requested date and the timeslot's start time
@@ -227,7 +249,7 @@ class ReservationController extends Controller
                 // diffInHours with false returns negative if $slotDateTime is in the past
                 if (now()->diffInHours($slotDateTime, false) < 24) {
                     return response()->json([
-                        'message' => 'No puedes cancelar una reserva con menos de 24 horas de antelación. Contacta con administración en caso de emergencia.'
+                        'message' => 'No puedes cancelar una reserva con menos de 24 horas de antelación y han pasado más de 15 minutos desde que la hiciste. Contacta con administración en caso de emergencia.'
                     ], 422);
                 }
             }

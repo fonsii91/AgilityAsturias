@@ -239,6 +239,37 @@
     background: var(--other-bg);
 }
 
+.attending-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    border: 2px solid white;
+    z-index: 10;
+}
+
+.attending-dot {
+    background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.attending-dot::after {
+    content: '✔';
+    font-family: Arial, sans-serif;
+    font-size: 8px;
+    color: white;
+}
+
 /* Modal Styles */
 .modal-overlay {
     position: fixed;
