@@ -3,10 +3,21 @@ import { RouterLink } from '@angular/router';
 import { Location as AngularLocation } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [RouterLink],
+    imports: [
+        RouterLink,
+        MatButtonModule,
+        MatCardModule,
+        MatIconModule,
+        MatDividerModule
+    ],
     templateUrl: './home.component.html',
     styleUrl: './home.component.css'
 })

@@ -1,6 +1,7 @@
 import { Component, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { CompetitionService } from '../../services/competition.service';
 import { Competition } from '../../models/competition.model';
 import { ImageCompressorService } from '../../services/image-compressor.service';
@@ -9,7 +10,7 @@ import { ToastService } from '../../services/toast.service';
 @Component({
     selector: 'app-crud-competicion',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, MatIconModule],
     templateUrl: './crud-competicion.component.html',
     styleUrl: './crud-competicion.component.css'
 })

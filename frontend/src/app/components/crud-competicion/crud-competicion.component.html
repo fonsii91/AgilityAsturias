@@ -38,10 +38,10 @@
                         <td>{{ comp.fechaLimite | date:'dd/MM/yyyy' }}</td>
                         <td class="actions">
                             <button class="btn-icon edit" (click)="editCompetition(comp)" title="Editar">
-                                ✏️
+                                <mat-icon>edit</mat-icon>
                             </button>
                             <button class="btn-icon delete" (click)="deleteCompetition(comp.id)" title="Eliminar">
-                                🗑️
+                                <mat-icon>delete</mat-icon>
                             </button>
                         </td>
                     </tr>
@@ -147,7 +147,10 @@
 <!-- Delete Confirmation Modal -->
 <div class="modal-overlay" *ngIf="showDeleteModal()">
     <div class="modal-content">
-        <h3>Eliminar Competición</h3>
+        <h3>
+            <mat-icon class="modal-icon">delete</mat-icon>
+            Eliminar Competición
+        </h3>
         <p>¿Estás seguro de que deseas eliminar esta competición? Esta acción no se puede deshacer.</p>
         <div class="modal-actions">
             <button class="btn-cancel-modal" (click)="cancelDelete()">Cancelar</button>

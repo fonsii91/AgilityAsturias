@@ -6,10 +6,8 @@ import {
   InteractivityChecker,
   _IdGenerator,
   _animationsDisabled,
-  coerceArray,
-  coerceCssPixelValue,
   hasModifierKey
-} from "./chunk-4JTP52IN.js";
+} from "./chunk-MSG3C5VW.js";
 import {
   _getEventTarget,
   _getFocusedElementPierceShadowDom,
@@ -18,6 +16,11 @@ import {
 import "./chunk-A7SOCZYE.js";
 import "./chunk-26NCPBZN.js";
 import "./chunk-G7O7NOZN.js";
+import "./chunk-XICY6Y34.js";
+import {
+  coerceArray,
+  coerceCssPixelValue
+} from "./chunk-AIEYJCOW.js";
 import {
   _CdkPrivateStyleLoader
 } from "./chunk-H777AJAD.js";
@@ -26,7 +29,7 @@ import {
   ScrollDispatcher,
   ScrollingModule,
   ViewportRuler
-} from "./chunk-PLSVJHI6.js";
+} from "./chunk-YFR62GCX.js";
 import {
   supportsScrollBehavior
 } from "./chunk-GUGIMSVJ.js";
@@ -35,15 +38,14 @@ import {
   Directionality
 } from "./chunk-L6A3VTX6.js";
 import {
-  coerceNumberProperty
-} from "./chunk-NZNHBRU6.js";
-import {
   Platform
 } from "./chunk-2DHHI2YC.js";
 import {
+  coerceNumberProperty
+} from "./chunk-NZNHBRU6.js";
+import {
   Location
 } from "./chunk-MTU2WV7Q.js";
-import "./chunk-XICY6Y34.js";
 import "./chunk-OV5FLENP.js";
 import {
   ANIMATION_MODULE_TYPE,
