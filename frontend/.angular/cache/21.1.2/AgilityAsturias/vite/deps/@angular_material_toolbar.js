@@ -2,11 +2,11 @@ import "./chunk-LYFQR52J.js";
 import "./chunk-GWBU7KI5.js";
 import "./chunk-GUGIMSVJ.js";
 import {
-  BidiModule
-} from "./chunk-L6A3VTX6.js";
-import {
   Platform
 } from "./chunk-2DHHI2YC.js";
+import {
+  BidiModule
+} from "./chunk-L6A3VTX6.js";
 import "./chunk-MTU2WV7Q.js";
 import "./chunk-OV5FLENP.js";
 import {

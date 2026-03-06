@@ -1,10 +1,4 @@
 <?php
-/**
- * Script para ejecutar migraciones de Laravel en Hostalia sin acceso SSH.
- * Sube este archivo a tu carpeta httpdocs, accede a él desde el navegador:
- * https://agilityasturias.com/run_migrations.php
- * ¡BORRA ESTE ARCHIVO INMEDIATAMENTE DESPUÉS DE USARLO!
- */
 
 // Mostrar errores para depuración (opcional, quitar en producción real)
 ini_set('display_errors', 1);
