@@ -33,7 +33,7 @@
                             <span class="user-name-small">Vas a asistir con:</span>
                             <div class="dogs-chips">
                                 <span *ngFor="let dog of slot.dogs" class="dog-chip">🐕 {{ dog }}</span>
-                                <span *ngIf="!slot.dogs?.length" class="no-dogs">Sin perros</span>
+                                <span *ngIf="!slot.dogs.length" class="no-dogs">Sin perros</span>
                             </div>
                         </div>
                     </div>

@@ -10,6 +10,7 @@ export class DogService {
     private http = inject(HttpClient);
     private apiUrl = `${environment.apiUrl}/dogs`;
     private dogsSignal = signal<Dog[]>([]);
+    private allDogsSignal = signal<Dog[]>([]);
 
     constructor() {
         // Initial load possibly? Or wait for explicit call?
@@ -17,8 +18,11 @@ export class DogService {
     }
 
     loadUserDogs() {
-        this.http.get<Dog[]>(this.apiUrl).subscribe({
-            next: (dogs) => this.dogsSignal.set(dogs),
+        this.http.get<any[]>(this.apiUrl).subscribe({
+            next: (data) => {
+                const dogs = data.map(d => this.mapDog(d));
+                this.dogsSignal.set(dogs);
+            },
             error: (err) => {
                 if (err.status !== 403) {
                     console.error('Error loading dogs:', err);
@@ -27,8 +31,35 @@ export class DogService {
         });
     }
 
+    loadAllDogs() {
+        this.http.get<any[]>(`${this.apiUrl}/all`).subscribe({
+            next: (data) => {
+                const dogs = data.map(d => this.mapDog(d));
+                this.allDogsSignal.set(dogs);
+            },
+            error: (err) => {
+                if (err.status !== 403) {
+                    console.error('Error loading all dogs:', err);
+                }
+            }
+        });
+    }
+
+    private mapDog(data: any): Dog {
+        return {
+            ...data,
+            userId: data.user_id,
+            createdAt: data.created_at,
+            updatedAt: data.updated_at
+        };
+    }
+
     getDogs() {
         return this.dogsSignal;
+    }
+
+    getAllDogs() {
+        return this.allDogsSignal;
     }
 
     addDog(dog: Omit<Dog, 'id'>) {

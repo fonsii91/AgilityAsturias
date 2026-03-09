@@ -22,6 +22,11 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@ffmpeg/core/dist/umd",
+                "output": "/assets/ffmpeg"
               }
             ],
             "styles": [

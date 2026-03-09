@@ -34,4 +34,9 @@ class Dog extends Model
     {
         return $this->belongsToMany(Competition::class);
     }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
 }

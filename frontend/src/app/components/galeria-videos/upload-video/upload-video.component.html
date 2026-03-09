@@ -1,0 +1,83 @@
+<div class="form-container">
+    <h2>Subir Vídeo</h2>
+    <p class="subtitle">Asocia un vídeo a tu perro para la galería.</p>
+
+    <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+
+        <div class="form-group">
+            <label>Perro *</label>
+            <select formControlName="dog_id" class="form-control"
+                [ngClass]="{ 'is-invalid': uploadForm.get('dog_id')?.invalid && uploadForm.get('dog_id')?.touched }">
+                <option value="" disabled selected>Selecciona un perro</option>
+                <option *ngFor="let dog of dogService.getAllDogs()()" [value]="dog.id">
+                    {{ dog.name }}
+                </option>
+            </select>
+            <div *ngIf="uploadForm.get('dog_id')?.invalid && uploadForm.get('dog_id')?.touched"
+                class="invalid-feedback">
+                El perro es obligatorio.
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Competición (Opcional)</label>
+            <select formControlName="competition_id" class="form-control">
+                <option value="">Ninguna</option>
+                <option *ngFor="let comp of compService.getCompetitions()()" [value]="comp.id">
+                    {{ comp.nombre }}
+                </option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col">
+                <label>Fecha del Vídeo *</label>
+                <input type="date" formControlName="date" class="form-control"
+                    [ngClass]="{ 'is-invalid': uploadForm.get('date')?.invalid && uploadForm.get('date')?.touched }" />
+                <div *ngIf="uploadForm.get('date')?.invalid && uploadForm.get('date')?.touched"
+                    class="invalid-feedback">
+                    La fecha es obligatoria.
+                </div>
+            </div>
+
+            <div class="form-group col">
+                <label>Título (Opcional)</label>
+                <input type="text" formControlName="title" placeholder="Ej. Pista Agility Manga 1"
+                    class="form-control" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Archivo de Vídeo * <span style="font-weight: normal; font-size: 0.85em; color: #666;">(Si pesa más de
+                    380MB, se comprimirá automáticamente)</span></label>
+            <input type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/webm"
+                (change)="onFileSelected($event)" class="form-control-file" />
+        </div>
+
+        <div *ngIf="isCompressing" class="loading-alert">
+            <div class="spinner-blue"></div>
+            <div class="loading-text">
+                <strong>{{ compressionMessage }}</strong>
+                <div class="progress-bar-container" *ngIf="compressionProgress >= 0">
+                    <div class="progress-bar" [style.width.%]="compressionProgress"></div>
+                </div>
+                <p>Tu vídeo se está reduciendo localmente para ahorrar datos. Por favor, no cierres esta página.</p>
+            </div>
+        </div>
+
+        <div *ngIf="isUploading && !isCompressing" class="loading-alert">
+            <div class="spinner-blue"></div>
+            <div class="loading-text">
+                <strong>Subiendo vídeo... paciencia.</strong>
+                <p>Por favor, no cierres esta página ni quites el internet. Los vídeos pesados pueden tardar varios
+                    minutos en subir al servidor.</p>
+            </div>
+        </div>
+
+        <button *ngIf="!isUploading && !isCompressing" type="submit" [disabled]="uploadForm.invalid || !selectedFile"
+            class="submit-btn">
+            Subir Vídeo
+        </button>
+
+    </form>
+</div>

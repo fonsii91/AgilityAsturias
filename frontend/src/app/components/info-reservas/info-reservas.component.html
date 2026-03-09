@@ -41,7 +41,7 @@
                         <span class="user-name">{{ res.userName }}</span>
                         <div class="dogs-chips">
                             <span *ngFor="let dog of res.selectedDogs" class="dog-chip">🐕 {{ dog }}</span>
-                            <span *ngIf="!res.selectedDogs?.length" class="no-dogs">Sin perros</span>
+                            <span *ngIf="!res.selectedDogs.length" class="no-dogs">Sin perros</span>
                         </div>
                     </div>
                 </div>

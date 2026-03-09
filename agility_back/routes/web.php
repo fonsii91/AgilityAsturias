@@ -22,3 +22,4 @@ Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
 
     return response()->file(storage_path('app/public/' . $path));
 });
+

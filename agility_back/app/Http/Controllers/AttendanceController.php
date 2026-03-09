@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Models\Competition;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -82,7 +83,7 @@ class AttendanceController extends Controller
                     $res->status = 'completed';
                     // Award points directly to the assigned dog
                     if ($res->dog) {
-                        $res->dog->increment('points');
+                        $res->dog->increment('points', 3);
                         if ($res->user) {
                             Notification::send($res->user, new DogPointNotification($res->dog));
                         }
@@ -100,5 +101,110 @@ class AttendanceController extends Controller
         });
 
         return response()->json(['message' => 'Asistencia confirmada y puntos actualizados']);
+    }
+
+    // Fetch past competitions that haven't been verified yet
+    public function pendingCompetitions()
+    {
+        $now = Carbon::now();
+        $todayStr = $now->toDateString();
+
+        $competitions = Competition::where('attendance_verified', false)
+            ->where('fecha_evento', '<=', $todayStr)
+            ->with(['attendees', 'attendingDogs'])
+            ->orderBy('fecha_evento', 'desc')
+            ->get();
+
+        return response()->json($competitions);
+    }
+
+    // Confirm attendance for a competition
+    public function confirmCompetition(Request $request)
+    {
+        $validated = $request->validate([
+            'competition_id' => 'required|integer|exists:competitions,id',
+            'attended_dogs' => 'array',
+            'attended_dogs.*.id' => 'required|integer|exists:dogs,id',
+            'attended_dogs.*.position' => 'nullable|string|in:1,2,3,4+',
+            'new_attendees' => 'array',
+            'new_attendees.*.user_id' => 'required|integer|exists:users,id',
+            'new_attendees.*.dog_id' => 'required|integer|exists:dogs,id',
+            'new_attendees.*.position' => 'nullable|string|in:1,2,3,4+',
+        ]);
+
+        $competitionId = $validated['competition_id'];
+        $attendedDogsData = collect($validated['attended_dogs'] ?? []);
+        $newAttendeesData = collect($validated['new_attendees'] ?? []);
+
+        DB::transaction(function () use ($competitionId, $attendedDogsData, $newAttendeesData) {
+            $competition = Competition::findOrFail($competitionId);
+
+            // Re-sync all dogs that attended from original list
+            $attendedDogIdsFromList = $attendedDogsData->pluck('id')->toArray();
+
+            $allAttendedDogIds = [];
+            $syncData = [];
+
+            // Add original attended dogs to sync data
+            foreach ($attendedDogsData as $dogData) {
+                $allAttendedDogIds[] = $dogData['id'];
+                $pos = !empty($dogData['position']) ? $dogData['position'] : '4+';
+                $syncData[$dogData['id']] = ['position' => $pos];
+            }
+
+            // Sync new attendees
+            foreach ($newAttendeesData as $newAtt) {
+                // Ensure user is attached
+                if (!$competition->attendees()->where('users.id', $newAtt['user_id'])->exists()) {
+                    $competition->attendees()->attach($newAtt['user_id']);
+                }
+                $allAttendedDogIds[] = $newAtt['dog_id'];
+                $pos = !empty($newAtt['position']) ? $newAtt['position'] : '4+';
+                $syncData[$newAtt['dog_id']] = ['position' => $pos];
+            }
+
+            // Override attending dogs for this competition exactly to those who effectively attended
+            // Or we could keep the non-attended dogs without a position, but the requirement implies we just detach non-attendees or keep them?
+            // Usually, "non-attended" means they didn't go. Let's say if they didn't go, we remove them from competition_dog.
+            $competition->attendingDogs()->sync($syncData);
+
+            // Assign points to dogs based on their positions
+            // Position 1 -> 4 points
+            // Position 2 -> 3 points
+            // Position 3 -> 2 points
+            // Position 4+ -> 1 point
+            foreach ($syncData as $dogId => $data) {
+                $position = $data['position'];
+
+                $pointsToAdd = 0;
+                switch ($position) {
+                    case '1':
+                        $pointsToAdd = 4;
+                        break;
+                    case '2':
+                        $pointsToAdd = 3;
+                        break;
+                    case '3':
+                        $pointsToAdd = 2;
+                        break;
+                    case '4+':
+                        $pointsToAdd = 1;
+                        break;
+                }
+
+                if ($pointsToAdd > 0) {
+                    $dog = \App\Models\Dog::find($dogId);
+                    if ($dog) {
+                        $dog->increment('points', $pointsToAdd);
+                        // We can optionally trigger Notification::send like in regular attendance
+                    }
+                }
+            }
+
+            $competition->attendance_verified = true;
+            $competition->save();
+        });
+
+        return response()->json(['message' => 'Asistencia de competición confirmada']);
     }
 }

@@ -1,0 +1,146 @@
+<div class="video-gallery-container">
+
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar vídeos..." class="search-input"
+                (keyup.enter)="applyFilters()">
+            <button class="search-btn" (click)="applyFilters()" aria-label="Buscar">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="search-icon">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+            </button>
+        </div>
+        <button class="adv-filters-btn" (click)="toggleFilters()" [class.active]="isFiltersOpen"
+            aria-label="Filtros Avanzados">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="filter-icon">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+            </svg>
+            <span class="adv-filters-text">Filtros</span>
+        </button>
+    </div>
+
+    <div class="advanced-filters-panel" *ngIf="isFiltersOpen">
+
+        <div class="filter-group">
+            <label>Perro</label>
+            <select [(ngModel)]="filterDogId" (change)="applyFilters()" class="filter-select">
+                <option value="">Todos los perros</option>
+                <option *ngFor="let dog of dogService.getAllDogs()()" [value]="dog.id">{{ dog.name }}</option>
+            </select>
+        </div>
+
+
+        <div class="filter-group">
+            <label>Fecha de subida</label>
+            <select [(ngModel)]="filterDateRange" (change)="applyFilters()" class="filter-select">
+                <option value="">Cualquier momento</option>
+                <option value="week">Última semana</option>
+                <option value="month">Último mes</option>
+                <option value="3months">Últimos 3 meses</option>
+                <option value="6months">Últimos 6 meses</option>
+                <option value="year">Último año</option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label>Ordenar por</label>
+            <select [(ngModel)]="activeSort" (change)="applyFilters()" class="filter-select">
+                <option value="latest">Más recientes</option>
+                <option value="popular">Más populares</option>
+            </select>
+        </div>
+
+
+
+        <div class="filter-group">
+            <label>Evento / Competición</label>
+            <select [(ngModel)]="filterCompetitionId" (change)="applyFilters()" class="filter-select">
+                <option value="">Todos los eventos</option>
+                <option *ngFor="let comp of compService.getCompetitions()()" [value]="comp.id">{{ comp.nombre ||
+                    comp.lugar }}</option>
+            </select>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="loading-state">
+        <p>Cargando vídeos...</p>
+    </div>
+
+    <div *ngIf="!isLoading && videos.length === 0" class="empty-state">
+        <p>No hay vídeos disponibles.</p>
+    </div>
+
+    <div *ngIf="!isLoading && videos.length > 0" class="video-grid">
+        <div *ngFor="let video of videos" class="video-card">
+            <app-smart-video-player [youtubeId]="video.youtube_id" [localPath]="video.local_path">
+            </app-smart-video-player>
+
+            <div class="video-info">
+                <div class="title-like-row">
+                    <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+                        {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+                    </h3>
+                    <button class="like-btn" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="like-icon" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        <span class="like-count">{{ video.likes_count || 0 }}</span>
+                    </button>
+                </div>
+                <p class="video-subtitle">
+                    <span class="dog-name">{{ video.dog?.name }}</span>
+                    <span *ngIf="video.competition"> • {{ video.competition.nombre }}</span>
+                </p>
+                <p class="uploader-name">
+                    Subido por: {{ video.user?.name || 'Usuario' }}
+                </p>
+                <div class="video-meta">
+                    <span>{{ video.date | date:'dd/MM/yyyy' }}</span>
+
+                    <button *ngIf="video.status === 'local'" (click)="downloadVideo($event, video)" class="download-btn"
+                        title="Descargar vídeo" style="border: none; cursor: pointer;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="download-icon" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Descargar
+                    </button>
+
+                    <span *ngIf="video.status === 'in_queue' || video.status === 'failed'" class="status-badge"
+                        [ngClass]="{
+                  'status-local': video.status === 'in_queue',
+                  'status-error': video.status === 'failed'
+                }">
+                        {{ video.status === 'in_queue' ? 'Procesando' : 'Error' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paginación Simple -->
+    <div *ngIf="totalPages > 1" class="pagination">
+        <button [disabled]="currentPage === 1" (click)="loadVideos(currentPage - 1)" class="page-btn">Anterior</button>
+        <span class="page-info">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button [disabled]="currentPage === totalPages" (click)="loadVideos(currentPage + 1)"
+            class="page-btn">Siguiente</button>
+    </div>
+
+    <!-- Botón Flotante Subir -->
+    <a routerLink="/galeria-videos/subir" class="fab-upload" title="Subir Nuevo Vídeo">
+        <svg xmlns="http://www.w3.org/2000/svg" class="fab-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clip-rule="evenodd" />
+        </svg>
+    </a>
+</div>

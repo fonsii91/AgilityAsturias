@@ -1,0 +1,161 @@
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { VideoService } from '../../../services/video.service';
+import { DogService } from '../../../services/dog.service';
+import { CompetitionService } from '../../../services/competition.service';
+import { Video } from '../../../models/video.model';
+import { SmartVideoPlayerComponent } from '../smart-video-player/smart-video-player.component';
+import { RouterLink } from '@angular/router';
+import { environment } from '../../../../environments/environment';
+
+@Component({
+    selector: 'app-video-list',
+    standalone: true,
+    imports: [CommonModule, FormsModule, SmartVideoPlayerComponent, RouterLink],
+    templateUrl: './video-list.component.html',
+    styleUrl: './video-list.component.css'
+})
+export class VideoListComponent implements OnInit {
+    private videoService = inject(VideoService);
+    public dogService = inject(DogService);
+    public compService = inject(CompetitionService);
+    private cdr = inject(ChangeDetectorRef);
+
+    videos: Video[] = [];
+    currentPage = 1;
+    totalPages = 1;
+    isLoading = true;
+    isFiltersOpen = false;
+
+    searchQuery: string = '';
+    filterDateRange: string = '';
+    filterDogId: string = '';
+    filterCompetitionId: string = '';
+    activeSort: string = 'latest';
+
+    ngOnInit() {
+        this.loadVideos();
+        this.dogService.loadAllDogs();
+        this.compService.fetchCompetitions();
+    }
+
+    toggleFilters() {
+        this.isFiltersOpen = !this.isFiltersOpen;
+    }
+
+    loadVideos(page: number = 1) {
+        this.isLoading = true;
+        const filters: any = {
+            search: this.searchQuery
+        };
+
+        if (this.filterDateRange) filters.dateRange = this.filterDateRange;
+        if (this.filterDogId) filters.dog_id = this.filterDogId;
+        if (this.filterCompetitionId) filters.competition_id = this.filterCompetitionId;
+
+        if (this.activeSort !== 'latest') {
+            filters.sort = this.activeSort;
+        }
+
+        this.videoService.getVideos(page, filters).subscribe({
+            next: (res) => {
+                console.log('VIDEOS API RESPONSE:', res);
+                this.videos = res.data;
+                this.currentPage = res.current_page;
+                this.totalPages = res.last_page;
+                this.isLoading = false;
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error loading videos', err);
+                this.isLoading = false;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    applyFilters() {
+        this.loadVideos(1);
+    }
+
+    clearFilters() {
+        this.searchQuery = '';
+        this.filterDateRange = '';
+        this.filterDogId = '';
+        this.filterCompetitionId = '';
+        this.activeSort = 'latest';
+        this.loadVideos(1);
+    }
+
+    toggleLike(video: Video) {
+        const originallyLiked = video.is_liked_by_user;
+        video.is_liked_by_user = !originallyLiked;
+        video.likes_count = (video.likes_count || 0) + (originallyLiked ? -1 : 1);
+
+        this.videoService.toggleLike(video.id).subscribe({
+            next: (res) => {
+                video.is_liked_by_user = res.liked;
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error toggling like', err);
+                // Revert optimistic update
+                video.is_liked_by_user = originallyLiked;
+                video.likes_count = (video.likes_count || 0) + (originallyLiked ? 1 : -1);
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    getDownloadUrl(video: Video): string {
+        if (!video.id) return '#';
+        return `${environment.apiUrl}/videos/${video.id}/download`;
+    }
+
+    async downloadVideo(event: Event, video: Video) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!video.id) return;
+
+        const url = this.getDownloadUrl(video);
+
+        try {
+            // Using fetch alongside the new backend download endpoint
+            const response = await fetch(url, {
+                headers: {
+                    // Provide auth token if required by backend to fetch the file
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Download failed');
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+
+            // Define safe filename
+            const extension = video.local_path?.split('.').pop() || 'mp4';
+            const safeTitle = (video.title || video.dog?.name || 'video_agility').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            a.download = `${safeTitle}.${extension}`;
+
+            document.body.appendChild(a);
+            a.click();
+
+            setTimeout(() => {
+                window.URL.revokeObjectURL(downloadUrl);
+                document.body.removeChild(a);
+            }, 100);
+
+        } catch (error) {
+            console.error('Download error:', error);
+            // Fallback to opening the URL directly if fetch/blob fails
+            window.open(url, '_blank');
+        }
+    }
+}

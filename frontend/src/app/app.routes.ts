@@ -96,5 +96,17 @@ export const routes: Routes = [
         path: 'register',
         loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent),
         title: 'Registrarse | Agility Asturias'
+    },
+    {
+        path: 'galeria-videos',
+        loadComponent: () => import('./components/galeria-videos/video-list/video-list.component').then(m => m.VideoListComponent),
+        canActivate: [authGuard],
+        title: 'Cine Agility | Agility Asturias'
+    },
+    {
+        path: 'galeria-videos/subir',
+        loadComponent: () => import('./components/galeria-videos/upload-video/upload-video.component').then(m => m.UploadVideoComponent),
+        canActivate: [authGuard],
+        title: 'Subir Vídeo | Agility Asturias'
     }
 ];

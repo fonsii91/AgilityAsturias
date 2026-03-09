@@ -106,6 +106,18 @@ export class ReservationService {
         return this.http.post(`${environment.apiUrl}/admin/attendance/confirm`, data);
     }
 
+    getPendingCompetitions() {
+        return this.http.get<any[]>(`${environment.apiUrl}/admin/attendance/pending-competitions`);
+    }
+
+    confirmCompetitionAttendance(data: {
+        competition_id: number,
+        attended_dogs: { id: number, position: string }[],
+        new_attendees: { user_id: number, dog_id: number, position: string }[]
+    }) {
+        return this.http.post(`${environment.apiUrl}/admin/attendance/confirm-competition`, data);
+    }
+
     // Ranking
     getRanking() {
         return this.http.get<any[]>(`${environment.apiUrl}/ranking`);

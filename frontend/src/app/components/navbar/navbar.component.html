@@ -22,6 +22,8 @@
                     Clasificación</a></li>
             <li><a routerLink="/galeria"><span class="material-icons">photo_library</span>
                     Galería</a></li>
+            <li *ngIf="authService.isAdmin()"><a routerLink="/galeria-videos"><span class="material-icons">movie</span>
+                    Vídeos</a></li>
             <li *ngIf="authService.isMember()"><a routerLink="/calendario"><span
                         class="material-icons">calendar_month</span> Calendario</a>
             </li>

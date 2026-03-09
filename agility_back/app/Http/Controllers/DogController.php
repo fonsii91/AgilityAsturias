@@ -17,6 +17,14 @@ class DogController extends Controller
     }
 
     /**
+     * Display a listing of all dogs in the system.
+     */
+    public function all()
+    {
+        return Dog::all();
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
