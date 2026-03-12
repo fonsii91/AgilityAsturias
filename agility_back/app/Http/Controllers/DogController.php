@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Dog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\DogExtraPointNotification;
 
 class DogController extends Controller
 {
@@ -21,7 +22,7 @@ class DogController extends Controller
      */
     public function all()
     {
-        return Dog::all();
+        return Dog::with('user:id,name')->get();
     }
 
     /**
@@ -32,7 +33,10 @@ class DogController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'breed' => 'nullable|string',
-            'age' => 'nullable|integer',
+            'birth_date' => 'nullable|date',
+            'license_expiration_date' => 'nullable|date',
+            'microchip' => 'nullable|string|max:15',
+            'pedigree' => 'nullable|string',
         ]);
 
         $dog = $request->user()->dogs()->create($validated);
@@ -58,7 +62,10 @@ class DogController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'breed' => 'nullable|string',
-            'age' => 'nullable|integer',
+            'birth_date' => 'nullable|date',
+            'license_expiration_date' => 'nullable|date',
+            'microchip' => 'nullable|string|max:15',
+            'pedigree' => 'nullable|string',
         ]);
 
         $dog->update($validated);
@@ -101,5 +108,29 @@ class DogController extends Controller
         }
 
         return response()->json($dog);
+    }
+
+    /**
+     * Give extra points to a dog (Staff/Admin only).
+     */
+    public function giveExtraPoints(Request $request, string $id)
+    {
+        $request->validate([
+            'points' => 'required|integer|min:1|max:3',
+            'category' => 'required|string|max:50',
+        ]);
+
+        $dog = Dog::findOrFail($id);
+        $dog->points += $request->points;
+        $dog->save();
+
+        if ($dog->user) {
+            $dog->user->notify(new DogExtraPointNotification($dog, $request->points, $request->category));
+        }
+
+        return response()->json([
+            'message' => 'Puntos extra otorgados exitosamente',
+            'dog' => $dog
+        ]);
     }
 }

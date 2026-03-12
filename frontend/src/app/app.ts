@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, OnDestroy, Injector } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy, Injector, effect } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 
@@ -11,7 +11,8 @@ import { TimeSlotService } from './services/time-slot.service';
 import { ToastService } from './services/toast.service';
 import { SwUpdate } from '@angular/service-worker';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router, NavigationEnd } from '@angular/router';
+import { DogService } from './services/dog.service';
 
 @Component({
   selector: 'app-root',
@@ -25,8 +26,34 @@ export class App implements OnInit, OnDestroy {
   private toastService = inject(ToastService);
   private swUpdate = inject(SwUpdate);
   private injector = inject(Injector);
+  private router = inject(Router);
+  private dogService = inject(DogService);
 
+  isProfileRoute = signal(false);
+  isWarningMinimized = signal(false);
+
+  constructor() {
+      // Listen to route changes
+      this.router.events.subscribe(event => {
+          if (event instanceof NavigationEnd) {
+              this.isProfileRoute.set(event.urlAfterRedirects.includes('/perfil'));
+          }
+      });
+      
+      // Load dogs when user changes
+      effect(() => {
+          const user = this.authService.currentUserSignal();
+          if (user) {
+              this.dogService.loadUserDogs();
+          }
+      });
+  }
+
+  // Load dogs when user is logged in
   ngOnInit() {
+      if (this.authService.isLoggedIn()) {
+          this.dogService.loadUserDogs();
+      }
     if (this.swUpdate.isEnabled) {
       this.swUpdate.versionUpdates.subscribe((event) => {
         if (event.type === 'VERSION_READY') {
@@ -43,6 +70,44 @@ export class App implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+  }
+
+  showLicenseWarning() {
+      if (this.isProfileRoute()) return false;
+      if (!this.authService.isLoggedIn()) return false;
+
+      const dogs = this.dogService.getDogs()();
+      if (!dogs || dogs.length === 0) return false;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const warningDays = 15;
+
+      return dogs.some(dog => {
+          if (!dog.license_expiration_date) return false;
+          
+          const expirationDate = new Date(dog.license_expiration_date);
+          expirationDate.setHours(0,0,0,0);
+          
+          const diffTime = expirationDate.getTime() - today.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+          return diffDays <= warningDays;
+      });
+  }
+
+  goToProfile() {
+      this.router.navigate(['/perfil']);
+      this.isWarningMinimized.set(false); // reset state when going to profile
+  }
+
+  minimizeWarning() {
+      this.isWarningMinimized.set(true);
+  }
+
+  maximizeWarning() {
+      this.isWarningMinimized.set(false);
   }
 
   private handleVisibilityChange = () => {

@@ -59,6 +59,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/admin/attendance/confirm', [AttendanceController::class, 'confirm']);
         Route::get('/admin/attendance/pending-competitions', [AttendanceController::class, 'pendingCompetitions']);
         Route::post('/admin/attendance/confirm-competition', [AttendanceController::class, 'confirmCompetition']);
+        
+        // Extra Points (Admin/Staff)
+        Route::post('/dogs/{id}/extra-points', [DogController::class, 'giveExtraPoints']);
 
         // Reservations index moved to general authenticated routes
 

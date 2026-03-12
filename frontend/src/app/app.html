@@ -42,4 +42,36 @@
   </mat-sidenav-container>
 
   <app-toast />
+
+  <!-- Global License Expiration Warning Modal -->
+  <div class="modal-overlay global-warning-overlay" *ngIf="showLicenseWarning() && !isWarningMinimized()">
+      <div class="modal-content warning-card pop-in">
+          <button class="btn-minimize" (click)="minimizeWarning()" title="Minimizar advertencia">
+              <span class="material-icons">close</span>
+          </button>
+          <div class="warning-icon-wrapper">
+              <span class="material-icons-outlined warning-icon">warning_amber</span>
+          </div>
+          <div class="warning-body">
+              <h3>Atención Requerida</h3>
+              <p>
+                  Uno o más de tus perros tienen la <strong>licencia de agility caducada o a punto de caducar</strong> (menos de 15 días).
+              </p>
+              <p class="warning-subtitle">
+                  Actualiza la fecha de caducidad en el perfil correspondiente para mantenerte al día y continuar usando la aplicación de forma normal.
+              </p>
+          </div>
+          <div class="warning-actions">
+              <button class="btn-warning-action" (click)="goToProfile()">
+                  <span>Actualizar ahora</span>
+                  <span class="material-icons">arrow_forward</span>
+              </button>
+          </div>
+      </div>
+  </div>
+
+  <!-- Minimized Warning Icon -->
+  <div class="minimized-warning-fab pulse-animation" *ngIf="showLicenseWarning() && isWarningMinimized()" (click)="maximizeWarning()" title="Ver advertencia de licencia">
+      <span class="material-icons-outlined">warning_amber</span>
+  </div>
 </div>

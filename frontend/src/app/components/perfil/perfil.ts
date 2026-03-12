@@ -6,11 +6,11 @@ import { DogService } from '../../services/dog.service';
 import { ImageCompressorService } from '../../services/image-compressor.service';
 import { ToastService } from '../../services/toast.service';
 import { Dog } from '../../models/dog.model';
-
+import { FichaPerroComponent } from '../ficha-perro/ficha-perro.component';
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FichaPerroComponent],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css'
 })
@@ -29,6 +29,11 @@ export class Perfil {
   // Image Modal state
   imageModalOpen = signal(false);
   selectedImage = signal<string | null>(null);
+
+  // Ficha Perro Modal state
+  fichaModalOpen = signal(false);
+  selectedDogFicha = signal<Dog | null>(null);
+  fichaStartInEditMode = signal(false);
 
   // Name editing state
   isEditingName = signal(false);
@@ -175,6 +180,39 @@ export class Perfil {
   closeImageModal() {
     this.imageModalOpen.set(false);
     this.selectedImage.set(null);
+  }
+
+  openFicha(dog: Dog) {
+    this.selectedDogFicha.set(dog);
+    this.fichaStartInEditMode.set(false);
+    this.fichaModalOpen.set(true);
+  }
+
+  openFichaForEdit(dog: Dog, event: Event) {
+    event.stopPropagation();
+    this.selectedDogFicha.set(dog);
+    this.fichaStartInEditMode.set(true);
+    this.fichaModalOpen.set(true);
+  }
+
+  closeFicha() {
+    this.fichaModalOpen.set(false);
+    this.selectedDogFicha.set(null);
+  }
+
+  async saveDogFicha(updatedData: Partial<Dog>) {
+    const dog = this.selectedDogFicha();
+    if (!dog) return;
+
+    try {
+      const updatedDog = await this.dogService.updateDog(dog.id, updatedData);
+      // Update the selected dog with the new data to reflect in the modal (if still open)
+      this.selectedDogFicha.set(updatedDog);
+      this.toastService.success('Ficha del perro actualizada correctamente');
+    } catch (error: any) {
+      console.error('Error updating dog:', error);
+      this.toastService.error('Error al actualizar la ficha del perro');
+    }
   }
 
   async confirmDelete() {

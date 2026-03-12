@@ -1,0 +1,104 @@
+<div class="modal-overlay modal-ficha-overlay" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-content ficha-perro-card" (click)="stopPropagation($event)">
+    <div class="modal-header">
+      <div class="header-title-group">
+        <h3 *ngIf="!isEditing">Ficha de {{ dog.name }} 🐾</h3>
+        <h3 *ngIf="isEditing">Editar Perfil ✏️</h3>
+      </div>
+      <div class="header-actions">
+        <button class="edit-btn" (click)="toggleEdit()" title="Editar Ficha" *ngIf="!isEditing && isOwner()">
+          <span class="material-icons-outlined">edit</span>
+        </button>
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+      </div>
+    </div>
+
+    <div class="modal-body ficha-body">
+      <div class="dog-photo-container">
+        <!-- Photo display (clickable if not editing) -->
+        <img *ngIf="dog.photo_url" [src]="dog.photo_url" alt="Foto de {{ dog.name }}" 
+             class="dog-photo large-photo" 
+             [class.clickable-image]="!isEditing"
+             (click)="!isEditing && openImageModal()">
+             
+        <div *ngIf="!dog.photo_url" class="dog-icon-large">🐕</div>
+
+        <!-- Camera button for editing -->
+        <label *ngIf="isEditing" class="camera-btn-edit" title="Cambiar foto">
+            <span class="material-icons-outlined camera-icon-small">photo_camera</span>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+        </label>
+      </div>
+      
+      
+      <div class="dog-details">
+        <!-- Display Mode -->
+        <ng-container *ngIf="!isEditing">
+          <div class="detail-item">
+            <span class="detail-label">Nombre:</span>
+            <span class="detail-value">{{ dog.name }}</span>
+          </div>
+          <div class="detail-item" *ngIf="dog.breed">
+            <span class="detail-label">Raza:</span>
+            <span class="detail-value">{{ dog.breed }}</span>
+          </div>
+          <div class="detail-item" *ngIf="dog.birth_date">
+            <span class="detail-label">Edad:</span>
+            <span class="detail-value">{{ getFormattedAge() }}</span>
+          </div>
+          <div class="detail-item" *ngIf="isOwner()">
+            <span class="detail-label">Caducidad Licencia Agility:</span>
+            <span class="detail-value">{{ getFormattedLicenseExpirationDate() }}</span>
+          </div>
+          <div class="detail-item" *ngIf="dog.microchip && isOwner()">
+            <span class="detail-label">Microchip:</span>
+            <span class="detail-value">{{ dog.microchip }}</span>
+          </div>
+          <div class="detail-item" *ngIf="dog.pedigree && isOwner()">
+            <span class="detail-label">Libro de Orígenes:</span>
+            <span class="detail-value">{{ dog.pedigree }}</span>
+          </div>
+        </ng-container>
+
+        <!-- Edit Mode -->
+        <ng-container *ngIf="isEditing">
+          <div class="edit-form-group">
+            <label class="form-label">Nombre *</label>
+            <input type="text" class="form-input" [(ngModel)]="editForm.name" placeholder="Nombre del perro">
+          </div>
+          <div class="edit-form-group">
+            <label class="form-label">Raza</label>
+            <input type="text" class="form-input" [(ngModel)]="editForm.breed" placeholder="Raza">
+          </div>
+          <div class="edit-form-group">
+            <label class="form-label">Fecha de Nacimiento</label>
+            <input type="date" class="form-input" [(ngModel)]="editForm.birth_date">
+          </div>
+          <div class="edit-form-group">
+            <label class="form-label">Caducidad Licencia Agility</label>
+            <input type="date" class="form-input" [(ngModel)]="editForm.license_expiration_date">
+          </div>
+          <div class="edit-form-group">
+            <label class="form-label">Microchip (15 caracteres)</label>
+            <input type="text" class="form-input" [(ngModel)]="editForm.microchip" maxlength="15" placeholder="Ej: 981100000000000">
+          </div>
+          <div class="edit-form-group">
+            <label class="form-label">Libro de Orígenes</label>
+            <input type="text" class="form-input" [(ngModel)]="editForm.pedigree" placeholder="LOE, LOC, etc.">
+          </div>
+
+          <div class="edit-actions-bottom">
+            <button class="btn-cancel" (click)="toggleEdit()">Cancelar</button>
+            <button class="btn-save" (click)="saveChanges()" [disabled]="!editForm.name?.trim()">Guardar</button>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Image Modal -->
+  <div class="modal-overlay image-modal-overlay" *ngIf="imageModalOpen" (click)="closeImageModal()">
+      <button class="close-image-btn" (click)="closeImageModal()">&times;</button>
+      <img *ngIf="dog.photo_url" [src]="dog.photo_url" class="full-size-image" (click)="stopPropagation($event)">
+  </div>
+</div>

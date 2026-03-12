@@ -1,0 +1,46 @@
+<div class="dialog-container">
+    <div class="dialog-header">
+        <h2 class="dialog-title">Dar Puntos Extra</h2>
+        <p class="dialog-subtitle">Valora la actitud y participación de los perros</p>
+    </div>
+
+    <div class="dialog-content">
+        <div class="form-group">
+            <label for="dogSelect">Selecciona un Perro:</label>
+            <select id="dogSelect" [(ngModel)]="selectedDogId" [disabled]="isLoading">
+                <option [ngValue]="null" disabled selected>-- Elige un perro --</option>
+                <option *ngFor="let dog of dogs()" [ngValue]="dog.id">{{ dog.name }} ({{ getOwnerName(dog) }})</option>
+            </select>
+            <small *ngIf="dogs().length === 0 && !isLoading">No hay perros disponibles.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="categorySelect">Categoría a valorar:</label>
+            <select id="categorySelect" [(ngModel)]="selectedCategory" [disabled]="isLoading">
+                <option value="" disabled selected>-- Selecciona categoría --</option>
+                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+        </div>
+
+        <div class="form-group" *ngIf="selectedCategory === 'Otra'">
+            <label for="customCategoryInput">Especifica la categoría:</label>
+            <input type="text" id="customCategoryInput" [(ngModel)]="customCategory" [disabled]="isLoading" placeholder="Ej: Esfuerzo, Simpatía...">
+        </div>
+
+        <div class="form-group">
+            <label for="pointsInput">Puntos (1 a 3):</label>
+            <select id="pointsInput" [(ngModel)]="selectedPoints" [disabled]="isLoading">
+                <option [ngValue]="1">1 Punto</option>
+                <option [ngValue]="2">2 Puntos</option>
+                <option [ngValue]="3">3 Puntos</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="dialog-actions">
+        <button class="cancel-btn" (click)="onCancel()" [disabled]="isLoading">Cancelar</button>
+        <button class="submit-btn" (click)="onSubmit()" [disabled]="!isFormValid() || isLoading">
+            {{ isLoading ? 'Guardando...' : 'Dar Puntos' }}
+        </button>
+    </div>
+</div>

@@ -100,4 +100,30 @@ export class DogService {
             });
         });
     }
+
+    updateDog(id: number, dogData: Partial<Dog>) {
+        return new Promise<Dog>((resolve, reject) => {
+            this.http.post<Dog>(`${this.apiUrl}/${id}`, dogData).subscribe({
+                next: (updatedDog) => {
+                    this.dogsSignal.update(list => list.map(d => d.id === id ? updatedDog : d));
+                    resolve(updatedDog);
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    giveExtraPoints(dogId: number, points: number, category: string) {
+        return new Promise<Dog>((resolve, reject) => {
+            this.http.post<{message: string; dog: Dog}>(`${this.apiUrl}/${dogId}/extra-points`, { points, category }).subscribe({
+                next: (res) => {
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
+                    // Update allDogsSignal as well if it exists in the list
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
+                    resolve(res.dog);
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
 }

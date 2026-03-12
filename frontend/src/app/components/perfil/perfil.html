@@ -56,9 +56,10 @@
                         <input type="file" (change)="onDogFileSelected($event, dog.id)" accept="image/*" hidden>
                     </label>
                 </div>
-                <div class="dog-info">
+                <div class="dog-info" (click)="openFicha(dog)" style="cursor: pointer;" title="Ver Ficha">
                     <span class="dog-name">{{ dog.name }}</span>
                 </div>
+                <button class="btn-edit-dog" (click)="openFichaForEdit(dog, $event)" title="Editar Perro">✏️</button>
                 <button class="btn-delete" (click)="deleteDog(dog.id, dog.name)" title="Eliminar">🗑️</button>
             </div>
         </div>
@@ -93,4 +94,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Ficha Perro Modal -->
+    <app-ficha-perro *ngIf="selectedDogFicha()" [dog]="selectedDogFicha()!" [isOpen]="fichaModalOpen()"
+        [startInEditMode]="fichaStartInEditMode()" (close)="closeFicha()" (save)="saveDogFicha($event)">
+    </app-ficha-perro>
 </div>

@@ -15,7 +15,10 @@ class Dog extends Model
         'user_id',
         'name',
         'breed',
-        'age',
+        'birth_date',
+        'license_expiration_date',
+        'microchip',
+        'pedigree',
         'photo_url',
         'points',
     ];

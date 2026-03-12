@@ -64,15 +64,15 @@
 
                         <div class="notif-icon-container" [ngClass]="{
                                 'event-icon': notif.type.includes('NewEventNotification') || notif.data.type === 'new_event', 
-                                'point-icon': notif.type.includes('DogPointNotification') || notif.data.type === 'dog_point',
-                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && notif.data.type !== 'dog_point'
+                                'point-icon': notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point',
+                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point'
                             }">
                             <span class="material-icons"
                                 *ngIf="notif.type.includes('NewEventNotification') || notif.data.type === 'new_event'">event_available</span>
                             <span class="material-icons"
-                                *ngIf="notif.type.includes('DogPointNotification') || notif.data.type === 'dog_point'">emoji_events</span>
+                                *ngIf="notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point'">emoji_events</span>
                             <span class="material-icons"
-                                *ngIf="!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && notif.data.type !== 'dog_point'">notifications</span>
+                                *ngIf="!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point'">notifications</span>
                         </div>
 
                         <div class="notif-content">
@@ -125,6 +125,10 @@
                 <a *ngIf="authService.isStaff()" routerLink="/info-reservas" (click)="closeMenu()"
                     class="dropdown-item staff-item">
                     <span class="material-icons">visibility</span> Monitor Reservas
+                </a>
+                <a *ngIf="authService.isStaff()" (click)="openExtraPointsDialog()"
+                    class="dropdown-item staff-item" style="cursor: pointer;">
+                    <span class="material-icons">military_tech</span> Dar Puntos Extra
                 </a>
 
                 <div class="dropdown-divider" *ngIf="authService.isAdmin()"></div>

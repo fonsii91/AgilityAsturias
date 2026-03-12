@@ -306,6 +306,7 @@
     white-space: nowrap;
 }
 
+.btn-edit-dog,
 .btn-delete {
     background: none;
     border: none;
@@ -317,6 +318,7 @@
     /* Larger touch area */
 }
 
+.btn-edit-dog:hover,
 .btn-delete:hover {
     opacity: 1;
 }
