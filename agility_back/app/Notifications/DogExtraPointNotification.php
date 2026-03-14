@@ -42,13 +42,18 @@ class DogExtraPointNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $pointText = $this->points == 1 ? 'punto extra' : 'puntos extra';
+        $isNegative = $this->points < 0;
+        $absPoints = abs($this->points);
+        $pointText = $absPoints == 1 ? 'punto' : 'puntos';
+        
+        $actionText = $isNegative ? 'ha perdido' : 'ha recibido';
+        $extraText = $isNegative ? '' : ' extra';
 
         return [
             'type' => 'dog_extra_point',
             'dog_id' => $this->dog->id,
             'nombre' => $this->dog->name,
-            'message' => '¡' . ($this->dog->name ?? 'Tu perro') . ' ha recibido ' . $this->points . ' ' . $pointText . ' en ' . $this->category . '!',
+            'message' => '¡' . ($this->dog->name ?? 'Tu perro') . " $actionText " . $absPoints . " $pointText$extraText por " . $this->category . '!',
             'action_url' => '/ranking'
         ];
     }

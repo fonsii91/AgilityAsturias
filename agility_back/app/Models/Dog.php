@@ -42,4 +42,9 @@ class Dog extends Model
     {
         return $this->hasMany(Video::class);
     }
+
+    public function pointHistories()
+    {
+        return $this->hasMany(PointHistory::class);
+    }
 }

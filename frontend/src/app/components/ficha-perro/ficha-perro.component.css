@@ -15,6 +15,9 @@
 .ficha-perro-card {
   max-width: 420px;
   width: 90%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   border-radius: var(--border-radius-lg, 16px);
   overflow: hidden;
   box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
@@ -42,6 +45,7 @@
   padding: 1.5rem 2rem;
   border-bottom: 1px solid #eee;
   background-color: #fafafa;
+  flex-shrink: 0;
 }
 
 .header-title-group h3 {
@@ -101,6 +105,23 @@
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.ficha-body::-webkit-scrollbar {
+  width: 6px;
+}
+.ficha-body::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 10px 0;
+}
+.ficha-body::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+.ficha-body::-webkit-scrollbar-thumb:hover {
+  background: #bbb;
 }
 
 .dog-photo-container {
@@ -316,9 +337,144 @@
     transform: scale(0.95);
     opacity: 0;
   }
-
   to {
     transform: scale(1);
     opacity: 1;
   }
+}
+
+/* Point History Styles */
+.point-history-section {
+  width: 100%;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.history-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main, #333);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.points-badge {
+  background-color: var(--primary-blue, #0073CF);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 250px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Custom scrollbar for history list */
+.history-list::-webkit-scrollbar {
+  width: 6px;
+}
+.history-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+.history-list::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+.history-list::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid transparent;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.history-item:hover {
+  background-color: #f5f5f5;
+  transform: translateX(2px);
+}
+
+.history-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.history-category {
+  font-weight: 600;
+  color: var(--text-main, #333);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.emoji-badge {
+  font-size: 1.3rem;
+  line-height: 1;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 36px;
+  height: 36px;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.history-item:hover .emoji-badge {
+  transform: scale(1.1) rotate(-5deg);
+  background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+  border-color: #cbd5e1;
+  box-shadow: 0 8px 12px -3px rgba(0, 0, 0, 0.1);
+}
+
+.history-date {
+  font-size: 0.8rem;
+  color: var(--text-muted, #999);
+}
+
+.history-points {
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 40px;
+  text-align: center;
+}
+
+.history-points.positive {
+  color: #4caf50;
+}
+
+.history-points.negative {
+  color: #f44336;
+}
+
+.no-history-msg {
+  text-align: center;
+  color: var(--text-muted, #999);
+  font-style: italic;
+  padding: 1rem;
+  background: #fdfdfd;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
 }

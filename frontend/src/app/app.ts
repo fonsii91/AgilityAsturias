@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit, OnDestroy, Injector, effect } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 
 import { ToastComponent } from './components/toast/toast.component';
@@ -11,12 +11,11 @@ import { TimeSlotService } from './services/time-slot.service';
 import { ToastService } from './services/toast.service';
 import { SwUpdate } from '@angular/service-worker';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { DogService } from './services/dog.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterModule, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

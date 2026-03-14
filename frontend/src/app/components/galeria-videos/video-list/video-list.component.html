@@ -1,26 +1,33 @@
 <div class="video-gallery-container">
-
-    <div class="search-container">
-        <div class="search-bar">
-            <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar vídeos..." class="search-input"
-                (keyup.enter)="applyFilters()">
-            <button class="search-btn" (click)="applyFilters()" aria-label="Buscar">
+    
+    <div class="action-top-bar">
+        <div class="search-filters-group">
+            <div class="search-bar">
+                <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar vídeos..." class="search-input"
+                    (keyup.enter)="applyFilters()">
+                <button class="search-btn" (click)="applyFilters()" aria-label="Buscar">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="search-icon">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                    </svg>
+                </button>
+            </div>
+            <button class="adv-filters-btn" (click)="toggleFilters()" [class.active]="isFiltersOpen"
+                aria-label="Filtros Avanzados">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="search-icon">
+                    stroke="currentColor" class="filter-icon">
                     <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
                 </svg>
+                <span class="adv-filters-text">Filtros</span>
             </button>
         </div>
-        <button class="adv-filters-btn" (click)="toggleFilters()" [class.active]="isFiltersOpen"
-            aria-label="Filtros Avanzados">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                stroke="currentColor" class="filter-icon">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-            </svg>
-            <span class="adv-filters-text">Filtros</span>
-        </button>
+
+        <a routerLink="/galeria-videos/subir" class="btn-primary-add">
+            <span class="material-icons">add_circle_outline</span>
+            <span>Subir Vídeo</span>
+        </a>
     </div>
 
     <div class="advanced-filters-panel" *ngIf="isFiltersOpen">
@@ -105,7 +112,7 @@
                     <span>{{ video.date | date:'dd/MM/yyyy' }}</span>
 
                     <button *ngIf="video.status === 'local'" (click)="downloadVideo($event, video)" class="download-btn"
-                        title="Descargar vídeo" style="border: none; cursor: pointer;">
+                        title="Descargar vídeo">
                         <svg xmlns="http://www.w3.org/2000/svg" class="download-icon" viewBox="0 0 20 20"
                             fill="currentColor">
                             <path fill-rule="evenodd"
@@ -113,6 +120,16 @@
                                 clip-rule="evenodd" />
                         </svg>
                         Descargar
+                    </button>
+
+                    <button *ngIf="video.user_id === currentUserId" (click)="openDeleteModal($event, video)" class="delete-btn"
+                        title="Eliminar vídeo">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="delete-icon" viewBox="0 0 20 20"
+                            fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
                     </button>
 
                     <span *ngIf="video.status === 'in_queue' || video.status === 'failed'" class="status-badge"
@@ -143,4 +160,19 @@
                 clip-rule="evenodd" />
         </svg>
     </a>
+</div>
+
+<!-- Modal de Confirmación de Borrado -->
+<div class="modal-overlay" *ngIf="videoToDelete">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-icon-wrapper">
+            <span class="material-icons">warning</span>
+        </div>
+        <h3>Eliminar Vídeo</h3>
+        <p>¿Estás seguro de que deseas eliminar el vídeo <strong>"{{ videoToDelete.title || videoToDelete.dog?.name }}"</strong>? Esta acción no se puede deshacer.</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
+            <button class="btn-danger" (click)="confirmDelete()">Sí, Eliminar</button>
+        </div>
+    </div>
 </div>

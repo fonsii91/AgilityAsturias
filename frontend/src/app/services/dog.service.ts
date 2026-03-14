@@ -49,6 +49,7 @@ export class DogService {
         return {
             ...data,
             userId: data.user_id,
+            pointHistories: data.point_histories,
             createdAt: data.created_at,
             updatedAt: data.updated_at
         };

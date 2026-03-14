@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\DogPointNotification;
 use Illuminate\Support\Facades\Notification;
+use App\Models\PointHistory;
 
 class AttendanceController extends Controller
 {
@@ -84,6 +85,12 @@ class AttendanceController extends Controller
                     // Award points directly to the assigned dog
                     if ($res->dog) {
                         $res->dog->increment('points', 3);
+                        PointHistory::create([
+                            'dog_id' => $res->dog->id,
+                            'points' => 3,
+                            'category' => 'Asistencia a entrenamiento'
+                        ]);
+                        
                         if ($res->user) {
                             Notification::send($res->user, new DogPointNotification($res->dog));
                         }
@@ -177,15 +184,20 @@ class AttendanceController extends Controller
                 $position = $data['position'];
 
                 $pointsToAdd = 0;
+                $categoryName = 'Asistencia a competición ' . $competition->nombre;
+
                 switch ($position) {
                     case '1':
                         $pointsToAdd = 4;
+                        $categoryName = 'Primero en ' . $competition->nombre;
                         break;
                     case '2':
                         $pointsToAdd = 3;
+                        $categoryName = 'Segundo en ' . $competition->nombre;
                         break;
                     case '3':
                         $pointsToAdd = 2;
+                        $categoryName = 'Tercero en ' . $competition->nombre;
                         break;
                     case '4+':
                         $pointsToAdd = 1;
@@ -196,6 +208,11 @@ class AttendanceController extends Controller
                     $dog = \App\Models\Dog::find($dogId);
                     if ($dog) {
                         $dog->increment('points', $pointsToAdd);
+                        PointHistory::create([
+                            'dog_id' => $dog->id,
+                            'points' => $pointsToAdd,
+                            'category' => $categoryName
+                        ]);
                         // We can optionally trigger Notification::send like in regular attendance
                     }
                 }

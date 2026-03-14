@@ -9,6 +9,13 @@ export interface Dog {
     pedigree?: string;
     photo_url?: string;
     user?: { id: number; name: string };
+    points?: number;
+    pointHistories?: Array<{
+        id: number;
+        points: number;
+        category: string;
+        created_at: string;
+    }>;
     createdAt?: string; // Laravel uses timestamps, string
     updatedAt?: string;
 }

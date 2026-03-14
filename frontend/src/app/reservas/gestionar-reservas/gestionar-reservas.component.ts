@@ -60,6 +60,20 @@ export class GestionarReservasComponent {
                 this.dogService.loadUserDogs();
             }
         });
+
+        // Auto-switch to next week if current week has no grouped slots
+        effect(() => {
+            const currentWeek = this.selectedWeek();
+            const groups = this.groupedSlots();
+            const definedSlots = this.timeSlots();
+
+            if (currentWeek === 'current' && definedSlots.length > 0 && groups.length === 0) {
+                // Defer the state update to avoid ExpressionChangedAfterItHasBeenCheckedError
+                setTimeout(() => {
+                    this.selectedWeek.set('next');
+                }, 0);
+            }
+        });
     }
 
     toggleWeek(week: 'current' | 'next') {

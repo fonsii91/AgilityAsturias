@@ -39,7 +39,7 @@
     cursor: pointer;
 }
 
-nav.desktop-nav ul {
+nav.desktop-nav > ul {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -63,9 +63,107 @@ nav.desktop-nav a .material-icons {
     font-size: 20px;
 }
 
-nav.desktop-nav a:hover {
+nav.desktop-nav a:hover,
+nav.desktop-nav a.active-route {
     color: #ffd700;
-    /* Gold color on hover */
+    /* Gold color on hover or active */
+}
+
+/* Nav Dropdown (Explorar) */
+.nav-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nav-dropdown .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.nav-dropdown .dropdown-toggle .arrow {
+    font-size: 18px;
+    transition: transform 0.2s ease;
+}
+
+.nav-dropdown:hover .dropdown-toggle .arrow {
+    transform: rotate(180deg);
+}
+
+nav.desktop-nav .dropdown-menu-list {
+    display: block;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 200px;
+    background: white;
+    list-style: none;
+    padding: 0.5rem 0;
+    margin: 0;
+    margin-top: 10px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.nav-dropdown:hover .dropdown-menu-list {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Bridge the gap to prevent hover loss */
+.nav-dropdown::after {
+    content: '';
+    position: absolute;
+    height: 15px;
+    width: 100%;
+    bottom: -15px;
+    left: 0;
+}
+
+.dropdown-menu-list li {
+    display: block;
+}
+
+nav.desktop-nav .dropdown-menu-list li a {
+    display: flex;
+    align-items: center;
+    padding: 10px 20px;
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+nav.desktop-nav .dropdown-menu-list li a:hover {
+    background-color: var(--surface-background);
+    color: var(--primary-blue);
+}
+
+nav.desktop-nav .dropdown-menu-list li a.active-route {
+    color: var(--primary-blue);
+    background-color: #eff6ff;
+    font-weight: 600;
+}
+
+nav.desktop-nav .dropdown-menu-list li a .material-icons {
+    margin-right: 12px;
+    font-size: 20px;
+    color: var(--text-secondary);
+    transition: color 0.2s ease;
+}
+
+nav.desktop-nav .dropdown-menu-list li a:hover .material-icons,
+nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
+    color: var(--primary-blue);
 }
 
 /* Auth Item Specifics */

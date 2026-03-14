@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Dog } from '../../models/dog.model';
@@ -6,7 +6,7 @@ import { DogService } from '../../services/dog.service';
 import { ImageCompressorService } from '../../services/image-compressor.service';
 import { ToastService } from '../../services/toast.service';
 import { AuthService } from '../../services/auth.service';
-import { inject } from '@angular/core';
+import { getEmojiForCategory } from '../../utils/point-categories';
 
 @Component({
     selector: 'app-ficha-perro',
@@ -172,6 +172,20 @@ export class FichaPerroComponent implements OnChanges {
             month: '2-digit',
             year: 'numeric'
         });
+    }
+
+    getFormattedHistoryDate(dateString: string): string {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
+
+    getEmoji(category: string, points: number): string {
+        return getEmojiForCategory(category, points);
     }
 
     isOwner(): boolean {

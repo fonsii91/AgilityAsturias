@@ -88,6 +88,28 @@
             <button class="btn-save" (click)="saveChanges()" [disabled]="!editForm.name?.trim()">Guardar</button>
           </div>
         </ng-container>
+
+        <!-- Point History -->
+        <div class="point-history-section" *ngIf="!isEditing">
+          <h4 class="history-title">Historial de Puntos <span class="points-badge">{{ dog.points || 0 }} pts</span></h4>
+          <div class="history-list" *ngIf="dog.pointHistories && dog.pointHistories.length > 0; else noHistory">
+            <div class="history-item" *ngFor="let history of dog.pointHistories">
+              <div class="history-info">
+                <span class="history-category">
+                  <span class="emoji-badge">{{ getEmoji(history.category, history.points) }}</span>
+                  {{ history.category }}
+                </span>
+                <span class="history-date">{{ getFormattedHistoryDate(history.created_at) }}</span>
+              </div>
+              <div class="history-points" [ngClass]="{'positive': history.points > 0, 'negative': history.points < 0}">
+                {{ history.points > 0 ? '+' : '' }}{{ history.points }}
+              </div>
+            </div>
+          </div>
+          <ng-template #noHistory>
+            <p class="no-history-msg">No hay registro de puntos todavía.</p>
+          </ng-template>
+        </div>
       </div>
     </div>
   </div>

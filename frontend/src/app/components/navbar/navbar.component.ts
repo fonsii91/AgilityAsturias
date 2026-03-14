@@ -1,5 +1,5 @@
 import { Component, inject, effect, output } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { NotificationService, AppNotification } from '../../services/notification.service';
@@ -10,7 +10,7 @@ import { DarPuntosExtraDialogComponent } from '../dar-puntos-extra-dialog/dar-pu
 @Component({
     selector: 'app-navbar',
     standalone: true,
-    imports: [RouterLink, CommonModule, MatToolbarModule, MatDialogModule],
+    imports: [RouterLink, RouterLinkActive, CommonModule, MatToolbarModule, MatDialogModule],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.css'
 })

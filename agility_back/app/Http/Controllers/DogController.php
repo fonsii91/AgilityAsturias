@@ -6,6 +6,7 @@ use App\Models\Dog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\DogExtraPointNotification;
+use App\Models\PointHistory;
 
 class DogController extends Controller
 {
@@ -14,7 +15,9 @@ class DogController extends Controller
      */
     public function index(Request $request)
     {
-        return $request->user()->dogs;
+        return $request->user()->dogs()->with(['pointHistories' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }])->get();
     }
 
     /**
@@ -22,7 +25,9 @@ class DogController extends Controller
      */
     public function all()
     {
-        return Dog::with('user:id,name')->get();
+        return Dog::with(['user:id,name', 'pointHistories' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }])->get();
     }
 
     /**
@@ -49,7 +54,9 @@ class DogController extends Controller
      */
     public function show(string $id)
     {
-        return Auth::user()->dogs()->findOrFail($id);
+        return Auth::user()->dogs()->with(['pointHistories' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }])->findOrFail($id);
     }
 
     /**
@@ -69,6 +76,10 @@ class DogController extends Controller
         ]);
 
         $dog->update($validated);
+
+        $dog->load(['pointHistories' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }]);
 
         return response()->json($dog);
     }
@@ -107,6 +118,10 @@ class DogController extends Controller
             $dog->save();
         }
 
+        $dog->load(['pointHistories' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }]);
+
         return response()->json($dog);
     }
 
@@ -116,7 +131,7 @@ class DogController extends Controller
     public function giveExtraPoints(Request $request, string $id)
     {
         $request->validate([
-            'points' => 'required|integer|min:1|max:3',
+            'points' => 'required|integer|min:-3|max:3|not_in:0',
             'category' => 'required|string|max:50',
         ]);
 
@@ -124,12 +139,22 @@ class DogController extends Controller
         $dog->points += $request->points;
         $dog->save();
 
+        PointHistory::create([
+            'dog_id' => $dog->id,
+            'points' => $request->points,
+            'category' => $request->category
+        ]);
+
         if ($dog->user) {
             $dog->user->notify(new DogExtraPointNotification($dog, $request->points, $request->category));
         }
 
+        $dog->load(['pointHistories' => function ($query) {
+            $query->orderBy('created_at', 'desc');
+        }]);
+
         return response()->json([
-            'message' => 'Puntos extra otorgados exitosamente',
+            'message' => 'Puntos modificados exitosamente',
             'dog' => $dog
         ]);
     }

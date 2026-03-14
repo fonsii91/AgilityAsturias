@@ -1,7 +1,4 @@
 <div class="ranking-container">
-    <div class="header">
-        <h1>🏆 Clasificación</h1>
-    </div>
 
     <div *ngIf="isLoading()" class="loading-state">
         <div class="spinner"></div>
@@ -23,8 +20,7 @@
                     <span class="number" *ngIf="i > 2">{{ i + 1 }}</span>
                 </div>
 
-                <div class="user-avatar-small" (click)="openFicha(dog)"
-                    style="cursor: pointer;">
+                <div class="user-avatar-small" (click)="openFicha(dog)" style="cursor: pointer;">
                     <!-- Standard size for everyone -->
                     <img [src]="dog.photo_url || 'Images/Agility_Asturias_logo.jpg'" alt="Dog"
                         onError="this.src='Images/Agility_Asturias_logo.jpg'">
@@ -63,7 +59,14 @@
                             <span>NUEVO</span>
                         </div>
                     </div>
-                    <span class="owner-name" *ngIf="dog.user">de {{ dog.user.name }}</span>
+                    <span class="owner-name" *ngIf="dog.user">{{ dog.user.name }}</span>
+                </div>
+
+                <div class="recent-emojis" *ngIf="dog.recentEmojis && dog.recentEmojis.length > 0">
+                    <span *ngFor="let item of dog.recentEmojis" class="recent-emoji" [matTooltip]="item.category"
+                        matTooltipPosition="above">
+                        {{ item.emoji }}
+                    </span>
                 </div>
 
                 <div class="points-badge">
@@ -74,11 +77,7 @@
     </div>
 
     <!-- Ficha Perro Modal -->
-    <app-ficha-perro 
-        *ngIf="selectedDogModal()" 
-        [dog]="selectedDogModal()" 
-        [isOpen]="fichaModalOpen()"
-        (close)="closeFicha()"
-        (save)="saveDogFicha($event)">
+    <app-ficha-perro *ngIf="selectedDogModal()" [dog]="selectedDogModal()" [isOpen]="fichaModalOpen()"
+        (close)="closeFicha()" (save)="saveDogFicha($event)">
     </app-ficha-perro>
 </div>

@@ -1,7 +1,7 @@
 <div class="dialog-container">
     <div class="dialog-header">
-        <h2 class="dialog-title">Dar Puntos Extra</h2>
-        <p class="dialog-subtitle">Valora la actitud y participación de los perros</p>
+        <h2 class="dialog-title">Modificar Puntos</h2>
+        <p class="dialog-subtitle">Dar o quitar puntos al perro seleccionado</p>
     </div>
 
     <div class="dialog-content">
@@ -15,20 +15,34 @@
         </div>
 
         <div class="form-group">
+            <label>Acción:</label>
+            <div class="radio-group">
+                <label>
+                    <input type="radio" name="action" [(ngModel)]="action" (ngModelChange)="onActionChange()" value="add" [disabled]="isLoading"> 
+                    <i class="fas fa-plus-circle" style="margin-right: 6px;"></i> Dar Puntos
+                </label>
+                <label>
+                    <input type="radio" name="action" [(ngModel)]="action" (ngModelChange)="onActionChange()" value="remove" [disabled]="isLoading"> 
+                    <i class="fas fa-minus-circle" style="margin-right: 6px;"></i> Quitar Puntos
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label for="categorySelect">Categoría a valorar:</label>
             <select id="categorySelect" [(ngModel)]="selectedCategory" [disabled]="isLoading">
                 <option value="" disabled selected>-- Selecciona categoría --</option>
-                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                <option *ngFor="let cat of categories" [value]="cat">{{ getEmoji(cat) }} {{ cat }}</option>
             </select>
         </div>
 
-        <div class="form-group" *ngIf="selectedCategory === 'Otra'">
+        <div class="form-group" *ngIf="selectedCategory === 'Otro'">
             <label for="customCategoryInput">Especifica la categoría:</label>
             <input type="text" id="customCategoryInput" [(ngModel)]="customCategory" [disabled]="isLoading" placeholder="Ej: Esfuerzo, Simpatía...">
         </div>
 
         <div class="form-group">
-            <label for="pointsInput">Puntos (1 a 3):</label>
+            <label for="pointsInput">Cantidad de puntos (1 a 3):</label>
             <select id="pointsInput" [(ngModel)]="selectedPoints" [disabled]="isLoading">
                 <option [ngValue]="1">1 Punto</option>
                 <option [ngValue]="2">2 Puntos</option>
@@ -39,8 +53,10 @@
 
     <div class="dialog-actions">
         <button class="cancel-btn" (click)="onCancel()" [disabled]="isLoading">Cancelar</button>
-        <button class="submit-btn" (click)="onSubmit()" [disabled]="!isFormValid() || isLoading">
-            {{ isLoading ? 'Guardando...' : 'Dar Puntos' }}
+        <button class="submit-btn" (click)="onSubmit()" [disabled]="!isFormValid() || isLoading" [ngClass]="{'remove-btn': action === 'remove'}">
+            <i class="fas fa-spinner fa-spin" *ngIf="isLoading" style="margin-right: 8px;"></i>
+            <i class="fas fa-check" *ngIf="!isLoading" style="margin-right: 8px;"></i>
+            {{ isLoading ? 'Guardando...' : (action === 'add' ? 'Dar Puntos' : 'Quitar Puntos') }}
         </button>
     </div>
 </div>

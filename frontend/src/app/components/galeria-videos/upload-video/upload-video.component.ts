@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, effect } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DogService } from '../../../services/dog.service';
@@ -28,6 +28,7 @@ export class UploadVideoComponent implements OnInit {
     uploadForm: FormGroup;
     selectedFile: File | null = null;
     isUploading = false;
+    isDragging = false;
 
     ffmpeg = new FFmpeg();
     isCompressing = false;
@@ -41,10 +42,31 @@ export class UploadVideoComponent implements OnInit {
             date: ['', Validators.required],
             title: ['']
         });
+
+        effect(() => {
+            const comps = this.compService.getCompetitions()();
+            const today = new Date().toISOString().split('T')[0];
+            
+            const currentCompId = this.uploadForm.get('competition_id')?.value;
+            if (!currentCompId) {
+                // Find if any competition is happening today
+                const todayComp = comps.find(c => c.fechaEvento && c.fechaEvento.startsWith(today));
+                if (todayComp) {
+                    this.uploadForm.patchValue({ competition_id: todayComp.id });
+                }
+            }
+        });
     }
 
     ngOnInit() {
         this.dogService.loadAllDogs();
+
+        const today = new Date().toISOString().split('T')[0];
+        this.uploadForm.patchValue({ date: today });
+    }
+
+    cancel() {
+        this.router.navigate(['/galeria-videos']);
     }
 
     onFileSelected(event: any) {
@@ -52,6 +74,47 @@ export class UploadVideoComponent implements OnInit {
         if (file) {
             this.selectedFile = file;
         }
+    }
+
+    onDragOver(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragging = true;
+    }
+
+    onDragLeave(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragging = false;
+    }
+
+    onDrop(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.isDragging = false;
+        
+        const files = event.dataTransfer?.files;
+        if (files && files.length > 0) {
+            const file = files[0];
+            // Validate it's a video
+            if (file.type.startsWith('video/')) {
+                this.selectedFile = file;
+            } else {
+                this.toastService.error('Por favor, selecciona un archivo de vídeo válido.');
+            }
+        }
+    }
+
+    removeFile() {
+        this.selectedFile = null;
+    }
+
+    formatFileSize(bytes: number): string {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
     async loadFFmpeg() {

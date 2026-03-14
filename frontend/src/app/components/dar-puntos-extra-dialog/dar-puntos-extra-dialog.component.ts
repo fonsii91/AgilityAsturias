@@ -5,6 +5,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DogService } from '../../services/dog.service';
 import { Dog } from '../../models/dog.model';
+import { getEmojiForCategory } from '../../utils/point-categories';
 
 @Component({
   selector: 'app-dar-puntos-extra-dialog',
@@ -24,15 +25,35 @@ export class DarPuntosExtraDialogComponent implements OnInit {
   selectedCategory: string = '';
   customCategory: string = '';
   selectedPoints: number = 1;
+  action: 'add' | 'remove' = 'add';
   isLoading = false;
 
-  categories = [
+  positiveCategories = [
     'Puntualidad',
     'Proactividad',
     'Compañerismo',
     'Motivación',
-    'Otra'
+    'Otro'
   ];
+
+  negativeCategories = [
+    'Caca',
+    'Pis',
+    'Otro'
+  ];
+
+  get categories() {
+    return this.action === 'add' ? this.positiveCategories : this.negativeCategories;
+  }
+
+  getEmoji(category: string) {
+    return getEmojiForCategory(category, this.action === 'add' ? 1 : -1);
+  }
+
+  onActionChange() {
+    this.selectedCategory = '';
+    this.customCategory = '';
+  }
 
   ngOnInit() {
     this.dogService.loadAllDogs();
@@ -46,7 +67,7 @@ export class DarPuntosExtraDialogComponent implements OnInit {
   }
 
   isFormValid(): boolean {
-    const isCategoryValid = this.selectedCategory === 'Otra' ? this.customCategory.trim().length > 0 : this.selectedCategory !== '';
+    const isCategoryValid = this.selectedCategory === 'Otro' ? this.customCategory.trim().length > 0 : this.selectedCategory !== '';
     return this.selectedDogId !== null && 
            isCategoryValid && 
            this.selectedPoints >= 1 && 
@@ -62,21 +83,24 @@ export class DarPuntosExtraDialogComponent implements OnInit {
 
     this.isLoading = true;
     try {
-      const finalCategory = this.selectedCategory === 'Otra' ? this.customCategory.trim() : this.selectedCategory;
+      const finalCategory = this.selectedCategory === 'Otro' ? this.customCategory.trim() : this.selectedCategory;
+      const finalPoints = this.action === 'add' ? this.selectedPoints : -this.selectedPoints;
 
       await this.dogService.giveExtraPoints(
         this.selectedDogId!,
-        this.selectedPoints,
+        finalPoints,
         finalCategory
       );
-      this.snackBar.open('¡Puntos extra otorgados exitosamente!', 'Cerrar', {
+      
+      const successMessage = this.action === 'add' ? '¡Puntos otorgados exitosamente!' : '¡Puntos quitados exitosamente!';
+      this.snackBar.open(successMessage, 'Cerrar', {
         duration: 3000,
         panelClass: ['success-snackbar']
       });
       this.dialogRef.close(true);
     } catch (error) {
-      console.error('Error al dar puntos extra', error);
-      this.snackBar.open('Error al otorgar los puntos extra.', 'Cerrar', {
+      console.error('Error al modificar puntos', error);
+      this.snackBar.open('Error al modificar los puntos.', 'Cerrar', {
         duration: 3000,
         panelClass: ['error-snackbar']
       });

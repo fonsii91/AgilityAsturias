@@ -7,25 +7,33 @@
       <!-- Mobile Navigation Links -->
       <nav class="mobile-nav">
         <ul>
-          <li><a routerLink="/" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenido</a></li>
-          <li *ngIf="authService.isMember()"><a routerLink="/reservas" (click)="sidenav.close()"><span
+          <li *ngIf="!authService.userProfileSignal()"><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenido</a></li>
+          <li *ngIf="authService.isMember()"><a routerLink="/reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">event</span> Reservas</a>
           </li>
-          <li *ngIf="authService.isMember()"><a routerLink="/ranking" (click)="sidenav.close()"><span
+          <li *ngIf="authService.isMember()"><a routerLink="/ranking" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">emoji_events</span> Clasificación</a></li>
-          <li><a routerLink="/galeria" (click)="sidenav.close()"><span class="material-icons">photo_library</span>
+          <li *ngIf="!authService.userProfileSignal()"><a routerLink="/galeria" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">photo_library</span>
               Galería</a></li>
-          <li *ngIf="authService.isMember()"><a routerLink="/galeria-videos" (click)="sidenav.close()"><span
+          <li *ngIf="authService.isAdmin()"><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">movie</span>
               Vídeos</a></li>
-          <li *ngIf="authService.isMember()"><a routerLink="/calendario" (click)="sidenav.close()"><span
+          <li *ngIf="authService.isMember()"><a routerLink="/calendario" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">calendar_month</span> Calendario</a>
           </li>
-          <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones" (click)="sidenav.close()"><span
+          <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">sports_score</span> Eventos</a>
           </li>
-          <li><a routerLink="/contacto" (click)="sidenav.close()"><span class="material-icons">contact_support</span>
+          <li *ngIf="!authService.userProfileSignal()"><a routerLink="/contacto" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">contact_support</span>
               Contacto</a></li>
+          
+          <!-- Secondary links moved to bottom for logged-in users -->
+          <ng-container *ngIf="authService.userProfileSignal()">
+            <li class="mobile-nav-divider">Otros</li>
+            <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenido</a></li>
+            <li><a routerLink="/galeria" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">photo_library</span> Galería</a></li>
+            <li><a routerLink="/contacto" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">contact_support</span> Contacto</a></li>
+          </ng-container>
         </ul>
       </nav>
     </mat-sidenav>

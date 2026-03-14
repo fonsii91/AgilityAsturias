@@ -8,6 +8,8 @@ import { Video } from '../../../models/video.model';
 import { SmartVideoPlayerComponent } from '../smart-video-player/smart-video-player.component';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../../environments/environment';
+import { AuthService } from '../../../services/auth.service';
+import { ToastService } from '../../../services/toast.service';
 
 @Component({
     selector: 'app-video-list',
@@ -20,9 +22,13 @@ export class VideoListComponent implements OnInit {
     private videoService = inject(VideoService);
     public dogService = inject(DogService);
     public compService = inject(CompetitionService);
+    public authService = inject(AuthService);
+    private toastService = inject(ToastService);
     private cdr = inject(ChangeDetectorRef);
 
     videos: Video[] = [];
+    currentUserId: number | null = null;
+    videoToDelete: Video | null = null;
     currentPage = 1;
     totalPages = 1;
     isLoading = true;
@@ -35,6 +41,7 @@ export class VideoListComponent implements OnInit {
     activeSort: string = 'latest';
 
     ngOnInit() {
+        this.currentUserId = this.authService.currentUserSignal()?.id || null;
         this.loadVideos();
         this.dogService.loadAllDogs();
         this.compService.fetchCompetitions();
@@ -157,5 +164,36 @@ export class VideoListComponent implements OnInit {
             // Fallback to opening the URL directly if fetch/blob fails
             window.open(url, '_blank');
         }
+    }
+
+    openDeleteModal(event: Event, video: Video) {
+        event.stopPropagation();
+        this.videoToDelete = video;
+        this.cdr.detectChanges();
+    }
+
+    cancelDelete() {
+        this.videoToDelete = null;
+        this.cdr.detectChanges();
+    }
+
+    confirmDelete() {
+        if (!this.videoToDelete) return;
+
+        const videoId = this.videoToDelete.id;
+        this.videoService.deleteVideo(videoId).subscribe({
+            next: () => {
+                this.toastService.success('Vídeo eliminado correctamente');
+                this.videos = this.videos.filter(v => v.id !== videoId);
+                this.videoToDelete = null;
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error deleting video', err);
+                this.toastService.error('Hubo un error al eliminar el vídeo');
+                this.videoToDelete = null;
+                this.cdr.detectChanges();
+            }
+        });
     }
 }

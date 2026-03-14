@@ -14,24 +14,34 @@
 
     <nav class="desktop-nav">
         <ul>
-            <li><a routerLink="/"><span class="material-icons">home</span> Bienvenido</a></li>
-            <li *ngIf="authService.isMember()"><a routerLink="/reservas"><span class="material-icons">event</span>
+            <li *ngIf="!authService.userProfileSignal()"><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
+            <li *ngIf="authService.isMember()"><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span>
                     Reservas</a>
             </li>
-            <li *ngIf="authService.isMember()"><a routerLink="/ranking"><span class="material-icons">emoji_events</span>
+            <li *ngIf="authService.isMember()"><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
                     Clasificación</a></li>
-            <li><a routerLink="/galeria"><span class="material-icons">photo_library</span>
+            <li *ngIf="!authService.userProfileSignal()"><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
                     Galería</a></li>
-            <li *ngIf="authService.isAdmin()"><a routerLink="/galeria-videos"><span class="material-icons">movie</span>
+            <li *ngIf="authService.isAdmin()"><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
                     Vídeos</a></li>
-            <li *ngIf="authService.isMember()"><a routerLink="/calendario"><span
+            <li *ngIf="authService.isMember()"><a routerLink="/calendario" routerLinkActive="active-route"><span
                         class="material-icons">calendar_month</span> Calendario</a>
             </li>
-            <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones"><span
+            <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span
                         class="material-icons">sports_score</span> Eventos</a>
             </li>
-            <li><a routerLink="/contacto"><span class="material-icons">contact_support</span>
+            <li *ngIf="!authService.userProfileSignal()"><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span>
                     Contacto</a></li>
+            
+            <!-- Explorar Dropdown for Logged In Users -->
+            <li class="nav-dropdown" *ngIf="authService.userProfileSignal()">
+                <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span class="material-icons arrow">expand_more</span></a>
+                <ul class="dropdown-menu-list">
+                    <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
+                    <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
+                    <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
+                </ul>
+            </li>
         </ul>
     </nav>
 
