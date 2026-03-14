@@ -1,9 +1,9 @@
-# Script de Preparación para Despliegue en Hostalia
+# Script de Preparación para Despliegue en Hostalia (Sin Vendor)
 # Este script organiza todos los archivos en una carpeta 'deploy_package' lista para subir.
 
 $ErrorActionPreference = "Stop"
 
-Write-Host "Iniciando preparación del paquete de despliegue..." -ForegroundColor Green
+Write-Host "Iniciando preparación del paquete de despliegue (Excluyendo vendor)..." -ForegroundColor Green
 
 # 1. Definir rutas
 $rootDir = Get-Location
@@ -27,14 +27,23 @@ if (!(Test-Path $frontendDist)) {
 Copy-Item -Path "$frontendDist\*" -Destination "$deployDir\httpdocs" -Recurse
 
 # 4. Copiar Backend Core (Laravel)
-Write-Host "Copiando Backend Core..." -ForegroundColor Cyan
-# Excluciones para no subir basura
-$exclude = @('node_modules', '.git', '.idea', 'tests', 'public')
+Write-Host "Copiando Backend Core (Ignorando vendor y archivos de usuario en storage)..." -ForegroundColor Cyan
+# Excluciones para no subir basura, INCLUYENDO vendor
+$exclude = @('node_modules', '.git', '.idea', 'tests', 'public', 'vendor')
 Get-ChildItem -Path $backendSrc -Exclude $exclude | Copy-Item -Destination "$deployDir\agility_back_core" -Recurse
 
+# Borrar archivos generados por usuarios de local que fueron copiados sin querer
+$storageAppPublic = "$deployDir\agility_back_core\storage\app\public"
+if (Test-Path $storageAppPublic) {
+    Remove-Item -Path "$storageAppPublic\videos" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path "$storageAppPublic\dog_photos" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path "$storageAppPublic\profile_photos" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -Path "$storageAppPublic\gallery_photos" -Recurse -Force -ErrorAction SilentlyContinue
+}
+
 # 5. Preparar Backend Public (index.php modificado)
-Write-Host "Preparando Backend Public..." -ForegroundColor Cyan
-Copy-Item -Path "$backendSrc\public\*" -Destination "$deployDir\httpdocs\backend" -Recurse
+Write-Host "Preparando Backend Public (Excluyendo public/storage)..." -ForegroundColor Cyan
+Get-ChildItem -Path "$backendSrc\public" -Exclude "storage" | Copy-Item -Destination "$deployDir\httpdocs\backend" -Recurse
 
 # Modificar index.php para apuntar al core
 $indexPath = "$deployDir\httpdocs\backend\index.php"
@@ -92,11 +101,14 @@ try {
 
 Set-Content -Path "$deployDir\httpdocs\backend\run_migrations.php" -Value $migrationsScript
 
+# 6.5 Copiar script de fix de tablas
+Write-Host "Copiando script fix_tables.php..." -ForegroundColor Cyan
+Copy-Item -Path "$rootDir\fix_tables.php" -Destination "$deployDir\httpdocs\backend\fix_tables.php"
 
 Write-Host "--------------------------------------------------------" -ForegroundColor Green
 Write-Host "¡Paquete creado en: $deployDir" -ForegroundColor Green
 Write-Host "INSTRUCCIONES PARA SUBIR:" -ForegroundColor Yellow
-Write-Host "1. Sube el contenido de 'deploy_package/agility_back_core' a la RAIZ de tu hosting (fuera de httpdocs)."
+Write-Host "1. Sube el contenido de 'deploy_package/agility_back_core' a la RAIZ de tu hosting (fuera de httpdocs), SOBRESCRIBIENDO lo que haya menos vendor."
 Write-Host "2. Sube el contenido de 'deploy_package/httpdocs' DENTRO de la carpeta 'httpdocs' de tu hosting."
 Write-Host "3. Edita el archivo '.env' en 'agility_back_core' con tus datos de base de datos."
 Write-Host "--------------------------------------------------------"

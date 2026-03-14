@@ -9,6 +9,7 @@ use App\Http\Controllers\RankingController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\GalleryController;
+use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request; // Added for the closure route
 
 /*
@@ -26,6 +27,7 @@ Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
+Route::get('/videos/{id}/download', [VideoController::class, 'download']);
 
 Route::get('/time-slots', [TimeSlotController::class, 'index']);
 
@@ -55,6 +57,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Attendance (Admin/Staff)
         Route::get('/admin/attendance/pending', [AttendanceController::class, 'pending']);
         Route::post('/admin/attendance/confirm', [AttendanceController::class, 'confirm']);
+        Route::get('/admin/attendance/pending-competitions', [AttendanceController::class, 'pendingCompetitions']);
+        Route::post('/admin/attendance/confirm-competition', [AttendanceController::class, 'confirmCompetition']);
+        
+        // Extra Points (Admin/Staff)
+        Route::post('/dogs/{id}/extra-points', [DogController::class, 'giveExtraPoints']);
 
         // Reservations index moved to general authenticated routes
 
@@ -77,6 +84,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/reservations', [ReservationController::class, 'index']); // Ver todas o sus propias reservas
 
         Route::get('/dogs', [DogController::class, 'index']);
+        Route::get('/dogs/all', [DogController::class, 'all']);
         Route::post('/dogs', [DogController::class, 'store']);
         Route::get('/dogs/{id}', [DogController::class, 'show']);
         // Notifications
@@ -95,6 +103,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/reservations/{id}', [ReservationController::class, 'show']);
         Route::post('/reservations/{id}', [ReservationController::class, 'update']); // Solo su propia reserva
         Route::post('/reservations/{id}/delete', [ReservationController::class, 'destroy']); // Solo su propia reserva
+
+        Route::get('/videos', [VideoController::class, 'index']);
+        Route::post('/videos', [VideoController::class, 'store']);
+        Route::post('/videos/{id}/delete', [VideoController::class, 'destroy']);
+        Route::post('/videos/{id}/toggle-like', [VideoController::class, 'toggleLike']);
     });
 
 

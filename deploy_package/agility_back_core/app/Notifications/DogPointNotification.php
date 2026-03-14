@@ -42,7 +42,7 @@ class DogPointNotification extends Notification
             'type' => 'dog_point',
             'dog_id' => $this->dog->id,
             'nombre' => $this->dog->name,
-            'message' => '¡' . ($this->dog->name ?? 'Sin nombre') . ' ha recibido un punto para el ranking!, se ha verificado su asistencia a un entrenamiento',
+            'message' => '¡' . ($this->dog->name ?? 'Sin nombre') . ' ha recibido 3 puntos para el ranking!, se ha verificado su asistencia a un entrenamiento',
             'action_url' => '/ranking'
         ];
     }

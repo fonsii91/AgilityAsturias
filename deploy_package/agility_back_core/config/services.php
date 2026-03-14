@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'youtube' => [
+        'client_id' => env('YOUTUBE_CLIENT_ID'),
+        'client_secret' => env('YOUTUBE_CLIENT_SECRET'),
+        'refresh_token' => env('YOUTUBE_REFRESH_TOKEN'),
+    ],
+
 ];

@@ -15,7 +15,10 @@ class Dog extends Model
         'user_id',
         'name',
         'breed',
-        'age',
+        'birth_date',
+        'license_expiration_date',
+        'microchip',
+        'pedigree',
         'photo_url',
         'points',
     ];
@@ -33,5 +36,15 @@ class Dog extends Model
     public function competitions()
     {
         return $this->belongsToMany(Competition::class);
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
+
+    public function pointHistories()
+    {
+        return $this->hasMany(PointHistory::class);
     }
 }

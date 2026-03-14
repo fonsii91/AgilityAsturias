@@ -10,8 +10,10 @@ class RankingController extends Controller
     public function index()
     {
         // 1. Get all dogs with their current points and points obtained in the last 10 days.
-        $dogs = Dog::select('id', 'name', 'points', 'photo_url', 'user_id')
-            ->with('user:id,name,photo_url')
+        $dogs = Dog::select('id', 'name', 'breed', 'birth_date', 'license_expiration_date', 'microchip', 'pedigree', 'points', 'photo_url', 'user_id')
+            ->with(['user:id,name,photo_url', 'pointHistories' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            }])
             ->withCount([
                 'reservations as recent_points' => function ($query) {
                     // Count reservations that were marked as completed in the last 10 days
