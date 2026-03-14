@@ -28,6 +28,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -103,11 +104,11 @@
 }
 
 .dog-photo-container {
-  width: 120px;
-  height: 120px;
+  width: 300px;
+  height: 300px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid var(--accent-orange, var(--secondary-yellow, #F6D312));
+  border: 3px solid var(--accent-orange, var(--primary-blue, #0073CF));
   box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
   display: flex;
   align-items: center;
@@ -128,8 +129,8 @@
 
 .camera-btn-edit {
   position: absolute;
-  bottom: 0px;
-  right: 0px;
+  bottom: 25px;
+  right: 25px;
   background-color: var(--primary-blue, #0073CF);
   color: white;
   border-radius: 50%;
@@ -161,7 +162,7 @@
 }
 
 .dog-icon-large {
-  font-size: 4rem;
+  font-size: 9.5rem;
   line-height: 1;
   opacity: 0.8;
 }
@@ -312,11 +313,12 @@
 
 @keyframes zoomIn {
   from {
-      transform: scale(0.95);
-      opacity: 0;
+    transform: scale(0.95);
+    opacity: 0;
   }
+
   to {
-      transform: scale(1);
-      opacity: 1;
+    transform: scale(1);
+    opacity: 1;
   }
 }

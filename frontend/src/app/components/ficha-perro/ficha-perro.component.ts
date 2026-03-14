@@ -90,7 +90,10 @@ export class FichaPerroComponent implements OnChanges {
         }
     }
 
-    closeImageModal() {
+    closeImageModal(event?: Event) {
+        if (event) {
+            event.stopPropagation();
+        }
         this.imageModalOpen = false;
     }
 
