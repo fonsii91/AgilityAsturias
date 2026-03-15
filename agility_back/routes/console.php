@@ -8,4 +8,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 use Illuminate\Support\Facades\Schedule;
-Schedule::command('youtube:upload-videos')->dailyAt('02:00');
+// Using Schedule::call to avoid proc_open restrictions on Hostalia shared hosting
+Schedule::call(function () {
+    Artisan::call('youtube:upload-videos');
+})->dailyAt('23:00');

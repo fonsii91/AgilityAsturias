@@ -31,13 +31,13 @@ class UploadVideosToYouTube extends Command
             ->get();
 
         if ($videos->isEmpty()) {
-            $this->info('No videos to upload.');
+            \Illuminate\Support\Facades\Log::info('No videos to upload.');
             return;
         }
 
         // Check if credentials are set
         if (!config('services.youtube.client_id') || !config('services.youtube.client_secret') || !config('services.youtube.refresh_token')) {
-            $this->error('YouTube credentials are not configured in .env. Skipping upload.');
+            \Illuminate\Support\Facades\Log::error('YouTube credentials are not configured in .env. Skipping upload.');
             return;
         }
 
@@ -49,13 +49,13 @@ class UploadVideosToYouTube extends Command
         $youtube = new Google_Service_YouTube($client);
 
         foreach ($videos as $video) {
-            $this->info("Processing video ID: {$video->id}");
+            \Illuminate\Support\Facades\Log::info("Processing video ID: {$video->id}");
             $video->update(['status' => 'in_queue']);
 
             try {
                 // Ensure file exists
                 if (!$video->local_path || !Storage::disk('public')->exists($video->local_path)) {
-                    $this->error("File not found for video ID: {$video->id}");
+                    \Illuminate\Support\Facades\Log::error("File not found for video ID: {$video->id}");
                     $video->update(['status' => 'failed']);
                     continue;
                 }
@@ -106,7 +106,7 @@ class UploadVideosToYouTube extends Command
                 $client->setDefer(false);
 
                 if ($status && isset($status['id'])) {
-                    $this->info("Uploaded to YouTube with ID: {$status['id']}");
+                    \Illuminate\Support\Facades\Log::info("Uploaded to YouTube with ID: {$status['id']}");
 
                     Storage::disk('public')->delete($video->local_path);
 
@@ -116,7 +116,7 @@ class UploadVideosToYouTube extends Command
                     ]);
                 }
             } catch (\Exception $e) {
-                $this->error("Failed to upload video ID: {$video->id}. Error: " . $e->getMessage());
+                \Illuminate\Support\Facades\Log::error("Failed to upload video ID: {$video->id}. Error: " . $e->getMessage());
                 $video->update(['status' => 'failed']);
             }
         }

@@ -29,6 +29,19 @@ Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/videos/{id}/download', [VideoController::class, 'download']);
 
+// Backup endpoint to run scheduler from Hostalia via URL (bypassing CLI permission denied)
+Route::get('/run-scheduler-secret-1234', function () {
+    // Only run if the server thinks it's 02:10 (03:10 in Spain)
+    $currentTime = now()->copy()->format('H:i');
+    if ($currentTime == '02:10') {
+        $command = new \App\Console\Commands\UploadVideosToYouTube();
+        $command->handle();
+        return response()->json(['message' => 'Scheduler executed at 02:10, videos uploaded directly!']);
+    }
+    return response()->json(['message' => "Skipped. It is {$currentTime}, not 02:10 yet."]);
+});
+
+
 Route::get('/time-slots', [TimeSlotController::class, 'index']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
