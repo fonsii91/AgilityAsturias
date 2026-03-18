@@ -22,7 +22,7 @@
                     Clasificación</a></li>
             <li *ngIf="!authService.userProfileSignal()"><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
                     Galería</a></li>
-            <li *ngIf="authService.isAdmin()"><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
+            <li *ngIf="authService.isMember()"><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
                     Vídeos</a></li>
             <li *ngIf="authService.isMember()"><a routerLink="/calendario" routerLinkActive="active-route"><span
                         class="material-icons">calendar_month</span> Calendario</a>

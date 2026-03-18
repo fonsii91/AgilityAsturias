@@ -64,7 +64,7 @@
 
                 <div class="recent-emojis" *ngIf="dog.recentEmojis && dog.recentEmojis.length > 0">
                     <span *ngFor="let item of dog.recentEmojis" class="recent-emoji" [matTooltip]="item.category"
-                        matTooltipPosition="above">
+                        matTooltipPosition="above" (click)="openFicha(dog)" style="cursor: pointer;">
                         {{ item.emoji }}
                     </span>
                 </div>
