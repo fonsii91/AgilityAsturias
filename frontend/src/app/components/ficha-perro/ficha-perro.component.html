@@ -2,6 +2,17 @@
   <div class="modal-content ficha-perro-card" (click)="stopPropagation($event)">
     <div class="modal-header">
       <div class="header-title-group">
+        <div class="header-photo-container">
+          <img *ngIf="dog.photo_url" [src]="dog.photo_url" alt="Foto de {{ dog.name }}" class="header-photo"
+            [class.clickable-image]="!isEditing" (click)="!isEditing && openImageModal()">
+          <div *ngIf="!dog.photo_url" class="header-dog-icon">🐕</div>
+
+          <!-- Camera button for editing -->
+          <label *ngIf="isEditing" class="camera-btn-edit-small" title="Cambiar foto">
+            <span class="material-icons-outlined camera-icon-xs">photo_camera</span>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+          </label>
+        </div>
         <h3 *ngIf="!isEditing">{{ dog.name }}</h3>
         <h3 *ngIf="isEditing">Editar Perfil ✏️</h3>
       </div>
@@ -14,20 +25,6 @@
     </div>
 
     <div class="modal-body ficha-body">
-      <div class="dog-photo-container">
-        <!-- Photo display (clickable if not editing) -->
-        <img *ngIf="dog.photo_url" [src]="dog.photo_url" alt="Foto de {{ dog.name }}" class="dog-photo large-photo"
-          [class.clickable-image]="!isEditing" (click)="!isEditing && openImageModal()">
-
-        <div *ngIf="!dog.photo_url" class="dog-icon-large">🐕</div>
-
-        <!-- Camera button for editing -->
-        <label *ngIf="isEditing" class="camera-btn-edit" title="Cambiar foto">
-          <span class="material-icons-outlined camera-icon-small">photo_camera</span>
-          <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
-        </label>
-      </div>
-
 
       <div class="dog-details">
         <!-- Display Mode -->
