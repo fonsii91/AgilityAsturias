@@ -48,11 +48,67 @@
   flex-shrink: 0;
 }
 
+.header-title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .header-title-group h3 {
   margin: 0;
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--text-main, #333);
+}
+
+.header-photo-container {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--accent-orange, var(--primary-blue, #0073CF));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.header-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.header-dog-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.camera-btn-edit-small {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 2;
+}
+
+.camera-btn-edit-small:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.camera-icon-xs {
+  font-size: 18px;
 }
 
 .header-actions {
@@ -124,69 +180,7 @@
   background: #bbb;
 }
 
-.dog-photo-container {
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  overflow: hidden;
-  border: 3px solid var(--accent-orange, var(--primary-blue, #0073CF));
-  box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f9f9f9;
-  position: relative;
-}
 
-.clickable-image {
-  cursor: pointer;
-  transition: opacity 0.2s, transform 0.2s;
-}
-
-.clickable-image:hover {
-  opacity: 0.9;
-  transform: scale(1.02);
-}
-
-.camera-btn-edit {
-  position: absolute;
-  bottom: 25px;
-  right: 25px;
-  background-color: var(--primary-blue, #0073CF);
-  color: white;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s;
-  z-index: 2;
-}
-
-.camera-btn-edit:hover {
-  transform: scale(1.1);
-  background-color: var(--primary-blue-dark, #005bb5);
-}
-
-.camera-icon-small {
-  font-size: 18px;
-}
-
-.large-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.dog-icon-large {
-  font-size: 9.5rem;
-  line-height: 1;
-  opacity: 0.8;
-}
 
 .dog-details {
   width: 100%;
@@ -214,6 +208,16 @@
   font-weight: 700;
   color: var(--text-main, #333);
   font-size: 1.05rem;
+}
+
+.clickable-image {
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.clickable-image:hover {
+  opacity: 0.9;
+  transform: scale(1.05);
 }
 
 /* Edit Mode Styles */

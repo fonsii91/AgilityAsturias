@@ -9,17 +9,17 @@ class RankingController extends Controller
 {
     public function index()
     {
-        // 1. Get all dogs with their current points and points obtained in the last 10 days.
+        // 1. Get all dogs with their current points and points obtained in the last day.
         $dogs = Dog::select('id', 'name', 'breed', 'birth_date', 'license_expiration_date', 'microchip', 'pedigree', 'points', 'photo_url', 'user_id')
             ->with(['user:id,name,photo_url', 'pointHistories' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             }])
             ->withCount([
                 'reservations as recent_points' => function ($query) {
-                    // Count reservations that were marked as completed in the last 10 days
+                    // Count reservations that were marked as completed in the last day
                     $query->where('status', 'completed')
                         ->where('attendance_verified', true)
-                        ->where('updated_at', '>=', now()->subDays(10));
+                        ->where('updated_at', '>=', now()->subDays(1));
                 }
             ])
             ->where('points', '>', 0)
@@ -36,7 +36,7 @@ class RankingController extends Controller
             $dog->past_points = $dog->points - $dog->recent_points;
         }
 
-        // 3. Sort to get past ranking (10 days ago)
+        // 3. Sort to get past ranking (1 day ago)
         $pastRanking = $dogs->sortByDesc('past_points')->values();
 
         $pastPositions = [];

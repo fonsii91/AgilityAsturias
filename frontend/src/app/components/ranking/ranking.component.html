@@ -12,7 +12,7 @@
     <div *ngIf="!isLoading() && ranking().length > 0" class="ranking-content">
         <div class="ranking-list glass-effect">
             <div *ngFor="let dog of ranking(); let i = index" class="ranking-row" [class.top-rank]="i < 3"
-                [class.highlight-user-dog]="dog.user_id === authService.currentUserSignal()?.id">
+                [class.highlight-user-dog]="dog.user_id === authService.currentUserSignal()?.id" (click)="openFicha(dog)" style="cursor: pointer;">
                 <div class="rank-position">
                     <span class="medal-icon" *ngIf="i === 0">🥇</span>
                     <span class="medal-icon" *ngIf="i === 1">🥈</span>
@@ -20,7 +20,7 @@
                     <span class="number" *ngIf="i > 2">{{ i + 1 }}</span>
                 </div>
 
-                <div class="user-avatar-small" (click)="openFicha(dog)" style="cursor: pointer;">
+                <div class="user-avatar-small">
                     <!-- Standard size for everyone -->
                     <img [src]="dog.photo_url || 'Images/Agility_Asturias_logo.jpg'" alt="Dog"
                         onError="this.src='Images/Agility_Asturias_logo.jpg'">
@@ -32,7 +32,7 @@
                         <ng-container *ngIf="dog.position_change !== 0 && dog.position_change !== 'NEW'">
                             <!-- Position Up -->
                             <div class="position-badge position-up" *ngIf="dog.position_change > 0"
-                                title="Puestos subidos en los últimos 10 días">
+                                title="Puestos subidos en el último día">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20"
                                     fill="currentColor">
                                     <path fill-rule="evenodd"
@@ -44,7 +44,7 @@
 
                             <!-- Position Down -->
                             <div class="position-badge position-down" *ngIf="dog.position_change < 0"
-                                title="Puestos bajados en los últimos 10 días">
+                                title="Puestos bajados en el último día">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20"
                                     fill="currentColor">
                                     <path fill-rule="evenodd"

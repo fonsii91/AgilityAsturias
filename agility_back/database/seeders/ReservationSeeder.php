@@ -53,10 +53,10 @@ class ReservationSeeder extends Seeder
                     $dog->increment('points');
                 }
 
-                // 2. Generate recent reservations (less than 10 days ago)
+                // 2. Generate recent reservations (in the last 1 day)
                 $newResCount = rand(0, 5); // 0 to 5 new reservations
                 for ($i = 0; $i < $newResCount; $i++) {
-                    $recentDate = now()->subDays(rand(1, 9));
+                    $recentDate = now()->subDays(rand(0, 1));
                     \App\Models\Reservation::create([
                         'slot_id' => $slots->random()->id,
                         'user_id' => $user->id,

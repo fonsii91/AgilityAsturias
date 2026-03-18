@@ -1,5 +1,5 @@
 <div class="video-gallery-container">
-    
+
     <div class="action-top-bar">
         <div class="search-filters-group">
             <div class="search-bar">
@@ -122,8 +122,8 @@
                         Descargar
                     </button>
 
-                    <button *ngIf="video.user_id === currentUserId" (click)="openDeleteModal($event, video)" class="delete-btn"
-                        title="Eliminar vídeo">
+                    <button *ngIf="video.user_id === currentUserId" (click)="openDeleteModal($event, video)"
+                        class="delete-btn" title="Eliminar vídeo">
                         <svg xmlns="http://www.w3.org/2000/svg" class="delete-icon" viewBox="0 0 20 20"
                             fill="currentColor">
                             <path fill-rule="evenodd"
@@ -169,10 +169,29 @@
             <span class="material-icons">warning</span>
         </div>
         <h3>Eliminar Vídeo</h3>
-        <p>¿Estás seguro de que deseas eliminar el vídeo <strong>"{{ videoToDelete.title || videoToDelete.dog?.name }}"</strong>? Esta acción no se puede deshacer.</p>
+        <p>¿Estás seguro de que deseas eliminar el vídeo <strong>"{{ videoToDelete.title || videoToDelete.dog?.name
+                }}"</strong>? Esta acción no se puede deshacer.</p>
         <div class="modal-actions">
             <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
             <button class="btn-danger" (click)="confirmDelete()">Sí, Eliminar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Disclaimer de Funcionalidad en Pruebas -->
+<div class="modal-overlay disclaimer-overlay" *ngIf="showDisclaimerModal">
+    <div class="modal-content disclaimer-content" (click)="$event.stopPropagation()">
+        <div class="modal-icon-wrapper info-icon">
+            <span class="material-icons">info</span>
+        </div>
+        <h3 style="margin-bottom: 10px;">Vídeos en Pruebas</h3>
+        <p style="margin-bottom: 20px;">
+            La galería de vídeos (Cine Agility) es una <b>característica que se encuentra actualmente en desarrollo</b>.
+            Es posible que te encuentres con errores, fallos al subir vídeos, o tiempos de carga prolongados.
+            ¡Gracias por tu paciencia!
+        </p>
+        <div class="modal-actions" style="justify-content: center;">
+            <button class="btn-primary" (click)="closeDisclaimer()">Entendido</button>
         </div>
     </div>
 </div>
