@@ -72,7 +72,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/admin/attendance/confirm', [AttendanceController::class, 'confirm']);
         Route::get('/admin/attendance/pending-competitions', [AttendanceController::class, 'pendingCompetitions']);
         Route::post('/admin/attendance/confirm-competition', [AttendanceController::class, 'confirmCompetition']);
-        
+
         // Extra Points (Admin/Staff)
         Route::post('/dogs/{id}/extra-points', [DogController::class, 'giveExtraPoints']);
 
@@ -84,10 +84,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     });
 
-    // Event Attendance
-    Route::post('/competitions/{id}/attend', [CompetitionController::class, 'attend']);
-    Route::post('/competitions/{id}/unattend', [CompetitionController::class, 'unattend']);
-    Route::get('/competitions/{id}/attendees', [CompetitionController::class, 'getAttendees']);
 
     Route::middleware(['role:admin,staff,member'])->group(function () {
         // Ranking
@@ -119,8 +115,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('/videos', [VideoController::class, 'index']);
         Route::post('/videos', [VideoController::class, 'store']);
+        Route::post('/videos/{id}', [VideoController::class, 'update']);
         Route::post('/videos/{id}/delete', [VideoController::class, 'destroy']);
         Route::post('/videos/{id}/toggle-like', [VideoController::class, 'toggleLike']);
+
+        // Event Attendance
+        Route::post('/competitions/{id}/attend', [CompetitionController::class, 'attend']);
+        Route::post('/competitions/{id}/unattend', [CompetitionController::class, 'unattend']);
+        Route::get('/competitions/{id}/attendees', [CompetitionController::class, 'getAttendees']);
+
     });
 
 

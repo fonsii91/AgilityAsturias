@@ -117,11 +117,44 @@ export class UploadVideoComponent implements OnInit {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
+    async fetchWithProgress(url: string, mimeType: string, isMainFiles: boolean = false): Promise<string> {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
+        
+        const contentLength = response.headers.get('content-length');
+        const total = contentLength ? parseInt(contentLength, 10) : 0;
+        let loaded = 0;
+        
+        const reader = response.body?.getReader();
+        if (!reader) {
+            const blob = await response.blob();
+            return URL.createObjectURL(new Blob([blob], { type: mimeType }));
+        }
+        
+        const chunks: Uint8Array[] = [];
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (value) {
+                chunks.push(value);
+                loaded += value.length;
+                if (total && isMainFiles) {
+                    const progress = Math.round((loaded / total) * 100);
+                    this.compressionMessage = `Descargando motor de compresión... ${progress}%`;
+                    this.cdr.detectChanges();
+                }
+            }
+        }
+        
+        const blob = new Blob(chunks as any, { type: mimeType });
+        return URL.createObjectURL(blob);
+    }
+
     async loadFFmpeg() {
         if (this.ffmpeg.loaded) return;
 
         this.isCompressing = true;
-        this.compressionMessage = 'Cargando motor de compresión...';
+        this.compressionMessage = 'Cargando motor de compresión (30MB)...';
         this.cdr.detectChanges();
 
         this.ffmpeg.on('progress', ({ progress }) => {
@@ -131,10 +164,31 @@ export class UploadVideoComponent implements OnInit {
         });
 
         const baseURL = 'assets/ffmpeg';
-        await this.ffmpeg.load({
-            coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
-        });
+        let workerUrl = '';
+        try {
+            const check = await fetch(`${baseURL}/814.ffmpeg.js`, { method: 'HEAD' });
+            if (!check.ok) throw new Error('Not found locally');
+            workerUrl = await toBlobURL(`${baseURL}/814.ffmpeg.js`, 'application/javascript');
+        } catch (e) {
+            workerUrl = await toBlobURL('https://unpkg.com/@ffmpeg/ffmpeg@0.12.15/dist/umd/814.ffmpeg.js', 'application/javascript');
+        }
+
+        const OriginalWorker = window.Worker;
+        window.Worker = function(url: string | URL, options?: WorkerOptions) {
+            // Force classic worker by stripping `{ type: 'module' }`.
+            // Module workers prevent `importScripts`, which crashes the UMD worker internally.
+            return new OriginalWorker(url);
+        } as any;
+
+        try {
+            await this.ffmpeg.load({
+                coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
+                wasmURL: await this.fetchWithProgress(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm', true),
+                classWorkerURL: workerUrl
+            });
+        } finally {
+            window.Worker = OriginalWorker;
+        }
     }
 
     async compressVideo(file: File): Promise<File> {
@@ -189,9 +243,10 @@ export class UploadVideoComponent implements OnInit {
                 finalFile = await this.compressVideo(this.selectedFile);
             } catch (error) {
                 console.error('Error comprimiendo vídeo', error);
-                this.toastService.error('Error al comprimir el vídeo en local. Se intentará subir el original.');
+                this.toastService.error('Error al comprimir. El archivo original es demasiado pesado para subirlo sin comprimir (>100MB).');
                 this.isCompressing = false;
                 this.cdr.detectChanges();
+                return;
             }
         }
 

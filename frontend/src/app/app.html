@@ -15,7 +15,7 @@
                 class="material-icons">emoji_events</span> Clasificación</a></li>
           <li *ngIf="!authService.userProfileSignal()"><a routerLink="/galeria" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">photo_library</span>
               Galería</a></li>
-          <li *ngIf="authService.isAdmin()"><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *ngIf="authService.isMember()"><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">movie</span>
               Vídeos</a></li>
           <li *ngIf="authService.isMember()"><a routerLink="/calendario" routerLinkActive="active-route" (click)="sidenav.close()"><span

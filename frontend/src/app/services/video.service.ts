@@ -46,6 +46,10 @@ export class VideoService {
         return this.http.post(`${this.apiUrl}/${id}/delete`, {});
     }
 
+    updateVideo(id: number, data: any): Observable<Video> {
+        return this.http.post<Video>(`${this.apiUrl}/${id}`, data);
+    }
+
     toggleLike(id: number): Observable<any> {
         return this.http.post<any>(`${this.apiUrl}/${id}/toggle-like`, {});
     }

@@ -29,6 +29,9 @@ export class VideoListComponent implements OnInit {
     videos: Video[] = [];
     currentUserId: number | null = null;
     videoToDelete: Video | null = null;
+    videoToEdit: Video | null = null;
+    editData: any = {};
+    isSavingEdit = false;
     currentPage = 1;
     totalPages = 1;
     isLoading = true;
@@ -197,6 +200,56 @@ export class VideoListComponent implements OnInit {
                 console.error('Error deleting video', err);
                 this.toastService.error('Hubo un error al eliminar el vídeo');
                 this.videoToDelete = null;
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
+    openEditModal(event: Event, video: Video) {
+        event.stopPropagation();
+        this.videoToEdit = video;
+        this.editData = {
+            title: video.title || '',
+            date: video.date || '',
+            dog_id: video.dog_id || (video.dog ? video.dog.id : ''),
+            competition_id: video.competition_id || (video.competition ? video.competition.id : '')
+        };
+        this.cdr.detectChanges();
+    }
+
+    closeEditModal() {
+        this.videoToEdit = null;
+        this.cdr.detectChanges();
+    }
+
+    saveVideoChanges() {
+        if (!this.videoToEdit || this.isSavingEdit) return;
+
+        if (!this.editData.dog_id || !this.editData.date) {
+            this.toastService.error('Por favor completa los campos obligatorios (Perro y Fecha).');
+            return;
+        }
+
+        this.isSavingEdit = true;
+        this.cdr.detectChanges();
+
+        this.videoService.updateVideo(this.videoToEdit.id, this.editData).subscribe({
+            next: (updatedVideo) => {
+                this.toastService.success('Vídeo actualizado correctamente');
+                const index = this.videos.findIndex(v => v.id === updatedVideo.id);
+                if (index !== -1) {
+                    updatedVideo.likes_count = this.videos[index].likes_count;
+                    updatedVideo.is_liked_by_user = this.videos[index].is_liked_by_user;
+                    this.videos[index] = updatedVideo;
+                }
+                this.isSavingEdit = false;
+                this.videoToEdit = null;
+                this.cdr.detectChanges();
+            },
+            error: (err) => {
+                console.error('Error updating video', err);
+                this.toastService.error('Hubo un error al actualizar el vídeo');
+                this.isSavingEdit = false;
                 this.cdr.detectChanges();
             }
         });

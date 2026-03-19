@@ -115,6 +115,32 @@ class VideoController extends Controller
         return response()->json($video->load(['dog']), 201);
     }
 
+    public function update(Request $request, $id)
+    {
+        $video = Video::findOrFail($id);
+
+        $user = auth()->user();
+        if ($video->user_id !== $user->id && !in_array($user->role, ['admin', 'staff'])) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'dog_id' => 'required|exists:dogs,id',
+            'competition_id' => 'nullable|exists:competitions,id',
+            'date' => 'required|date',
+            'title' => 'nullable|string|max:255'
+        ]);
+
+        $video->update([
+            'dog_id' => $request->dog_id,
+            'competition_id' => $request->competition_id,
+            'date' => $request->date,
+            'title' => $request->title,
+        ]);
+
+        return response()->json($video->load(['dog', 'user', 'competition']));
+    }
+
     public function destroy($id)
     {
         $video = Video::findOrFail($id);

@@ -122,8 +122,20 @@
                         Descargar
                     </button>
 
-                    <button *ngIf="video.user_id === currentUserId" (click)="openDeleteModal($event, video)"
-                        class="delete-btn" title="Eliminar vídeo">
+                    <button
+                        *ngIf="video.user_id === currentUserId || authService.currentUserSignal()?.role === 'admin' || authService.currentUserSignal()?.role === 'staff'"
+                        (click)="openEditModal($event, video)" class="edit-btn" title="Editar vídeo"
+                        style="background: none; border: none; color: #4b5563; cursor: pointer; padding: 4px; border-radius: 4px; transition: all 0.2s ease;">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="edit-icon" viewBox="0 0 20 20"
+                            fill="currentColor" style="width: 20px; height: 20px;">
+                            <path
+                                d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                    </button>
+
+                    <button
+                        *ngIf="video.user_id === currentUserId || authService.currentUserSignal()?.role === 'admin' || authService.currentUserSignal()?.role === 'staff'"
+                        (click)="openDeleteModal($event, video)" class="delete-btn" title="Eliminar vídeo">
                         <svg xmlns="http://www.w3.org/2000/svg" class="delete-icon" viewBox="0 0 20 20"
                             fill="currentColor">
                             <path fill-rule="evenodd"
@@ -175,6 +187,58 @@
             <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
             <button class="btn-danger" (click)="confirmDelete()">Sí, Eliminar</button>
         </div>
+    </div>
+</div>
+
+<!-- Modal de Edición de Vídeo -->
+<div class="modal-overlay" *ngIf="videoToEdit">
+    <div class="modal-content edit-modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3><span class="material-icons edit-header-icon">edit</span> Detalles del Vídeo</h3>
+            <button class="close-btn" (click)="closeEditModal()">&times;</button>
+        </div>
+
+        <form (ngSubmit)="saveVideoChanges()">
+            <div class="form-group">
+                <label class="form-label">Título (Opcional)</label>
+                <input type="text" name="title" [(ngModel)]="editData.title" placeholder="Título del vídeo"
+                    class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Perro *</label>
+                <div class="select-wrapper">
+                    <select name="dog_id" [(ngModel)]="editData.dog_id" required class="form-input">
+                        <option value="">Selecciona un perro...</option>
+                        <option *ngFor="let dog of dogService.getAllDogs()()" [value]="dog.id">{{ dog.name }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Competición / Evento (Opcional)</label>
+                <div class="select-wrapper">
+                    <select name="competition_id" [(ngModel)]="editData.competition_id" class="form-input">
+                        <option value="">Ninguna / Entrenamiento</option>
+                        <option *ngFor="let comp of compService.getCompetitions()()" [value]="comp.id">{{ comp.nombre ||
+                            comp.lugar }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label">Fecha del Vídeo *</label>
+                <input type="date" name="date" [(ngModel)]="editData.date" required class="form-input">
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" (click)="closeEditModal()"
+                    [disabled]="isSavingEdit">Cancelar</button>
+                <button type="submit" class="btn-primary" [disabled]="isSavingEdit">
+                    {{ isSavingEdit ? 'Guardando...' : 'Guardar' }}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 
