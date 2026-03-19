@@ -2,20 +2,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 10000;
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
+  padding: 1.5rem;
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
 }
 
 .ficha-perro-card {
   max-width: 420px;
-  width: 90%;
-  max-height: 90vh;
+  width: 100%;
+  min-height: 50vh;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   border-radius: var(--border-radius-lg, 16px);
@@ -73,7 +75,7 @@
   background: #f9f9f9;
   position: relative;
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .header-photo {
@@ -156,11 +158,11 @@
 }
 
 .ficha-body {
-  padding: 2rem;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.2rem;
   overflow-y: auto;
   flex-grow: 1;
 }
@@ -168,14 +170,17 @@
 .ficha-body::-webkit-scrollbar {
   width: 6px;
 }
+
 .ficha-body::-webkit-scrollbar-track {
   background: transparent;
   margin: 10px 0;
 }
+
 .ficha-body::-webkit-scrollbar-thumb {
   background: #ddd;
   border-radius: 4px;
 }
+
 .ficha-body::-webkit-scrollbar-thumb:hover {
   background: #bbb;
 }
@@ -307,7 +312,7 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 2000;
+  z-index: 11000;
 }
 
 .close-image-btn {
@@ -319,7 +324,7 @@
   color: white;
   font-size: 2.5rem;
   cursor: pointer;
-  z-index: 2001;
+  z-index: 11001;
   transition: color 0.2s;
 }
 
@@ -341,6 +346,7 @@
     transform: scale(0.95);
     opacity: 0;
   }
+
   to {
     transform: scale(1);
     opacity: 1;
@@ -378,6 +384,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
+  min-height: 120px;
   max-height: 250px;
   overflow-y: auto;
   padding-right: 0.5rem;
@@ -387,14 +394,17 @@
 .history-list::-webkit-scrollbar {
   width: 6px;
 }
+
 .history-list::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 4px;
 }
+
 .history-list::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 4px;
 }
+
 .history-list::-webkit-scrollbar-thumb:hover {
   background: #999;
 }

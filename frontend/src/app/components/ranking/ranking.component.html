@@ -76,8 +76,9 @@
         </div>
     </div>
 
+</div>
+
     <!-- Ficha Perro Modal -->
     <app-ficha-perro *ngIf="selectedDogModal()" [dog]="selectedDogModal()" [isOpen]="fichaModalOpen()"
         (close)="closeFicha()" (save)="saveDogFicha($event)">
     </app-ficha-perro>
-</div>

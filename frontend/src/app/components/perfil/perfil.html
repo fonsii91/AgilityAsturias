@@ -95,8 +95,9 @@
         </div>
     </div>
 
+</div>
+
     <!-- Ficha Perro Modal -->
     <app-ficha-perro *ngIf="selectedDogFicha()" [dog]="selectedDogFicha()!" [isOpen]="fichaModalOpen()"
         [startInEditMode]="fichaStartInEditMode()" (close)="closeFicha()" (save)="saveDogFicha($event)">
     </app-ficha-perro>
-</div>

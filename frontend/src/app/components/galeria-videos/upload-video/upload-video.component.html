@@ -65,7 +65,7 @@
 
         <!-- Drag and Drop Zone -->
         <div class="form-group">
-            <label>Archivo de Vídeo * <span style="font-weight: normal; font-size: 0.85em; color: var(--text-light);">(Máx aprox 380MB, si no se comprime)</span></label>
+            <label>Archivo de Vídeo * <span style="font-weight: normal; font-size: 0.85em; color: var(--text-light);">(Máx aprox 100MB, si no se comprime)</span></label>
             
             <div *ngIf="!selectedFile" class="drag-drop-zone" [class.drag-over]="isDragging"
                 (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"

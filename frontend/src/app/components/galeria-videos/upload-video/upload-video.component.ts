@@ -183,8 +183,8 @@ export class UploadVideoComponent implements OnInit {
         }
 
         let finalFile = this.selectedFile;
-        // Solo comprimir si es mayor a 380MB (Al borde de los 400MB de Hostalia)
-        if (this.selectedFile.size > 380 * 1024 * 1024) {
+        // Solo comprimir si es mayor a 100MB (Límite del servidor)
+        if (this.selectedFile.size > 100 * 1024 * 1024) {
             try {
                 finalFile = await this.compressVideo(this.selectedFile);
             } catch (error) {
