@@ -8,7 +8,10 @@ export const CATEGORY_EMOJIS: Record<string, string> = {
     'Pis': '💦',
     'Pis en pista': '💦',
     'Asistencia a clase': '🎓',
-    'Asistencia a entrenamiento': '🎓'
+    'Asistencia a entrenamiento': '🎓',
+    'Falta sin avisar': '👻',
+    'Retraso': '⏳',
+    'Molestar a un perro en pista': '🤫'
 };
 
 export function getEmojiForCategory(category: string, points?: number): string {

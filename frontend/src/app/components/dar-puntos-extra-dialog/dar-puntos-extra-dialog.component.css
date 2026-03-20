@@ -7,11 +7,15 @@
     max-width: 400px;
     width: 100%;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .dialog-header {
     margin-bottom: 24px;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .dialog-title {
@@ -31,6 +35,21 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow-y: auto;
+    max-height: 60vh;
+    padding-right: 4px;
+}
+
+/* Scrollbar styling for smoother look */
+.dialog-content::-webkit-scrollbar {
+    width: 6px;
+}
+.dialog-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.dialog-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
 }
 
 .form-group {
@@ -108,10 +127,11 @@ select:focus, input:focus {
 }
 
 .dialog-actions {
-    margin-top: 32px;
+    margin-top: 24px;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .cancel-btn, .submit-btn {

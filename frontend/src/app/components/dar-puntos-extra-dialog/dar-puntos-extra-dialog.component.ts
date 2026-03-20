@@ -37,6 +37,9 @@ export class DarPuntosExtraDialogComponent implements OnInit {
   ];
 
   negativeCategories = [
+    'Falta sin avisar',
+    'Retraso',
+    'Molestar a un perro en pista',
     'Caca',
     'Pis',
     'Otro'

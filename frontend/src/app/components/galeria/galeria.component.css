@@ -246,12 +246,8 @@ h2 {
     justify-content: center;
     cursor: pointer;
     z-index: 10;
-    opacity: 0;
-    transition: opacity 0.3s, background-color 0.2s;
-}
-
-.gallery-item:hover .delete-btn {
     opacity: 1;
+    transition: background-color 0.2s;
 }
 
 .delete-btn:hover {
