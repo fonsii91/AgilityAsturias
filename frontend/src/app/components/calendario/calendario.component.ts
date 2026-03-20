@@ -1,4 +1,4 @@
-import { Component, computed, Signal, signal, inject, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, computed, Signal, signal, inject, ChangeDetectorRef, NgZone, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CompetitionService } from '../../services/competition.service';
 import { AuthService } from '../../services/auth.service';
@@ -24,7 +24,7 @@ interface CalendarDay {
     templateUrl: './calendario.component.html',
     styleUrls: ['./calendario.component.css']
 })
-export class CalendarioComponent {
+export class CalendarioComponent implements AfterViewInit {
     currentYear = signal(new Date().getFullYear());
     monthNames = [
         'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -65,6 +65,7 @@ export class CalendarioComponent {
     dogService = inject(DogService);
     isConfirmingAttendance = false;
     selectedDogIds = new Set<number>();
+    selectedAttendanceDays = new Set<string>();
     viewingAttendees = false;
     attendees: any[] = [];
     isLoadingAttendees = false;
@@ -74,6 +75,20 @@ export class CalendarioComponent {
 
     constructor(private competitionService: CompetitionService) {
         this.competitions = this.competitionService.getCompetitions();
+    }
+
+    ngAfterViewInit() {
+        setTimeout(() => this.scrollToCurrentMonth(), 300);
+    }
+
+    scrollToCurrentMonth() {
+        const today = new Date();
+        if (this.currentYear() === today.getFullYear()) {
+            const currentMonthElement = document.getElementById(`month-${today.getMonth()}`);
+            if (currentMonthElement && window.innerWidth <= 768) {
+                currentMonthElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
     }
 
     openModal(day: CalendarDay) {
@@ -113,8 +128,12 @@ export class CalendarioComponent {
         this.viewingAttendees = false;
         this.attendees = [];
         this.selectedDogIds.clear();
+        this.selectedAttendanceDays.clear();
         if (this.selectedCompetition?.attendingDogIds) {
             this.selectedDogIds = new Set(this.selectedCompetition.attendingDogIds);
+        }
+        if (this.selectedCompetition?.diasAsistencia) {
+            this.selectedAttendanceDays = new Set(this.selectedCompetition.diasAsistencia);
         }
     }
 
@@ -205,6 +224,7 @@ export class CalendarioComponent {
         this.isConfirmingAttendance = false;
         this.viewingAttendees = false;
         this.attendees = [];
+        this.selectedAttendanceDays.clear();
 
         document.body.style.overflow = 'auto';
     }
@@ -212,14 +232,26 @@ export class CalendarioComponent {
     // Attendance Methods
     startAttendance() {
         this.isConfirmingAttendance = true;
+        
+        // Auto-select all user's dogs if it's a new attendance
+        if (this.selectedCompetition && !this.selectedCompetition.isAttending) {
+            const currentDogs = this.userDogs();
+            if (currentDogs && currentDogs.length > 0) {
+                currentDogs.forEach(dog => this.selectedDogIds.add(dog.id));
+            }
+        }
     }
 
     cancelAttendanceForm() {
         this.isConfirmingAttendance = false;
         // Revert selected dogs to whatever was saved
         this.selectedDogIds.clear();
+        this.selectedAttendanceDays.clear();
         if (this.selectedCompetition?.attendingDogIds) {
             this.selectedDogIds = new Set(this.selectedCompetition.attendingDogIds);
+        }
+        if (this.selectedCompetition?.diasAsistencia) {
+            this.selectedAttendanceDays = new Set(this.selectedCompetition.diasAsistencia);
         }
     }
 
@@ -231,15 +263,57 @@ export class CalendarioComponent {
         }
     }
 
+    toggleAttendanceDay(dayStr: string) {
+        if (this.selectedAttendanceDays.has(dayStr)) {
+            this.selectedAttendanceDays.delete(dayStr);
+        } else {
+            this.selectedAttendanceDays.add(dayStr);
+        }
+    }
+
+    getEventDays(comp: any): Date[] {
+        if (!comp) return [];
+        const days: Date[] = [];
+        const start = new Date(comp.fechaEvento);
+        const end = comp.fechaFinEvento ? new Date(comp.fechaFinEvento) : new Date(comp.fechaEvento);
+        
+        const current = new Date(start);
+        while (current <= end) {
+            days.push(new Date(current));
+            current.setDate(current.getDate() + 1);
+        }
+        return days;
+    }
+    
+    formatDateToIso(date: Date): string {
+        const y = date.getFullYear();
+        const m = (date.getMonth() + 1).toString().padStart(2, '0');
+        const d = date.getDate().toString().padStart(2, '0');
+        return `${y}-${m}-${d}`;
+    }
+
     async confirmAttendance() {
         if (!this.selectedCompetition) return;
         try {
             const dogIdsArray = Array.from(this.selectedDogIds);
-            await this.competitionService.attendCompetition(this.selectedCompetition.id, dogIdsArray);
+            const daysArray = Array.from(this.selectedAttendanceDays);
+            
+            const eventDays = this.getEventDays(this.selectedCompetition);
+            if (eventDays.length > 1 && daysArray.length === 0) {
+                alert('Por favor, selecciona al menos un día para asistir al evento.');
+                return;
+            }
+
+            if (eventDays.length === 1 && daysArray.length === 0) {
+                daysArray.push(this.formatDateToIso(eventDays[0]));
+            }
+
+            await this.competitionService.attendCompetition(this.selectedCompetition.id, dogIdsArray, daysArray);
 
             // Update local state temporarily, or rely on a fresh refetch
             this.selectedCompetition.isAttending = true;
             this.selectedCompetition.attendingDogIds = dogIdsArray;
+            this.selectedCompetition.diasAsistencia = daysArray;
             this.isConfirmingAttendance = false;
 
             if (this.viewingAttendees) {
@@ -256,7 +330,9 @@ export class CalendarioComponent {
             await this.competitionService.unattendCompetition(this.selectedCompetition.id);
             this.selectedCompetition.isAttending = false;
             this.selectedCompetition.attendingDogIds = [];
+            this.selectedCompetition.diasAsistencia = [];
             this.selectedDogIds.clear();
+            this.selectedAttendanceDays.clear();
 
             if (this.viewingAttendees) {
                 this.loadAttendees();

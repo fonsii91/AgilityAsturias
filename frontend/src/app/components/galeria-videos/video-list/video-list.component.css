@@ -130,11 +130,18 @@
 /* Tarjeta individual de vídeo */
 .video-card {
     background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #f1f5f9;
+}
+
+.video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
 }
 
 .video-info {
@@ -386,21 +393,101 @@
     color: #fff;
 }
 
-.video-subtitle {
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin: 0;
+/* --- New Video Info Styles --- */
+
+.video-author-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.dog-avatar-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dog-avatar-wrapper:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.dog-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.dog-avatar-placeholder {
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.author-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.dog-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.25rem 0;
+    flex-wrap: wrap;
 }
 
 .dog-name {
-    font-weight: 600;
-    color: #495057;
+    font-weight: 700;
+    color: #1a202c;
+    font-size: 0.95rem;
+    transition: color 0.2s;
+}
+
+.dog-name:hover {
+    color: var(--primary-color, #0d6efd);
+}
+
+.competition-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    background-color: #f1f5f9;
+    color: #475569;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    font-weight: 500;
+}
+
+.comp-icon {
+    font-size: 14px !important;
+    color: #f59e0b;
 }
 
 .uploader-name {
     font-size: 0.8rem;
-    color: #888;
-    margin: 0.25rem 0 0 0;
+    color: #64748b;
+    margin: 0;
+}
+
+.uploader-name strong {
+    color: #334155;
+    font-weight: 600;
 }
 
 .video-meta {
@@ -409,15 +496,102 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.video-date {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 500;
+}
+
+.date-icon {
+    font-size: 16px !important;
+}
+
+.video-actions-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.icon-btn .material-icons {
+    font-size: 18px;
+}
+
+.icon-btn:hover {
+    background-color: var(--primary-color, #0d6efd);
+    color: #fff;
+    border-color: var(--primary-color, #0d6efd);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+}
+
+.delete-icon-btn:hover {
+    background-color: var(--error-color, #e53e3e);
+    border-color: var(--error-color, #e53e3e);
+    color: white;
+    box-shadow: 0 4px 6px rgba(229, 62, 62, 0.2);
+}
+
+/* Tooltip Styles */
+.tooltip-btn {
+    position: relative;
+}
+
+.tooltip-btn:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-5px);
+    background-color: #1e293b;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
     font-size: 0.75rem;
-    color: #999;
+    white-space: nowrap;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.tooltip-btn:hover::before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #1e293b transparent transparent transparent;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 10;
 }
 
 .status-badge {
-    padding: 0.25rem 0.5rem;
+    padding: 0.25rem 0.6rem;
     border-radius: 9999px;
     color: #fff;
     font-weight: 500;
+    font-size: 0.75rem;
 }
 
 .status-local {

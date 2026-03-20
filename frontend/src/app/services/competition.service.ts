@@ -69,9 +69,9 @@ export class CompetitionService {
         });
     }
 
-    attendCompetition(id: number, dogIds: number[] = []) {
+    attendCompetition(id: number, dogIds: number[] = [], diasAsistencia: string[] = []) {
         return new Promise<any>((resolve, reject) => {
-            this.http.post<any>(`${this.apiUrl}/${id}/attend`, { dog_ids: dogIds }).subscribe({
+            this.http.post<any>(`${this.apiUrl}/${id}/attend`, { dog_ids: dogIds, dias_asistencia: diasAsistencia }).subscribe({
                 next: (res) => resolve(res),
                 error: (err) => reject(err)
             });
@@ -124,7 +124,8 @@ export class CompetitionService {
             tipo: data.tipo,
             cartel: data.cartel,
             isAttending: !!data.is_attending,
-            attendingDogIds: data.attending_dog_ids || []
+            attendingDogIds: data.attending_dog_ids || [],
+            diasAsistencia: data.dias_asistencia || []
         };
     }
 }

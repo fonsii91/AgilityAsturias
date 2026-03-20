@@ -7,7 +7,7 @@ Write-Host "Iniciando preparación del paquete de despliegue (Excluyendo vendor)
 
 # 1. Definir rutas
 $rootDir = Get-Location
-$deployDir = "$rootDir\deploy_package"
+$deployDir = "$rootDir\deploy_package_new"
 $frontendDist = "$rootDir\frontend\dist\AgilityAsturias\browser"
 $backendSrc = "$rootDir\agility_back"
 

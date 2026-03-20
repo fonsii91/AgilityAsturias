@@ -12,4 +12,5 @@ export interface Competition {
 
     isAttending?: boolean;
     attendingDogIds?: number[];
+    diasAsistencia?: string[];
 }

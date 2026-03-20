@@ -120,7 +120,9 @@ class VideoController extends Controller
         $video = Video::findOrFail($id);
 
         $user = auth()->user();
-        if ($video->user_id !== $user->id && !in_array($user->role, ['admin', 'staff'])) {
+        $isDogOwner = $video->dog && $video->dog->user_id === $user->id;
+
+        if ($video->user_id !== $user->id && !$isDogOwner && !in_array($user->role, ['admin', 'staff'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -146,7 +148,9 @@ class VideoController extends Controller
         $video = Video::findOrFail($id);
 
         $user = auth()->user();
-        if ($video->user_id !== $user->id && !in_array($user->role, ['admin', 'staff'])) {
+        $isDogOwner = $video->dog && $video->dog->user_id === $user->id;
+
+        if ($video->user_id !== $user->id && !$isDogOwner && !in_array($user->role, ['admin', 'staff'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

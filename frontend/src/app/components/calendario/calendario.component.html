@@ -31,7 +31,7 @@
     </div>
 
     <div class="months-grid">
-        <div class="month-card" *ngFor="let month of months()">
+        <div class="month-card" *ngFor="let month of months(); let i = index" [id]="'month-' + i">
             <h2>{{ month.name }}</h2>
             <div class="weekdays">
                 <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
@@ -233,6 +233,46 @@
                             <p *ngIf="!userDogs() || userDogs().length === 0" class="no-dogs-msg">No tienes perros
                                 registrados.</p>
 
+                            <ng-container *ngIf="getEventDays(selectedCompetition).length > 1">
+                                <h4 style="margin-top: 1.5rem;">📅 ¿Qué días asistirás?</h4>
+                                <p class="subtitle" style="margin-bottom: 8px;">Este evento dura varios días. <strong style="color: #e65100;">Debes seleccionar al menos un día</strong> para confirmar tu asistencia:</p>
+                                
+                                <div *ngIf="selectedAttendanceDays.size === 0" style="background-color: #fff3e0; border-left: 4px solid #ff9800; padding: 8px 12px; font-size: 0.85rem; color: #e65100; margin-bottom: 12px; border-radius: 4px; display: inline-flex; align-items: center;">
+                                    <span class="material-icons-outlined" style="font-size: 1rem; margin-right: 6px;">info</span>
+                                    <span>Haz clic en los días a los que tienes pensado ir.</span>
+                                </div>
+                                
+                                <div class="days-selectable-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 1.5rem;">
+                                    <div class="day-large-card" *ngFor="let day of getEventDays(selectedCompetition)"
+                                        (click)="toggleAttendanceDay(formatDateToIso(day))"
+                                        style="padding: 12px; border-radius: 12px; border: 2px solid; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; position: relative; overflow: hidden; background: white; user-select: none;"
+                                        [style.borderColor]="selectedAttendanceDays.has(formatDateToIso(day)) ? '#e65100' : '#e0e0e0'"
+                                        [style.boxShadow]="selectedAttendanceDays.has(formatDateToIso(day)) ? '0 4px 12px rgba(230, 81, 0, 0.15)' : 'none'"
+                                        [style.transform]="selectedAttendanceDays.has(formatDateToIso(day)) ? 'translateY(-2px)' : 'none'">
+                                        
+                                        <!-- Top Accent Line for Selected State -->
+                                        <div *ngIf="selectedAttendanceDays.has(formatDateToIso(day))" style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);"></div>
+                                        
+                                        <!-- Day name (Mon, Tue) -->
+                                        <div style="font-size: 0.8rem; color: #666; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 4px; margin-bottom: 2px;">{{ day | date:'EEEE' }}</div>
+                                        
+                                        <!-- Day number (15) -->
+                                        <div style="font-size: 1.8rem; font-weight: 900; line-height: 1; margin-bottom: 2px; transition: color 0.2s;"
+                                             [style.color]="selectedAttendanceDays.has(formatDateToIso(day)) ? '#e65100' : '#333'">
+                                            {{ day | date:'d' }}
+                                        </div>
+                                        
+                                        <!-- Month name (Mar) -->
+                                        <div style="font-size: 0.85rem; color: #888; font-weight: 500;">{{ day | date:'MMM' }}</div>
+                                        
+                                        <!-- Checkmark Badge -->
+                                        <div *ngIf="selectedAttendanceDays.has(formatDateToIso(day))" style="position: absolute; bottom: 8px; right: 8px; background: #e65100; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(230, 81, 0, 0.3);">
+                                            <span class="material-icons-outlined" style="font-size: 14px; font-weight: 900;">check</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </ng-container>
+
                             <div class="form-actions-premium">
                                 <button class="btn-cancel" (click)="cancelAttendanceForm()">Cancelar</button>
                                 <button class="btn-save" (click)="confirmAttendance()">Guardar Asistencia</button>
@@ -268,7 +308,15 @@
                                     <div class="attendee-info">
                                         <img [src]="attendee.photo_url || 'assets/default-user.png'"
                                             class="attendee-avatar" referrerpolicy="no-referrer">
-                                        <span class="attendee-name">{{ attendee.name }}</span>
+                                        <div style="display: flex; flex-direction: column;">
+                                            <span class="attendee-name">{{ attendee.name }}</span>
+                                            <div *ngIf="attendee.dias_asistencia?.length > 0" style="font-size: 0.8rem; color: #666; margin-top: 2px;">
+                                                <span class="material-icons-outlined" style="font-size: 0.8rem; vertical-align: middle; margin-right: 2px;">event</span>
+                                                <span *ngFor="let day of attendee.dias_asistencia; let last = last" style="vertical-align: middle; text-transform: capitalize;">
+                                                    {{ day | date:'EEEE d' }}<span *ngIf="!last">, </span>
+                                                </span>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="attendee-dogs-list" *ngIf="attendee.attending_dogs?.length > 0">
                                         <div class="dog-chip" *ngFor="let dog of attendee.attending_dogs">
