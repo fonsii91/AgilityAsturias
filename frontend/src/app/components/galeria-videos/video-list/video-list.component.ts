@@ -42,17 +42,12 @@ export class VideoListComponent implements OnInit {
     filterDogId: string = '';
     filterCompetitionId: string = '';
     activeSort: string = 'latest';
-    showDisclaimerModal: boolean = true;
 
     ngOnInit() {
         this.currentUserId = this.authService.currentUserSignal()?.id || null;
         this.loadVideos();
         this.dogService.loadAllDogs();
         this.compService.fetchCompetitions();
-    }
-
-    closeDisclaimer() {
-        this.showDisclaimerModal = false;
     }
 
     toggleFilters() {

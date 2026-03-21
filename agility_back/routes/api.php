@@ -55,6 +55,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware(['role:admin,staff'])->group(function () {
         Route::get('/users', [AuthController::class, 'index']);
         Route::post('/users/{id}/role', [AuthController::class, 'updateRole']);
+        Route::post('/users/{id}/delete', [AuthController::class, 'destroy']);
         Route::post('/users/{id}/generate-reset-link', [AuthController::class, 'generateResetLink']);
 
         Route::post('/competitions', [CompetitionController::class, 'store']);

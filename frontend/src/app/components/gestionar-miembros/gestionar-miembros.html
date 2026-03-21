@@ -50,6 +50,10 @@
                                 title="Generar Enlace de Recuperación">
                                 <span class="material-icons">key</span>
                             </button>
+                            <button class="btn-icon delete-btn" (click)="openDeleteModal(user)"
+                                title="Eliminar Miembro y Perros">
+                                <span class="material-icons">delete</span>
+                            </button>
                         </div>
                     </td>
                     <td>
@@ -76,6 +80,36 @@
         <div class="zoom-modal-content" (click)="$event.stopPropagation()">
             <button class="close-zoom-btn" (click)="closeImageZoom()">&times;</button>
             <img [src]="zoomedImageURL" alt="Zoomed Profile Foto">
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay delete-modal-overlay" *ngIf="userToDelete()" (click)="closeDeleteModal()">
+        <div class="modal-content delete-modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-icon-wrapper danger-icon">
+                <span class="material-icons">warning</span>
+            </div>
+            <h3>Eliminar Miembro</h3>
+            <p>
+                ¿Estás seguro de que deseas eliminar permanentemente a <strong>{{ userToDelete()?.displayName }}</strong>?
+            </p>
+            <p class="warning-text">
+                <strong>ATENCIÓN:</strong> Esta acción eliminará permanentemente la cuenta, TODOS sus perros, reservas y registros de asistencia. Esta acción no se puede deshacer.
+            </p>
+            
+            <div class="delete-confirmation-group">
+                <label>Por favor, escribe <strong>BORRAR</strong> para confirmar:</label>
+                <input type="text" [(ngModel)]="deleteConfirmationText" class="form-input confirmation-input" placeholder="BORRAR">
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" (click)="closeDeleteModal()" [disabled]="isDeleting()">Cancelar</button>
+                <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting() || deleteConfirmationText() !== 'BORRAR'">
+                    <span class="material-icons btn-icon" *ngIf="!isDeleting()">delete_forever</span>
+                    <span class="spinner-small" *ngIf="isDeleting()"></span>
+                    {{ isDeleting() ? 'Eliminando...' : 'Sí, Eliminar' }}
+                </button>
+            </div>
         </div>
     </div>
 </div>

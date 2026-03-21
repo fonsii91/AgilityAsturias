@@ -243,21 +243,4 @@
         </form>
     </div>
 </div>
-
-<!-- Modal de Disclaimer de Funcionalidad en Pruebas -->
-<div class="modal-overlay disclaimer-overlay" *ngIf="showDisclaimerModal">
-    <div class="modal-content disclaimer-content" (click)="$event.stopPropagation()">
-        <div class="modal-icon-wrapper info-icon">
-            <span class="material-icons">info</span>
-        </div>
-        <h3 style="margin-bottom: 10px;">Vídeos en Pruebas</h3>
-        <p style="margin-bottom: 20px;">
-            La galería de vídeos (Cine Agility) es una <b>característica que se encuentra actualmente en desarrollo</b>.
-            Es posible que te encuentres con errores al subir vídeos, descargar vídeos o tiempos de carga prolongados.
-            ¡Gracias por tu paciencia!
-        </p>
-        <div class="modal-actions" style="justify-content: center;">
-            <button class="btn-primary" (click)="closeDisclaimer()">Entendido</button>
-        </div>
-    </div>
-</div>
+

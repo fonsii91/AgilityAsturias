@@ -154,6 +154,10 @@ export class AuthService {
         return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/role`, { role }));
     }
 
+    deleteUser(userId: number): Promise<any> {
+        return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/delete`, {}));
+    }
+
     async updateProfile(name: string, photo?: File): Promise<void> {
         const formData = new FormData();
         formData.append('name', name);

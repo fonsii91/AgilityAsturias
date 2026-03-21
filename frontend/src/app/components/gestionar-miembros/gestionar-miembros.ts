@@ -1,12 +1,13 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-gestionar-miembros',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './gestionar-miembros.html',
   styleUrls: ['./gestionar-miembros.css']
 })
@@ -16,6 +17,10 @@ export class GestionarMiembrosComponent implements OnInit {
 
   users = signal<UserProfile[]>([]);
   loading = signal<boolean>(true);
+  
+  userToDelete = signal<UserProfile | null>(null);
+  isDeleting = signal<boolean>(false);
+  deleteConfirmationText = signal<string>('');
 
   // Filter out admins to prevent modification by regular staff, but SHOW staff
   displayUsers = computed(() => {
@@ -85,6 +90,44 @@ export class GestionarMiembrosComponent implements OnInit {
         errorMsg = error.error.message;
       }
       this.toastService.error(errorMsg);
+    }
+  }
+
+  // Delete User Logic
+  openDeleteModal(user: UserProfile) {
+    this.userToDelete.set(user);
+    this.deleteConfirmationText.set('');
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeDeleteModal() {
+    this.userToDelete.set(null);
+    this.deleteConfirmationText.set('');
+    document.body.style.overflow = 'auto';
+  }
+
+  async confirmDelete() {
+    const user = this.userToDelete();
+    if (!user) return;
+
+    this.isDeleting.set(true);
+    try {
+      await this.authService.deleteUser(user.id);
+      
+      // Update local state
+      this.users.update(users => users.filter(u => u.uid !== user.uid));
+      
+      this.toastService.success(`Usuario ${user.displayName} y sus perros han sido eliminados correctamente`);
+      this.closeDeleteModal();
+    } catch (error: any) {
+      console.error('Error deleting user', error);
+      let errorMsg = 'Error al eliminar usuario';
+      if (error.error && error.error.message) {
+        errorMsg = error.error.message;
+      }
+      this.toastService.error(errorMsg);
+    } finally {
+      this.isDeleting.set(false);
     }
   }
 
