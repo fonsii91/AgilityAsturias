@@ -175,6 +175,65 @@ class AuthController extends Controller
         }
     }
 
+    public function destroy(Request $request, $id)
+    {
+        $currentUser = $request->user();
+
+        // Allow admin or staff
+        if (!in_array($currentUser->role, ['admin', 'staff'])) {
+            return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
+        }
+
+        try {
+            $targetUser = User::find($id);
+            if (!$targetUser) {
+                return response()->json(['message' => 'Usuario no encontrado.'], 404);
+            }
+
+            // Prevent self-deletion via this endpoint
+            if ($currentUser->id === $targetUser->id) {
+                return response()->json(['message' => 'No puedes eliminarte a ti mismo desde esta vista.'], 400);
+            }
+
+            // Staff restrictions
+            if ($currentUser->role === 'staff') {
+                // Cannot delete an admin or another staff
+                if (in_array($targetUser->role, ['admin', 'staff'])) {
+                    return response()->json(['message' => 'El personal no puede eliminar a administradores u otro personal.'], 403);
+                }
+            }
+
+            \Illuminate\Support\Facades\DB::transaction(function () use ($targetUser) {
+                // Delete user's dogs
+                foreach ($targetUser->dogs as $dog) {
+                    $dog->delete();
+                }
+
+                // Delete reservations if they exist
+                if (\Schema::hasTable('reservations')) {
+                    $targetUser->reservations()->delete();
+                }
+
+                // Detach from competitions
+                $targetUser->competitions()->detach();
+
+                // Finally delete the user
+                $targetUser->delete();
+            });
+
+            return response()->json([
+                'message' => 'Usuario y sus datos asociados eliminados correctamente.'
+            ]);
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Error deleting user: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Ocurrió un error al eliminar el usuario.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function updateProfile(Request $request)
     {
         try {

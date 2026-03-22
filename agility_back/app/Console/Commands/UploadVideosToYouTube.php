@@ -26,7 +26,7 @@ class UploadVideosToYouTube extends Command
     public function handle()
     {
         $videos = Video::whereIn('status', ['local', 'in_queue'])
-            ->where('created_at', '<=', now()->subDays(5))
+            ->where('created_at', '<=', now()->subDays(3))
             ->take(6)
             ->get();
 

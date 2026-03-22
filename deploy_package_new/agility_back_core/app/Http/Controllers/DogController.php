@@ -17,7 +17,7 @@ class DogController extends Controller
     {
         return $request->user()->dogs()->with(['pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
-        }])->get();
+        }])->orderBy('name', 'asc')->get();
     }
 
     /**
@@ -27,7 +27,7 @@ class DogController extends Controller
     {
         return Dog::with(['user:id,name', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
-        }])->get();
+        }])->orderBy('name', 'asc')->get();
     }
 
     /**
