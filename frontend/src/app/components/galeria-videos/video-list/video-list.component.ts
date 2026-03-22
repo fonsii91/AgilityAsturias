@@ -5,7 +5,9 @@ import { VideoService } from '../../../services/video.service';
 import { DogService } from '../../../services/dog.service';
 import { CompetitionService } from '../../../services/competition.service';
 import { Video } from '../../../models/video.model';
+import { Dog } from '../../../models/dog.model';
 import { SmartVideoPlayerComponent } from '../smart-video-player/smart-video-player.component';
+import { FichaPerroComponent } from '../../ficha-perro/ficha-perro.component';
 import { RouterLink } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../services/auth.service';
@@ -14,7 +16,7 @@ import { ToastService } from '../../../services/toast.service';
 @Component({
     selector: 'app-video-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, SmartVideoPlayerComponent, RouterLink],
+    imports: [CommonModule, FormsModule, SmartVideoPlayerComponent, RouterLink, FichaPerroComponent],
     templateUrl: './video-list.component.html',
     styleUrl: './video-list.component.css'
 })
@@ -36,6 +38,9 @@ export class VideoListComponent implements OnInit {
     totalPages = 1;
     isLoading = true;
     isFiltersOpen = false;
+
+    selectedDogForProfile: Dog | null = null;
+    isDogProfileOpen = false;
 
     searchQuery: string = '';
     filterDateRange: string = '';
@@ -178,6 +183,23 @@ export class VideoListComponent implements OnInit {
     cancelDelete() {
         this.videoToDelete = null;
         this.cdr.detectChanges();
+    }
+
+    openDogProfile(event: Event, dog?: Dog) {
+        event.stopPropagation();
+        event.preventDefault();
+        if (!dog) return;
+        this.selectedDogForProfile = dog;
+        this.isDogProfileOpen = true;
+        this.cdr.detectChanges();
+    }
+
+    closeDogProfile() {
+        this.isDogProfileOpen = false;
+        setTimeout(() => {
+            this.selectedDogForProfile = null;
+            this.cdr.detectChanges();
+        }, 300);
     }
 
     confirmDelete() {

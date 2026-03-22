@@ -82,77 +82,70 @@
     </div>
 
     <div *ngIf="!isLoading && videos.length > 0" class="video-grid">
-        <div *ngFor="let video of videos" class="video-card">
+        <div *ngFor="let video of videos" class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id}">
             <app-smart-video-player [youtubeId]="video.youtube_id" [localPath]="video.local_path">
             </app-smart-video-player>
 
-            <div class="video-info">
-                <div class="title-like-row">
+            <div class="video-info-overlay">
+                <!-- Bottom Left Info -->
+                <div class="bottom-info-left">
+                    <p class="dog-name-row">
+                        <span class="dog-name" (click)="openDogProfile($event, video.dog)" style="cursor: pointer">@{{
+                            video.dog?.name }}</span>
+                        <span *ngIf="video.competition" class="competition-badge" [title]="video.competition.nombre">
+                            <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre
+                                }}</span>
+                        </span>
+                    </p>
                     <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
                         {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
                     </h3>
-                    <button class="like-btn" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="like-icon" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        <span class="like-count">{{ video.likes_count || 0 }}</span>
-                    </button>
+                    <p class="video-description">Subido por {{ video.user?.name || 'Usuario' }} • {{ video.date |
+                        date:'dd/MM/yy' }}</p>
                 </div>
-                
-                <div class="video-author-row">
-                    <div class="dog-avatar-wrapper" [routerLink]="['/perfil']" [queryParams]="{ dogId: video.dog_id }" style="cursor: pointer" title="Ver perfil de {{video.dog?.name}}">
-                        <img *ngIf="video.dog?.photo_url; else defaultDogIcon" [src]="video.dog?.photo_url" alt="{{ video.dog?.name }}" class="dog-avatar-img">
+
+                <!-- Stacked Actions on the Right -->
+                <div class="floating-actions-right">
+                    <div class="dog-avatar-wrapper" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
+                        title="Ver perfil de {{video.dog?.name}}">
+                        <img *ngIf="video.dog?.photo_url; else defaultDogIcon" [src]="video.dog?.photo_url"
+                            alt="{{ video.dog?.name }}" class="dog-avatar-img">
                         <ng-template #defaultDogIcon>
                             <div class="dog-avatar-placeholder">
                                 <span class="material-icons">pets</span>
                             </div>
                         </ng-template>
                     </div>
-                    <div class="author-details">
-                        <p class="dog-name-row">
-                            <span class="dog-name" [routerLink]="['/perfil']" [queryParams]="{ dogId: video.dog_id }" style="cursor: pointer">{{ video.dog?.name }}</span>
-                            <span *ngIf="video.competition" class="competition-badge" [title]="video.competition.nombre">
-                                <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre }}</span>
-                            </span>
-                        </p>
-                        <p class="uploader-name">
-                            Subido por <strong>{{ video.user?.name || 'Usuario' }}</strong>
-                        </p>
-                    </div>
-                </div>
 
-                <div class="video-meta">
-                    <div class="video-date">
-                        <span class="material-icons date-icon">event</span>
-                        <span>{{ video.date | date:'dd/MM/yyyy' }}</span>
-                    </div>
+                    <button class="action-bubble" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
+                        <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
+                            'favorite_border' }}</span>
+                        <span class="action-count">{{ video.likes_count || 0 }}</span>
+                    </button>
 
-                    <div class="video-actions-group">
-                        <span *ngIf="video.status === 'in_queue' || video.status === 'failed'" class="status-badge"
-                            [ngClass]="{
-                            'status-local': video.status === 'in_queue',
-                            'status-error': video.status === 'failed'
-                            }">
-                            {{ video.status === 'in_queue' ? 'Procesando' : 'Error' }}
-                        </span>
+                    <button *ngIf="video.status === 'local'" (click)="downloadVideo($event, video)"
+                        class="action-bubble" title="Descargar">
+                        <span class="material-icons">download</span>
+                    </button>
 
-                        <button *ngIf="video.status === 'local'" (click)="downloadVideo($event, video)" class="icon-btn tooltip-btn" data-tooltip="Descargar">
-                            <span class="material-icons">download</span>
-                        </button>
+                    <button
+                        *ngIf="video.user_id === currentUserId || video.dog?.userId === currentUserId || authService.currentUserSignal()?.role === 'admin' || authService.currentUserSignal()?.role === 'staff'"
+                        (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
+                        <span class="material-icons">edit</span>
+                    </button>
 
-                        <button *ngIf="video.user_id === currentUserId || video.dog?.userId === currentUserId || authService.currentUserSignal()?.role === 'admin' || authService.currentUserSignal()?.role === 'staff'"
-                            (click)="openEditModal($event, video)" class="icon-btn tooltip-btn" data-tooltip="Editar">
-                            <span class="material-icons">edit</span>
-                        </button>
+                    <button
+                        *ngIf="video.user_id === currentUserId || video.dog?.userId === currentUserId || authService.currentUserSignal()?.role === 'admin' || authService.currentUserSignal()?.role === 'staff'"
+                        (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
+                        <span class="material-icons">delete</span>
+                    </button>
 
-                        <button *ngIf="video.user_id === currentUserId || video.dog?.userId === currentUserId || authService.currentUserSignal()?.role === 'admin' || authService.currentUserSignal()?.role === 'staff'"
-                            (click)="openDeleteModal($event, video)" class="icon-btn delete-icon-btn tooltip-btn" data-tooltip="Eliminar">
-                            <span class="material-icons">delete</span>
-                        </button>
-                    </div>
+                    <span *ngIf="video.status === 'in_queue' || video.status === 'failed'" class="status-indicator"
+                        [ngClass]="{'status-local': video.status === 'in_queue', 'status-error': video.status === 'failed'}"
+                        [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
+                        <span class="material-icons">{{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline'
+                            }}</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -243,4 +236,8 @@
         </form>
     </div>
 </div>
-
+
+<!-- Modal Ficha de Perro -->
+<app-ficha-perro *ngIf="selectedDogForProfile" [dog]="selectedDogForProfile" [isOpen]="isDogProfileOpen"
+    (close)="closeDogProfile()">
+</app-ficha-perro>

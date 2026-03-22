@@ -1,12 +1,14 @@
 .video-wrapper {
     position: relative;
-    padding-bottom: 56.25%;
-    /* 16:9 Aspect Ratio */
-    height: 0;
+    aspect-ratio: 9 / 16;
+    width: 100%;
     overflow: hidden;
     background-color: #000;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    border-radius: 12px;
+}
+
+.video-wrapper.is-youtube {
+    border-radius: 12px 12px 0 0;
 }
 
 .video-iframe,
@@ -17,6 +19,7 @@
     left: 0;
     width: 100%;
     height: 100%;
+    object-fit: contain;
 }
 
 .video-unavailable {
@@ -26,3 +29,97 @@
     color: #6c757d;
     font-size: 1rem;
 }
+
+.video-wrapper {
+    cursor: pointer;
+}
+
+.custom-play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 72px;
+    height: 72px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    pointer-events: auto;
+    cursor: pointer;
+    backdrop-filter: blur(2px);
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.custom-play-overlay:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+    transform: translate(-50%, -50%) scale(1.05);
+}
+
+.play-icon-large {
+    color: white;
+    font-size: 48px !important;
+    margin-left: 4px;
+}
+
+/* Custom Progress Bar Hitbox */
+.custom-progress-hitbox {
+    position: absolute;
+    bottom: 0px;
+    left: 2%;
+    width: 96%;
+    height: 36px;
+    cursor: pointer;
+    z-index: 50;
+    display: flex;
+    align-items: center; /* Center the visual bar vertically within the hitbox */
+}
+
+.custom-progress-container {
+    width: 100%;
+    height: 6px; 
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.4);
+    transition: height 0.2s ease;
+    overflow: hidden;
+    pointer-events: none; /* Hitbox catches the hover/clicks */
+}
+
+.custom-progress-hitbox:hover .custom-progress-container {
+    height: 10px;
+}
+
+.custom-progress-fill {
+    height: 100%;
+    background-color: var(--primary-color, #ff2a5f);
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+/* Fullscreen Button */
+.fullscreen-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    z-index: 30; /* Ensure it floats above the video overlay */
+    backdrop-filter: blur(2px);
+    transition: background-color 0.2s, transform 0.2s;
+    outline: none;
+}
+
+.fullscreen-btn:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+    transform: scale(1.1);
+}

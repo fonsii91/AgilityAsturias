@@ -111,113 +111,33 @@
 /* Rejilla de vídeos */
 .video-grid {
     display: grid;
-    grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
-}
-
-@media (min-width: 768px) {
-    .video-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (min-width: 1024px) {
-    .video-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
 }
 
 /* Tarjeta individual de vídeo */
 .video-card {
-    background: #fff;
+    background: #000;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #f1f5f9;
+    border: none;
+    aspect-ratio: 9/16;
 }
 
 .video-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
 }
 
-.video-info {
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.video-title {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #333;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-}
-
-.title-like-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.25rem;
-    gap: 0.5rem;
-}
-
-.like-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #999;
-    padding: 0.25rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.like-btn:hover {
-    background: #f8f9fa;
-    color: #dc3545;
-}
-
-.like-btn.liked {
-    color: #dc3545;
-}
-
-.like-btn.liked .like-icon {
-    animation: heartBeat 0.3s ease-in-out;
-}
-
-@keyframes heartBeat {
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.3);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-}
-
-.like-icon {
-    width: 20px;
-    height: 20px;
-}
-
-.like-count {
-    font-size: 0.875rem;
-    font-weight: 600;
+.video-card app-smart-video-player {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 /* YouTube-style Search */
@@ -393,15 +313,196 @@
     color: #fff;
 }
 
-/* --- New Video Info Styles --- */
+/* --- Video Info Overlay Styles (TikTok/Reels style) --- */
 
-.video-author-row {
+.video-info-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    padding: 4rem 1rem 2.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    z-index: 10;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, transparent 100%);
+    color: #fff;
+    pointer-events: none;
+    transition: bottom 0.2s ease;
+}
+
+/* YouTube Classic Card Overrides */
+.video-card.is-youtube {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    aspect-ratio: auto;
+}
+
+.video-card.is-youtube app-smart-video-player {
+    position: relative;
+    height: auto;
+}
+
+.video-card.is-youtube .video-info-overlay {
+    position: relative;
+    bottom: auto;
+    padding: 1.25rem 1rem;
+    background: #fff;
+    flex-direction: column;
+    align-items: flex-start;
+    pointer-events: auto;
+}
+
+.video-card.is-youtube .bottom-info-left {
+    padding-right: 0;
+    margin-bottom: 1rem;
+}
+
+.video-card.is-youtube .dog-name,
+.video-card.is-youtube .video-title {
+    color: #1a202c;
+    text-shadow: none;
+}
+
+.video-card.is-youtube .video-description {
+    color: #64748b;
+    text-shadow: none;
+}
+
+.video-card.is-youtube .competition-badge {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.video-card.is-youtube .floating-actions-right {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding-bottom: 0;
+}
+
+.video-card.is-youtube .action-bubble {
+    color: #475569;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.4rem 0.6rem;
+    flex-direction: row;
+}
+
+.video-card.is-youtube .action-bubble:hover {
+    color: #1a202c;
+    background-color: #e2e8f0;
+}
+
+.video-card.is-youtube .action-bubble.liked {
+    color: #e53e3e;
+    background-color: #fff5f5;
+    border-color: #fed7d7;
+}
+
+.video-card.is-youtube .action-bubble .material-icons {
+    font-size: 20px;
+    filter: none;
+}
+
+.video-card.is-youtube .action-count {
+    text-shadow: none;
+}
+
+.video-card.is-youtube .dog-avatar-wrapper {
+    border-color: #e2e8f0;
+    box-shadow: none;
+}
+
+.video-info-overlay button,
+.video-info-overlay a,
+.video-info-overlay .dog-avatar-wrapper,
+.video-info-overlay .dog-name[routerLink],
+.video-info-overlay [style*="cursor: pointer"] {
+    pointer-events: auto;
+}
+
+.bottom-info-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+    padding-right: 1rem;
+}
+
+.dog-name-row {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    flex-wrap: wrap;
+}
+
+.dog-name {
+    font-weight: 700;
+    color: #fff;
+    font-size: 1.05rem;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    transition: color 0.2s;
+}
+
+.dog-name:hover {
+    text-decoration: underline;
+    color: #e0e0e0;
+}
+
+.competition-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    background-color: rgba(255,255,255,0.2);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.comp-icon {
+    font-size: 14px !important;
+    color: #ffd700;
+}
+
+.video-title {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #fff;
+    margin: 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.video-description {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.8);
+    margin: 0;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Right Side Floating Actions */
+.floating-actions-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
-    margin-top: 0.5rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 0.5rem;
 }
 
 .dog-avatar-wrapper {
@@ -409,19 +510,17 @@
     height: 44px;
     border-radius: 50%;
     overflow: hidden;
-    background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+    background: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0;
     border: 2px solid #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
 }
 
 .dog-avatar-wrapper:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: scale(1.1);
 }
 
 .dog-avatar-img {
@@ -437,174 +536,61 @@
     justify-content: center;
 }
 
-.author-details {
+.action-bubble {
     display: flex;
     flex-direction: column;
+    align-items: center;
     justify-content: center;
-}
-
-.dog-name-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0 0 0.25rem 0;
-    flex-wrap: wrap;
-}
-
-.dog-name {
-    font-weight: 700;
-    color: #1a202c;
-    font-size: 0.95rem;
-    transition: color 0.2s;
-}
-
-.dog-name:hover {
-    color: var(--primary-color, #0d6efd);
-}
-
-.competition-badge {
-    display: inline-flex;
-    align-items: center;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.2s, color 0.2s;
     gap: 0.25rem;
+}
+
+.action-bubble:hover {
+    transform: scale(1.1);
+    color: #e0e0e0;
+}
+
+.action-bubble .material-icons {
+    font-size: 28px;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.action-bubble.liked {
+    color: #fa3e3e;
+}
+
+.action-bubble.action-delete:hover {
+    color: #ff4757;
+}
+
+.action-count {
     font-size: 0.75rem;
-    background-color: #f1f5f9;
-    color: #475569;
-    padding: 0.2rem 0.5rem;
-    border-radius: 9999px;
-    font-weight: 500;
-}
-
-.comp-icon {
-    font-size: 14px !important;
-    color: #f59e0b;
-}
-
-.uploader-name {
-    font-size: 0.8rem;
-    color: #64748b;
-    margin: 0;
-}
-
-.uploader-name strong {
-    color: #334155;
     font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-.video-meta {
-    margin-top: auto;
-    padding-top: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.85rem;
-    color: #64748b;
-}
-
-.video-date {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-weight: 500;
-}
-
-.date-icon {
-    font-size: 16px !important;
-}
-
-.video-actions-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.icon-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+.status-indicator {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: #f8fafc;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.icon-btn .material-icons {
-    font-size: 18px;
-}
-
-.icon-btn:hover {
-    background-color: var(--primary-color, #0d6efd);
-    color: #fff;
-    border-color: var(--primary-color, #0d6efd);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
-}
-
-.delete-icon-btn:hover {
-    background-color: var(--error-color, #e53e3e);
-    border-color: var(--error-color, #e53e3e);
-    color: white;
-    box-shadow: 0 4px 6px rgba(229, 62, 62, 0.2);
-}
-
-/* Tooltip Styles */
-.tooltip-btn {
-    position: relative;
-}
-
-.tooltip-btn:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-5px);
-    background-color: #1e293b;
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    white-space: nowrap;
-    opacity: 1;
-    pointer-events: none;
-    z-index: 10;
-}
-
-.tooltip-btn:hover::before {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border-width: 5px;
-    border-style: solid;
-    border-color: #1e293b transparent transparent transparent;
-    opacity: 1;
-    pointer-events: none;
-    z-index: 10;
-}
-
-.status-badge {
-    padding: 0.25rem 0.6rem;
-    border-radius: 9999px;
-    color: #fff;
-    font-weight: 500;
-    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .status-local {
     background-color: #ffc107;
-    color: #000;
-}
-
-.status-youtube {
-    background-color: #dc3545;
 }
 
 .status-error {
-    background-color: #6c757d;
+    background-color: #dc3545;
+    color: #fff;
 }
 
 /* Paginación */
