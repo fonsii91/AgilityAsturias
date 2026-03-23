@@ -665,6 +665,32 @@
     overflow: hidden;
 }
 
+.video-uploader-cover-small {
+    position: absolute;
+    bottom: 1rem;
+    right: 1rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    z-index: 30;
+    text-align: right;
+}
+
+.cover-badges-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.dog-icon-huge {
+    font-size: 22px !important;
+    color: #4dabf7;
+}
+
 .date-badge-cover-huge {
     display: inline-flex;
     align-items: center;
@@ -742,6 +768,29 @@
 
 .dog-avatar-wrapper:hover {
     transform: scale(1.1);
+}
+
+.dog-name-cover-small {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    cursor: pointer;
+    z-index: 30;
+    max-width: 150px;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.dog-name-cover-small:hover {
+    color: #e0e0e0;
+    text-decoration: underline;
 }
 
 .dog-avatar-img {

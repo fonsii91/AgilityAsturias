@@ -108,5 +108,23 @@ export const routes: Routes = [
         loadComponent: () => import('./components/galeria-videos/upload-video/upload-video.component').then(m => m.UploadVideoComponent),
         canActivate: [authGuard],
         title: 'Subir Vídeo | Agility Asturias'
+    },
+    {
+        path: 'recursos',
+        loadComponent: () => import('./components/recursos/recursos-list/recursos-list.component').then(m => m.RecursosListComponent),
+        canActivate: [authGuard],
+        title: 'Recursos | Agility Asturias'
+    },
+    {
+        path: 'recursos/nuevo',
+        loadComponent: () => import('./components/recursos/recursos-form/recursos-form.component').then(m => m.RecursosFormComponent),
+        canActivate: [staffGuard],
+        title: 'Añadir Recurso | Agility Asturias'
+    },
+    {
+        path: 'recursos/editar/:id',
+        loadComponent: () => import('./components/recursos/recursos-form/recursos-form.component').then(m => m.RecursosFormComponent),
+        canActivate: [staffGuard],
+        title: 'Editar Recurso | Agility Asturias'
     }
 ];

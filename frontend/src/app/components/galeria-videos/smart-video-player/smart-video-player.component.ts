@@ -31,13 +31,13 @@ import { environment } from '../../../../environments/environment';
           <span class="material-icons play-icon-large">play_arrow</span>
         </div>
 
-        <div class="custom-progress-hitbox" (click)="seekVideo($event)">
+        <div class="custom-progress-hitbox" *ngIf="isVideoActive" (click)="seekVideo($event)">
           <div class="custom-progress-container">
             <div class="custom-progress-fill" [style.width.%]="progress"></div>
           </div>
         </div>
 
-        <button class="fullscreen-btn" (click)="toggleFullscreen($event)">
+        <button class="fullscreen-btn" *ngIf="isVideoActive" (click)="toggleFullscreen($event)">
           <span class="material-icons">fullscreen</span>
         </button>
       </ng-container>

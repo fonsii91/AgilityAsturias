@@ -10,6 +10,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\ResourceController;
 use Illuminate\Http\Request; // Added for the closure route
 
 /*
@@ -66,6 +67,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/gallery', [GalleryController::class, 'store']);
         Route::post('/gallery/{id}/delete', [GalleryController::class, 'destroy']);
 
+        // Resources
+        Route::post('/resources', [ResourceController::class, 'store']);
+        Route::post('/resources/{id}', [ResourceController::class, 'update']);
+        Route::post('/resources/{id}/delete', [ResourceController::class, 'destroy']);
+
         // Ranking moved to general authenticated routes
 
         // Attendance (Admin/Staff)
@@ -89,6 +95,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware(['role:admin,staff,member'])->group(function () {
         // Ranking
         Route::get('/ranking', [RankingController::class, 'index']);
+
+        // Resources
+        Route::get('/resources', [ResourceController::class, 'index']);
 
         // Reservations
         Route::get('/reservations', [ReservationController::class, 'index']); // Ver todas o sus propias reservas

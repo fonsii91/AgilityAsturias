@@ -152,13 +152,22 @@
                 </div>
 
                 <div class="center-bottom-cover">
-                    <span class="date-badge-cover-huge">
-                        <span class="material-icons date-icon-huge">calendar_month</span>
-                        {{ video.date | date:'dd/MM/yyyy' }}
-                    </span>
+                    <div class="cover-badges-row">
+                        <span class="date-badge-cover-huge">
+                            <span class="material-icons date-icon-huge">calendar_month</span>
+                            {{ video.date | date:'dd/MM/yyyy' }}
+                        </span>
+                    </div>
                     <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
                         {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
                     </div>
+                </div>
+
+                <div class="video-uploader-cover-small">
+                    Subido por {{ video.user?.name || 'Usuario' }}
+                </div>
+                <div class="dog-name-cover-small" (click)="openDogProfile($event, video.dog)" style="cursor: pointer" title="Ver perfil de {{video.dog?.name}}">
+                    {{ video.dog?.name }}
                 </div>
             </div>
 

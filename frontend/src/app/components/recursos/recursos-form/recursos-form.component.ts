@@ -1,0 +1,116 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ResourceService, RESOURCE_CATEGORIES } from '../../../services/resource.service';
+
+@Component({
+  selector: 'app-recursos-form',
+  standalone: true,
+  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  templateUrl: './recursos-form.component.html',
+  styleUrls: ['./recursos-form.component.scss']
+})
+export class RecursosFormComponent implements OnInit {
+  resourceForm: FormGroup;
+  categories = RESOURCE_CATEGORIES;
+  isEditing = false;
+  resourceId: number | null = null;
+  selectedFile: File | null = null;
+  isSubmitting = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private resourceService: ResourceService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
+    this.resourceForm = this.fb.group({
+      title: ['', Validators.required],
+      description: [''],
+      type: ['document', Validators.required],
+      category: ['', Validators.required],
+      url: ['']
+    });
+  }
+
+  ngOnInit(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.isEditing = true;
+      this.resourceId = +id;
+      this.resourceService.getResources().subscribe((resources: any[]) => {
+          const res = resources.find((r: any) => r.id === this.resourceId);
+          if (res) {
+              this.resourceForm.patchValue({
+                  title: res.title,
+                  description: res.description,
+                  type: res.type,
+                  category: res.category,
+                  url: res.url
+              });
+          }
+      });
+    }
+
+    this.resourceForm.get('type')?.valueChanges.subscribe(type => {
+      const urlControl = this.resourceForm.get('url');
+      if (type === 'video' || type === 'link') {
+        urlControl?.setValidators([Validators.required]);
+      } else {
+        urlControl?.clearValidators();
+      }
+      urlControl?.updateValueAndValidity();
+    });
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+    }
+  }
+
+  onSubmit(): void {
+    if (this.resourceForm.invalid) return;
+
+    this.isSubmitting = true;
+    const formData = new FormData();
+    const values = this.resourceForm.value;
+
+    formData.append('title', values.title);
+    if (values.description) formData.append('description', values.description);
+    formData.append('type', values.type);
+    formData.append('category', values.category);
+
+    if (values.type !== 'document' && values.url) {
+        formData.append('url', values.url);
+    }
+
+    if (values.type === 'document' && this.selectedFile) {
+        formData.append('file', this.selectedFile);
+    }
+
+    if (this.isEditing && this.resourceId) {
+        this.resourceService.updateResource(this.resourceId, formData).subscribe({
+            next: () => {
+                this.router.navigate(['/recursos']);
+            },
+            error: (err: any) => {
+                console.error(err);
+                this.isSubmitting = false;
+            }
+        });
+    } else {
+        this.resourceService.createResource(formData).subscribe({
+            next: () => {
+                this.router.navigate(['/recursos']);
+            },
+            error: (err: any) => {
+                console.error(err);
+                this.isSubmitting = false;
+            }
+        });
+    }
+  }
+}
