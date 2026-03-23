@@ -9,14 +9,25 @@ import { environment } from '../../../../environments/environment';
   imports: [CommonModule],
   styleUrl: './smart-video-player.component.css',
   template: `
-    <div class="video-wrapper" [class.is-youtube]="youtubeUrl">
-      <iframe *ngIf="youtubeUrl" [src]="youtubeUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="video-iframe"></iframe>
+    <div class="video-wrapper" [class.is-youtube]="youtubeUrl" [class.is-active]="isVideoActive">
+
+      <!-- Video Cover / Poster -->
+      <div class="poster-cover" *ngIf="!isVideoActive" (click)="startPlayback()">
+         <img *ngIf="coverImageUrl" [src]="coverImageUrl" class="poster-image" alt="Video cover">
+         <div *ngIf="!coverImageUrl" class="poster-placeholder">
+            <span class="material-icons">pets</span>
+         </div>
+         <div class="poster-overlay-gradient"></div>
+         <span class="material-icons play-icon-massive">play_circle_outline</span>
+      </div>
+
+      <iframe *ngIf="youtubeUrl && hasStarted" [src]="autoplayYoutubeUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="video-iframe"></iframe>
 
       <ng-container *ngIf="!youtubeUrl && localUrl">
         <video #localVideo [src]="localUrl" class="video-local" playsinline webkit-playsinline loop preload="metadata" 
                (playing)="isPlaying = true" (pause)="isPlaying = false" (timeupdate)="onTimeUpdate($event)" (click)="togglePlay()"></video>
         
-        <div class="custom-play-overlay" *ngIf="!isPlaying" (click)="togglePlay()">
+        <div class="custom-play-overlay" *ngIf="!isPlaying && isVideoActive" (click)="togglePlay()">
           <span class="material-icons play-icon-large">play_arrow</span>
         </div>
 
@@ -38,6 +49,7 @@ import { environment } from '../../../../environments/environment';
   `
 })
 export class SmartVideoPlayerComponent implements OnInit {
+  @Input() coverImageUrl?: string;
   @Input() youtubeId?: string;
   @Input() localPath?: string;
   @ViewChild('localVideo') localVideoRef?: ElementRef<HTMLVideoElement>;
@@ -45,15 +57,32 @@ export class SmartVideoPlayerComponent implements OnInit {
   private sanitizer = inject(DomSanitizer);
 
   youtubeUrl?: SafeResourceUrl;
+  autoplayYoutubeUrl?: SafeResourceUrl;
   localUrl?: string;
   isPlaying = false;
+  hasStarted = false; // Tracks if the video was ever started
   progress = 0;
+
+  get isVideoActive(): boolean {
+    return this.hasStarted;
+  }
 
   ngOnInit() {
     if (this.youtubeId) {
       this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${this.youtubeId}?playsinline=1&rel=0&modestbranding=1`);
+      this.autoplayYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${this.youtubeId}?playsinline=1&rel=0&modestbranding=1&autoplay=1`);
     } else if (this.localPath) {
       this.localUrl = `${environment.apiUrl.replace('/api', '')}/storage/${this.localPath}`;
+    }
+  }
+
+  startPlayback() {
+    this.hasStarted = true;
+    if (this.youtubeId) {
+      // YouTube iframe will start rendering and autoplay
+    } else if (this.localVideoRef) {
+      const video = this.localVideoRef.nativeElement;
+      video.play().catch(e => console.error('Play error:', e));
     }
   }
 

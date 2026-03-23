@@ -1,5 +1,13 @@
 <div class="video-gallery-container">
 
+    <!-- Selector flotante de perro principal -->
+    <select [(ngModel)]="filterDogId" (change)="applyFilters()" class="stylish-dog-select">
+        <option value="">🐶 Todos los perros</option>
+        <option *ngFor="let dog of sortedDogs" [value]="dog.id">
+            {{ (dog.user_id === currentUserId || dog.userId === currentUserId) && currentUserId ? '🐾 ' + dog.name : dog.name }}
+        </option>
+    </select>
+
     <div class="action-top-bar">
         <div class="search-filters-group">
             <div class="search-bar">
@@ -36,7 +44,9 @@
             <label>Perro</label>
             <select [(ngModel)]="filterDogId" (change)="applyFilters()" class="filter-select">
                 <option value="">Todos los perros</option>
-                <option *ngFor="let dog of dogService.getAllDogs()()" [value]="dog.id">{{ dog.name }}</option>
+                <option *ngFor="let dog of sortedDogs" [value]="dog.id">
+                    {{ (dog.user_id === currentUserId || dog.userId === currentUserId) && currentUserId ? '🐾 ' + dog.name : dog.name }}
+                </option>
             </select>
         </div>
 
@@ -83,10 +93,77 @@
 
     <div *ngIf="!isLoading && videos.length > 0" class="video-grid">
         <div *ngFor="let video of videos" class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id}">
-            <app-smart-video-player [youtubeId]="video.youtube_id" [localPath]="video.local_path">
+            <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path" [coverImageUrl]="video.dog?.photo_url">
             </app-smart-video-player>
 
-            <div class="video-info-overlay">
+            <!-- LARGE COVER OVERLAY: Visible only when NOT playing -->
+            <div class="video-cover-overlay" *ngIf="!player.isVideoActive">
+                <!-- Stacked Actions on the Right -->
+                <div class="floating-actions-right">
+                    <div class="dog-avatar-wrapper" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
+                        title="Ver perfil de {{video.dog?.name}}">
+                        <img *ngIf="video.dog?.photo_url; else defaultDogIconCover" [src]="video.dog?.photo_url"
+                            alt="{{ video.dog?.name }}" class="dog-avatar-img">
+                        <ng-template #defaultDogIconCover>
+                            <div class="dog-avatar-placeholder">
+                                <span class="material-icons">pets</span>
+                            </div>
+                        </ng-template>
+                    </div>
+
+                    <button class="action-bubble" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
+                        <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
+                            'favorite_border' }}</span>
+                        <span class="action-count">{{ video.likes_count || 0 }}</span>
+                    </button>
+
+                    <button *ngIf="video.status === 'local'" (click)="downloadVideo($event, video)"
+                        class="action-bubble" title="Descargar">
+                        <span class="material-icons">download</span>
+                    </button>
+
+                    <button *ngIf="canModifyVideo(video)"
+                        (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
+                        <span class="material-icons">edit</span>
+                    </button>
+
+                    <button *ngIf="canModifyVideo(video)"
+                        (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
+                        <span class="material-icons">delete</span>
+                    </button>
+
+                    <span *ngIf="video.status === 'in_queue' || video.status === 'failed'" class="status-indicator"
+                        [ngClass]="{'status-local': video.status === 'in_queue', 'status-error': video.status === 'failed'}"
+                        [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
+                        <span class="material-icons">{{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline'
+                            }}</span>
+                    </span>
+                </div>
+
+                <div class="center-event-cover">
+                    <span *ngIf="video.competition" class="event-name-huge" [title]="video.competition.nombre">
+                        <span class="material-icons comp-icon-huge">emoji_events</span> 
+                        <span>{{ video.competition.nombre }}</span>
+                    </span>
+                    <span *ngIf="!video.competition" class="event-name-huge training-text">
+                        <span class="material-icons comp-icon-huge">fitness_center</span> 
+                        <span>Entrenamiento</span>
+                    </span>
+                </div>
+
+                <div class="center-bottom-cover">
+                    <span class="date-badge-cover-huge">
+                        <span class="material-icons date-icon-huge">calendar_month</span>
+                        {{ video.date | date:'dd/MM/yyyy' }}
+                    </span>
+                    <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+                        {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- ORIGINAL PLAYER OVERLAY: Visible only when PLAYING -->
+            <div class="video-info-overlay" *ngIf="player.isVideoActive">
                 <!-- Bottom Left Info -->
                 <div class="bottom-info-left">
                     <p class="dog-name-row">
@@ -128,14 +205,12 @@
                         <span class="material-icons">download</span>
                     </button>
 
-                    <button
-                        *ngIf="video.user_id === currentUserId || video.dog?.userId === currentUserId || authService.currentUserSignal()?.role === 'admin' || authService.currentUserSignal()?.role === 'staff'"
+                    <button *ngIf="canModifyVideo(video)"
                         (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
                         <span class="material-icons">edit</span>
                     </button>
 
-                    <button
-                        *ngIf="video.user_id === currentUserId || video.dog?.userId === currentUserId || authService.currentUserSignal()?.role === 'admin' || authService.currentUserSignal()?.role === 'staff'"
+                    <button *ngIf="canModifyVideo(video)"
                         (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
                         <span class="material-icons">delete</span>
                     </button>
@@ -159,14 +234,6 @@
             class="page-btn">Siguiente</button>
     </div>
 
-    <!-- Botón Flotante Subir -->
-    <a routerLink="/galeria-videos/subir" class="fab-upload" title="Subir Nuevo Vídeo">
-        <svg xmlns="http://www.w3.org/2000/svg" class="fab-icon" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd"
-                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
-                clip-rule="evenodd" />
-        </svg>
-    </a>
 </div>
 
 <!-- Modal de Confirmación de Borrado -->
@@ -205,7 +272,9 @@
                 <div class="select-wrapper">
                     <select name="dog_id" [(ngModel)]="editData.dog_id" required class="form-input">
                         <option value="">Selecciona un perro...</option>
-                        <option *ngFor="let dog of dogService.getAllDogs()()" [value]="dog.id">{{ dog.name }}</option>
+                        <option *ngFor="let dog of sortedDogs" [value]="dog.id">
+                            {{ (dog.user_id === currentUserId || dog.userId === currentUserId) && currentUserId ? '🐾 ' + dog.name : dog.name }}
+                        </option>
                     </select>
                 </div>
             </div>

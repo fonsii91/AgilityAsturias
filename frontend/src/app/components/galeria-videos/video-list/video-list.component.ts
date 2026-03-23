@@ -59,6 +59,22 @@ export class VideoListComponent implements OnInit {
         this.isFiltersOpen = !this.isFiltersOpen;
     }
 
+    get sortedDogs(): Dog[] {
+        const dogs = this.dogService.getAllDogs()() || [];
+        const userId = this.currentUserId;
+        if (!userId) {
+            return [...dogs].sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        return [...dogs].sort((a, b) => {
+            const aIsMine = a.userId === userId;
+            const bIsMine = b.userId === userId;
+            if (aIsMine && !bIsMine) return -1;
+            if (!aIsMine && bIsMine) return 1;
+            return a.name.localeCompare(b.name);
+        });
+    }
+
     loadVideos(page: number = 1) {
         this.isLoading = true;
         const filters: any = {
@@ -172,6 +188,21 @@ export class VideoListComponent implements OnInit {
             // Fallback to opening the URL directly if fetch/blob fails
             window.open(url, '_blank');
         }
+    }
+
+    canModifyVideo(video: Video): boolean {
+        const userId = this.currentUserId;
+        if (!userId) return false;
+        
+        const role = this.authService.currentUserSignal()?.role;
+        if (role === 'admin' || role === 'staff') return true;
+
+        if (video.user_id == userId) return true;
+        if (video.dog?.user_id == userId) return true;
+        if (video.dog?.userId == userId) return true;
+        if (video.dog?.user?.id == userId) return true;
+
+        return false;
     }
 
     openDeleteModal(event: Event, video: Video) {
