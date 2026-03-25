@@ -106,6 +106,17 @@ class ReservationController extends Controller
             'dog_ids.*' => 'exists:dogs,id'
         ]);
 
+        // EXCEPTION CHECK
+        $isCancelled = \App\Models\TimeSlotException::where('slot_id', $validated['slot_id'])
+            ->whereDate('date', $validated['date'])
+            ->exists();
+
+        if ($isCancelled) {
+            return response()->json([
+                'message' => 'Esta clase está cancelada y no admite reservas.'
+            ], 422);
+        }
+
         // DUPLICATE DOG CHECK
         // Check if any of the selected dogs are already booked in this slot/date
         $existingReservations = Reservation::where('slot_id', $validated['slot_id'])

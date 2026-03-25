@@ -18,7 +18,13 @@ export class CompetitionService {
     fetchCompetitions() {
         this.http.get<any[]>(this.apiUrl).subscribe({
             next: (comps) => {
-                const mapped = comps.map(c => this.mapFromBackend(c));
+                const mapped = comps.map((c: any) => this.mapFromBackend(c));
+                // Ordenar de más recientes a más antiguos (fechaEvento puede ser null/vacio)
+                mapped.sort((a, b) => {
+                    const dateA = a.fechaEvento ? new Date(a.fechaEvento).getTime() : 0;
+                    const dateB = b.fechaEvento ? new Date(b.fechaEvento).getTime() : 0;
+                    return dateB - dateA;
+                });
                 this.competitionsSignal.set(mapped);
             },
             error: (err) => console.error('Error loading competitions:', err)

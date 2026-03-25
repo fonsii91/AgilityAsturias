@@ -76,14 +76,17 @@
                         <div class="notif-icon-container" [ngClass]="{
                                 'event-icon': notif.type.includes('NewEventNotification') || notif.data.type === 'new_event', 
                                 'point-icon': notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point',
-                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point'
+                                'cancel-icon': notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled',
+                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled'
                             }">
                             <span class="material-icons"
                                 *ngIf="notif.type.includes('NewEventNotification') || notif.data.type === 'new_event'">event_available</span>
                             <span class="material-icons"
                                 *ngIf="notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point'">emoji_events</span>
                             <span class="material-icons"
-                                *ngIf="!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point'">notifications</span>
+                                *ngIf="notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled'">event_busy</span>
+                            <span class="material-icons"
+                                *ngIf="!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled'">notifications</span>
                         </div>
 
                         <div class="notif-content">

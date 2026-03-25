@@ -536,6 +536,11 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     color: #ffa000;
 }
 
+.notif-icon-container.cancel-icon {
+    background-color: #ffebee;
+    color: #f44336;
+}
+
 .notif-icon-container.default-icon {
     background-color: #f3e5f5;
     color: #8e24aa;

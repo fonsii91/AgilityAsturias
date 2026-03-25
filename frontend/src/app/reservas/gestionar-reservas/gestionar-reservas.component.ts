@@ -106,6 +106,7 @@ export class GestionarReservasComponent {
     slots = computed(() => {
         const reservations = this.reservationService.getReservations()();
         const availability = this.reservationService.getAvailability()(); // New data source
+        const exceptions = this.reservationService.getExceptions()();
         const currentUser = this.authService.currentUserSignal();
         const week = this.selectedWeek();
         const weekOffset = week === 'current' ? 0 : 1;
@@ -174,14 +175,17 @@ export class GestionarReservasComponent {
                 })
                 : undefined;
 
+            const isCancelled = exceptions.some(e => e.slot_id === slot.id && e.date.substring(0, 10) === slotDate);
+
             return {
                 ...slot,
                 date: slotDate,
                 currentBookings: totalBookedSpots,
                 isBookedByCurrentUser: !!myReservation,
                 userReservationId: myReservation?.id,
-                reservations: allAttendees
-            } as TimeSlot & { date: string };
+                reservations: allAttendees,
+                isCancelled
+            } as TimeSlot & { date: string, isCancelled: boolean };
         });
 
         // Filter out slots from past days
@@ -433,6 +437,42 @@ export class GestionarReservasComponent {
         } catch (error) {
             console.error(error);
             this.toastService.error('Error al cancelar.');
+        } finally {
+            this.isSubmitting.set(false);
+        }
+    }
+
+    // Staff Cancellation Modal State
+    isStaffCancelModalOpen = false;
+    slotToToggle: (TimeSlot & { date: string, isCancelled?: boolean }) | null = null;
+    
+    openStaffCancelModal(slot: TimeSlot & { date: string, isCancelled?: boolean }) {
+        this.slotToToggle = slot;
+        this.isStaffCancelModalOpen = true;
+    }
+    
+    closeStaffCancelModal() {
+        this.isStaffCancelModalOpen = false;
+        this.slotToToggle = null;
+    }
+
+    async confirmStaffToggle() {
+        if (!this.slotToToggle) return;
+        const slot = this.slotToToggle;
+
+        this.isSubmitting.set(true);
+        try {
+            if (slot.isCancelled) {
+                await this.reservationService.deleteException(slot.id, slot.date);
+                this.toastService.success('Clase restaurada con éxito.');
+            } else {
+                await this.reservationService.addException(slot.id, slot.date, 'Cancelada por el staff');
+                this.toastService.success('Clase cancelada con éxito.');
+            }
+            this.closeStaffCancelModal();
+        } catch (error) {
+            console.error(error);
+            this.toastService.error('Error al modificar el estado de la clase.');
         } finally {
             this.isSubmitting.set(false);
         }

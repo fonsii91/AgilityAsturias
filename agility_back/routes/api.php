@@ -89,6 +89,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/time-slots/{id}', [TimeSlotController::class, 'update']);
         Route::post('/time-slots/{id}/delete', [TimeSlotController::class, 'destroy']);
 
+        // Time Slot Exceptions
+        Route::post('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'store']);
+        Route::post('/time-slot-exceptions/delete', [\App\Http\Controllers\TimeSlotExceptionController::class, 'destroy']);
+
     });
 
 
@@ -115,6 +119,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/dogs/{id}/photo', [DogController::class, 'uploadPhoto']);
 
         Route::get('/availability', [ReservationController::class, 'availability']); // ???
+        Route::get('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'index']);
 
         Route::get('/reservations/my', [ReservationController::class, 'myReservations']); // Necesitaríamos este endpoint
         Route::post('/reservations', [ReservationController::class, 'store']); // ???

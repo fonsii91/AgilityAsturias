@@ -33,7 +33,7 @@
                 <select formControlName="competition_id">
                     <option value="">Ninguna</option>
                     <option *ngFor="let comp of compService.getCompetitions()()" [value]="comp.id">
-                        {{ comp.nombre }}
+                        {{ comp.nombre }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : '' }}
                     </option>
                 </select>
                 <span class="material-icons">emoji_events</span>

@@ -40,12 +40,16 @@
                         <span class="material-icons time-icon">schedule</span>
                         {{ slot.start_time }} - {{ slot.end_time }}
                     </div>
-                    <div class="status-indicator"
+                    <div class="status-indicator" *ngIf="!slot.isCancelled"
                         [class.status-green]="(slot.currentBookings || 0) / slot.max_bookings < 0.5"
                         [class.status-orange]="(slot.currentBookings || 0) / slot.max_bookings >= 0.5 && (slot.currentBookings || 0) < slot.max_bookings"
                         [class.status-red]="(slot.currentBookings || 0) >= slot.max_bookings">
                         <span class="status-dot"></span>
                         {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Completo' : 'Disponible' }}
+                    </div>
+                    <div class="status-indicator status-red" *ngIf="slot.isCancelled">
+                        <span class="status-dot"></span>
+                        Festivo/Cancelada
                     </div>
                 </div>
 
@@ -105,17 +109,30 @@
                 </div>
 
                 <div class="actions">
-                    <!-- Show Cancel button ONLY if booked by current user -->
-                    <button *ngIf="slot.isBookedByCurrentUser" class="btn-action btn-cancel-card"
-                        (click)="openCancelModal(slot)">
-                        Cancelar Reserva
+                    <!-- Staff Toggle Cancelled Status -->
+                    <button *ngIf="['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')"
+                        class="btn-action"
+                        [class.btn-secondary]="slot.isCancelled"
+                        [class.btn-cancel-card]="!slot.isCancelled"
+                        (click)="openStaffCancelModal(slot)"
+                        style="margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <span class="material-icons" style="font-size: 1.1rem;">{{ slot.isCancelled ? 'restore' : 'block' }}</span>
+                        {{ slot.isCancelled ? 'Restaurar Clase' : 'Anular Clase' }}
                     </button>
 
-                    <!-- Show Book button if NOT booked by user -->
-                    <button *ngIf="!slot.isBookedByCurrentUser" class="btn-action btn-book"
-                        [disabled]="(slot.currentBookings || 0) >= slot.max_bookings" (click)="bookSlot(slot)">
-                        {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Sin Plazas' : 'Reservar Plaza' }}
-                    </button>
+                    <ng-container *ngIf="!slot.isCancelled">
+                        <!-- Show Cancel button ONLY if booked by current user -->
+                        <button *ngIf="slot.isBookedByCurrentUser" class="btn-action btn-cancel-card"
+                            (click)="openCancelModal(slot)">
+                            Cancelar Reserva
+                        </button>
+
+                        <!-- Show Book button if NOT booked by user -->
+                        <button *ngIf="!slot.isBookedByCurrentUser" class="btn-action btn-book"
+                            [disabled]="(slot.currentBookings || 0) >= slot.max_bookings" (click)="bookSlot(slot)">
+                            {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Sin Plazas' : 'Reservar Plaza' }}
+                        </button>
+                    </ng-container>
                 </div>
             </div>
         </div>
@@ -307,5 +324,45 @@
             <span class="material-icons">close</span>
         </button>
         <img [src]="enlargedImageStr" alt="Enlarged" class="enlarged-img" (click)="$event.stopPropagation()">
+    </div>
+</div>
+
+<!-- Staff Anular Clase Modal -->
+<div class="modal-backdrop" *ngIf="isStaffCancelModalOpen" (click)="closeStaffCancelModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3>
+            <span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem; color: #ff5252;">{{ slotToToggle?.isCancelled ? 'restore' : 'warning' }}</span>
+            {{ slotToToggle?.isCancelled ? 'Restaurar' : 'Anular' }} Clase
+        </h3>
+
+        <div class="modal-body" style="margin-top: 1rem;">
+            <p class="confirm-message" style="margin-bottom: 1.5rem;">
+                ¿Estás seguro de que quieres <strong>{{ slotToToggle?.isCancelled ? 'restaurar' : 'anular' }}</strong> la clase del <strong>{{ slotToToggle?.day }} {{ slotToToggle?.date | date:'dd/MM' }}</strong> a las <strong>{{ slotToToggle?.start_time }}</strong>?
+            </p>
+
+            <div class="note warning" *ngIf="!slotToToggle?.isCancelled" style="display: flex; gap: 0.8rem; align-items: center;">
+                <span class="material-icons">notifications_active</span>
+                <div>
+                    Al confirmar, se enviará una <strong>notificación</strong> a todos los miembros inscritos avisando de la cancelación y se eliminarán sus plazas reservadas.
+                </div>
+            </div>
+            
+            <div class="note" *ngIf="slotToToggle?.isCancelled" style="background: #e8f5e9; color: #2e7d32; border-left: 4px solid #4caf50; padding: 1rem; border-radius: 4px; display: flex; gap: 0.8rem; align-items: center;">
+                <span class="material-icons">info</span>
+                <div>
+                    La clase volverá a estar disponible para que los usuarios puedan inscribirse.
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 2rem;">
+            <button class="btn-secondary" (click)="closeStaffCancelModal()" [disabled]="isSubmitting()">Cancelar</button>
+            <button class="btn-confirm" 
+                    [class.btn-delete-action]="!slotToToggle?.isCancelled" 
+                    (click)="confirmStaffToggle()" 
+                    [disabled]="isSubmitting()">
+                {{ isSubmitting() ? 'Procesando...' : (slotToToggle?.isCancelled ? 'Sí, restaurar' : 'Sí, anular clase') }}
+            </button>
+        </div>
     </div>
 </div>

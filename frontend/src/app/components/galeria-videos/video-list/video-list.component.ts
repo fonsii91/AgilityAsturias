@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VideoService } from '../../../services/video.service';
@@ -37,6 +37,8 @@ export class VideoListComponent implements OnInit {
     currentPage = 1;
     totalPages = 1;
     isLoading = true;
+    isLoadingMore = false;
+    hasReachedEnd = false;
     isFiltersOpen = false;
 
     selectedDogForProfile: Dog | null = null;
@@ -76,7 +78,11 @@ export class VideoListComponent implements OnInit {
     }
 
     loadVideos(page: number = 1) {
-        this.isLoading = true;
+        if (page === 1) {
+            this.isLoading = true;
+        } else {
+            this.isLoadingMore = true;
+        }
         const filters: any = {
             search: this.searchQuery
         };
@@ -92,18 +98,42 @@ export class VideoListComponent implements OnInit {
         this.videoService.getVideos(page, filters).subscribe({
             next: (res) => {
                 console.log('VIDEOS API RESPONSE:', res);
-                this.videos = res.data;
+                if (page === 1) {
+                    this.videos = res.data;
+                } else {
+                    this.videos = [...this.videos, ...res.data];
+                }
+                
                 this.currentPage = res.current_page;
                 this.totalPages = res.last_page;
+                this.hasReachedEnd = this.currentPage >= this.totalPages;
+                
                 this.isLoading = false;
+                this.isLoadingMore = false;
                 this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error('Error loading videos', err);
                 this.isLoading = false;
+                this.isLoadingMore = false;
                 this.cdr.detectChanges();
             }
         });
+    }
+
+    @HostListener('window:scroll', ['$event'])
+    onWindowScroll(event: Event) {
+        if (this.isLoading || this.isLoadingMore || this.hasReachedEnd) return;
+
+        const pos = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
+        const max = document.documentElement.scrollHeight;
+        
+        // Load more when user is 400px from the bottom
+        if (pos > max - 400) {
+            if (this.currentPage < this.totalPages) {
+                this.loadVideos(this.currentPage + 1);
+            }
+        }
     }
 
     applyFilters() {

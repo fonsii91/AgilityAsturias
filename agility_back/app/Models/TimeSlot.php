@@ -21,4 +21,9 @@ class TimeSlot extends Model
     {
         return $this->hasMany(Reservation::class, 'slot_id');
     }
+
+    public function exceptions()
+    {
+        return $this->hasMany(TimeSlotException::class, 'slot_id');
+    }
 }

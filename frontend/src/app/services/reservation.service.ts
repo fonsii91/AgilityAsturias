@@ -17,9 +17,13 @@ export class ReservationService {
     // Availability Signal
     private availabilitySignal = signal<{ slot_id: number, date: string, count: number, attendees: any[] }[]>([]);
 
+    // Exceptions Signal
+    private exceptionsSignal = signal<{ id: number, slot_id: number, date: string, reason: string | null }[]>([]);
+
     constructor() {
         this.fetchReservations();
         this.fetchAvailability();
+        this.fetchExceptions();
     }
 
     fetchReservations() {
@@ -41,12 +45,25 @@ export class ReservationService {
         });
     }
 
+    fetchExceptions() {
+        this.http.get<any[]>(`${environment.apiUrl}/time-slot-exceptions`).subscribe({
+            next: (data) => {
+                this.exceptionsSignal.set(data);
+            },
+            error: (err) => console.error('Error fetching exceptions', err)
+        });
+    }
+
     getReservations() {
         return this.reservationsSignal;
     }
 
     getAvailability() {
         return this.availabilitySignal;
+    }
+
+    getExceptions() {
+        return this.exceptionsSignal;
     }
 
     addReservation(payload: { slotId: number, userId: number, date: string, dogIds: number[] }) {
@@ -90,6 +107,30 @@ export class ReservationService {
                 next: () => {
                     this.fetchReservations();
                     this.fetchAvailability();
+                    resolve();
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    addException(slotId: number, date: string, reason?: string) {
+        return new Promise<void>((resolve, reject) => {
+            this.http.post<void>(`${environment.apiUrl}/time-slot-exceptions`, { slot_id: slotId, date, reason }).subscribe({
+                next: () => {
+                    this.fetchExceptions();
+                    resolve();
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    deleteException(slotId: number, date: string) {
+        return new Promise<void>((resolve, reject) => {
+            this.http.post<void>(`${environment.apiUrl}/time-slot-exceptions/delete`, { slot_id: slotId, date }).subscribe({
+                next: () => {
+                    this.fetchExceptions();
                     resolve();
                 },
                 error: (err) => reject(err)

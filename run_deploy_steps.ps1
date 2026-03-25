@@ -34,15 +34,15 @@ function createLinuxCompatibleZip(`$sourceDir, `$zipFile) {
 }
 
 // Zip httpdocs -> agilityasturias_com.zip
-`$httpdocsSource = 'c:\\Users\\Usuario\\Desktop\\AgilityAsturiass\\deploy_package\\httpdocs';
-`$httpdocsZip = 'c:\\Users\\Usuario\\Desktop\\AgilityAsturiass\\deploy_package\\agilityasturias_com.zip';
+`$httpdocsSource = 'c:\\Users\\Fonsi\\Desktop\\AgilityAsturias\\deploy_package\\httpdocs';
+`$httpdocsZip = 'c:\\Users\\Fonsi\\Desktop\\AgilityAsturias\\deploy_package\\agilityasturias_com.zip';
 if (is_dir(`$httpdocsSource)) {
     createLinuxCompatibleZip(`$httpdocsSource, `$httpdocsZip);
 }
 
 // Zip backend core -> agility_back_core.zip
-`$coreSource = 'c:\\Users\\Usuario\\Desktop\\AgilityAsturiass\\deploy_package\\agility_back_core';
-`$coreZip = 'c:\\Users\\Usuario\\Desktop\\AgilityAsturiass\\deploy_package\\agility_back_core.zip';
+`$coreSource = 'c:\\Users\\Fonsi\\Desktop\\AgilityAsturias\\deploy_package\\agility_back_core';
+`$coreZip = 'c:\\Users\\Fonsi\\Desktop\\AgilityAsturias\\deploy_package\\agility_back_core.zip';
 if (is_dir(`$coreSource)) {
     // Excluir .env si se ha colado
     if (file_exists(`$coreSource . '\\.env')) {
@@ -55,8 +55,8 @@ if (is_dir(`$coreSource)) {
 }
 "@
 
-Set-Content -Path "c:\Users\Usuario\Desktop\AgilityAsturiass\create_final_zips.php" -Value $phpScript
-php c:\Users\Usuario\Desktop\AgilityAsturiass\create_final_zips.php
+Set-Content -Path "c:\Users\Fonsi\Desktop\AgilityAsturias\create_final_zips.php" -Value $phpScript
+php c:\Users\Fonsi\Desktop\AgilityAsturias\create_final_zips.php
 
-Remove-Item -Path "c:\Users\Usuario\Desktop\AgilityAsturiass\create_final_zips.php" -Force
+Remove-Item -Path "c:\Users\Fonsi\Desktop\AgilityAsturias\create_final_zips.php" -Force
 Write-Host "Paquetes de despliegue listos en la carpeta deploy_package."

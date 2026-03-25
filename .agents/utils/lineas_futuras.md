@@ -8,8 +8,8 @@ description: futuras lineas de desarrollo para la app de Agility Asturias
 A continuación se detallan las propuestas para la evolución y escalabilidad de la aplicación, divididas por áreas temáticas y orientadas a aportar más valor tanto a los socios del club como a los entrenadores y la directiva.
 
 ## 1. 🔔 Notificaciones y Comunicación
-- **Notificaciones Push (Staff a Usuario):** Sistema para que los entrenadores o la directiva puedan enviar comunicados urgentes (ej. "Clase cancelada por lluvia", "Cambio de horario") y que los usuarios lo reciban como push en su móvil.
-- **Alertas Automáticas del Sistema:** Notificaciones push para eventos del sistema: recordatorios de reservas próximas, aviso de que un nuevo mapa de pista ha sido subido, o cuando un usuario recibe feedback en su vídeo.
+- **Notificaciones Push (Staff a Miembros):** Sistema para que los staff o la administrador puedan enviar comunicados urgentes (ej. "Clase cancelada por lluvia", "Cambio de horario") y que los usuarios lo reciban como push en su móvil.
+- **Alertas Automáticas del Sistema:** Notificaciones push para eventos del sistema: que las notifivaciones actuales se implementen tambien como notificaciones push.
 
 ## 2. 📂 Recursos y Material Didáctico
 - **Gestor de Recursos (Mejorado):** Que los miembros del staff puedan subir documentos (PDFs, normativas).
