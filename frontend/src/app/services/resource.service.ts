@@ -6,18 +6,18 @@ import { environment } from '../../environments/environment';
 export interface Resource {
   id: number;
   title: string;
-  description?: string;
+  description: string;
   type: 'document' | 'video' | 'link';
-  url?: string;
-  file_path?: string;
   category: string;
-  uploaded_by: number;
+  level: string;
+  url: string | null;
+  file_path: string | null;
+  user_id: number;
   created_at: string;
   updated_at: string;
   uploader?: {
     id: number;
     name: string;
-    last_name: string;
     role: string;
   };
 }
@@ -30,6 +30,14 @@ export const RESOURCE_CATEGORIES = [
   { value: 'otros', label: 'Otros' }
 ];
 
+export const RESOURCE_LEVELS = [
+  { value: 'all', label: 'Todos los niveles' },
+  { value: 'iniciacion', label: 'Iniciación' },
+  { value: 'grado1', label: 'Grado 1' },
+  { value: 'grado2', label: 'Grado 2' },
+  { value: 'grado3', label: 'Grado 3' }
+];
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,10 +46,14 @@ export class ResourceService {
 
   constructor(private http: HttpClient) {}
 
-  getResources(category?: string): Observable<Resource[]> {
+  getResources(category?: string, level?: string): Observable<Resource[]> {
     let url = this.apiUrl;
-    if (category) {
-      url += `?category=${category}`;
+    const params: string[] = [];
+    if (category) params.push(`category=${category}`);
+    if (level) params.push(`level=${level}`);
+
+    if (params.length > 0) {
+      url += '?' + params.join('&');
     }
     return this.http.get<Resource[]>(url);
   }

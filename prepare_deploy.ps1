@@ -86,6 +86,13 @@ try {
         ]),
         `$output
     );
+    
+    // 5.5 Limpiar cachés para que las nuevas rutas sean detectadas en producción
+    `$kernel->call('route:clear');
+    `$kernel->call('config:clear');
+    `$kernel->call('cache:clear');
+    `$output->write("Caché de rutas y configuración limpiada correctamente.\n");
+
 
     // 6. Mostrar el resultado
     echo "<h1>Resultado de la Migración</h1>";

@@ -18,9 +18,9 @@ A continuación se detallan las propuestas para la evolución y escalabilidad de
 ## 3. 🐕 Conexión con Flow Agility
 - **Métricas de Pista Avanzadas:** Permitir el registro detallado en las competiciones (velocidad en m/s, número de faltas, rehusos, tiempo total).
 - **Gráficas de Evolución:** Visualización del progreso del perro a lo largo de la temporada (ej. evolución de la velocidad promedio, ratio de pistas a cero).
+- **Live Scoring (Resultados en Vivo):** Si el club organiza una prueba de agility, tener un panel de resultados en vivo dentro de la app para que los participantes vean (los datos se conseguirán conectándose a la web de flowagility.com).
 
 ## 4. 🏆 Competiciones y Eventos
-- **Live Scoring (Resultados en Vivo):** Si el club organiza una prueba de agility, tener un panel de resultados en vivo dentro de la app para que los participantes vean (los datos se conseguirán conectándose a la web de flowagility.com).
 - **Gamificación Avanzada:** Ampliar el sistema de 'Ranking' y 'PointHistory' con Insignias o Logros visuales (ej. "Primer Cero Oficial", "Racha de Asistencia", "Súper Veterano").
 
 ## 5. Subir mapa de pista

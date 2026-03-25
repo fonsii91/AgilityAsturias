@@ -37,7 +37,6 @@ export class VideoListComponent implements OnInit {
     currentPage = 1;
     totalPages = 1;
     isLoading = true;
-    isLoadingMore = false;
     hasReachedEnd = false;
     isFiltersOpen = false;
 
@@ -78,11 +77,7 @@ export class VideoListComponent implements OnInit {
     }
 
     loadVideos(page: number = 1) {
-        if (page === 1) {
-            this.isLoading = true;
-        } else {
-            this.isLoadingMore = true;
-        }
+        this.isLoading = true;
         const filters: any = {
             search: this.searchQuery
         };
@@ -97,42 +92,27 @@ export class VideoListComponent implements OnInit {
 
         this.videoService.getVideos(page, filters).subscribe({
             next: (res) => {
-                console.log('VIDEOS API RESPONSE:', res);
-                if (page === 1) {
-                    this.videos = res.data;
-                } else {
-                    this.videos = [...this.videos, ...res.data];
-                }
+                this.videos = res.data;
                 
                 this.currentPage = res.current_page;
                 this.totalPages = res.last_page;
                 this.hasReachedEnd = this.currentPage >= this.totalPages;
                 
                 this.isLoading = false;
-                this.isLoadingMore = false;
                 this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error('Error loading videos', err);
                 this.isLoading = false;
-                this.isLoadingMore = false;
                 this.cdr.detectChanges();
             }
         });
     }
 
-    @HostListener('window:scroll', ['$event'])
-    onWindowScroll(event: Event) {
-        if (this.isLoading || this.isLoadingMore || this.hasReachedEnd) return;
-
-        const pos = (document.documentElement.scrollTop || document.body.scrollTop) + window.innerHeight;
-        const max = document.documentElement.scrollHeight;
-        
-        // Load more when user is 400px from the bottom
-        if (pos > max - 400) {
-            if (this.currentPage < this.totalPages) {
-                this.loadVideos(this.currentPage + 1);
-            }
+    goToPage(page: number) {
+        if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+            this.loadVideos(page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
 

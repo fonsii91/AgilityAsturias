@@ -1222,3 +1222,45 @@ h2 {
     object-fit: contain;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
+
+/* --- Staff Action Icon --- */
+.btn-icon-staff {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    padding: 6px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-icon-staff:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.btn-icon-staff .material-icons {
+    font-size: 18px;
+}
+
+.btn-icon-staff.cancel:hover {
+    color: #ef4444;
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.btn-icon-staff.restore {
+    color: #ef4444; /* Cancelled state looks red by default */
+    background: #fef2f2;
+    border-color: #fca5a5;
+}
+
+.btn-icon-staff.restore:hover {
+    color: #10b981;
+    background: #ecfdf5;
+    border-color: #6ee7b7;
+}

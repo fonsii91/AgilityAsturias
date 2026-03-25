@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ResourceService, RESOURCE_CATEGORIES } from '../../../services/resource.service';
+import { ResourceService, RESOURCE_CATEGORIES, RESOURCE_LEVELS } from '../../../services/resource.service';
 
 @Component({
   selector: 'app-recursos-form',
@@ -14,6 +14,7 @@ import { ResourceService, RESOURCE_CATEGORIES } from '../../../services/resource
 export class RecursosFormComponent implements OnInit {
   resourceForm: FormGroup;
   categories = RESOURCE_CATEGORIES;
+  levels = RESOURCE_LEVELS;
   isEditing = false;
   resourceId: number | null = null;
   selectedFile: File | null = null;
@@ -30,6 +31,7 @@ export class RecursosFormComponent implements OnInit {
       description: [''],
       type: ['document', Validators.required],
       category: ['', Validators.required],
+      level: ['', Validators.required],
       url: ['']
     });
   }
@@ -47,6 +49,7 @@ export class RecursosFormComponent implements OnInit {
                   description: res.description,
                   type: res.type,
                   category: res.category,
+                  level: res.level,
                   url: res.url
               });
           }
@@ -82,6 +85,7 @@ export class RecursosFormComponent implements OnInit {
     if (values.description) formData.append('description', values.description);
     formData.append('type', values.type);
     formData.append('category', values.category);
+    formData.append('level', values.level);
 
     if (values.type !== 'document' && values.url) {
         formData.append('url', values.url);
@@ -98,7 +102,7 @@ export class RecursosFormComponent implements OnInit {
             },
             error: (err: any) => {
                 console.error(err);
-                this.isSubmitting = false;
+                setTimeout(() => this.isSubmitting = false);
             }
         });
     } else {
@@ -108,7 +112,7 @@ export class RecursosFormComponent implements OnInit {
             },
             error: (err: any) => {
                 console.error(err);
-                this.isSubmitting = false;
+                setTimeout(() => this.isSubmitting = false);
             }
         });
     }

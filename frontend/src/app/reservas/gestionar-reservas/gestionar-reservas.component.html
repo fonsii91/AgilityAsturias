@@ -40,16 +40,28 @@
                         <span class="material-icons time-icon">schedule</span>
                         {{ slot.start_time }} - {{ slot.end_time }}
                     </div>
-                    <div class="status-indicator" *ngIf="!slot.isCancelled"
-                        [class.status-green]="(slot.currentBookings || 0) / slot.max_bookings < 0.5"
-                        [class.status-orange]="(slot.currentBookings || 0) / slot.max_bookings >= 0.5 && (slot.currentBookings || 0) < slot.max_bookings"
-                        [class.status-red]="(slot.currentBookings || 0) >= slot.max_bookings">
-                        <span class="status-dot"></span>
-                        {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Completo' : 'Disponible' }}
-                    </div>
-                    <div class="status-indicator status-red" *ngIf="slot.isCancelled">
-                        <span class="status-dot"></span>
-                        Festivo/Cancelada
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <div class="status-indicator" *ngIf="!slot.isCancelled"
+                            [class.status-green]="(slot.currentBookings || 0) / slot.max_bookings < 0.5"
+                            [class.status-orange]="(slot.currentBookings || 0) / slot.max_bookings >= 0.5 && (slot.currentBookings || 0) < slot.max_bookings"
+                            [class.status-red]="(slot.currentBookings || 0) >= slot.max_bookings">
+                            <span class="status-dot"></span>
+                            {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Completo' : 'Disponible' }}
+                        </div>
+                        <div class="status-indicator status-red" *ngIf="slot.isCancelled">
+                            <span class="status-dot"></span>
+                            Festivo/Cancelada
+                        </div>
+
+                        <!-- Staff Toggle Cancelled Status -->
+                        <button *ngIf="['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')"
+                            class="btn-icon-staff"
+                            [class.cancel]="!slot.isCancelled"
+                            [class.restore]="slot.isCancelled"
+                            [title]="slot.isCancelled ? 'Restaurar Clase' : 'Anular Clase'"
+                            (click)="openStaffCancelModal(slot)">
+                            <span class="material-icons">{{ slot.isCancelled ? 'restore' : 'block' }}</span>
+                        </button>
                     </div>
                 </div>
 
@@ -109,16 +121,7 @@
                 </div>
 
                 <div class="actions">
-                    <!-- Staff Toggle Cancelled Status -->
-                    <button *ngIf="['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')"
-                        class="btn-action"
-                        [class.btn-secondary]="slot.isCancelled"
-                        [class.btn-cancel-card]="!slot.isCancelled"
-                        (click)="openStaffCancelModal(slot)"
-                        style="margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <span class="material-icons" style="font-size: 1.1rem;">{{ slot.isCancelled ? 'restore' : 'block' }}</span>
-                        {{ slot.isCancelled ? 'Restaurar Clase' : 'Anular Clase' }}
-                    </button>
+
 
                     <ng-container *ngIf="!slot.isCancelled">
                         <!-- Show Cancel button ONLY if booked by current user -->

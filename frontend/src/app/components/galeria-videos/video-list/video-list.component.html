@@ -228,16 +228,17 @@
         </div>
     </div>
 
-    <!-- Skeletons al cargar más páginas -->
-    <div *ngIf="isLoadingMore" class="video-grid" style="margin-top: 1.5rem; padding-bottom: 2rem;">
-        <div *ngFor="let i of [1,2,3]" class="video-card skeleton-card" style="opacity: 0.6;">
-            <div class="skeleton-cover"></div>
-        </div>
-    </div>
-
-    <!-- Mensaje Final -->
-    <div *ngIf="hasReachedEnd && videos.length > 0 && !isLoading" class="end-reached-state">
-        <p>🎉 ¡Has llegado al final! No hay más vídeos para esta búsqueda.</p>
+    <!-- Controles de Paginación -->
+    <div *ngIf="totalPages > 1 && !isLoading" class="pagination-controls">
+        <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)" class="pagination-btn">
+            <span class="material-icons">chevron_left</span> Anterior
+        </button>
+        
+        <span class="pagination-info">Página {{ currentPage }} de {{ totalPages }}</span>
+        
+        <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)" class="pagination-btn">
+            Siguiente <span class="material-icons">chevron_right</span>
+        </button>
     </div>
 
 </div>

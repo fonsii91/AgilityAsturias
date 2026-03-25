@@ -16,6 +16,7 @@ class Resource extends Model
         'url',
         'file_path',
         'category',
+        'level',
         'uploaded_by',
     ];
 

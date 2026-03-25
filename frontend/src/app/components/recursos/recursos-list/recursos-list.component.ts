@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { ResourceService, Resource, RESOURCE_CATEGORIES } from '../../../services/resource.service';
+import { ResourceService, Resource, RESOURCE_CATEGORIES, RESOURCE_LEVELS } from '../../../services/resource.service';
+import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -15,28 +16,23 @@ import { environment } from '../../../../environments/environment';
 export class RecursosListComponent implements OnInit {
   resources: Resource[] = [];
   categories = RESOURCE_CATEGORIES;
+  levels = RESOURCE_LEVELS;
   selectedCategory: string = '';
+  selectedLevel: string = 'all';
   isLoading = true;
-  userRole: string = '';
 
   constructor(
-    private resourceService: ResourceService
+    private resourceService: ResourceService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        const user = JSON.parse(userStr);
-        this.userRole = user.role;
-      } catch(e) {}
-    }
     this.loadResources();
   }
 
   loadResources(): void {
     this.isLoading = true;
-    this.resourceService.getResources(this.selectedCategory).subscribe({
+    this.resourceService.getResources(this.selectedCategory, this.selectedLevel).subscribe({
       next: (data: Resource[]) => {
         this.resources = data;
         this.isLoading = false;
@@ -52,12 +48,20 @@ export class RecursosListComponent implements OnInit {
     this.loadResources();
   }
 
+  onLevelChange(): void {
+    this.loadResources();
+  }
+
   canManage(): boolean {
-    return this.userRole === 'staff' || this.userRole === 'admin';
+    return this.authService.isStaff();
   }
 
   getCategoryLabel(val: string): string {
     return this.categories.find((c: any) => c.value === val)?.label || val;
+  }
+
+  getLevelLabel(val: string): string {
+    return this.levels.find((l: any) => l.value === val)?.label || val;
   }
 
   getIconForType(type: string): string {

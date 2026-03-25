@@ -21,6 +21,14 @@
         </div>
 
         <div class="form-group">
+            <label>Nivel *</label>
+            <select formControlName="level" class="form-control">
+                <option value="">Selecciona un nivel</option>
+                <option *ngFor="let lvl of levels" [value]="lvl.value">{{ lvl.label }}</option>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label>Tipo de Recurso *</label>
             <select formControlName="type" class="form-control">
                 <option value="document">Documento (PDF, Word, etc.)</option>

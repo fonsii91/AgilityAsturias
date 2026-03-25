@@ -11,10 +11,14 @@ class ResourceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Resource::with('uploader:id,name,last_name,role');
+        $query = Resource::with('uploader:id,name,role');
         
         if ($request->has('category')) {
             $query->where('category', $request->category);
+        }
+        
+        if ($request->has('level')) {
+            $query->where('level', $request->level);
         }
         
         $resources = $query->orderBy('created_at', 'desc')->get();
@@ -33,8 +37,9 @@ class ResourceController extends Controller
             'description' => 'nullable|string',
             'type' => 'required|in:document,video,link',
             'category' => 'required|string',
+            'level' => 'required|string',
             'url' => 'nullable|string|required_if:type,video,link',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:20480|required_if:type,document'
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:102400|required_if:type,document'
         ]);
 
         $data = [
@@ -42,6 +47,7 @@ class ResourceController extends Controller
             'description' => $validated['description'] ?? null,
             'type' => $validated['type'],
             'category' => $validated['category'],
+            'level' => $validated['level'],
             'uploaded_by' => $user->id,
         ];
 
@@ -54,7 +60,7 @@ class ResourceController extends Controller
 
         $resource = Resource::create($data);
 
-        return response()->json($resource->load('uploader:id,name,last_name,role'), 201);
+        return response()->json($resource->load('uploader:id,name,role'), 201);
     }
 
     public function update(Request $request, $id)
@@ -71,11 +77,12 @@ class ResourceController extends Controller
             'description' => 'nullable|string',
             'type' => 'sometimes|required|in:document,video,link',
             'category' => 'sometimes|required|string',
+            'level' => 'sometimes|required|string',
             'url' => 'nullable|string|required_if:type,video,link',
-            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:20480'
+            'file' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,txt,jpg,jpeg,png|max:102400'
         ]);
 
-        $data = $request->only(['title', 'description', 'type', 'category']);
+        $data = $request->only(['title', 'description', 'type', 'category', 'level']);
 
         // Handle type specific fields
         if (isset($validated['type'])) {
@@ -112,7 +119,7 @@ class ResourceController extends Controller
 
         $resource->update($data);
 
-        return response()->json($resource->load('uploader:id,name,last_name,role'));
+        return response()->json($resource->load('uploader:id,name,role'));
     }
 
     public function destroy($id)

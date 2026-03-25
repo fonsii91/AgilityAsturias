@@ -7,9 +7,12 @@
     <div class="controls-section">
         <div class="filter-group">
             <span class="material-icons filter-icon">filter_list</span>
-            <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="category-select">
+            <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="category-select" style="margin-right: 10px;">
                 <option value="">Todas las categorías</option>
                 <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
+            </select>
+            <select [(ngModel)]="selectedLevel" (change)="onLevelChange()" class="category-select">
+                <option *ngFor="let lvl of levels" [value]="lvl.value">{{ lvl.label }}</option>
             </select>
         </div>
 
@@ -17,6 +20,14 @@
             <span class="material-icons">add_circle_outline</span>
             <span>Añadir Recurso</span>
         </button>
+    </div>
+
+    <!-- DEBUG TRAY -->
+    <div style="background: #ffeaa7; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
+        <strong style="color: dimgrey;">Debug Info del Agente:</strong><br/>
+        <span>Cargando (isLoading): {{ isLoading }}</span> | 
+        <span>Cantidad de recursos: {{ resources ? resources.length : 'NULL' }}</span> | 
+        <span>Filtro Nivel: {{ selectedLevel }}</span>
     </div>
 
     <div *ngIf="isLoading" class="loading-state">
@@ -29,26 +40,16 @@
     </div>
 
     <div *ngIf="!isLoading && resources.length > 0" class="resources-grid">
-        <div *ngFor="let resource of resources" class="resource-card" (click)="openResource(resource)">
-            <div class="resource-icon-wrapper" [ngClass]="resource.type">
+        <div *ngFor="let resource of resources" class="resource-card compact-horizontal" (click)="openResource(resource)">
+            <div class="resource-icon-side" [ngClass]="resource.type">
                 <span class="material-icons">{{ getIconForType(resource.type) }}</span>
             </div>
             
-            <div class="resource-content">
+            <div class="resource-body">
+                <h3 class="resource-title" [title]="resource.title">{{ resource.title }}</h3>
                 <div class="resource-badges">
                     <span class="badge category-badge">{{ getCategoryLabel(resource.category) }}</span>
-                    <span class="badge type-badge" [ngClass]="resource.type">{{ resource.type | titlecase }}</span>
-                </div>
-                
-                <h3 class="resource-title" [title]="resource.title">{{ resource.title }}</h3>
-                <p class="resource-description" *ngIf="resource.description">{{ resource.description }}</p>
-                
-                <div class="resource-footer">
-                    <span class="uploader-info">
-                        <span class="material-icons small-icon">person</span>
-                        {{ resource.uploader?.name }} {{ resource.uploader?.last_name }}
-                    </span>
-                    <span class="date-info">{{ resource.created_at | date:'dd/MM/yyyy' }}</span>
+                    <span class="badge level-badge" *ngIf="resource.level && resource.level !== 'all'">{{ getLevelLabel(resource.level) }}</span>
                 </div>
             </div>
 

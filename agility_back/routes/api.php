@@ -100,6 +100,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Ranking
         Route::get('/ranking', [RankingController::class, 'index']);
 
+        Route::get('/resources-test', [ResourceController::class, 'index']);
+
         // Resources
         Route::get('/resources', [ResourceController::class, 'index']);
 
