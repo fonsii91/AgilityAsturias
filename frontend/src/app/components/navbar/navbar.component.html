@@ -71,6 +71,7 @@
                 </div>
                 <div class="notification-list">
                     <div class="notification-item" *ngFor="let notif of notificationService.notificationsSignal()"
+                        [class.read]="notif.read_at"
                         (click)="handleNotificationClick(notif)">
 
                         <div class="notif-icon-container" [ngClass]="{

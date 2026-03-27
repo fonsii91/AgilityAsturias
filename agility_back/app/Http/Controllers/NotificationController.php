@@ -7,11 +7,18 @@ use Illuminate\Http\Request;
 class NotificationController extends Controller
 {
     /**
-     * Get all unread notifications for the authenticated user.
+     * Get the latest 10 notifications for the authenticated user and clean up older ones.
      */
     public function index(Request $request)
     {
-        return response()->json($request->user()->unreadNotifications);
+        $user = $request->user();
+
+        // Keep only the most recent 10 notifications
+        $notificationsToKeep = $user->notifications()->latest()->take(10)->pluck('id');
+        $user->notifications()->whereNotIn('id', $notificationsToKeep)->delete();
+
+        // Return up to 10 notifications
+        return response()->json($user->notifications()->latest()->get());
     }
 
     /**

@@ -35,7 +35,7 @@ export class NotificationService {
         this.http.get<AppNotification[]>(this.apiUrl).subscribe({
             next: (data) => {
                 this.notificationsSignal.set(data);
-                this.unreadCountSignal.set(data.length);
+                this.unreadCountSignal.set(data.filter(n => !n.read_at).length);
             },
             error: (err) => {
                 // If it's a 403 Forbidden, it just means the user doesn't have permissions (e.g. they are a basic rule 'user')
@@ -50,9 +50,11 @@ export class NotificationService {
     markAsRead(id: string): Observable<any> {
         return this.http.post(`${this.apiUrl}/${id}/read`, {}).pipe(
             tap(() => {
-                const currentList = this.notificationsSignal().filter(n => n.id !== id);
+                const currentList = this.notificationsSignal().map(n => 
+                    n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+                );
                 this.notificationsSignal.set(currentList);
-                this.unreadCountSignal.set(currentList.length);
+                this.unreadCountSignal.set(currentList.filter(n => !n.read_at).length);
             })
         );
     }
@@ -60,7 +62,11 @@ export class NotificationService {
     markAllAsRead(): Observable<any> {
         return this.http.post(`${this.apiUrl}/mark-all-read`, {}).pipe(
             tap(() => {
-                this.notificationsSignal.set([]);
+                const currentList = this.notificationsSignal().map(n => ({
+                    ...n, 
+                    read_at: n.read_at ? n.read_at : new Date().toISOString()
+                }));
+                this.notificationsSignal.set(currentList);
                 this.unreadCountSignal.set(0);
             })
         );

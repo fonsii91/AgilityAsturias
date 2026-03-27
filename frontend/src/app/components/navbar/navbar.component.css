@@ -483,13 +483,22 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     transition: all 0.2s ease;
     align-items: flex-start;
     gap: 14px;
-    background-color: #fff;
+    background-color: #f4f8ff; /* unread background */
     position: relative;
     overflow: hidden;
 }
 
+.notification-item.read {
+    background-color: #fff;
+    opacity: 0.75;
+}
+
 .notification-item:hover {
-    background-color: #f8faff;
+    background-color: #eef4ff;
+}
+
+.notification-item.read:hover {
+    background-color: #f9f9f9;
 }
 
 .notification-item::before {
@@ -499,12 +508,16 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     top: 0;
     bottom: 0;
     width: 3px;
-    background-color: transparent;
+    background-color: var(--primary-blue, #0056b3);
     transition: background-color 0.2s;
 }
 
-.notification-item:hover::before {
-    background-color: var(--primary-blue, #0056b3);
+.notification-item.read::before {
+    background-color: transparent;
+}
+
+.notification-item.read:hover::before {
+    background-color: #ddd;
 }
 
 .notification-item:last-child {
@@ -566,6 +579,7 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     white-space: normal;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -625,5 +639,14 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
         right: 0;
         width: 220px;
         /* Fixed width prevents squashing */
+    }
+
+    .notification-menu {
+        position: fixed;
+        top: 64px; /* Toolbar height */
+        right: 1rem;
+        left: auto;
+        width: calc(100vw - 2rem);
+        max-width: 340px;
     }
 }
