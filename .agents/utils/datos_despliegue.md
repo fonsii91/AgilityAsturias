@@ -22,4 +22,4 @@ description: Datos para desplegar en producción el proyecto
 - **[Completado]** Fase 1: Instalados Nginx, PHP 8.4, Node.js 20, MariaDB, Redis, FFmpeg y Supervisor.
 - **[Completado]** Fase 2 y 3: Base de datos configurada, repositorio clonado, dependencias instaladas y Angular compilado en producción en `/var/www/agilityasturias`.
 - **[Completado]** Fase 4: Configurado Nginx y Supervisor para mantener el backend y queues levantados.
-- **[Completado]** Fase 5: Verificada la disponibilidad del sitio web por HTTP en la IP pública. SSL está pendiente hasta la configuración del dominio.
+- **[Completado]** Fase 5: Verificada la disponibilidad del sitio web y configurado el certificado SSL (HTTPS) con Certbot.
