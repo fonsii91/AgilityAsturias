@@ -2,6 +2,9 @@
 description: Prepare Hostalia Production Deployment
 ---
 
+
+# Este .md esta obsoleto, ya no desplegamos en hostaloa, ahora desplegamos en contabo, se guarda este archivo como recuerdo
+
 # Preparar Despliegue en Hostalia
 
 Este workflow automatiza la preparación de los archivos para subirlos a producción en Hostalia. 

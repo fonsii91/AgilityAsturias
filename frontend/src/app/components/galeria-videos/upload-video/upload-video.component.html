@@ -33,7 +33,8 @@
                 <select formControlName="competition_id">
                     <option value="">Ninguna</option>
                     <option *ngFor="let comp of compService.getCompetitions()()" [value]="comp.id">
-                        {{ comp.nombre }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : '' }}
+                        {{ comp.nombre }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : ''
+                        }}
                     </option>
                 </select>
                 <span class="material-icons">emoji_events</span>
@@ -65,14 +66,16 @@
 
         <!-- Drag and Drop Zone -->
         <div class="form-group">
-            <label>Archivo de Vídeo * <span style="font-weight: normal; font-size: 0.85em; color: var(--text-light);">(Máx aprox 100MB, si no se comprime)</span></label>
-            
+            <label>Archivo de Vídeo * <span
+                    style="font-weight: normal; font-size: 0.85em; color: var(--text-light);">(Máx aprox
+                    500MB)</span></label>
+
             <div *ngIf="!selectedFile" class="drag-drop-zone" [class.drag-over]="isDragging"
                 (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
                 (click)="fileInput.click()">
                 <div class="drag-content">
                     <span class="material-icons drag-icon">movie</span>
-                    <p class="drag-title">Haz clic o arrastra tu vídeo aquí</p>
+                    <p class="drag-title">Haz click o arrastra tu vídeo aquí</p>
                     <p class="drag-subtitle">MP4, MOV, AVI o WEBM</p>
                 </div>
                 <!-- Hidden file input -->

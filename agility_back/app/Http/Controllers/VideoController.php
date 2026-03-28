@@ -96,7 +96,7 @@ class VideoController extends Controller
             'dog_id' => 'required|exists:dogs,id',
             'competition_id' => 'nullable|exists:competitions,id',
             'date' => 'required|date',
-            'video' => 'required|file|mimes:mp4,mov,avi,wmv,webm|max:389120', // 380MB
+            'video' => 'required|file|mimes:mp4,mov,avi,wmv,webm|max:512000', // 500MB
             'title' => 'nullable|string|max:255'
         ]);
 

@@ -237,13 +237,13 @@ export class UploadVideoComponent implements OnInit {
         }
 
         let finalFile = this.selectedFile;
-        // Solo comprimir si es mayor a 100MB (Límite del servidor)
-        if (this.selectedFile.size > 100 * 1024 * 1024) {
+        // Solo comprimir si es mayor a 500MB (Límite del servidor)
+        if (this.selectedFile.size > 500 * 1024 * 1024) {
             try {
                 finalFile = await this.compressVideo(this.selectedFile);
             } catch (error) {
                 console.error('Error comprimiendo vídeo', error);
-                this.toastService.error('Error al comprimir. El archivo original es demasiado pesado para subirlo sin comprimir (>100MB).');
+                this.toastService.error('Error al comprimir. El archivo original es demasiado pesado para subirlo sin comprimir (>500MB).');
                 this.isCompressing = false;
                 this.cdr.detectChanges();
                 return;
@@ -293,7 +293,7 @@ export class UploadVideoComponent implements OnInit {
                     
                     this.toastService.error(errorMsg);
                 } else if (err.status === 413) {
-                    this.toastService.error('El vídeo fue rechazado por el servidor porque es demasiado pesado (Máximo 100MB).');
+                    this.toastService.error('El vídeo fue rechazado por el servidor porque es demasiado pesado (Máximo 500MB).');
                 } else if (err.status === 0) {
                     this.toastService.error('Se perdió la conexión con el servidor. El archivo podría ser demasiado pesado.');
                 } else {

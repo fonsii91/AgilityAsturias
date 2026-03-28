@@ -11,4 +11,4 @@ use Illuminate\Support\Facades\Schedule;
 // Using Schedule::call to avoid proc_open restrictions on Hostalia shared hosting
 Schedule::call(function () {
     Artisan::call('youtube:upload-videos');
-})->dailyAt('23:00');
+})->dailyAt('03:00')->timezone('Europe/Madrid');
