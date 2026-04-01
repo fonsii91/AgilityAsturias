@@ -1,6 +1,7 @@
 # Script de Preparación para Despliegue en Hostalia (Sin Vendor)
 # Este script organiza todos los archivos en una carpeta 'deploy_package' lista para subir.
 
+## ya no se usa este script
 $ErrorActionPreference = "Stop"
 
 Write-Host "Iniciando preparación del paquete de despliegue (Excluyendo vendor)..." -ForegroundColor Green

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface Resource {
@@ -43,6 +43,7 @@ export const RESOURCE_LEVELS = [
 })
 export class ResourceService {
   private apiUrl = environment.apiUrl + '/resources';
+  private cache = new Map<string, Observable<Resource[]>>();
 
   constructor(private http: HttpClient) {}
 
@@ -55,18 +56,31 @@ export class ResourceService {
     if (params.length > 0) {
       url += '?' + params.join('&');
     }
-    return this.http.get<Resource[]>(url);
+    
+    if (!this.cache.has(url)) {
+      this.cache.set(url, this.http.get<Resource[]>(url).pipe(
+          shareReplay(1)
+      ));
+    }
+    return this.cache.get(url)!;
+  }
+
+  clearCache(): void {
+      this.cache.clear();
   }
 
   createResource(data: FormData): Observable<Resource> {
+    this.clearCache();
     return this.http.post<Resource>(this.apiUrl, data);
   }
 
   updateResource(id: number, data: FormData): Observable<Resource> {
+    this.clearCache();
     return this.http.post<Resource>(`${this.apiUrl}/${id}`, data);
   }
 
   deleteResource(id: number): Observable<any> {
+    this.clearCache();
     return this.http.post(`${this.apiUrl}/${id}/delete`, {});
   }
 }

@@ -17,7 +17,7 @@ class ResourceController extends Controller
             $query->where('category', $request->category);
         }
         
-        if ($request->has('level')) {
+        if ($request->has('level') && $request->level !== 'all') {
             $query->where('level', $request->level);
         }
         

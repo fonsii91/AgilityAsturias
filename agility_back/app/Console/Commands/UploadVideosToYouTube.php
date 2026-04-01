@@ -27,7 +27,7 @@ class UploadVideosToYouTube extends Command
     {
         $videos = Video::whereIn('status', ['local', 'in_queue'])
             ->where('created_at', '<=', now()->subDays(3))
-            ->take(6)
+            ->take(5) // Reducido de 6 a 5 para no superar la cuota diaria (10,000 req) de YouTube Data API
             ->get();
 
         if ($videos->isEmpty()) {
@@ -117,7 +117,14 @@ class UploadVideosToYouTube extends Command
                 }
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error("Failed to upload video ID: {$video->id}. Error: " . $e->getMessage());
-                $video->update(['status' => 'failed']);
+                
+                // Si el error es por límite de subida diario de Youtube (uploadLimitExceeded), 
+                // lo marcamos como 'local' para que el CRON lo vuelva a intentar mañana cuando se reinicie la cuota.
+                if (str_contains($e->getMessage(), 'uploadLimitExceeded') || str_contains($e->getMessage(), 'quota')) {
+                    $video->update(['status' => 'local']);
+                } else {
+                    $video->update(['status' => 'failed']);
+                }
             }
         }
     }

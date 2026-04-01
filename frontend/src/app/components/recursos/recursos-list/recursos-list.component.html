@@ -16,18 +16,16 @@
             </select>
         </div>
 
-        <button *ngIf="canManage()" routerLink="/recursos/nuevo" class="btn-primary-add">
-            <span class="material-icons">add_circle_outline</span>
-            <span>Añadir Recurso</span>
-        </button>
-    </div>
-
-    <!-- DEBUG TRAY -->
-    <div style="background: #ffeaa7; padding: 10px; margin-bottom: 20px; border-radius: 5px;">
-        <strong style="color: dimgrey;">Debug Info del Agente:</strong><br/>
-        <span>Cargando (isLoading): {{ isLoading }}</span> | 
-        <span>Cantidad de recursos: {{ resources ? resources.length : 'NULL' }}</span> | 
-        <span>Filtro Nivel: {{ selectedLevel }}</span>
+        <div style="display: flex; gap: 10px;">
+            <button (click)="loadResources()" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer;">
+                <span class="material-icons" style="font-size: 18px;">refresh</span>
+                <span>Recargar</span>
+            </button>
+            <button *ngIf="canManage()" routerLink="/recursos/nuevo" class="btn-primary-add">
+                <span class="material-icons">add_circle_outline</span>
+                <span>Añadir Recurso</span>
+            </button>
+        </div>
     </div>
 
     <div *ngIf="isLoading" class="loading-state">
