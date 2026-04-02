@@ -85,7 +85,7 @@
     </div>
 
     <div *ngIf="!isLoading && videos.length > 0" class="video-grid">
-        <div *ngFor="let video of videos" class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id}">
+        <div *ngFor="let video of videos" class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id && player.isVideoActive}">
             <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path" [coverImageUrl]="video.dog?.photo_url">
             </app-smart-video-player>
 
