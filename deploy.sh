@@ -25,7 +25,7 @@ fi
 if [ -d "frontend" ]; then
     echo "➡️  Compilando Frontend (Angular)..."
     cd frontend
-    npm install
+    npm install --legacy-peer-deps
     # Usamos npx para asegurar el uso local de NG (Angular CLI)
     npx ng build --configuration production
     cd ..
