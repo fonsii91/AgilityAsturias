@@ -14,12 +14,38 @@ description: Datos para desplegar en producción el proyecto
 
 ## Datos de acceso
 - **Usuario**: root
+- **Acceso SSH**: Configurado con certificados/claves SSH.
+  - **Comando principal (configurado localmente)**: `ssh agilityasturias` (Usando `~/.ssh/config` y `id_rsa`).
+  - **Desde otros equipos (con certificado)**: `ssh -i <ruta_a_tu_clave> root@157.173.121.242`
+  - **Desde otros equipos (solo contraseña)**: `ssh root@157.173.121.242`
 - **Contraseña**: z1jateU3PgSii3fB7
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
-- El servidor está activo y accesible por SSH como root.
+- El servidor está activo y accesible por SSH como root utilizando certificados SSH.
 - **[Completado]** Fase 1: Instalados Nginx, PHP 8.4, Node.js 20, MariaDB, Redis, FFmpeg y Supervisor.
 - **[Completado]** Fase 2 y 3: Base de datos configurada, repositorio clonado, dependencias instaladas y Angular compilado en producción en `/var/www/agilityasturias`.
 - **[Completado]** Fase 4: Configurado Nginx y Supervisor para mantener el backend y queues levantados.
 - **[Completado]** Fase 5: Verificada la disponibilidad del sitio web y configurado el certificado SSL (HTTPS) con Certbot.
+
+---
+
+## 🚀 Protocolo oficial de despliegue
+
+Gracias al uso del script `deploy.sh` que se encuentra en la raíz del repositorio, subir los cambios a producción es muy directo. El protocolo consiste simplemente en:
+
+1. **Guardar y Subir (Desde tu entorno Local):**  
+   Acumula tus cambios y envíalos habitualmente hacia `main`:
+   ```bash
+   git add .
+   git commit -m "Descripción de tu mejora"
+   git push origin main
+   ```
+
+2. **Ejecutar el Despliegue (En el Servidor de Producción):**  
+   Simplemente ejecuta este comando desde cualquier terminal local que tenga permisos por SSH. El servidor se encargará de realizar el git pull, instalar dependencias para back/front, limpiar cachés, compilar en production y reiniciar las colas automáticamente:
+   ```bash
+   ssh agilityasturias "cd /var/www/agilityasturias && bash deploy.sh"
+   ```
+
+*(Nota: Si alguna vez tuvieras que usar un ordenador no configurado con la clave, en lugar de ese comando tendrías que entrar mediante `ssh root@157.173.121.242`, moverte al directorio con `cd /var/www/agilityasturias` y ejecutar manualmente `bash deploy.sh`)*
