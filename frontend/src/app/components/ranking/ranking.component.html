@@ -12,7 +12,7 @@
     <div *ngIf="!isLoading() && ranking().length > 0" class="ranking-content">
         <div class="ranking-list glass-effect">
             <div *ngFor="let dog of ranking(); let i = index" class="ranking-row" [class.top-rank]="i < 3"
-                [class.highlight-user-dog]="dog.user_id === authService.currentUserSignal()?.id" (click)="openFicha(dog)" style="cursor: pointer;">
+                [class.highlight-user-dog]="hasDogUser(dog, authService.currentUserSignal()?.id)" (click)="openFicha(dog)" style="cursor: pointer;">
                 <div class="rank-position">
                     <span class="medal-icon" *ngIf="i === 0">🥇</span>
                     <span class="medal-icon" *ngIf="i === 1">🥈</span>
@@ -59,7 +59,7 @@
                             <span>NUEVO</span>
                         </div>
                     </div>
-                    <span class="owner-name" *ngIf="dog.user">{{ dog.user.name }}</span>
+                    <span class="owner-name" *ngIf="dog.users">{{ dog.users[0]?.name }}</span>
                 </div>
 
                 <div class="recent-emojis" *ngIf="dog.recentEmojis && dog.recentEmojis.length > 0">

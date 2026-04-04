@@ -24,7 +24,7 @@ export class MisReservasComponent {
         if (!user) return [];
 
         return this.reservationService.getReservations()()
-            .filter(r => r.userId === user.id);
+            .filter(r => r.userId === user.id || ((r.dog as any)?.users && (r.dog as any).users.some((u: any) => u.id === user.id)));
     });
 
     // Reservas de hoy

@@ -74,7 +74,7 @@ class AttendanceController extends Controller
             $reservations = Reservation::where('date', $date)
                 ->where('slot_id', $slotId)
                 ->where('attendance_verified', false)
-                ->with('dog')
+                ->with('dog.users')
                 ->get();
 
             foreach ($reservations as $res) {
@@ -91,8 +91,10 @@ class AttendanceController extends Controller
                             'category' => 'Asistencia a entrenamiento'
                         ]);
                         
-                        if ($res->user) {
-                            Notification::send($res->user, new DogPointNotification($res->dog));
+                        if ($res->dog && $res->dog->users) {
+                            foreach ($res->dog->users as $owner) {
+                                Notification::send($owner, new DogPointNotification($res->dog));
+                            }
                         }
                     }
                 } else {
@@ -213,7 +215,13 @@ class AttendanceController extends Controller
                             'points' => $pointsToAdd,
                             'category' => $categoryName
                         ]);
-                        // We can optionally trigger Notification::send like in regular attendance
+                        // Notificamos a todos los dueños del perro
+                        $dog->load('users');
+                        if ($dog->users) {
+                            foreach ($dog->users as $owner) {
+                                \Illuminate\Support\Facades\Notification::send($owner, new \App\Notifications\DogPointNotification($dog));
+                            }
+                        }
                     }
                 }
             }

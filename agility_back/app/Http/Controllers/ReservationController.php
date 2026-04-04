@@ -16,7 +16,7 @@ class ReservationController extends Controller
         // Admin/Staff sees all
         $user = $request->user();
         if ($user->role === 'admin' || $user->role === 'staff') {
-            return Reservation::with(['user', 'timeSlot', 'dog'])->get();
+            return Reservation::with(['user', 'timeSlot', 'dog.users:id'])->get();
         }
 
         // Standard user only sees their own (fallback for index)
@@ -28,7 +28,16 @@ class ReservationController extends Controller
      */
     public function myReservations(Request $request)
     {
-        return $request->user()->reservations()->with(['user', 'timeSlot', 'dog'])->get();
+        $userId = $request->user()->id;
+
+        return Reservation::with(['user', 'timeSlot', 'dog.users:id']) // Load dog.users for frontend logic
+            ->where(function($query) use ($userId) {
+                $query->where('user_id', $userId)
+                      ->orWhereHas('dog.users', function($qDogUser) use ($userId) {
+                          $qDogUser->where('users.id', $userId);
+                      });
+            })
+            ->get();
     }
 
     /**
@@ -154,7 +163,8 @@ class ReservationController extends Controller
         $reservation = Reservation::with(['user', 'timeSlot', 'dog'])->findOrFail($id);
 
         // Authorization check
-        if ($request->user()->id !== $reservation->user_id && !in_array($request->user()->role, ['admin', 'staff'])) {
+        $isDogOwner = $reservation->dog_id ? $request->user()->dogs()->where('dogs.id', $reservation->dog_id)->exists() : false;
+        if ($request->user()->id !== $reservation->user_id && !$isDogOwner && !in_array($request->user()->role, ['admin', 'staff'])) {
             abort(403);
         }
 
@@ -168,8 +178,9 @@ class ReservationController extends Controller
     {
         $reservation = Reservation::findOrFail($id);
 
-        // Authorization: User can update own, or staff/admin
-        if ($request->user()->id !== $reservation->user_id && !in_array($request->user()->role, ['admin', 'staff'])) {
+        // Authorization: User can update own, or staff/admin, or explicitly co-owner
+        $isDogOwner = $reservation->dog_id ? $request->user()->dogs()->where('dogs.id', $reservation->dog_id)->exists() : false;
+        if ($request->user()->id !== $reservation->user_id && !$isDogOwner && !in_array($request->user()->role, ['admin', 'staff'])) {
             abort(403);
         }
 
@@ -195,7 +206,9 @@ class ReservationController extends Controller
 
         // Authorization check
         $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
-        if ($user->id !== $reservation->user_id && !$isAdminOrStaff) {
+        $isDogOwner = $reservation->dog_id ? $user->dogs()->where('dogs.id', $reservation->dog_id)->exists() : false;
+
+        if ($user->id !== $reservation->user_id && !$isDogOwner && !$isAdminOrStaff) {
             abort(403);
         }
 
@@ -232,10 +245,14 @@ class ReservationController extends Controller
 
         $user = $request->user();
         $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
+        $myDogs = $user->dogs()->pluck('dogs.id')->toArray();
 
-        $reservationsToDelete = Reservation::where('user_id', $user->id)
-            ->where('slot_id', $request->slot_id)
+        $reservationsToDelete = Reservation::where('slot_id', $request->slot_id)
             ->whereDate('date', $request->date)
+            ->where(function($query) use ($user, $myDogs) {
+                $query->where('user_id', $user->id)
+                      ->orWhereIn('dog_id', $myDogs);
+            })
             ->get();
 
         if ($reservationsToDelete->isEmpty()) {
@@ -266,10 +283,7 @@ class ReservationController extends Controller
             }
         }
 
-        Reservation::where('user_id', $user->id)
-            ->where('slot_id', $request->slot_id)
-            ->whereDate('date', $request->date)
-            ->delete();
+        Reservation::whereIn('id', $reservationsToDelete->pluck('id'))->delete();
 
         return response()->noContent();
     }

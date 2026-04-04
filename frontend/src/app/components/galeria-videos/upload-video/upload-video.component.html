@@ -15,8 +15,8 @@
                 <select formControlName="dog_id"
                     [ngClass]="{ 'is-invalid': uploadForm.get('dog_id')?.invalid && uploadForm.get('dog_id')?.touched }">
                     <option value="" disabled selected>Selecciona un perro</option>
-                    <option *ngFor="let dog of dogService.getAllDogs()()" [value]="dog.id">
-                        {{ dog.name }}
+                    <option *ngFor="let dog of sortedDogs" [value]="dog.id">
+                        {{ hasDogUser(dog, authService.currentUserSignal()?.id ?? null) ? '🐾 ' + dog.name : '🦴 ' + dog.name }}
                     </option>
                 </select>
                 <span class="material-icons">pets</span>

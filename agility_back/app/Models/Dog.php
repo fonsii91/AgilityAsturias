@@ -12,7 +12,6 @@ class Dog extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'name',
         'breed',
         'birth_date',
@@ -23,9 +22,9 @@ class Dog extends Model
         'points',
     ];
 
-    public function user()
+    public function users()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class);
     }
 
     public function reservations()

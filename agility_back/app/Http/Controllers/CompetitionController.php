@@ -25,7 +25,9 @@ class CompetitionController extends Controller
                 $comp->dias_asistencia = $userAttendance && $userAttendance->pivot->dias_asistencia ? json_decode($userAttendance->pivot->dias_asistencia, true) : [];
 
                 $comp->attending_dog_ids = $comp->attendingDogs()
-                    ->where('dogs.user_id', $user->id)
+                    ->whereHas('users', function($q) use ($user) {
+                        $q->where('users.id', $user->id);
+                    })
                     ->pluck('dogs.id');
                 return $comp;
             });
@@ -133,18 +135,42 @@ class CompetitionController extends Controller
         $competition->attendees()->syncWithoutDetaching([$user->id => $pivotData]);
 
         // Attach dogs (verify they belong to user)
-        $userDogs = $user->dogs()->pluck('id')->toArray();
+        $userDogs = $user->dogs()->pluck('dogs.id')->toArray();
         if ($request->has('dog_ids')) {
             $validDogIds = collect($request->dog_ids)->intersect($userDogs)->toArray();
 
-            // Detach only this user's dogs, then attach the new valid ones
-            $competition->attendingDogs()->detach($userDogs);
+            $dogsToUnattend = array_diff($userDogs, $validDogIds);
+            
+            $otherAttendeesIds = $competition->attendees()->where('users.id', '!=', $user->id)->pluck('users.id')->toArray();
+            $dogsToDetach = [];
+            
+            foreach ($dogsToUnattend as $dogId) {
+                $dog = \App\Models\Dog::find($dogId);
+                if ($dog) {
+                    $attendingOwners = $dog->users()->whereIn('users.id', $otherAttendeesIds)->exists();
+                    if (!$attendingOwners) {
+                        $dogsToDetach[] = $dogId;
+                    }
+                }
+            }
+
+            $competition->attendingDogs()->detach($dogsToDetach);
+
             if (!empty($validDogIds)) {
-                $competition->attendingDogs()->attach($validDogIds);
+                $competition->attendingDogs()->syncWithoutDetaching($validDogIds);
             }
         } else {
-            // Remove user's dogs if no dog is sent
-            $competition->attendingDogs()->detach($userDogs);
+            // Remove user's dogs if no dog is sent, protecting shared dogs
+            $otherAttendeesIds = $competition->attendees()->where('users.id', '!=', $user->id)->pluck('users.id')->toArray();
+            $dogsToDetach = [];
+            
+            foreach ($userDogs as $dogId) {
+                $dog = \App\Models\Dog::find($dogId);
+                if ($dog && !$dog->users()->whereIn('users.id', $otherAttendeesIds)->exists()) {
+                    $dogsToDetach[] = $dogId;
+                }
+            }
+            $competition->attendingDogs()->detach($dogsToDetach);
         }
 
         return response()->json(['message' => 'Attendance recorded successfully']);
@@ -157,8 +183,18 @@ class CompetitionController extends Controller
 
         $competition->attendees()->detach($user->id);
 
-        $userDogs = $user->dogs()->pluck('id')->toArray();
-        $competition->attendingDogs()->detach($userDogs);
+        $userDogs = $user->dogs()->pluck('dogs.id')->toArray();
+        $otherAttendeesIds = $competition->attendees()->pluck('users.id')->toArray();
+
+        $dogsToDetach = [];
+        foreach ($userDogs as $dogId) {
+            $dog = \App\Models\Dog::find($dogId);
+            if ($dog && !$dog->users()->whereIn('users.id', $otherAttendeesIds)->exists()) {
+                $dogsToDetach[] = $dogId;
+            }
+        }
+
+        $competition->attendingDogs()->detach($dogsToDetach);
 
         return response()->json(['message' => 'Attendance removed successfully']);
     }
@@ -171,7 +207,9 @@ class CompetitionController extends Controller
 
         $attendees->transform(function ($user) use ($competition) {
             $user->attending_dogs = $competition->attendingDogs()
-                ->where('dogs.user_id', $user->id)
+                ->whereHas('users', function($q) use ($user) {
+                    $q->where('users.id', $user->id);
+                })
                 ->select('dogs.id', 'dogs.name', 'dogs.photo_url')
                 ->get();
             $user->dias_asistencia = $user->pivot->dias_asistencia ? json_decode($user->pivot->dias_asistencia, true) : [];

@@ -214,7 +214,7 @@ export class AttendanceVerificationComponent {
 
     getUserDogs(userId: number | null): Dog[] {
         if (!userId) return [];
-        return this.allDogs().filter(d => d.userId == userId);
+        return this.allDogs().filter(d => d.users?.some(u => u.id == userId));
     }
 
     // --- Modals ---

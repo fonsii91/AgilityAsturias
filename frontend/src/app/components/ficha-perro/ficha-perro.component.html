@@ -80,9 +80,31 @@
             <input type="text" class="form-input" [(ngModel)]="editForm.pedigree" placeholder="LOE, LOC, etc.">
           </div>
 
+          <!-- Acciones de Dueño: Compartir -->
+          <div class="dog-actions-footer" *ngIf="isOwner()" style="margin-top: 1.5rem; margin-bottom: 2rem; text-align: center;">
+            <button class="btn-secondary" (click)="toggleShare()" *ngIf="!isSharing" style="width: 100%; border: 1px solid var(--primary-color); border-radius: var(--border-radius); padding: 0.5rem; color: var(--primary-color); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <span class="material-icons-outlined" style="font-size: 18px;">group_add</span> Compartir Perro con Familiar
+            </button>
+            
+            <div class="share-dog-panel glass-effect" *ngIf="isSharing" style="margin-top: 1rem; padding: 1rem; border-radius: var(--border-radius); text-align: left;">
+              <h5 style="margin-bottom: 0.8rem; font-size: 0.95rem; color: var(--text-color);">Reasignar Pista (Vincular Familiar):</h5>
+              <div *ngIf="isFetchingUsers" class="loading-text" style="font-size: 0.85rem; color: #666;">Cargando usuarios...</div>
+              <div *ngIf="!isFetchingUsers">
+                  <select [(ngModel)]="shareEmail" class="form-input" style="width: 100%; margin-bottom: 0.8rem;">
+                      <option value="" disabled selected>-- Elige un usuario --</option>
+                      <option *ngFor="let user of usersList" [value]="user.email">{{ user.name }}</option>
+                  </select>
+                  <div style="display: flex; gap: 10px;">
+                      <button (click)="toggleShare()" style="flex: 1; padding: 0.5rem; background: #e0e0e0; color: #333; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
+                      <button (click)="submitShare()" [disabled]="!shareEmail" style="flex: 1; padding: 0.5rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;" [style.opacity]="!shareEmail ? 0.5 : 1">Vincular</button>
+                  </div>
+              </div>
+            </div>
+          </div>
+
           <div class="edit-actions-bottom">
-            <button class="btn-cancel" (click)="toggleEdit()">Cancelar</button>
-            <button class="btn-save" (click)="saveChanges()" [disabled]="!editForm.name?.trim()">Guardar</button>
+            <button class="btn-cancel" (click)="toggleEdit()">Cancelar Formulario</button>
+            <button class="btn-save" (click)="saveChanges()" [disabled]="!editForm.name?.trim()">Guardar Cambios</button>
           </div>
         </ng-container>
 
@@ -107,6 +129,9 @@
             <p class="no-history-msg">No hay registro de puntos todavía.</p>
           </ng-template>
         </div>
+
+
+        
       </div>
     </div>
   </div>

@@ -192,7 +192,42 @@ export class FichaPerroComponent implements OnChanges {
         const currentUser = this.authService.userProfileSignal();
         if (!currentUser || !this.dog) return false;
         
-        const ownerId = (this.dog as any).user_id || this.dog.userId || this.dog.user?.id;
-        return currentUser.id === ownerId;
+        if (this.dog.users && this.dog.users.some((u: any) => u.id == currentUser.id)) return true;
+
+        return false;
+    }
+
+    // Share Dog feature
+    isSharing = false;
+    shareEmail = '';
+    usersList: {id: number, name: string, email: string}[] = [];
+    isFetchingUsers = false;
+
+    async toggleShare() {
+        this.isSharing = !this.isSharing;
+        this.shareEmail = '';
+        if (this.isSharing && this.usersList.length === 0) {
+            this.isFetchingUsers = true;
+            try {
+                this.usersList = await this.authService.getMinimalUsers();
+            } catch (error) {
+                console.error('Error fetching users for share:', error);
+                this.toastService.error('Error al cargar la lista de usuarios.');
+            } finally {
+                this.isFetchingUsers = false;
+            }
+        }
+    }
+
+    async submitShare() {
+        if (!this.shareEmail) return;
+        try {
+            await this.dogService.shareDog(this.dog.id, this.shareEmail);
+            this.toastService.success('Perro compartido exitosamente.');
+            this.isSharing = false;
+        } catch (error: any) {
+            const msg = error?.error?.message || 'Error al compartir el perro.';
+            this.toastService.error(msg);
+        }
     }
 }

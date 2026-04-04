@@ -15,7 +15,7 @@ class DogController extends Controller
      */
     public function index(Request $request)
     {
-        return $request->user()->dogs()->with(['pointHistories' => function ($query) {
+        return $request->user()->dogs()->with(['users:id,name', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->orderBy('name', 'asc')->get();
     }
@@ -25,7 +25,7 @@ class DogController extends Controller
      */
     public function all()
     {
-        return Dog::with(['user:id,name', 'pointHistories' => function ($query) {
+        return Dog::with(['users:id,name', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->orderBy('name', 'asc')->get();
     }
@@ -45,6 +45,7 @@ class DogController extends Controller
         ]);
 
         $dog = $request->user()->dogs()->create($validated);
+        $dog->load('users:id,name');
 
         return response()->json($dog, 201);
     }
@@ -54,7 +55,7 @@ class DogController extends Controller
      */
     public function show(string $id)
     {
-        return Auth::user()->dogs()->with(['pointHistories' => function ($query) {
+        return Auth::user()->dogs()->with(['users:id,name', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->findOrFail($id);
     }
@@ -77,7 +78,7 @@ class DogController extends Controller
 
         $dog->update($validated);
 
-        $dog->load(['pointHistories' => function ($query) {
+        $dog->load(['users:id,name', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 
@@ -89,8 +90,15 @@ class DogController extends Controller
      */
     public function destroy(string $id)
     {
-        $dog = Auth::user()->dogs()->findOrFail($id);
-        $dog->delete();
+        $dog = Auth::user()->dogs()->withCount('users')->findOrFail($id);
+
+        if ($dog->users_count > 1) {
+            // Si hay compartición, simplemente nos desvinculamos
+            $dog->users()->detach(Auth::id());
+        } else {
+            // Si somos el único dueño, borramos el perro del sistema
+            $dog->delete();
+        }
 
         return response()->noContent();
     }
@@ -118,7 +126,7 @@ class DogController extends Controller
             $dog->save();
         }
 
-        $dog->load(['pointHistories' => function ($query) {
+        $dog->load(['users:id,name', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 
@@ -145,17 +153,49 @@ class DogController extends Controller
             'category' => $request->category
         ]);
 
-        if ($dog->user) {
-            $dog->user->notify(new DogExtraPointNotification($dog, $request->points, $request->category));
+        foreach ($dog->users as $owner) {
+            $owner->notify(new DogExtraPointNotification($dog, $request->points, $request->category));
         }
 
-        $dog->load(['pointHistories' => function ($query) {
+        $dog->load(['users:id,name', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 
         return response()->json([
             'message' => 'Puntos modificados exitosamente',
             'dog' => $dog
+        ]);
+    }
+
+    /**
+     * Share a dog with another user via email.
+     */
+    public function share(Request $request, string $id)
+    {
+        $dog = Auth::user()->dogs()->findOrFail($id);
+
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $userToShareWith = \App\Models\User::where('email', $validated['email'])->first();
+
+        // Check if the user is the same as the authenticated user
+        if ($userToShareWith->id === Auth::id()) {
+            return response()->json(['message' => 'No puedes compartir el perro contigo mismo.'], 422);
+        }
+
+        if ($dog->users()->where('users.id', $userToShareWith->id)->exists()) {
+            return response()->json(['message' => 'Este usuario ya es co-dueño del perro.'], 422);
+        }
+
+        $dog->users()->attach($userToShareWith->id);
+
+        return response()->json([
+            'message' => 'Perro compartido exitosamente con ' . $userToShareWith->name,
+            'dog' => $dog->load(['users:id,name', 'pointHistories' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            }])
         ]);
     }
 }

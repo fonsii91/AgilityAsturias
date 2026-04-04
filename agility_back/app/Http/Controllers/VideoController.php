@@ -10,7 +10,7 @@ class VideoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Video::query()->with(['dog', 'user', 'competition']);
+        $query = Video::query()->with(['dog.users:id,name', 'user', 'competition']);
 
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
@@ -58,7 +58,13 @@ class VideoController extends Controller
             switch ($request->category) {
                 case 'my_videos':
                     if (auth()->check()) {
-                        $query->where('user_id', auth()->id());
+                        $userId = auth()->id();
+                        $query->where(function ($q) use ($userId) {
+                            $q->where('user_id', $userId)
+                              ->orWhereHas('dog.users', function ($qDogUser) use ($userId) {
+                                  $qDogUser->where('users.id', $userId);
+                              });
+                        });
                     }
                     break;
                 case 'competitions':
@@ -112,7 +118,7 @@ class VideoController extends Controller
             'status' => 'local'
         ]);
 
-        return response()->json($video->load(['dog']), 201);
+        return response()->json($video->load(['dog.users:id,name', 'user', 'competition']), 201);
     }
 
     public function update(Request $request, $id)
@@ -120,7 +126,7 @@ class VideoController extends Controller
         $video = Video::findOrFail($id);
 
         $user = auth()->user();
-        $isDogOwner = $video->dog && $video->dog->user_id === $user->id;
+        $isDogOwner = $video->dog && $video->dog->users->contains('id', $user->id);
 
         if ($video->user_id !== $user->id && !$isDogOwner && !in_array($user->role, ['admin', 'staff'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -140,7 +146,7 @@ class VideoController extends Controller
             'title' => $request->title,
         ]);
 
-        return response()->json($video->load(['dog', 'user', 'competition']));
+        return response()->json($video->load(['dog.users:id,name', 'user', 'competition']));
     }
 
     public function destroy($id)
@@ -148,7 +154,7 @@ class VideoController extends Controller
         $video = Video::findOrFail($id);
 
         $user = auth()->user();
-        $isDogOwner = $video->dog && $video->dog->user_id === $user->id;
+        $isDogOwner = $video->dog && $video->dog->users->contains('id', $user->id);
 
         if ($video->user_id !== $user->id && !$isDogOwner && !in_array($user->role, ['admin', 'staff'])) {
             return response()->json(['message' => 'Unauthorized'], 403);

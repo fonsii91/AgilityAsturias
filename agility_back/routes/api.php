@@ -100,6 +100,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Ranking
         Route::get('/ranking', [RankingController::class, 'index']);
 
+        // Users for sharing
+        Route::get('/users/minimal', [\App\Http\Controllers\AuthController::class, 'minimalIndex']);
+
         Route::get('/resources-test', [ResourceController::class, 'index']);
 
         // Resources
@@ -112,6 +115,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/dogs/all', [DogController::class, 'all']);
         Route::post('/dogs', [DogController::class, 'store']);
         Route::get('/dogs/{id}', [DogController::class, 'show']);
+        Route::post('/dogs/{id}/share', [DogController::class, 'share']);
         // Notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);

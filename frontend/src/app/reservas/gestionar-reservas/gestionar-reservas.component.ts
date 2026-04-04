@@ -171,7 +171,8 @@ export class GestionarReservasComponent {
             const myReservation = currentUser
                 ? slotMyReservations.find(r => {
                     const sameUser = String(r.userId) === String(currentUser.id);
-                    return sameUser;
+                    const isMyDog = (r.dog as any)?.users?.some((u: any) => String(u.id) === String(currentUser.id));
+                    return sameUser || isMyDog;
                 })
                 : undefined;
 

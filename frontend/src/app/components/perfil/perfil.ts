@@ -149,7 +149,6 @@ export class Perfil {
 
     try {
       await this.dogService.addDog({
-        userId: user.id,
         name: this.newDogName()
         // createdAt handled by backend
       });

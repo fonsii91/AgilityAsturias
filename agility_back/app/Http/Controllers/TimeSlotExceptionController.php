@@ -32,7 +32,23 @@ class TimeSlotExceptionController extends Controller
                 ->where('date', $validated['date'])
                 ->get();
 
-            $userIds = $reservations->pluck('user_id')->unique();
+            $reservations->load('dog.users');
+            $usersToNotify = collect();
+
+            foreach ($reservations as $res) {
+                // Notify the user who made the reservation
+                if ($res->user_id) {
+                    $usersToNotify->push($res->user_id);
+                }
+                // Notify all co-owners of the dog
+                if ($res->dog && $res->dog->users) {
+                    foreach ($res->dog->users as $owner) {
+                        $usersToNotify->push($owner->id);
+                    }
+                }
+            }
+
+            $userIds = $usersToNotify->unique();
             if ($userIds->isNotEmpty()) {
                 $users = \App\Models\User::whereIn('id', $userIds)->get();
                 $dateFormatted = \Carbon\Carbon::parse($validated['date'])->format('d/m/Y');

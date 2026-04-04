@@ -58,7 +58,6 @@ export class RankingComponent {
 
                     return {
                         ...d,
-                        userId: d.user_id,
                         pointHistories: histories,
                         createdAt: d.created_at,
                         updatedAt: d.updated_at,
@@ -80,6 +79,11 @@ export class RankingComponent {
         if (index === 1) return '🥈';
         if (index === 2) return '🥉';
         return '';
+    }
+
+    hasDogUser(dog: any, userId: number | undefined): boolean {
+        if (!dog?.users || !userId) return false;
+        return dog.users.some((u: any) => u.id === userId);
     }
 
     openFicha(dog: any) {

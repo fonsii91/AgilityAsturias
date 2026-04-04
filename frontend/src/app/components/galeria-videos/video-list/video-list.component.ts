@@ -68,8 +68,8 @@ export class VideoListComponent implements OnInit {
         }
 
         return [...dogs].sort((a, b) => {
-            const aIsMine = a.userId === userId;
-            const bIsMine = b.userId === userId;
+            const aIsMine = this.hasDogUser(a, userId);
+            const bIsMine = this.hasDogUser(b, userId);
             if (aIsMine && !bIsMine) return -1;
             if (!aIsMine && bIsMine) return 1;
             return a.name.localeCompare(b.name);
@@ -208,11 +208,14 @@ export class VideoListComponent implements OnInit {
         if (role === 'admin' || role === 'staff') return true;
 
         if (video.user_id == userId) return true;
-        if (video.dog?.user_id == userId) return true;
-        if (video.dog?.userId == userId) return true;
-        if (video.dog?.user?.id == userId) return true;
+        if (video.dog?.users && video.dog.users.some(u => u.id == userId)) return true;
 
         return false;
+    }
+
+    hasDogUser(dog: Dog | undefined, userId: number | undefined | null): boolean {
+        if (!dog?.users || !userId) return false;
+        return dog.users.some(u => u.id === userId);
     }
 
     openDeleteModal(event: Event, video: Video) {

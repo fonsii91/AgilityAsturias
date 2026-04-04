@@ -5,7 +5,7 @@
         <select [(ngModel)]="filterDogId" (change)="applyFilters()" class="stylish-dog-select">
             <option value="">🐶 Todos los perros</option>
             <option *ngFor="let dog of sortedDogs" [value]="dog.id">
-                {{ (dog.user_id === currentUserId || dog.userId === currentUserId) && currentUserId ? '🐾 ' + dog.name : dog.name }}
+                {{ (dog && hasDogUser(dog, currentUserId)) ? '🐾 ' + dog.name : dog.name }}
             </option>
         </select>
 
@@ -280,7 +280,7 @@
                     <select name="dog_id" [(ngModel)]="editData.dog_id" required class="form-input">
                         <option value="">Selecciona un perro...</option>
                         <option *ngFor="let dog of sortedDogs" [value]="dog.id">
-                            {{ (dog.user_id === currentUserId || dog.userId === currentUserId) && currentUserId ? '🐾 ' + dog.name : dog.name }}
+                            {{ (dog && hasDogUser(dog, currentUserId)) ? '🐾 ' + dog.name : dog.name }}
                         </option>
                     </select>
                 </div>

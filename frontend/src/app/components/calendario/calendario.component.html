@@ -182,11 +182,19 @@
                         <!-- State 1: Not attending -->
                         <div class="attendance-prompt"
                             *ngIf="!isConfirmingAttendance && !selectedCompetition.isAttending">
-                            <div class="attendance-icon">
+                            <div class="attendance-icon" *ngIf="selectedCompetition.attendingDogIds?.length > 0">
+                                <span class="material-icons-outlined" style="color: #e65100;">info</span>
+                            </div>
+                            <div class="attendance-icon" *ngIf="!selectedCompetition.attendingDogIds?.length">
                                 <span class="material-icons-outlined">celebration</span>
                             </div>
-                            <h4>¿Te apuntas?</h4>
-                            <p>Únete a este evento y hazle saber a los demás que vas a ir.</p>
+                            
+                            <h4 *ngIf="selectedCompetition.attendingDogIds?.length > 0">¡Perro ya inscrito!</h4>
+                            <h4 *ngIf="!selectedCompetition.attendingDogIds?.length">¿Te apuntas?</h4>
+                            
+                            <p *ngIf="selectedCompetition.attendingDogIds?.length > 0">Un co-guía ya ha inscrito a vuestro perro. ¿Tú también vas a asistir como guía o espectador?</p>
+                            <p *ngIf="!selectedCompetition.attendingDogIds?.length">Únete a este evento y hazle saber a los demás que vas a ir.</p>
+                            
                             <button class="btn-primary-action" (click)="startAttendance()">
                                 <span class="material-icons-outlined">how_to_reg</span> ¡Asistiré!
                             </button>
@@ -227,7 +235,11 @@
                                             <span class="material-icons-outlined">check</span>
                                         </div>
                                     </div>
-                                    <span class="dog-name">{{ dog.name }}</span>
+                                    <span class="dog-name" style="display: block; line-height: 1.2;">{{ dog.name }}</span>
+                                    <span style="font-size: 0.7rem; color: #e65100; font-weight: bold; text-align: center;" 
+                                          *ngIf="!selectedCompetition.isAttending && selectedCompetition.attendingDogIds?.includes(dog.id)">
+                                        Apuntado por<br>co-guía
+                                    </span>
                                 </div>
                             </div>
                             <p *ngIf="!userDogs() || userDogs().length === 0" class="no-dogs-msg">No tienes perros

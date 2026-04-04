@@ -48,7 +48,6 @@ export class DogService {
     private mapDog(data: any): Dog {
         return {
             ...data,
-            userId: data.user_id,
             pointHistories: data.point_histories,
             createdAt: data.created_at,
             updatedAt: data.updated_at
@@ -120,6 +119,19 @@ export class DogService {
                 next: (res) => {
                     this.dogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
                     // Update allDogsSignal as well if it exists in the list
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
+                    resolve(res.dog);
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    shareDog(dogId: number, email: string) {
+        return new Promise<Dog>((resolve, reject) => {
+            this.http.post<{message: string; dog: Dog}>(`${this.apiUrl}/${dogId}/share`, { email }).subscribe({
+                next: (res) => {
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
                     this.allDogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
                     resolve(res.dog);
                 },

@@ -8,6 +8,8 @@ import { ToastService } from '../../../services/toast.service';
 import { Router } from '@angular/router';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import { AuthService } from '../../../services/auth.service';
+import { Dog } from '../../../models/dog.model';
 
 @Component({
     selector: 'app-upload-video',
@@ -24,6 +26,7 @@ export class UploadVideoComponent implements OnInit {
     private toastService = inject(ToastService);
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
+    public authService = inject(AuthService);
 
     uploadForm: FormGroup;
     selectedFile: File | null = null;
@@ -67,6 +70,27 @@ export class UploadVideoComponent implements OnInit {
 
     cancel() {
         this.router.navigate(['/galeria-videos']);
+    }
+
+    get sortedDogs(): Dog[] {
+        const dogs = this.dogService.getAllDogs()() || [];
+        const userId = this.authService.currentUserSignal()?.id;
+        if (!userId) {
+            return [...dogs].sort((a, b) => a.name.localeCompare(b.name));
+        }
+
+        return [...dogs].sort((a, b) => {
+            const aIsMine = this.hasDogUser(a, userId);
+            const bIsMine = this.hasDogUser(b, userId);
+            if (aIsMine && !bIsMine) return -1;
+            if (!aIsMine && bIsMine) return 1;
+            return a.name.localeCompare(b.name);
+        });
+    }
+
+    hasDogUser(dog: any, userId: number | null): boolean {
+        if (!dog?.users || !userId) return false;
+        return dog.users.some((u: any) => u.id == userId);
     }
 
     onFileSelected(event: any) {

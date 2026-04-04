@@ -150,6 +150,10 @@ export class AuthService {
         ));
     }
 
+    getMinimalUsers(): Promise<{id: number, name: string, email: string}[]> {
+        return firstValueFrom(this.http.get<{id: number, name: string, email: string}[]>(`${this.apiUrl}/users/minimal`));
+    }
+
     updateUserRole(userId: number, role: string): Promise<any> {
         return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/role`, { role }));
     }

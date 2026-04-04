@@ -63,10 +63,7 @@ export class DarPuntosExtraDialogComponent implements OnInit {
   }
 
   getOwnerName(dog: any): string {
-    // Assuming the API returns the user relation if populated, otherwise handle gracefully
-    // Usually, in `all()`, dog.user may or may not be loaded depending on the backend.
-    // Let's assume the user doesn't have it directly or use a fallback.
-    return dog.user?.name || `Dueño ID: ${dog.userId}`;
+    return dog.users?.map((u: any) => u.name).join(', ') || 'Sin dueño';
   }
 
   isFormValid(): boolean {

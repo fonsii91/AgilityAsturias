@@ -120,6 +120,11 @@ class AuthController extends Controller
         return User::all();
     }
 
+    public function minimalIndex(Request $request)
+    {
+        return User::select('id', 'name', 'email')->orderBy('name')->get();
+    }
+
     public function updateRole(Request $request, $id)
     {
         $currentUser = $request->user();
@@ -204,9 +209,16 @@ class AuthController extends Controller
             }
 
             \Illuminate\Support\Facades\DB::transaction(function () use ($targetUser) {
-                // Delete user's dogs
+                // Delete user's dogs but preserve shared ones
+                $targetUser->loadCount('dogs.users');
                 foreach ($targetUser->dogs as $dog) {
-                    $dog->delete();
+                    // Si el perro lo tiene alguien más (co-propiedad), solo lo desvinculamos
+                    $usersCount = $dog->users()->count();
+                    if ($usersCount > 1) {
+                        $dog->users()->detach($targetUser->id);
+                    } else {
+                        $dog->delete();
+                    }
                 }
 
                 // Delete reservations if they exist
