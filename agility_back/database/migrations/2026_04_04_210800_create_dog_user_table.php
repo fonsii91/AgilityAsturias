@@ -25,8 +25,15 @@ return new class extends Migration
 
         // 3. Drop user_id from dogs table
         Schema::table('dogs', function (Blueprint $table) {
-            $table->dropForeign(['user_id']);
-            $table->dropColumn('user_id');
+            if (Schema::hasColumn('dogs', 'user_id')) {
+                // Ignore dropForeign errors if the FK is already gone
+                try {
+                    $table->dropForeign(['user_id']);
+                } catch (\Exception $e) {
+                    // Foreign key might not exist
+                }
+                $table->dropColumn('user_id');
+            }
         });
     }
 
