@@ -167,10 +167,13 @@ Novedades</a></li>
       <div class="dropdown-divider"></div>
       <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item"><span
       class="material-icons">pets</span> Mi Perfil</a>
-      @if (authService.isMember()) {
+        @if (authService.isMember()) {
         <a routerLink="/mis-reservas" (click)="closeMenu()"
           class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
         }
+        <a (click)="openSugerenciaDialog()" class="dropdown-item" style="cursor: pointer;">
+          <span class="material-icons">bug_report</span> Sugerencias / Bugs
+        </a>
         @if (authService.isStaff()) {
           <div class="dropdown-divider"></div>
         }
@@ -205,6 +208,12 @@ Novedades</a></li>
           <a routerLink="/admin/usuarios" (click)="closeMenu()"
             class="dropdown-item admin-item">
             <span class="material-icons">admin_panel_settings</span> Administrar Sistema
+          </a>
+        }
+        @if (authService.isAdmin()) {
+          <a routerLink="/admin/sugerencias" (click)="closeMenu()"
+            class="dropdown-item admin-item">
+            <span class="material-icons">report_problem</span> Sugerencias
           </a>
         }
         <button (click)="logout()" class="dropdown-item logout-item"><span class="material-icons">logout</span>

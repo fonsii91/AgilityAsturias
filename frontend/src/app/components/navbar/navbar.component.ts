@@ -6,6 +6,7 @@ import { NotificationService, AppNotification } from '../../services/notificatio
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DarPuntosExtraDialogComponent } from '../dar-puntos-extra-dialog/dar-puntos-extra-dialog.component';
+import { SugerenciaDialog } from '../sugerencias/sugerencia-dialog/sugerencia-dialog';
 
 @Component({
     selector: 'app-navbar',
@@ -83,6 +84,14 @@ export class NavbarComponent {
         this.closeMenu();
         this.dialog.open(DarPuntosExtraDialogComponent, {
             width: '400px',
+            maxWidth: '90vw'
+        });
+    }
+
+    openSugerenciaDialog() {
+        this.closeMenu();
+        this.dialog.open(SugerenciaDialog, {
+            width: '600px',
             maxWidth: '90vw'
         });
     }

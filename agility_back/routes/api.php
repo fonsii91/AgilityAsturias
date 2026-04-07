@@ -11,6 +11,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\SuggestionController;
 use Illuminate\Http\Request; // Added for the closure route
 
 /*
@@ -92,6 +93,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Time Slot Exceptions
         Route::post('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'store']);
         Route::post('/time-slot-exceptions/delete', [\App\Http\Controllers\TimeSlotExceptionController::class, 'destroy']);
+        
+        // Suggestions (Admin)
+        Route::get('/admin/suggestions', [SuggestionController::class, 'index']);
+        Route::post('/admin/suggestions/{id}/resolve', [SuggestionController::class, 'resolve']);
 
     });
 
@@ -133,6 +138,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/reservations/{id}', [ReservationController::class, 'show']);
         Route::post('/reservations/{id}', [ReservationController::class, 'update']); // Solo su propia reserva
         Route::post('/reservations/{id}/delete', [ReservationController::class, 'destroy']); // Solo su propia reserva
+
+        // Suggestions
+        Route::post('/suggestions', [SuggestionController::class, 'store']);
 
         Route::get('/videos', [VideoController::class, 'index']);
         Route::post('/videos', [VideoController::class, 'store']);

@@ -41,6 +41,12 @@ export const routes: Routes = [
         title: 'Calendario | Agility Asturias'
     },
     {
+        path: 'admin/sugerencias',
+        loadComponent: () => import('./components/admin-sugerencias/admin-sugerencias').then(m => m.AdminSugerencias),
+        canActivate: [adminGuard],
+        title: 'Sugerencias | Agility Asturias'
+    },
+    {
         path: 'gestionar-competiciones',
         loadComponent: () => import('./components/crud-competicion/crud-competicion.component').then(m => m.CrudCompeticionComponent),
         canActivate: [staffGuard],

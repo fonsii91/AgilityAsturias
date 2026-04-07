@@ -143,6 +143,10 @@ export class AuthService {
         this.currentUserSignal.set(null);
     }
 
+    refreshUserState(): Observable<User> {
+        return this.fetchUser();
+    }
+
     // Admin / Member management methods
     getAllUsers(): Promise<User[]> {
         return firstValueFrom(this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
