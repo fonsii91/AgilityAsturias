@@ -8,7 +8,7 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 use Illuminate\Support\Facades\Schedule;
-// Using Schedule::call to avoid proc_open restrictions on Hostalia shared hosting
+// Using Schedule::call to avoid proc_open restrictions on shared hosting
 Schedule::call(function () {
     Artisan::call('youtube:upload-videos');
 })->dailyAt('03:00')->timezone('Europe/Madrid');

@@ -30,7 +30,7 @@ Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/videos/{id}/download', [VideoController::class, 'download']);
 
-// Backup endpoint to run scheduler from Hostalia via URL (bypassing CLI permission denied)
+// Backup endpoint to run scheduler from web via URL (bypassing CLI permission denied)
 Route::get('/run-scheduler-secret-1234', function () {
     // Only run if the server thinks it's 02:10 (03:10 in Spain)
     $currentTime = now()->copy()->format('H:i');

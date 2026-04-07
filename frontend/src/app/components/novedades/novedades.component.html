@@ -1,0 +1,62 @@
+<div class="novedades-container animate-fade-in">
+    <div class="novedades-header">
+        <h1>Novedades y Actualizaciones</h1>
+        <p>Mantente al día con las últimas mejoras, correcciones y nuevas funcionalidades de Agility Asturias.</p>
+    </div>
+
+    <div class="timeline">
+        <div class="timeline-item animate-slide-up" *ngFor="let release of releases; let i = index"
+            [style.animation-delay]="i * 100 + 'ms'">
+            <div class="timeline-icon">
+                <mat-icon>rocket_launch</mat-icon>
+            </div>
+            <div class="timeline-content glass-card">
+                <div class="release-header">
+                    <h2>Versión {{ release.version }}</h2>
+                    <span class="release-date">
+                        <mat-icon class="date-icon">calendar_today</mat-icon>
+                        {{ release.date | date:'dd MMM yyyy' }}
+                    </span>
+                </div>
+
+                <div class="release-body">
+                    <div class="feature-group" *ngIf="release.features && release.features.length > 0">
+                        <h3 class="feature-title"><mat-icon>auto_awesome</mat-icon> Novedades</h3>
+                        <ul class="feature-list">
+                            <li *ngFor="let feature of release.features">
+                                <span class="list-bullet"></span> {{ feature }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="warning-group" *ngIf="release.warnings && release.warnings.length > 0">
+                        <h3 class="warning-title"><mat-icon>warning_amber</mat-icon> Avisos Importantes</h3>
+                        <ul class="feature-list warning-list">
+                            <li *ngFor="let warning of release.warnings">
+                                <span class="list-bullet warning-bullet"></span> {{ warning }}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bugfix-group" *ngIf="release.bugfixes && release.bugfixes.length > 0">
+                        <h3 class="bugfix-title"><mat-icon>build_circle</mat-icon> Correcciones</h3>
+                        <ul class="feature-list bugfix-list">
+                            <li *ngFor="let fix of release.bugfixes">
+                                <span class="list-bullet bugfix-bullet"></span> {{ fix }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline-item" *ngIf="releases.length === 0">
+            <div class="timeline-icon empty">
+                <mat-icon>info</mat-icon>
+            </div>
+            <div class="timeline-content glass-card empty-content">
+                <p>No hay novedades disponibles en este momento.</p>
+            </div>
+        </div>
+    </div>
+</div>

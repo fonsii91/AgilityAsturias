@@ -52,8 +52,13 @@ export class UploadVideoComponent implements OnInit {
             
             const currentCompId = this.uploadForm.get('competition_id')?.value;
             if (!currentCompId) {
-                // Find if any competition is happening today
-                const todayComp = comps.find(c => c.fechaEvento && c.fechaEvento.startsWith(today));
+                // Find if any competition is happening today (or within its date range)
+                const todayComp = comps.find(c => {
+                    if (!c.fechaEvento) return false;
+                    const start = c.fechaEvento.split('T')[0];
+                    const end = c.fechaFinEvento ? c.fechaFinEvento.split('T')[0] : start;
+                    return today >= start && today <= end;
+                });
                 if (todayComp) {
                     this.uploadForm.patchValue({ competition_id: todayComp.id });
                 }

@@ -26,10 +26,6 @@
                 {{ group.day }}
                 <span class="date-label">{{ group.slots[0].date | date:'dd/MM' }}</span>
             </h3>
-            <span class="period-badge" [class.morning]="group.period === 'Mañana'"
-                [class.afternoon]="group.period === 'Tarde'">
-                {{ group.period }}
-            </span>
         </div>
         <div class="slots-grid">
             <div *ngFor="let slot of group.slots" class="slot-card"

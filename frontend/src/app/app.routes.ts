@@ -126,5 +126,10 @@ export const routes: Routes = [
         loadComponent: () => import('./components/recursos/recursos-form/recursos-form.component').then(m => m.RecursosFormComponent),
         canActivate: [staffGuard],
         title: 'Editar Recurso | Agility Asturias'
+    },
+    {
+        path: 'novedades',
+        loadComponent: () => import('./components/novedades/novedades.component').then(m => m.NovedadesComponent),
+        title: 'Novedades | Agility Asturias'
     }
 ];

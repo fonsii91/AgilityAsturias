@@ -59,7 +59,7 @@
                             <span>NUEVO</span>
                         </div>
                     </div>
-                    <span class="owner-name" *ngIf="dog.users">{{ dog.users[0]?.name }}</span>
+                    <span class="owner-name" *ngIf="dog.users">{{ getOwnerNames(dog) }}</span>
                 </div>
 
                 <div class="recent-emojis" *ngIf="dog.recentEmojis && dog.recentEmojis.length > 0">

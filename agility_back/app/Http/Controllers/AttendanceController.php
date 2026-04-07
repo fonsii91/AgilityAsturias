@@ -154,11 +154,19 @@ class AttendanceController extends Controller
             $allAttendedDogIds = [];
             $syncData = [];
 
+            // Get original pivot data before syncing to preserve user_id
+            $originalPivots = \Illuminate\Support\Facades\DB::table('competition_dog')
+                                ->where('competition_id', $competitionId)
+                                ->get()
+                                ->keyBy('dog_id');
+
             // Add original attended dogs to sync data
             foreach ($attendedDogsData as $dogData) {
                 $allAttendedDogIds[] = $dogData['id'];
                 $pos = !empty($dogData['position']) ? $dogData['position'] : '4+';
-                $syncData[$dogData['id']] = ['position' => $pos];
+                
+                $oldUserId = isset($originalPivots[$dogData['id']]) ? $originalPivots[$dogData['id']]->user_id : null;
+                $syncData[$dogData['id']] = ['position' => $pos, 'user_id' => $oldUserId];
             }
 
             // Sync new attendees
@@ -169,7 +177,7 @@ class AttendanceController extends Controller
                 }
                 $allAttendedDogIds[] = $newAtt['dog_id'];
                 $pos = !empty($newAtt['position']) ? $newAtt['position'] : '4+';
-                $syncData[$newAtt['dog_id']] = ['position' => $pos];
+                $syncData[$newAtt['dog_id']] = ['position' => $pos, 'user_id' => $newAtt['user_id']];
             }
 
             // Override attending dogs for this competition exactly to those who effectively attended

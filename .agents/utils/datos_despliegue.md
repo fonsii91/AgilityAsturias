@@ -32,9 +32,12 @@ description: Datos para desplegar en producción el proyecto
 
 ## 🚀 Protocolo oficial de despliegue
 
-Gracias al uso del script `deploy.sh` que se encuentra en la raíz del repositorio, subir los cambios a producción es muy directo. El protocolo consiste simplemente en:
+Gracias al uso del script `deploy.sh` que se encuentra en la raíz del repositorio, subir los cambios a producción es muy directo. **Atención IA:** Es obligatorio seguir el paso 1 minuciosamente antes del despliegue.
 
-1. **Guardar y Subir (Desde tu entorno Local):**  
+1. **Actualizar el archivo de Novedades (Atención IA):**
+   **ANTES** de hacer ningún `git add`, la IA debe editar obligatoriamente el archivo `frontend/public/novedades.json` para añadir una nueva entrada al principio del array (JSON) reflejando los desarrollos realizados en esta nueva versión (Incrementando la versión y poniendo la fecha actual).
+
+2. **Guardar y Subir (Desde tu entorno Local):**  
    Acumula tus cambios y envíalos habitualmente hacia `main`:
    ```bash
    git add .
@@ -42,7 +45,7 @@ Gracias al uso del script `deploy.sh` que se encuentra en la raíz del repositor
    git push origin main
    ```
 
-2. **Ejecutar el Despliegue (En el Servidor de Producción):**  
+3. **Ejecutar el Despliegue (En el Servidor de Producción):**  
    Simplemente ejecuta este comando desde cualquier terminal local que tenga permisos por SSH. El servidor se encargará de realizar el git pull, instalar dependencias para back/front, limpiar cachés, compilar en production y reiniciar las colas automáticamente:
    ```bash
    ssh agilityasturias "cd /var/www/agilityasturias && bash deploy.sh"

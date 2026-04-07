@@ -18,10 +18,9 @@ class DogFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
             'name' => $this->faker->firstName,
             'breed' => $this->faker->word,
-            'age' => $this->faker->numberBetween(1, 15),
+            'birth_date' => $this->faker->dateTimeBetween('-10 years', 'now')->format('Y-m-d'),
             'points' => 0,
         ];
     }

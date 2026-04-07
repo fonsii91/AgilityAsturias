@@ -18,8 +18,8 @@ class ReservationTest extends TestCase
     {
         $user = User::factory()->create();
         $slot = TimeSlot::factory()->create();
-        $dog1 = Dog::factory()->create(['user_id' => $user->id]);
-        $dog2 = Dog::factory()->create(['user_id' => $user->id]);
+        $dog1 = Dog::factory()->create(); $dog1->users()->attach($user->id);
+        $dog2 = Dog::factory()->create(); $dog2->users()->attach($user->id);
 
         // Create 2 reservations for the same user, same slot, same date
         Reservation::factory()->create([
@@ -51,8 +51,8 @@ class ReservationTest extends TestCase
     {
         $user = User::factory()->create();
         $slot = TimeSlot::factory()->create();
-        $dog1 = Dog::factory()->create(['user_id' => $user->id]);
-        $dog2 = Dog::factory()->create(['user_id' => $user->id]);
+        $dog1 = Dog::factory()->create(); $dog1->users()->attach($user->id);
+        $dog2 = Dog::factory()->create(); $dog2->users()->attach($user->id);
 
         $response = $this->actingAs($user)->postJson('/api/reservations', [
             'slot_id' => $slot->id,
@@ -82,7 +82,7 @@ class ReservationTest extends TestCase
     {
         $user = User::factory()->create();
         $slot = TimeSlot::factory()->create();
-        $dog = Dog::factory()->create(['user_id' => $user->id]);
+        $dog = Dog::factory()->create(); $dog->users()->attach($user->id);
         $date = now()->addDay()->toDateString();
 
         // Already booked

@@ -32,6 +32,8 @@
             </li>
             <li *ngIf="!authService.userProfileSignal()"><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span>
                     Contacto</a></li>
+            <li *ngIf="!authService.userProfileSignal()"><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span>
+                    Novedades</a></li>
             
             <!-- Explorar Dropdown for Logged In Users -->
             <li class="nav-dropdown" *ngIf="authService.userProfileSignal()">
@@ -40,6 +42,7 @@
                     <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
                     <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
                     <li><a routerLink="/recursos" routerLinkActive="active-route"><span class="material-icons">folder_shared</span> Recursos</a></li>
+                    <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span> Novedades</a></li>
                     <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
                 </ul>
             </li>

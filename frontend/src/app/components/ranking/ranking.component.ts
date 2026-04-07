@@ -86,6 +86,11 @@ export class RankingComponent {
         return dog.users.some((u: any) => u.id === userId);
     }
 
+    getOwnerNames(dog: any): string {
+        if (!dog?.users || dog.users.length === 0) return '';
+        return dog.users.map((u: any) => u.name).join(' & ');
+    }
+
     openFicha(dog: any) {
         if (dog) {
             this.selectedDogModal.set(dog);

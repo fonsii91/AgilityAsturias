@@ -84,11 +84,17 @@
                     ¿Estás seguro de que quieres jubilar a <strong>{{ dogToDelete()?.name }}</strong> de tu perfil?
                 </p>
                 <p class="note warning">Esta acción no se puede deshacer y perderás su historial.</p>
+                
+                <div class="delete-confirm-input" style="margin-top: 15px;">
+                    <label for="confirmDeleteInput" style="font-size: 0.9rem; color: #555;">Escribe <strong>BORRAR</strong> para confirmar:</label>
+                    <input type="text" id="confirmDeleteInput" [(ngModel)]="deleteConfirmText" 
+                        placeholder="BORRAR" style="width: 100%; padding: 8px; margin-top: 5px; border-radius: 4px; border: 1px solid #ccc; background-color: var(--input-bg); color: var(--text-color);">
+                </div>
             </div>
 
             <div class="modal-actions">
                 <button class="btn-cancel" (click)="closeDeleteModal()">Cancelar</button>
-                <button class="btn-confirm btn-delete-action" (click)="confirmDelete()">
+                <button class="btn-confirm btn-delete-action" (click)="confirmDelete()" [disabled]="deleteConfirmText() !== 'BORRAR'">
                     Sí, Eliminar
                 </button>
             </div>

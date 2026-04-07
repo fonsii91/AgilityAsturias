@@ -1,0 +1,32 @@
+[
+  {
+    "version": "1.1.0",
+    "date": "2026-04-07",
+    "features": [
+      "¡Nueva sección retrospectiva de Novedades (Release Notes) para que estés siempre al día de nuestras mejoras con un estilo visual premium!",
+      "Mejora en la usabilidad y experiencia de usuario implementando restricciones seguras en la cesión de perros compartidos.",
+      "Rediseño visual general en componentes, implementando un diseño más limpio y eliminando etiquetas redundantes ('Mañana' y 'Tarde') en el panel de reservas."
+    ],
+    "bugfixes": [
+      "Solucionado un problema al intentar anular la asistencia a competiciones con perros en régimen de copropiedad (1:M a N:M).",
+      "Corregida la lógica automática de selección de eventos en la Galería de Vídeos para fechas compuestas o rangos amplios.",
+      "Añadido un paso de seguridad y confirmación antes de eliminar permanentemente a un perro del sistema ('Escribe BORRAR')."
+    ],
+    "warnings": [
+      "La nueva funcionalidad de compartir perros (copropiedad N:M) ha requerido cambios arquitectónicos complejos profundos. Es posible que algunas funciones que antes operaban con normalidad se vean momentáneamente afectadas. Si te topas con algún error inusual, por favor repórtaselo inmediatamente al administrador."
+    ]
+  },
+  {
+    "version": "1.0.5",
+    "date": "2026-03-25",
+    "features": [
+      "Implementado el sistema de notificaciones Push Global. ¡Ahora estarás conectado en tiempo real al club!",
+      "Lanzado el nuevo sistema de Cancelación de Clases permitiendo ajustes flexibles en el calendario y notificación directa.",
+      "Paginado optimizado de alta velocidad desplegado en nuestro apartado de 'Cine Agility' ('Galería de Videos')."
+    ],
+    "bugfixes": [
+      "Refinado el comportamiento de las tarjetas de notificaciones para ser marcadas como leídas de forma más intuitiva.",
+      "Optimización masiva en la recuperación de eventos de cara al servidor de Contabo."
+    ]
+  }
+]

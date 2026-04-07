@@ -209,7 +209,15 @@ export class FichaPerroComponent implements OnChanges {
         if (this.isSharing && this.usersList.length === 0) {
             this.isFetchingUsers = true;
             try {
-                this.usersList = await this.authService.getMinimalUsers();
+                const users = await this.authService.getMinimalUsers();
+                const currentUser = this.authService.userProfileSignal();
+                
+                const existingOwnerIds = this.dog?.users?.map((u: any) => u.id) || [];
+                if (currentUser) {
+                    existingOwnerIds.push(currentUser.id);
+                }
+
+                this.usersList = users.filter((u: any) => !existingOwnerIds.includes(u.id));
             } catch (error) {
                 console.error('Error fetching users for share:', error);
                 this.toastService.error('Error al cargar la lista de usuarios.');
@@ -222,7 +230,8 @@ export class FichaPerroComponent implements OnChanges {
     async submitShare() {
         if (!this.shareEmail) return;
         try {
-            await this.dogService.shareDog(this.dog.id, this.shareEmail);
+            const updatedDog = await this.dogService.shareDog(this.dog.id, this.shareEmail);
+            this.dog = updatedDog; // Update local dog object so the ownership changes
             this.toastService.success('Perro compartido exitosamente.');
             this.isSharing = false;
         } catch (error: any) {

@@ -25,6 +25,7 @@ export class Perfil {
 
   deleteModalOpen = signal(false);
   dogToDelete = signal<{ id: number, name: string } | null>(null);
+  deleteConfirmText = signal('');
 
   // Image Modal state
   imageModalOpen = signal(false);
@@ -167,6 +168,7 @@ export class Perfil {
   closeDeleteModal() {
     this.deleteModalOpen.set(false);
     this.dogToDelete.set(null);
+    this.deleteConfirmText.set('');
   }
 
   openImageModal(imageUrl: string | null) {

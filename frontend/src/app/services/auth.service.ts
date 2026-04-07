@@ -169,7 +169,7 @@ export class AuthService {
             formData.append('photo', photo);
         }
 
-        // Hostalia server blocks PUT/DELETE, so the backend was updated to explicitly expect POST.
+        // The server was occasionally blocking PUT/DELETE, so the backend was updated to explicitly expect POST.
         // We no longer need to spoof with _method=PUT.
 
         await firstValueFrom(this.http.post(`${this.apiUrl}/user/profile`, formData));

@@ -21,7 +21,7 @@ return new class extends Migration
         });
 
         // 2. Migrate existing data (owner -> dog_user pivot)
-        DB::statement('INSERT INTO dog_user (dog_id, user_id, created_at, updated_at) SELECT id, user_id, NOW(), NOW() FROM dogs WHERE user_id IS NOT NULL');
+        DB::statement('INSERT INTO dog_user (dog_id, user_id, created_at, updated_at) SELECT id, user_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP FROM dogs WHERE user_id IS NOT NULL');
 
         // 3. Drop user_id from dogs table
         Schema::table('dogs', function (Blueprint $table) {
