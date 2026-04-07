@@ -1,12 +1,12 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-admin-usuarios',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './admin-usuarios.html',
   styleUrl: './admin-usuarios.css'
 })

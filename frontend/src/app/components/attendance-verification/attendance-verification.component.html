@@ -1,192 +1,212 @@
 <div class="attendance-container">
-    <div class="header">
-        <h1>✅ Verificación de Asistencia</h1>
-        <p>Confirma quién asistió para asignar puntos.</p>
+  <div class="header">
+    <h1>✅ Verificación de Asistencia</h1>
+    <p>Confirma quién asistió para asignar puntos.</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando sesiones pendientes...</p>
     </div>
+  }
 
-    <div *ngIf="isLoading()" class="loading-state">
-        <div class="spinner"></div>
-        <p>Cargando sesiones pendientes...</p>
+  @if (!isLoading() && pendingSessions().length === 0 && pendingCompetitions().length === 0) {
+    <div
+      class="empty-state">
+      <div class="icon-check">✨</div>
+      <h3>¡Todo al día!</h3>
+      <p>No hay entrenamientos ni competiciones pendientes de revisión.</p>
     </div>
+  }
 
-    <div *ngIf="!isLoading() && pendingSessions().length === 0 && pendingCompetitions().length === 0"
-        class="empty-state">
-        <div class="icon-check">✨</div>
-        <h3>¡Todo al día!</h3>
-        <p>No hay entrenamientos ni competiciones pendientes de revisión.</p>
-    </div>
-
-    <div *ngIf="!isLoading() && pendingSessions().length > 0" class="sessions-list">
-        <h2>Entrenamientos Pendientes</h2>
-        <div *ngFor="let session of pendingSessions()" class="session-card">
-            <div class="session-header">
-                <div class="date-info">
-                    <span class="date">{{ session.date | date:'EEEE, d MMMM' : '' : 'es-ES' }}</span>
-                    <span class="time">{{ session.slot.start_time }} - {{ session.slot.end_time }}</span>
-                </div>
-                <div class="count-badge">
-                    {{ session.reservations.length }} reservas
-                </div>
+  @if (!isLoading() && pendingSessions().length > 0) {
+    <div class="sessions-list">
+      <h2>Entrenamientos Pendientes</h2>
+      @for (session of pendingSessions(); track session) {
+        <div class="session-card">
+          <div class="session-header">
+            <div class="date-info">
+              <span class="date">{{ session.date | date:'EEEE, d MMMM' : '' : 'es-ES' }}</span>
+              <span class="time">{{ session.slot.start_time }} - {{ session.slot.end_time }}</span>
             </div>
-
-            <div class="attendees-list">
-                <div *ngFor="let res of session.reservations" class="attendee-row"
-                    [class.unchecked]="!isChecked(session, res.id)" (click)="toggleCheck(session, res.id)">
-
-                    <div class="checkbox-custom">
-                        <span class="material-icons" *ngIf="isChecked(session, res.id)">check_circle</span>
-                        <span class="material-icons unchecked-icon"
-                            *ngIf="!isChecked(session, res.id)">radio_button_unchecked</span>
-                    </div>
-
-                    <div class="attendee-info">
-                        <span class="attendee-name">🐶 {{ res.dog?.name || 'Perro Desconocido' }}</span>
-                        <span class="attendee-dogs">Dueño: {{ res.user?.name || 'Usuario' }}</span>
-                    </div>
+            <div class="count-badge">
+              {{ session.reservations.length }} reservas
+            </div>
+          </div>
+          <div class="attendees-list">
+            @for (res of session.reservations; track res) {
+              <div class="attendee-row"
+                [class.unchecked]="!isChecked(session, res.id)" (click)="toggleCheck(session, res.id)">
+                <div class="checkbox-custom">
+                  @if (isChecked(session, res.id)) {
+                    <span class="material-icons">check_circle</span>
+                  }
+                  @if (!isChecked(session, res.id)) {
+                    <span class="material-icons unchecked-icon"
+                    >radio_button_unchecked</span>
+                  }
                 </div>
-            </div>
-
-            <div class="card-actions">
-                <button class="btn-confirm" (click)="openConfirmModal(session)">
-                    Confirmar Asistencia
-                </button>
-            </div>
+                <div class="attendee-info">
+                  <span class="attendee-name">🐶 {{ res.dog?.name || 'Perro Desconocido' }}</span>
+                  <span class="attendee-dogs">Dueño: {{ res.user?.name || 'Usuario' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="card-actions">
+            <button class="btn-confirm" (click)="openConfirmModal(session)">
+              Confirmar Asistencia
+            </button>
+          </div>
         </div>
+      }
     </div>
+  }
 
-    <div *ngIf="!isLoading() && pendingCompetitions().length > 0" class="sessions-list competitions-list">
-        <h2>Competiciones Pendientes</h2>
-        <div *ngFor="let comp of pendingCompetitions()" class="session-card competition-card">
-            <div class="session-header">
-                <div class="date-info">
-                    <span class="date">{{ comp.nombre || 'Competición' }} - {{ comp.fecha_evento | date:'EEEE, d MMMM' :
-                        '' : 'es-ES' }}</span>
-                    <span class="time">{{ comp.lugar || 'Ubicación sin definir' }}</span>
-                </div>
-                <div class="count-badge">
-                    {{ (comp.attending_dogs?.length || 0) + getExtraAttendees(comp.id).length }} participantes
-                </div>
+  @if (!isLoading() && pendingCompetitions().length > 0) {
+    <div class="sessions-list competitions-list">
+      <h2>Competiciones Pendientes</h2>
+      @for (comp of pendingCompetitions(); track comp) {
+        <div class="session-card competition-card">
+          <div class="session-header">
+            <div class="date-info">
+              <span class="date">{{ comp.nombre || 'Competición' }} - {{ comp.fecha_evento | date:'EEEE, d MMMM' :
+              '' : 'es-ES' }}</span>
+              <span class="time">{{ comp.lugar || 'Ubicación sin definir' }}</span>
             </div>
-
-            <div class="attendees-list">
-                <!-- Original Attendees -->
-                <div *ngFor="let dog of comp.attending_dogs" class="attendee-row"
-                    [class.unchecked]="!isCompChecked(comp.id, dog.id)">
-
-                    <div class="attendee-check-click" (click)="toggleCompCheck(comp.id, dog.id)">
-                        <div class="checkbox-custom">
-                            <span class="material-icons" *ngIf="isCompChecked(comp.id, dog.id)">check_circle</span>
-                            <span class="material-icons unchecked-icon"
-                                *ngIf="!isCompChecked(comp.id, dog.id)">radio_button_unchecked</span>
-                        </div>
-
-                        <div class="attendee-info">
-                            <span class="attendee-name">🐶 {{ dog.name || 'Perro Desconocido' }}</span>
-                            <!-- owner omitted from API attending_dogs simple struct unless we map it, but it's okay -->
-                        </div>
-                    </div>
-
-                    <!-- Position Selection if checked -->
-                    <div class="position-select" *ngIf="isCompChecked(comp.id, dog.id)">
-                        <label>Posición:</label>
-                        <select [ngModel]="getDogPosition(comp.id, dog.id)"
-                            (ngModelChange)="setDogPosition(comp.id, dog.id, $event)">
-                            <option value="">Ninguna</option>
-                            <option value="1">1º</option>
-                            <option value="2">2º</option>
-                            <option value="3">3º</option>
-                            <option value="4+">4º o más</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Extra Attendees -->
-                <div *ngFor="let extra of getExtraAttendees(comp.id)" class="attendee-row extra-attendee">
-                    <div class="attendee-check-click">
-                        <div class="checkbox-custom">
-                            <span class="material-icons" style="color: #2196f3">check_circle</span>
-                        </div>
-                        <div class="attendee-info">
-                            <span class="attendee-name">🐶 {{ extra.dog_name }}</span>
-                            <span class="attendee-dogs">Dueño: {{ extra.user_name }}</span>
-                        </div>
-                    </div>
-
-                    <div class="position-select">
-                        <label>Posición:</label>
-                        <select [(ngModel)]="extra.position">
-                            <option value="">Ninguna</option>
-                            <option value="1">1º</option>
-                            <option value="2">2º</option>
-                            <option value="3">3º</option>
-                            <option value="4+">4º o más</option>
-                        </select>
-                        <button class="btn-remove-extra" (click)="removeExtraAttendee(comp.id, extra.dog_id)">✕</button>
-                    </div>
-                </div>
+            <div class="count-badge">
+              {{ (comp.attending_dogs?.length || 0) + getExtraAttendees(comp.id).length }} participantes
             </div>
-
-            <div class="add-extra-section">
-                <h4>Añadir participante no listado</h4>
-                <div class="extra-controls">
-                    <select [(ngModel)]="selectedUserIdForExtra">
-                        <option [ngValue]="null">Selecciona Usuario</option>
-                        <option *ngFor="let user of allUsers()" [ngValue]="user.id">{{ user.name }}</option>
+          </div>
+          <div class="attendees-list">
+            <!-- Original Attendees -->
+            @for (dog of comp.attending_dogs; track dog) {
+              <div class="attendee-row"
+                [class.unchecked]="!isCompChecked(comp.id, dog.id)">
+                <div class="attendee-check-click" (click)="toggleCompCheck(comp.id, dog.id)">
+                  <div class="checkbox-custom">
+                    @if (isCompChecked(comp.id, dog.id)) {
+                      <span class="material-icons">check_circle</span>
+                    }
+                    @if (!isCompChecked(comp.id, dog.id)) {
+                      <span class="material-icons unchecked-icon"
+                      >radio_button_unchecked</span>
+                    }
+                  </div>
+                  <div class="attendee-info">
+                    <span class="attendee-name">🐶 {{ dog.name || 'Perro Desconocido' }}</span>
+                    <!-- owner omitted from API attending_dogs simple struct unless we map it, but it's okay -->
+                  </div>
+                </div>
+                <!-- Position Selection if checked -->
+                @if (isCompChecked(comp.id, dog.id)) {
+                  <div class="position-select">
+                    <label>Posición:</label>
+                    <select [ngModel]="getDogPosition(comp.id, dog.id)"
+                      (ngModelChange)="setDogPosition(comp.id, dog.id, $event)">
+                      <option value="">Ninguna</option>
+                      <option value="1">1º</option>
+                      <option value="2">2º</option>
+                      <option value="3">3º</option>
+                      <option value="4+">4º o más</option>
                     </select>
-
-                    <select [(ngModel)]="selectedDogIdForExtra" [disabled]="!selectedUserIdForExtra">
-                        <option [ngValue]="null">Selecciona Perro</option>
-                        <option *ngFor="let d of getUserDogs(selectedUserIdForExtra)" [ngValue]="d.id">{{ d.name }}
-                        </option>
-                    </select>
-
-                    <select [(ngModel)]="selectedPositionForExtra">
-                        <option value="">Posición (opc.)</option>
-                        <option value="1">1º</option>
-                        <option value="2">2º</option>
-                        <option value="3">3º</option>
-                        <option value="4+">4º o más</option>
-                    </select>
-
-                    <button class="btn-add-extra" (click)="addExtraAttendee(comp.id)">Añadir</button>
+                  </div>
+                }
+              </div>
+            }
+            <!-- Extra Attendees -->
+            @for (extra of getExtraAttendees(comp.id); track extra) {
+              <div class="attendee-row extra-attendee">
+                <div class="attendee-check-click">
+                  <div class="checkbox-custom">
+                    <span class="material-icons" style="color: #2196f3">check_circle</span>
+                  </div>
+                  <div class="attendee-info">
+                    <span class="attendee-name">🐶 {{ extra.dog_name }}</span>
+                    <span class="attendee-dogs">Dueño: {{ extra.user_name }}</span>
+                  </div>
                 </div>
+                <div class="position-select">
+                  <label>Posición:</label>
+                  <select [(ngModel)]="extra.position">
+                    <option value="">Ninguna</option>
+                    <option value="1">1º</option>
+                    <option value="2">2º</option>
+                    <option value="3">3º</option>
+                    <option value="4+">4º o más</option>
+                  </select>
+                  <button class="btn-remove-extra" (click)="removeExtraAttendee(comp.id, extra.dog_id)">✕</button>
+                </div>
+              </div>
+            }
+          </div>
+          <div class="add-extra-section">
+            <h4>Añadir participante no listado</h4>
+            <div class="extra-controls">
+              <select [(ngModel)]="selectedUserIdForExtra">
+                <option [ngValue]="null">Selecciona Usuario</option>
+                @for (user of allUsers(); track user) {
+                  <option [ngValue]="user.id">{{ user.name }}</option>
+                }
+              </select>
+              <select [(ngModel)]="selectedDogIdForExtra" [disabled]="!selectedUserIdForExtra">
+                <option [ngValue]="null">Selecciona Perro</option>
+                @for (d of getUserDogs(selectedUserIdForExtra); track d) {
+                  <option [ngValue]="d.id">{{ d.name }}
+                  </option>
+                }
+              </select>
+              <select [(ngModel)]="selectedPositionForExtra">
+                <option value="">Posición (opc.)</option>
+                <option value="1">1º</option>
+                <option value="2">2º</option>
+                <option value="3">3º</option>
+                <option value="4+">4º o más</option>
+              </select>
+              <button class="btn-add-extra" (click)="addExtraAttendee(comp.id)">Añadir</button>
             </div>
-
-            <div class="card-actions">
-                <button class="btn-confirm" (click)="openConfirmModal(comp, true)">
-                    Confirmar Competición
-                </button>
-            </div>
+          </div>
+          <div class="card-actions">
+            <button class="btn-confirm" (click)="openConfirmModal(comp, true)">
+              Confirmar Competición
+            </button>
+          </div>
         </div>
+      }
     </div>
+  }
 </div>
 
 <!-- Confirmation Modal -->
-<div class="modal-overlay" *ngIf="isConfirmModalOpen" (click)="closeConfirmModal()">
+@if (isConfirmModalOpen) {
+  <div class="modal-overlay" (click)="closeConfirmModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-        <div class="modal-header">
-            <h2>Confirmar Asistencia</h2>
-            <button class="close-btn" (click)="closeConfirmModal()">✕</button>
-        </div>
-
-        <div class="modal-body">
-            <p>Vas a confirmar la asistencia de <strong>{{ attendeesCountFn }}</strong> perros en esta {{
-                isCompetitionConfirm ? 'competición' : 'sesión' }}.</p>
-            <p class="subtext" *ngIf="!isCompetitionConfirm">Se asignarán +3 puntos al ranking de cada perrete
-                confirmado.
-            </p>
-            <p class="subtext" *ngIf="isCompetitionConfirm">La competición quedará verificada y se asignarán puntos
-                según la posición (1º: 4pts, 2º: 3pts, 3º: 2pts, 4º+: 1pt).</p>
-
-            <div class="info-box">
-                <span class="material-icons info-icon">info</span>
-                <p>Las personas no marcadas se registrarán como "No Asistido" y no recibirán puntos.</p>
-            </div>
-        </div>
-
-        <div class="modal-actions">
-            <button class="btn-cancel" (click)="closeConfirmModal()">Cancelar</button>
-            <button class="btn-confirm-modal" (click)="executeConfirm()">Confirmar y Asignar Puntos</button>
-        </div>
+      <div class="modal-header">
+        <h2>Confirmar Asistencia</h2>
+        <button class="close-btn" (click)="closeConfirmModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Vas a confirmar la asistencia de <strong>{{ attendeesCountFn }}</strong> perros en esta {{
+      isCompetitionConfirm ? 'competición' : 'sesión' }}.</p>
+      @if (!isCompetitionConfirm) {
+        <p class="subtext">Se asignarán +3 puntos al ranking de cada perrete
+          confirmado.
+        </p>
+      }
+      @if (isCompetitionConfirm) {
+        <p class="subtext">La competición quedará verificada y se asignarán puntos
+        según la posición (1º: 4pts, 2º: 3pts, 3º: 2pts, 4º+: 1pt).</p>
+      }
+      <div class="info-box">
+        <span class="material-icons info-icon">info</span>
+        <p>Las personas no marcadas se registrarán como "No Asistido" y no recibirán puntos.</p>
+      </div>
     </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeConfirmModal()">Cancelar</button>
+      <button class="btn-confirm-modal" (click)="executeConfirm()">Confirmar y Asignar Puntos</button>
+    </div>
+  </div>
 </div>
+}

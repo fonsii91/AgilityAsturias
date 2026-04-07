@@ -1,136 +1,156 @@
 <div class="form-container auth-card">
-    <div class="logo-area">
-        <div class="logo-circle">
-            <span class="material-icons">cloud_upload</span>
+  <div class="logo-area">
+    <div class="logo-circle">
+      <span class="material-icons">cloud_upload</span>
+    </div>
+    <h2>Subir Vídeo</h2>
+    <p>Asocia un vídeo a tu perro para la galería.</p>
+  </div>
+
+  <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+    <div class="form-group">
+      <label>Perro *</label>
+      <div class="input-wrapper">
+        <select formControlName="dog_id"
+          [ngClass]="{ 'is-invalid': uploadForm.get('dog_id')?.invalid && uploadForm.get('dog_id')?.touched }">
+          <option value="" disabled selected>Selecciona un perro</option>
+          @for (dog of sortedDogs; track dog) {
+            <option [value]="dog.id">
+              {{ hasDogUser(dog, authService.currentUserSignal()?.id ?? null) ? '🐾 ' + dog.name : '🦴 ' + dog.name }}
+            </option>
+          }
+        </select>
+        <span class="material-icons">pets</span>
+      </div>
+      @if (uploadForm.get('dog_id')?.invalid && uploadForm.get('dog_id')?.touched) {
+        <div
+          class="field-error-text">
+          El perro es obligatorio.
         </div>
-        <h2>Subir Vídeo</h2>
-        <p>Asocia un vídeo a tu perro para la galería.</p>
+      }
     </div>
 
-    <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" class="auth-form">
+    <div class="form-group">
+      <label>Competición (Opcional)</label>
+      <div class="input-wrapper">
+        <select formControlName="competition_id">
+          <option value="">Ninguna</option>
+          @for (comp of compService.getCompetitions()(); track comp) {
+            <option [value]="comp.id">
+              {{ comp.nombre }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : ''
+              }}
+            </option>
+          }
+        </select>
+        <span class="material-icons">emoji_events</span>
+      </div>
+    </div>
 
-        <div class="form-group">
-            <label>Perro *</label>
-            <div class="input-wrapper">
-                <select formControlName="dog_id"
-                    [ngClass]="{ 'is-invalid': uploadForm.get('dog_id')?.invalid && uploadForm.get('dog_id')?.touched }">
-                    <option value="" disabled selected>Selecciona un perro</option>
-                    <option *ngFor="let dog of sortedDogs" [value]="dog.id">
-                        {{ hasDogUser(dog, authService.currentUserSignal()?.id ?? null) ? '🐾 ' + dog.name : '🦴 ' + dog.name }}
-                    </option>
-                </select>
-                <span class="material-icons">pets</span>
+    <div class="form-row">
+      <div class="form-group col">
+        <label>Fecha del Vídeo *</label>
+        <div class="input-wrapper">
+          <input type="date" formControlName="date"
+            [ngClass]="{ 'is-invalid': uploadForm.get('date')?.invalid && uploadForm.get('date')?.touched }" />
+            <span class="material-icons">calendar_today</span>
+          </div>
+          @if (uploadForm.get('date')?.invalid && uploadForm.get('date')?.touched) {
+            <div
+              class="field-error-text">
+              La fecha es obligatoria.
             </div>
-            <div *ngIf="uploadForm.get('dog_id')?.invalid && uploadForm.get('dog_id')?.touched"
-                class="field-error-text">
-                El perro es obligatorio.
-            </div>
+          }
         </div>
 
-        <div class="form-group">
-            <label>Competición (Opcional)</label>
-            <div class="input-wrapper">
-                <select formControlName="competition_id">
-                    <option value="">Ninguna</option>
-                    <option *ngFor="let comp of compService.getCompetitions()()" [value]="comp.id">
-                        {{ comp.nombre }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : ''
-                        }}
-                    </option>
-                </select>
-                <span class="material-icons">emoji_events</span>
-            </div>
+        <div class="form-group col">
+          <label>Título (Opcional)</label>
+          <div class="input-wrapper">
+            <input type="text" formControlName="title" placeholder="Ej. Manga 1" />
+            <span class="material-icons">title</span>
+          </div>
         </div>
+      </div>
 
-        <div class="form-row">
-            <div class="form-group col">
-                <label>Fecha del Vídeo *</label>
-                <div class="input-wrapper">
-                    <input type="date" formControlName="date"
-                        [ngClass]="{ 'is-invalid': uploadForm.get('date')?.invalid && uploadForm.get('date')?.touched }" />
-                    <span class="material-icons">calendar_today</span>
-                </div>
-                <div *ngIf="uploadForm.get('date')?.invalid && uploadForm.get('date')?.touched"
-                    class="field-error-text">
-                    La fecha es obligatoria.
-                </div>
+      <!-- Drag and Drop Zone -->
+      <div class="form-group">
+        <label>Archivo de Vídeo * <span
+          style="font-weight: normal; font-size: 0.85em; color: var(--text-light);">(Máx aprox
+        500MB)</span></label>
+
+        @if (!selectedFile) {
+          <div class="drag-drop-zone" [class.drag-over]="isDragging"
+            (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
+            (click)="fileInput.click()">
+            <div class="drag-content">
+              <span class="material-icons drag-icon">movie</span>
+              <p class="drag-title">Haz click o arrastra tu vídeo aquí</p>
+              <p class="drag-subtitle">MP4, MOV, AVI o WEBM</p>
             </div>
-
-            <div class="form-group col">
-                <label>Título (Opcional)</label>
-                <div class="input-wrapper">
-                    <input type="text" formControlName="title" placeholder="Ej. Manga 1" />
-                    <span class="material-icons">title</span>
-                </div>
+            <!-- Hidden file input -->
+            <input #fileInput type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/webm"
+              (change)="onFileSelected($event)" style="display: none;" />
             </div>
-        </div>
+          }
 
-        <!-- Drag and Drop Zone -->
-        <div class="form-group">
-            <label>Archivo de Vídeo * <span
-                    style="font-weight: normal; font-size: 0.85em; color: var(--text-light);">(Máx aprox
-                    500MB)</span></label>
-
-            <div *ngIf="!selectedFile" class="drag-drop-zone" [class.drag-over]="isDragging"
-                (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)"
-                (click)="fileInput.click()">
-                <div class="drag-content">
-                    <span class="material-icons drag-icon">movie</span>
-                    <p class="drag-title">Haz click o arrastra tu vídeo aquí</p>
-                    <p class="drag-subtitle">MP4, MOV, AVI o WEBM</p>
-                </div>
-                <!-- Hidden file input -->
-                <input #fileInput type="file" accept="video/mp4,video/quicktime,video/x-msvideo,video/webm"
-                    (change)="onFileSelected($event)" style="display: none;" />
+          <!-- Selected File Preview -->
+          @if (selectedFile && !isCompressing && !isUploading) {
+            <div class="selected-file-card">
+              <div class="file-icon-wrapper">
+                <span class="material-icons">smart_display</span>
+              </div>
+              <div class="file-info">
+                <span class="file-name" [title]="selectedFile.name">{{ selectedFile.name }}</span>
+                <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
+              </div>
+              <button type="button" class="btn-remove-file" (click)="removeFile()" title="Quitar vídeo">
+                <span class="material-icons">close</span>
+              </button>
             </div>
-
-            <!-- Selected File Preview -->
-            <div *ngIf="selectedFile && !isCompressing && !isUploading" class="selected-file-card">
-                <div class="file-icon-wrapper">
-                    <span class="material-icons">smart_display</span>
-                </div>
-                <div class="file-info">
-                    <span class="file-name" [title]="selectedFile.name">{{ selectedFile.name }}</span>
-                    <span class="file-size">{{ formatFileSize(selectedFile.size) }}</span>
-                </div>
-                <button type="button" class="btn-remove-file" (click)="removeFile()" title="Quitar vídeo">
-                    <span class="material-icons">close</span>
-                </button>
-            </div>
+          }
         </div>
 
         <!-- Progress States -->
-        <div *ngIf="isCompressing" class="status-card compression-card">
+        @if (isCompressing) {
+          <div class="status-card compression-card">
             <div class="status-icon">
-                <div class="spinner-blue"></div>
+              <div class="spinner-blue"></div>
             </div>
             <div class="status-content">
-                <strong>{{ compressionMessage }}</strong>
-                <div class="progress-bar-container" *ngIf="compressionProgress >= 0">
-                    <div class="progress-bar" [style.width.%]="compressionProgress"></div>
+              <strong>{{ compressionMessage }}</strong>
+              @if (compressionProgress >= 0) {
+                <div class="progress-bar-container">
+                  <div class="progress-bar" [style.width.%]="compressionProgress"></div>
                 </div>
-                <p>Optimizando para no gastar tantos datos.</p>
+              }
+              <p>Optimizando para no gastar tantos datos.</p>
             </div>
-        </div>
+          </div>
+        }
 
-        <div *ngIf="isUploading && !isCompressing" class="status-card upload-card">
+        @if (isUploading && !isCompressing) {
+          <div class="status-card upload-card">
             <div class="status-icon">
-                <div class="spinner-blue"></div>
+              <div class="spinner-blue"></div>
             </div>
             <div class="status-content">
-                <strong>Subiendo vídeo... paciencia.</strong>
-                <p>No cierres esta página, los vídeos pesados tardan un poco.</p>
+              <strong>Subiendo vídeo... paciencia.</strong>
+              <p>No cierres esta página, los vídeos pesados tardan un poco.</p>
             </div>
-        </div>
+          </div>
+        }
 
-        <div class="form-actions" *ngIf="!isUploading && !isCompressing">
+        @if (!isUploading && !isCompressing) {
+          <div class="form-actions">
             <button type="button" class="btn-cancel" (click)="cancel()">
-                <span class="material-icons">arrow_back</span>
-                Cancelar
+              <span class="material-icons">arrow_back</span>
+              Cancelar
             </button>
             <button type="submit" [disabled]="uploadForm.invalid || !selectedFile" class="btn-primary">
-                Subir Vídeo <span class="material-icons">send</span>
+              Subir Vídeo <span class="material-icons">send</span>
             </button>
-        </div>
+          </div>
+        }
 
-    </form>
-</div>
+      </form>
+    </div>

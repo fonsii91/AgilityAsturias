@@ -1,115 +1,126 @@
 <div class="admin-container">
-    <div class="header">
-        <h1>Gestión de Miembros</h1>
-        <div class="stats">
-            <span>Usuarios: {{ displayUsers().length }}</span>
-        </div>
+  <div class="header">
+    <h1>Gestión de Miembros</h1>
+    <div class="stats">
+      <span>Usuarios: {{ displayUsers().length }}</span>
     </div>
+  </div>
 
-    <div class="info-banner">
-        <span class="material-icons info-icon">info</span>
-        <p>Aquí puedes gestionar quién tiene acceso como "Miembro" (y por tanto, a las funciones de miembro).</p>
-    </div>
+  <div class="info-banner">
+    <span class="material-icons info-icon">info</span>
+    <p>Aquí puedes gestionar quién tiene acceso como "Miembro" (y por tanto, a las funciones de miembro).</p>
+  </div>
 
-    <div class="table-container glass-effect" *ngIf="!loading(); else loader">
-        <div *ngIf="displayUsers().length === 0" class="empty-state">
-            No hay usuarios registrados (excepto aministradores).
+  @if (!loading()) {
+    <div class="table-container glass-effect">
+      @if (displayUsers().length === 0) {
+        <div class="empty-state">
+          No hay usuarios registrados (excepto aministradores).
         </div>
-
-        <table *ngIf="displayUsers().length > 0">
-            <thead>
-                <tr>
-                    <th>Usuario</th>
-                    <th>Acciones</th>
-                    <th>Estado</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let user of displayUsers()">
-                    <td class="user-cell">
-                        <ng-container *ngIf="user.photoURL; else defaultAvatarAdmin">
-                            <img [src]="user.photoURL" alt="Avatar" class="avatar clickable-avatar"
-                                referrerpolicy="no-referrer" (click)="openImageZoom(user.photoURL)">
-                        </ng-container>
-                        <ng-template #defaultAvatarAdmin>
-                            <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo"
-                                class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
-                        </ng-template>
-                        <span>{{ user.displayName }}</span>
+      }
+      @if (displayUsers().length > 0) {
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Acciones</th>
+              <th>Estado</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of displayUsers(); track user) {
+              <tr>
+                <td class="user-cell">
+                  @if (user.photoURL) {
+                    <img [src]="user.photoURL" alt="Avatar" class="avatar clickable-avatar"
+                      referrerpolicy="no-referrer" (click)="openImageZoom(user.photoURL)">
+                    } @else {
+                      <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo"
+                        class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
+                      }
+                      <span>{{ user.displayName }}</span>
                     </td>
                     <td>
-                        <div class="action-buttons-wrapper">
-                            <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
-                                class="role-select">
-                                <option value="user">Usuario</option>
-                                <option value="member">Miembro</option>
-                                <option value="staff">Staff</option>
-                            </select>
-                            <button class="btn-icon reset-pwd-btn" (click)="generateResetLink(user)"
-                                title="Generar Enlace de Recuperación">
-                                <span class="material-icons">key</span>
-                            </button>
-                            <button class="btn-icon delete-btn" (click)="openDeleteModal(user)"
-                                title="Eliminar Miembro y Perros">
-                                <span class="material-icons">delete</span>
-                            </button>
-                        </div>
+                      <div class="action-buttons-wrapper">
+                        <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
+                          class="role-select">
+                          <option value="user">Usuario</option>
+                          <option value="member">Miembro</option>
+                          <option value="staff">Staff</option>
+                        </select>
+                        <button class="btn-icon reset-pwd-btn" (click)="generateResetLink(user)"
+                          title="Generar Enlace de Recuperación">
+                          <span class="material-icons">key</span>
+                        </button>
+                        <button class="btn-icon delete-btn" (click)="openDeleteModal(user)"
+                          title="Eliminar Miembro y Perros">
+                          <span class="material-icons">delete</span>
+                        </button>
+                      </div>
                     </td>
                     <td>
-                        <span class="badge" [class]="user.role">
-                            {{ user.role | titlecase }}
-                        </span>
+                      <span class="badge" [class]="user.role">
+                        {{ user.role | titlecase }}
+                      </span>
                     </td>
                     <td class="email-cell">{{ user.email }}</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-
-
-    <ng-template #loader>
-        <div class="loader-container">
-            <div class="spinner"></div>
-            <p>Cargando usuarios...</p>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
         </div>
-    </ng-template>
+      } @else {
+        <div class="loader-container">
+          <div class="spinner"></div>
+          <p>Cargando usuarios...</p>
+        </div>
+      }
 
-    <!-- Image Zoom Modal -->
-    <div class="modal-overlay image-zoom-overlay" *ngIf="isZoomModalOpen" (click)="closeImageZoom()">
-        <div class="zoom-modal-content" (click)="$event.stopPropagation()">
+
+
+      <!-- Image Zoom Modal -->
+      @if (isZoomModalOpen) {
+        <div class="modal-overlay image-zoom-overlay" (click)="closeImageZoom()">
+          <div class="zoom-modal-content" (click)="$event.stopPropagation()">
             <button class="close-zoom-btn" (click)="closeImageZoom()">&times;</button>
             <img [src]="zoomedImageURL" alt="Zoomed Profile Foto">
+          </div>
         </div>
-    </div>
+      }
 
-    <!-- Confirm Delete Modal -->
-    <div class="modal-overlay delete-modal-overlay" *ngIf="userToDelete()" (click)="closeDeleteModal()">
-        <div class="modal-content delete-modal-content" (click)="$event.stopPropagation()">
+      <!-- Confirm Delete Modal -->
+      @if (userToDelete()) {
+        <div class="modal-overlay delete-modal-overlay" (click)="closeDeleteModal()">
+          <div class="modal-content delete-modal-content" (click)="$event.stopPropagation()">
             <div class="modal-icon-wrapper danger-icon">
-                <span class="material-icons">warning</span>
+              <span class="material-icons">warning</span>
             </div>
             <h3>Eliminar Miembro</h3>
             <p>
-                ¿Estás seguro de que deseas eliminar permanentemente a <strong>{{ userToDelete()?.displayName }}</strong>?
+              ¿Estás seguro de que deseas eliminar permanentemente a <strong>{{ userToDelete()?.displayName }}</strong>?
             </p>
             <p class="warning-text">
-                <strong>ATENCIÓN:</strong> Esta acción eliminará permanentemente la cuenta, TODOS sus perros, reservas y registros de asistencia. Esta acción no se puede deshacer.
+              <strong>ATENCIÓN:</strong> Esta acción eliminará permanentemente la cuenta, TODOS sus perros, reservas y registros de asistencia. Esta acción no se puede deshacer.
             </p>
-            
             <div class="delete-confirmation-group">
-                <label>Por favor, escribe <strong>BORRAR</strong> para confirmar:</label>
-                <input type="text" [(ngModel)]="deleteConfirmationText" class="form-input confirmation-input" placeholder="BORRAR">
+              <label>Por favor, escribe <strong>BORRAR</strong> para confirmar:</label>
+              <input type="text" [(ngModel)]="deleteConfirmationText" class="form-input confirmation-input" placeholder="BORRAR">
             </div>
-
             <div class="modal-actions">
-                <button class="btn-cancel" (click)="closeDeleteModal()" [disabled]="isDeleting()">Cancelar</button>
-                <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting() || deleteConfirmationText() !== 'BORRAR'">
-                    <span class="material-icons btn-icon" *ngIf="!isDeleting()">delete_forever</span>
-                    <span class="spinner-small" *ngIf="isDeleting()"></span>
-                    {{ isDeleting() ? 'Eliminando...' : 'Sí, Eliminar' }}
-                </button>
+              <button class="btn-cancel" (click)="closeDeleteModal()" [disabled]="isDeleting()">Cancelar</button>
+              <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting() || deleteConfirmationText() !== 'BORRAR'">
+                @if (!isDeleting()) {
+                  <span class="material-icons btn-icon">delete_forever</span>
+                }
+                @if (isDeleting()) {
+                  <span class="spinner-small"></span>
+                }
+                {{ isDeleting() ? 'Eliminando...' : 'Sí, Eliminar' }}
+              </button>
             </div>
+          </div>
         </div>
+      }
     </div>
-</div>

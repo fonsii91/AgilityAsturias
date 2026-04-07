@@ -1,40 +1,46 @@
 <div class="gallery-container">
-    <h2>Galería</h2>
-    <!-- Upload Button for Staff -->
-    <div class="admin-actions" *ngIf="isStaff()">
-        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
-        <button class="btn-upload" (click)="fileInput.click()" [disabled]="isUploading()">
-            <i class="fas fa-upload" *ngIf="!isUploading()"></i>
-            {{ isUploading() ? 'Subiendo...' : 'Añadir nueva foto' }}
-        </button>
+  <h2>Galería</h2>
+  <!-- Upload Button for Staff -->
+  @if (isStaff()) {
+    <div class="admin-actions">
+      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
+      <button class="btn-upload" (click)="fileInput.click()" [disabled]="isUploading()">
+        @if (!isUploading()) {
+          <i class="fas fa-upload"></i>
+        }
+        {{ isUploading() ? 'Subiendo...' : 'Añadir nueva foto' }}
+      </button>
     </div>
+  }
 
-    <div class="gallery-masonry" [@listAnimation]="images().length">
-        <div *ngFor="let image of images(); let i = index" class="gallery-item" (click)="openLightbox(i)">
-            <img [src]="image.url" [alt]="image.alt" loading="lazy">
-            <button class="delete-btn" *ngIf="isStaff()" (click)="deletePhoto(image.id, $event)" title="Eliminar foto">
-                &times;
-            </button>
-            <div class="overlay">
-                <span>{{ image.alt }}</span>
-            </div>
+  <div class="gallery-masonry" [@listAnimation]="images().length">
+    @for (image of images(); track image; let i = $index) {
+      <div class="gallery-item" (click)="openLightbox(i)">
+        <img [src]="image.url" [alt]="image.alt" loading="lazy">
+        @if (isStaff()) {
+          <button class="delete-btn" (click)="deletePhoto(image.id, $event)" title="Eliminar foto">
+            &times;
+          </button>
+        }
+        <div class="overlay">
+          <span>{{ image.alt }}</span>
         </div>
-    </div>
+      </div>
+    }
+  </div>
 </div>
 
 <!-- Lightbox Modal -->
-<div class="lightbox" *ngIf="lightboxOpen()" (click)="closeLightbox()">
+@if (lightboxOpen()) {
+  <div class="lightbox" (click)="closeLightbox()">
     <div class="lightbox-content" (click)="$event.stopPropagation()">
-        <button class="close-btn" (click)="closeLightbox()">&times;</button>
-
-        <button class="nav-btn prev" (click)="prevImage($event)">&#10094;</button>
-
-        <img [src]="images()[currentImageIndex()].url" [alt]="images()[currentImageIndex()].alt" class="lightbox-img">
-
-        <button class="nav-btn next" (click)="nextImage($event)">&#10095;</button>
-
-        <div class="lightbox-caption">
-            {{ images()[currentImageIndex()].alt }}
-        </div>
+      <button class="close-btn" (click)="closeLightbox()">&times;</button>
+      <button class="nav-btn prev" (click)="prevImage($event)">&#10094;</button>
+      <img [src]="images()[currentImageIndex()].url" [alt]="images()[currentImageIndex()].alt" class="lightbox-img">
+      <button class="nav-btn next" (click)="nextImage($event)">&#10095;</button>
+      <div class="lightbox-caption">
+        {{ images()[currentImageIndex()].alt }}
+      </div>
     </div>
-</div>
+  </div>
+}

@@ -1,367 +1,387 @@
 <div class="reservations-container">
-    <div class="header-main">
-        <div>
-            <h2>Gestionar Reservas</h2>
-            <p class="subtitle">Selecciona una franja horaria para reservar tu clase de Agility.</p>
-        </div>
-        <!-- ADMIN/STAFF ONLY: Edit Schedule Button -->
-        <button *ngIf="['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')"
-            class="btn-edit-schedule" (click)="openManageModal()">
-            ⚙️ Editar Horario
-        </button>
+  <div class="header-main">
+    <div>
+      <h2>Gestionar Reservas</h2>
+      <p class="subtitle">Selecciona una franja horaria para reservar tu clase de Agility.</p>
     </div>
+    <!-- ADMIN/STAFF ONLY: Edit Schedule Button -->
+    @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+      <button
+        class="btn-edit-schedule" (click)="openManageModal()">
+        ⚙️ Editar Horario
+      </button>
+    }
+  </div>
 
-    <div class="week-selector">
-        <button [class.active]="selectedWeek() === 'current'" (click)="toggleWeek('current')">
-            Semana Actual
-        </button>
-        <button [class.active]="selectedWeek() === 'next'" (click)="toggleWeek('next')">
-            Semana Siguiente
-        </button>
-    </div>
+  <div class="week-selector">
+    <button [class.active]="selectedWeek() === 'current'" (click)="toggleWeek('current')">
+      Semana Actual
+    </button>
+    <button [class.active]="selectedWeek() === 'next'" (click)="toggleWeek('next')">
+      Semana Siguiente
+    </button>
+  </div>
 
-    <div *ngFor="let group of groupedSlots()">
-        <div class="header-container">
-            <h3 class="day-header">
-                {{ group.day }}
-                <span class="date-label">{{ group.slots[0].date | date:'dd/MM' }}</span>
-            </h3>
-        </div>
-        <div class="slots-grid">
-            <div *ngFor="let slot of group.slots" class="slot-card"
-                [class.full]="(slot.currentBookings || 0) >= slot.max_bookings">
-
-                <div class="card-header">
-                    <div class="time-badge">
-                        <span class="material-icons time-icon">schedule</span>
-                        {{ slot.start_time }} - {{ slot.end_time }}
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <div class="status-indicator" *ngIf="!slot.isCancelled"
-                            [class.status-green]="(slot.currentBookings || 0) / slot.max_bookings < 0.5"
-                            [class.status-orange]="(slot.currentBookings || 0) / slot.max_bookings >= 0.5 && (slot.currentBookings || 0) < slot.max_bookings"
-                            [class.status-red]="(slot.currentBookings || 0) >= slot.max_bookings">
-                            <span class="status-dot"></span>
-                            {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Completo' : 'Disponible' }}
-                        </div>
-                        <div class="status-indicator status-red" *ngIf="slot.isCancelled">
-                            <span class="status-dot"></span>
-                            Festivo/Cancelada
-                        </div>
-
-                        <!-- Staff Toggle Cancelled Status -->
-                        <button *ngIf="['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')"
-                            class="btn-icon-staff"
-                            [class.cancel]="!slot.isCancelled"
-                            [class.restore]="slot.isCancelled"
-                            [title]="slot.isCancelled ? 'Restaurar Clase' : 'Anular Clase'"
-                            (click)="openStaffCancelModal(slot)">
-                            <span class="material-icons">{{ slot.isCancelled ? 'restore' : 'block' }}</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="availability-section">
-                    <div class="progress-labels">
-                        <span class="label">Ocupación</span>
-                        <strong class="count">{{ slot.currentBookings }} / {{ slot.max_bookings }}</strong>
-                    </div>
-                    <div class="progress-track">
-                        <div class="progress-fill"
-                            [style.width.%]="((slot.currentBookings || 0) / slot.max_bookings) * 100"
-                            [class.fill-green]="(slot.currentBookings || 0) / slot.max_bookings < 0.5"
-                            [class.fill-orange]="(slot.currentBookings || 0) / slot.max_bookings >= 0.5 && (slot.currentBookings || 0) < slot.max_bookings"
-                            [class.fill-red]="(slot.currentBookings || 0) >= slot.max_bookings">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Attendees Toggle & List -->
-                <div class="attendees-section" *ngIf="slot.reservations && slot.reservations.length > 0">
-                    <button class="toggle-attendees-btn" (click)="toggleAttendees(slot.id)"
-                        [class.active]="expandedSlots().has(slot.id)">
-                        <div class="btn-content">
-                            <span class="material-icons group-icon">group</span>
-                            <span>Ver asistentes ({{ slot.reservations.length }})</span>
-                        </div>
-                        <span class="material-icons chevron"
-                            [class.open]="expandedSlots().has(slot.id)">expand_more</span>
-                    </button>
-
-                    <div class="attendees-list-wrapper" [class.expanded]="expandedSlots().has(slot.id)">
-                        <div class="attendees-list">
-                            <div *ngFor="let res of slot.reservations" class="attendee-card">
-                                <div class="attendee-avatar" [class.clickable]="res.userImage"
-                                    (click)="enlargeImage(res.userImage)">
-                                    <ng-container *ngIf="res.userImage; else defaultAvatar">
-                                        <img [src]="res.userImage" alt="User">
-                                    </ng-container>
-                                    <ng-template #defaultAvatar>
-                                        <img src="assets/images/logo.png" alt="Logo" class="default-logo">
-                                    </ng-template>
-                                </div>
-                                <div class="attendee-info">
-                                    <span class="attendee-name">{{ res.userName }}</span>
-                                    <div class="attendee-dogs">
-                                        <span *ngFor="let dog of res.selectedDogs" class="dog-tag">
-                                            🐾
-                                            <span *ngIf="dog.image" class="dog-name-link"
-                                                (click)="enlargeImage(dog.image)">{{ dog.name }}</span>
-                                            <span *ngIf="!dog.image">{{ dog.name || dog }}</span>
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="actions">
-
-
-                    <ng-container *ngIf="!slot.isCancelled">
-                        <!-- Show Cancel button ONLY if booked by current user -->
-                        <button *ngIf="slot.isBookedByCurrentUser" class="btn-action btn-cancel-card"
-                            (click)="openCancelModal(slot)">
-                            Cancelar Reserva
-                        </button>
-
-                        <!-- Show Book button if NOT booked by user -->
-                        <button *ngIf="!slot.isBookedByCurrentUser" class="btn-action btn-book"
-                            [disabled]="(slot.currentBookings || 0) >= slot.max_bookings" (click)="bookSlot(slot)">
-                            {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Sin Plazas' : 'Reservar Plaza' }}
-                        </button>
-                    </ng-container>
-                </div>
+  @for (group of groupedSlots(); track group) {
+    <div>
+      <div class="header-container">
+        <h3 class="day-header">
+          {{ group.day }}
+          <span class="date-label">{{ group.slots[0].date | date:'dd/MM' }}</span>
+        </h3>
+      </div>
+      <div class="slots-grid">
+        @for (slot of group.slots; track slot) {
+          <div class="slot-card"
+            [class.full]="(slot.currentBookings || 0) >= slot.max_bookings">
+            <div class="card-header">
+              <div class="time-badge">
+                <span class="material-icons time-icon">schedule</span>
+                {{ slot.start_time }} - {{ slot.end_time }}
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                @if (!slot.isCancelled) {
+                  <div class="status-indicator"
+                    [class.status-green]="(slot.currentBookings || 0) / slot.max_bookings < 0.5"
+                    [class.status-orange]="(slot.currentBookings || 0) / slot.max_bookings >= 0.5 && (slot.currentBookings || 0) < slot.max_bookings"
+                    [class.status-red]="(slot.currentBookings || 0) >= slot.max_bookings">
+                    <span class="status-dot"></span>
+                    {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Completo' : 'Disponible' }}
+                  </div>
+                }
+                @if (slot.isCancelled) {
+                  <div class="status-indicator status-red">
+                    <span class="status-dot"></span>
+                    Festivo/Cancelada
+                  </div>
+                }
+                <!-- Staff Toggle Cancelled Status -->
+                @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+                  <button
+                    class="btn-icon-staff"
+                    [class.cancel]="!slot.isCancelled"
+                    [class.restore]="slot.isCancelled"
+                    [title]="slot.isCancelled ? 'Restaurar Clase' : 'Anular Clase'"
+                    (click)="openStaffCancelModal(slot)">
+                    <span class="material-icons">{{ slot.isCancelled ? 'restore' : 'block' }}</span>
+                  </button>
+                }
+              </div>
             </div>
-        </div>
+            <div class="availability-section">
+              <div class="progress-labels">
+                <span class="label">Ocupación</span>
+                <strong class="count">{{ slot.currentBookings }} / {{ slot.max_bookings }}</strong>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill"
+                  [style.width.%]="((slot.currentBookings || 0) / slot.max_bookings) * 100"
+                  [class.fill-green]="(slot.currentBookings || 0) / slot.max_bookings < 0.5"
+                  [class.fill-orange]="(slot.currentBookings || 0) / slot.max_bookings >= 0.5 && (slot.currentBookings || 0) < slot.max_bookings"
+                  [class.fill-red]="(slot.currentBookings || 0) >= slot.max_bookings">
+                </div>
+              </div>
+            </div>
+            <!-- Attendees Toggle & List -->
+            @if (slot.reservations && slot.reservations.length > 0) {
+              <div class="attendees-section">
+                <button class="toggle-attendees-btn" (click)="toggleAttendees(slot.id)"
+                  [class.active]="expandedSlots().has(slot.id)">
+                  <div class="btn-content">
+                    <span class="material-icons group-icon">group</span>
+                    <span>Ver asistentes ({{ slot.reservations.length }})</span>
+                  </div>
+                  <span class="material-icons chevron"
+                  [class.open]="expandedSlots().has(slot.id)">expand_more</span>
+                </button>
+                <div class="attendees-list-wrapper" [class.expanded]="expandedSlots().has(slot.id)">
+                  <div class="attendees-list">
+                    @for (res of slot.reservations; track res) {
+                      <div class="attendee-card">
+                        <div class="attendee-avatar" [class.clickable]="res.userImage"
+                          (click)="enlargeImage(res.userImage)">
+                          @if (res.userImage) {
+                            <img [src]="res.userImage" alt="User">
+                          } @else {
+                            <img src="assets/images/logo.png" alt="Logo" class="default-logo">
+                          }
+                        </div>
+                        <div class="attendee-info">
+                          <span class="attendee-name">{{ res.userName }}</span>
+                          <div class="attendee-dogs">
+                            @for (dog of res.selectedDogs; track dog) {
+                              <span class="dog-tag">
+                                🐾
+                                @if (dog.image) {
+                                  <span class="dog-name-link"
+                                  (click)="enlargeImage(dog.image)">{{ dog.name }}</span>
+                                }
+                                @if (!dog.image) {
+                                  <span>{{ dog.name || dog }}</span>
+                                }
+                              </span>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+            <div class="actions">
+              @if (!slot.isCancelled) {
+                <!-- Show Cancel button ONLY if booked by current user -->
+                @if (slot.isBookedByCurrentUser) {
+                  <button class="btn-action btn-cancel-card"
+                    (click)="openCancelModal(slot)">
+                    Cancelar Reserva
+                  </button>
+                }
+                <!-- Show Book button if NOT booked by user -->
+                @if (!slot.isBookedByCurrentUser) {
+                  <button class="btn-action btn-book"
+                    [disabled]="(slot.currentBookings || 0) >= slot.max_bookings" (click)="bookSlot(slot)">
+                    {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Sin Plazas' : 'Reservar Plaza' }}
+                  </button>
+                }
+              }
+            </div>
+          </div>
+        }
+      </div>
     </div>
+  }
 </div>
 
 <!-- Booking Modal -->
-<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
+@if (isModalOpen) {
+  <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-        <h3>📅 Confirmar Reserva</h3>
-
-        <p>¿Quieres reservar plaza para el <strong>{{ selectedSlotForBooking?.day }}</strong> a las <strong>{{
-                selectedSlotForBooking?.start_time }}</strong>?</p>
-
-        <div class="dog-selection">
-            <p style="margin: 0 0 1rem 0; font-weight: 600; color: #555;">Selecciona los perretes que vendrán:</p>
-
-            <div *ngIf="myDogs().length === 0" class="no-dogs-warning">
-                <p>⚠️ No tienes perros registrados.</p>
-                <a routerLink="/perfil" (click)="closeModal()">Ir a mi perfil para añadir uno</a>
-            </div>
-
-            <div class="dog-checkboxes">
-                <label *ngFor="let dog of myDogs()" class="dog-checkbox">
-                    <input type="checkbox" [checked]="selectedDogIds.has(dog.id)" (change)="toggleDogSelection(dog.id)">
-                    <span class="dog-label">🐾 {{ dog.name }}</span>
-                </label>
-            </div>
+      <h3>📅 Confirmar Reserva</h3>
+      <p>¿Quieres reservar plaza para el <strong>{{ selectedSlotForBooking?.day }}</strong> a las <strong>{{
+    selectedSlotForBooking?.start_time }}</strong>?</p>
+    <div class="dog-selection">
+      <p style="margin: 0 0 1rem 0; font-weight: 600; color: #555;">Selecciona los perretes que vendrán:</p>
+      @if (myDogs().length === 0) {
+        <div class="no-dogs-warning">
+          <p>⚠️ No tienes perros registrados.</p>
+          <a routerLink="/perfil" (click)="closeModal()">Ir a mi perfil para añadir uno</a>
         </div>
-
-        <div class="modal-actions">
-            <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
-            <button class="btn-confirm" (click)="confirmBooking()"
-                [disabled]="(myDogs().length > 0 && selectedDogIds.size === 0) || isSubmitting()">
-                {{ isSubmitting() ? 'Reservando...' : 'Confirmar Reserva' }}
-            </button>
-        </div>
+      }
+      <div class="dog-checkboxes">
+        @for (dog of myDogs(); track dog) {
+          <label class="dog-checkbox">
+            <input type="checkbox" [checked]="selectedDogIds.has(dog.id)" (change)="toggleDogSelection(dog.id)">
+            <span class="dog-label">🐾 {{ dog.name }}</span>
+          </label>
+        }
+      </div>
     </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+      <button class="btn-confirm" (click)="confirmBooking()"
+        [disabled]="(myDogs().length > 0 && selectedDogIds.size === 0) || isSubmitting()">
+        {{ isSubmitting() ? 'Reservando...' : 'Confirmar Reserva' }}
+      </button>
+    </div>
+  </div>
 </div>
+}
 
 <!-- Cancellation Modal -->
-<div class="modal-backdrop" *ngIf="isCancelModalOpen" (click)="closeCancelModal()">
+@if (isCancelModalOpen) {
+  <div class="modal-backdrop" (click)="closeCancelModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-        <h3>😢 Cancelar Reserva</h3>
-
-        <div class="modal-body">
-            <p class="confirm-message">¿Estás seguro de que quieres cancelar tu reserva para el <strong>{{
-                    selectedSlotForCancellation?.day }}</strong> a las <strong>{{
-                    selectedSlotForCancellation?.start_time }}</strong>?</p>
-
-            <p class="note warning">Esta acción liberará tu plaza inmediatamente.</p>
-        </div>
-
-        <div class="modal-actions">
-            <button class="btn-secondary" (click)="closeCancelModal()">No, mantener</button>
-            <button class="btn-confirm btn-delete-action" (click)="confirmCancellation()" [disabled]="isSubmitting()">
-                {{ isSubmitting() ? 'Cancelando...' : 'Sí, cancelar reserva' }}
-            </button>
-        </div>
+      <h3>😢 Cancelar Reserva</h3>
+      <div class="modal-body">
+        <p class="confirm-message">¿Estás seguro de que quieres cancelar tu reserva para el <strong>{{
+        selectedSlotForCancellation?.day }}</strong> a las <strong>{{
+      selectedSlotForCancellation?.start_time }}</strong>?</p>
+      <p class="note warning">Esta acción liberará tu plaza inmediatamente.</p>
     </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="closeCancelModal()">No, mantener</button>
+      <button class="btn-confirm btn-delete-action" (click)="confirmCancellation()" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Cancelando...' : 'Sí, cancelar reserva' }}
+      </button>
+    </div>
+  </div>
 </div>
+}
 
 <!-- Management Modal (Admin/Staff) -->
-<div class="modal-backdrop" *ngIf="isManageModalOpen" (click)="closeManageModal()">
+@if (isManageModalOpen) {
+  <div class="modal-backdrop" (click)="closeManageModal()">
     <div class="modal-content large-modal" (click)="$event.stopPropagation()">
-        <div class="modal-header header-light">
-            <h3>
-                <span class="material-icons header-icon">calendar_month</span>
-                Gestión de Horarios
-            </h3>
-            <button class="btn-icon close-btn" (click)="closeManageModal()" title="Cerrar">
-                <span class="material-icons">close</span>
-            </button>
-        </div>
-
-        <div class="management-body">
-            <!-- Form Section -->
-            <div class="management-form-card" [class.editing-mode]="editingSlot">
-                <div class="form-header-row">
-                    <h4 class="section-title card-title">
-                        <span class="material-icons indicator-icon">{{ editingSlot ? 'edit_calendar' : 'add_circle'
-                            }}</span>
-                        {{ editingSlot ? 'Editar Horario Existente' : 'Programar Nuevo Horario' }}
-                    </h4>
-                    <span class="status-badge" *ngIf="editingSlot">Modo Edición</span>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Día de la semana</label>
-                        <div class="select-wrapper">
-                            <select [(ngModel)]="slotForm.day" class="modern-input">
-                                <option value="Lunes">Lunes</option>
-                                <option value="Martes">Martes</option>
-                                <option value="Miércoles">Miércoles</option>
-                                <option value="Jueves">Jueves</option>
-                                <option value="Viernes">Viernes</option>
-                                <option value="Sábado">Sábado</option>
-                                <option value="Domingo">Domingo</option>
-                            </select>
-                            <span class="material-icons select-icon">expand_more</span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Hora Inicio</label>
-                        <div class="input-with-icon">
-                            <span class="material-icons input-icon">schedule</span>
-                            <input type="time" [(ngModel)]="slotForm.startTime" class="modern-input with-icon">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Hora Fin</label>
-                        <div class="input-with-icon">
-                            <span class="material-icons input-icon">update</span>
-                            <input type="time" [(ngModel)]="slotForm.endTime" class="modern-input with-icon">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Plazas Máx.</label>
-                        <div class="input-with-icon">
-                            <span class="material-icons input-icon">group</span>
-                            <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input with-icon"
-                                min="1">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-actions-row">
-                    <button *ngIf="editingSlot" class="btn-text"
-                        (click)="editingSlot = null; slotForm = {day: 'Lunes', startTime:'10:00', endTime:'11:00', maxBookings:5}">
-                        <span class="material-icons btn-icon-small">cancel</span>
-                        Cancelar
-                    </button>
-                    <button class="btn-primary-action" [class.btn-edit]="editingSlot" (click)="saveSlot()">
-                        <span class="material-icons btn-icon-small">{{ editingSlot ? 'save' : 'add' }}</span>
-                        {{ editingSlot ? 'Guardar Cambios' : 'Añadir Horario' }}
-                    </button>
-                </div>
+      <div class="modal-header header-light">
+        <h3>
+          <span class="material-icons header-icon">calendar_month</span>
+          Gestión de Horarios
+        </h3>
+        <button class="btn-icon close-btn" (click)="closeManageModal()" title="Cerrar">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="management-body">
+        <!-- Form Section -->
+        <div class="management-form-card" [class.editing-mode]="editingSlot">
+          <div class="form-header-row">
+            <h4 class="section-title card-title">
+              <span class="material-icons indicator-icon">{{ editingSlot ? 'edit_calendar' : 'add_circle'
+              }}</span>
+              {{ editingSlot ? 'Editar Horario Existente' : 'Programar Nuevo Horario' }}
+            </h4>
+            @if (editingSlot) {
+              <span class="status-badge">Modo Edición</span>
+            }
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Día de la semana</label>
+              <div class="select-wrapper">
+                <select [(ngModel)]="slotForm.day" class="modern-input">
+                  <option value="Lunes">Lunes</option>
+                  <option value="Martes">Martes</option>
+                  <option value="Miércoles">Miércoles</option>
+                  <option value="Jueves">Jueves</option>
+                  <option value="Viernes">Viernes</option>
+                  <option value="Sábado">Sábado</option>
+                  <option value="Domingo">Domingo</option>
+                </select>
+                <span class="material-icons select-icon">expand_more</span>
+              </div>
             </div>
-
-            <div class="divider"></div>
-
-            <!-- List Section -->
-            <div class="slots-list-section">
-                <div class="list-header">
-                    <h4 class="section-title card-title">
-                        <span class="material-icons indicator-icon">view_list</span>
-                        Horarios Configurados
-                    </h4>
-                    <span class="count-badge">{{ timeSlots().length }} horarios</span>
-                </div>
-
-                <div class="slots-list-container">
-                    <div *ngFor="let slot of timeSlots()" class="admin-slot-card"
-                        [class.highlighted]="editingSlot?.id === slot.id">
-                        <div class="slot-card-left">
-                            <div class="day-badge-container">
-                                <span class="day-badge">{{ slot.day.substring(0, 3) }}</span>
-                            </div>
-                            <div class="slot-info-main">
-                                <span class="time-range">{{ slot.start_time }} - {{ slot.end_time }}</span>
-                                <span class="capacity-badge">
-                                    <span class="material-icons icon-tiny">person</span>
-                                    {{ slot.max_bookings }} plazas max.
-                                </span>
-                            </div>
-                        </div>
-                        <div class="slot-actions">
-                            <button class="btn-icon-action edit" (click)="editSlot(slot)" title="Editar">
-                                <span class="material-icons">edit</span>
-                            </button>
-                            <button class="btn-icon-action delete" (click)="deleteSlot(slot.id)" title="Eliminar">
-                                <span class="material-icons">delete_outline</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group">
+              <label>Hora Inicio</label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">schedule</span>
+                <input type="time" [(ngModel)]="slotForm.startTime" class="modern-input with-icon">
+              </div>
             </div>
+            <div class="form-group">
+              <label>Hora Fin</label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">update</span>
+                <input type="time" [(ngModel)]="slotForm.endTime" class="modern-input with-icon">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Plazas Máx.</label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">group</span>
+                <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input with-icon"
+                  min="1">
+                </div>
+              </div>
+            </div>
+            <div class="form-actions-row">
+              @if (editingSlot) {
+                <button class="btn-text"
+                  (click)="editingSlot = null; slotForm = {day: 'Lunes', startTime:'10:00', endTime:'11:00', maxBookings:5}">
+                  <span class="material-icons btn-icon-small">cancel</span>
+                  Cancelar
+                </button>
+              }
+              <button class="btn-primary-action" [class.btn-edit]="editingSlot" (click)="saveSlot()">
+                <span class="material-icons btn-icon-small">{{ editingSlot ? 'save' : 'add' }}</span>
+                {{ editingSlot ? 'Guardar Cambios' : 'Añadir Horario' }}
+              </button>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <!-- List Section -->
+          <div class="slots-list-section">
+            <div class="list-header">
+              <h4 class="section-title card-title">
+                <span class="material-icons indicator-icon">view_list</span>
+                Horarios Configurados
+              </h4>
+              <span class="count-badge">{{ timeSlots().length }} horarios</span>
+            </div>
+            <div class="slots-list-container">
+              @for (slot of timeSlots(); track slot) {
+                <div class="admin-slot-card"
+                  [class.highlighted]="editingSlot?.id === slot.id">
+                  <div class="slot-card-left">
+                    <div class="day-badge-container">
+                      <span class="day-badge">{{ slot.day.substring(0, 3) }}</span>
+                    </div>
+                    <div class="slot-info-main">
+                      <span class="time-range">{{ slot.start_time }} - {{ slot.end_time }}</span>
+                      <span class="capacity-badge">
+                        <span class="material-icons icon-tiny">person</span>
+                        {{ slot.max_bookings }} plazas max.
+                      </span>
+                    </div>
+                  </div>
+                  <div class="slot-actions">
+                    <button class="btn-icon-action edit" (click)="editSlot(slot)" title="Editar">
+                      <span class="material-icons">edit</span>
+                    </button>
+                    <button class="btn-icon-action delete" (click)="deleteSlot(slot.id)" title="Eliminar">
+                      <span class="material-icons">delete_outline</span>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  }
 
-<!-- Image Modal -->
-<div class="modal-backdrop image-modal-backdrop" *ngIf="enlargedImageStr" (click)="closeImage()">
-    <div class="modal-content image-modal-content" (click)="closeImage()">
+  <!-- Image Modal -->
+  @if (enlargedImageStr) {
+    <div class="modal-backdrop image-modal-backdrop" (click)="closeImage()">
+      <div class="modal-content image-modal-content" (click)="closeImage()">
         <button class="btn-icon close-btn" (click)="closeImage()">
-            <span class="material-icons">close</span>
+          <span class="material-icons">close</span>
         </button>
         <img [src]="enlargedImageStr" alt="Enlarged" class="enlarged-img" (click)="$event.stopPropagation()">
+      </div>
     </div>
-</div>
+  }
 
-<!-- Staff Anular Clase Modal -->
-<div class="modal-backdrop" *ngIf="isStaffCancelModalOpen" (click)="closeStaffCancelModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+  <!-- Staff Anular Clase Modal -->
+  @if (isStaffCancelModalOpen) {
+    <div class="modal-backdrop" (click)="closeStaffCancelModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
         <h3>
-            <span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem; color: #ff5252;">{{ slotToToggle?.isCancelled ? 'restore' : 'warning' }}</span>
-            {{ slotToToggle?.isCancelled ? 'Restaurar' : 'Anular' }} Clase
+          <span class="material-icons" style="vertical-align: middle; margin-right: 0.5rem; color: #ff5252;">{{ slotToToggle?.isCancelled ? 'restore' : 'warning' }}</span>
+          {{ slotToToggle?.isCancelled ? 'Restaurar' : 'Anular' }} Clase
         </h3>
-
         <div class="modal-body" style="margin-top: 1rem;">
-            <p class="confirm-message" style="margin-bottom: 1.5rem;">
-                ¿Estás seguro de que quieres <strong>{{ slotToToggle?.isCancelled ? 'restaurar' : 'anular' }}</strong> la clase del <strong>{{ slotToToggle?.day }} {{ slotToToggle?.date | date:'dd/MM' }}</strong> a las <strong>{{ slotToToggle?.start_time }}</strong>?
-            </p>
-
-            <div class="note warning" *ngIf="!slotToToggle?.isCancelled" style="display: flex; gap: 0.8rem; align-items: center;">
-                <span class="material-icons">notifications_active</span>
-                <div>
-                    Al confirmar, se enviará una <strong>notificación</strong> a todos los miembros inscritos avisando de la cancelación y se eliminarán sus plazas reservadas.
-                </div>
+          <p class="confirm-message" style="margin-bottom: 1.5rem;">
+            ¿Estás seguro de que quieres <strong>{{ slotToToggle?.isCancelled ? 'restaurar' : 'anular' }}</strong> la clase del <strong>{{ slotToToggle?.day }} {{ slotToToggle?.date | date:'dd/MM' }}</strong> a las <strong>{{ slotToToggle?.start_time }}</strong>?
+          </p>
+          @if (!slotToToggle?.isCancelled) {
+            <div class="note warning" style="display: flex; gap: 0.8rem; align-items: center;">
+              <span class="material-icons">notifications_active</span>
+              <div>
+                Al confirmar, se enviará una <strong>notificación</strong> a todos los miembros inscritos avisando de la cancelación y se eliminarán sus plazas reservadas.
+              </div>
             </div>
-            
-            <div class="note" *ngIf="slotToToggle?.isCancelled" style="background: #e8f5e9; color: #2e7d32; border-left: 4px solid #4caf50; padding: 1rem; border-radius: 4px; display: flex; gap: 0.8rem; align-items: center;">
-                <span class="material-icons">info</span>
-                <div>
-                    La clase volverá a estar disponible para que los usuarios puedan inscribirse.
-                </div>
+          }
+          @if (slotToToggle?.isCancelled) {
+            <div class="note" style="background: #e8f5e9; color: #2e7d32; border-left: 4px solid #4caf50; padding: 1rem; border-radius: 4px; display: flex; gap: 0.8rem; align-items: center;">
+              <span class="material-icons">info</span>
+              <div>
+                La clase volverá a estar disponible para que los usuarios puedan inscribirse.
+              </div>
             </div>
+          }
         </div>
-
         <div class="modal-actions" style="margin-top: 2rem;">
-            <button class="btn-secondary" (click)="closeStaffCancelModal()" [disabled]="isSubmitting()">Cancelar</button>
-            <button class="btn-confirm" 
-                    [class.btn-delete-action]="!slotToToggle?.isCancelled" 
-                    (click)="confirmStaffToggle()" 
-                    [disabled]="isSubmitting()">
-                {{ isSubmitting() ? 'Procesando...' : (slotToToggle?.isCancelled ? 'Sí, restaurar' : 'Sí, anular clase') }}
-            </button>
+          <button class="btn-secondary" (click)="closeStaffCancelModal()" [disabled]="isSubmitting()">Cancelar</button>
+          <button class="btn-confirm"
+            [class.btn-delete-action]="!slotToToggle?.isCancelled"
+            (click)="confirmStaffToggle()"
+            [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Procesando...' : (slotToToggle?.isCancelled ? 'Sí, restaurar' : 'Sí, anular clase') }}
+          </button>
         </div>
+      </div>
     </div>
-</div>
+  }

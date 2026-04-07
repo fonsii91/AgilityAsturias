@@ -10,12 +10,12 @@ import { CompetitionService } from './services/competition.service';
 import { TimeSlotService } from './services/time-slot.service';
 import { ToastService } from './services/toast.service';
 import { SwUpdate } from '@angular/service-worker';
-import { CommonModule } from '@angular/common';
+
 import { DogService } from './services/dog.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

@@ -1,64 +1,68 @@
 <div class="admin-container">
-    <div class="header">
-        <h1>Gestión de Usuarios</h1>
-        <div class="stats">
-            <span>Total: {{ users().length }}</span>
-        </div>
+  <div class="header">
+    <h1>Gestión de Usuarios</h1>
+    <div class="stats">
+      <span>Total: {{ users().length }}</span>
     </div>
+  </div>
 
-    <div class="table-container glass-effect" *ngIf="!loading(); else loader">
-        <table>
-            <thead>
-                <tr>
-                    <th>Usuario</th>
-                    <th>Acciones</th>
-                    <th>Email</th>
-                    <th>Rol Actual</th>
+  @if (!loading()) {
+    <div class="table-container glass-effect">
+      <table>
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Acciones</th>
+            <th>Email</th>
+            <th>Rol Actual</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users(); track user) {
+            <tr>
+              <td class="user-cell">
+                @if (user.photoURL) {
+                  <img [src]="user.photoURL" alt="Avatar" class="avatar clickable-avatar"
+                    referrerpolicy="no-referrer" (click)="openImageZoom(user.photoURL)">
+                  } @else {
+                    <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo"
+                      class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
+                    }
+                    <span>{{ user.displayName }}</span>
+                  </td>
+                  <td>
+                    <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
+                      class="role-select">
+                      <option value="user">Usuario</option>
+                      <option value="member">Miembro</option>
+                      <option value="staff">Staff</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
+                  <td>{{ user.email }}</td>
+                  <td>
+                    <span class="badge" [class]="user.role">{{ user.role }}</span>
+                  </td>
                 </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let user of users()">
-                    <td class="user-cell">
-                        <ng-container *ngIf="user.photoURL; else defaultAvatar">
-                            <img [src]="user.photoURL" alt="Avatar" class="avatar clickable-avatar"
-                                referrerpolicy="no-referrer" (click)="openImageZoom(user.photoURL)">
-                        </ng-container>
-                        <ng-template #defaultAvatar>
-                            <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo"
-                                class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
-                        </ng-template>
-                        <span>{{ user.displayName }}</span>
-                    </td>
-                    <td>
-                        <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
-                            class="role-select">
-                            <option value="user">Usuario</option>
-                            <option value="member">Miembro</option>
-                            <option value="staff">Staff</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </td>
-                    <td>{{ user.email }}</td>
-                    <td>
-                        <span class="badge" [class]="user.role">{{ user.role }}</span>
-                    </td>
-                </tr>
+              }
             </tbody>
-        </table>
-    </div>
-
-    <ng-template #loader>
-        <div class="loader-container">
-            <div class="spinner"></div>
-            <p>Cargando usuarios...</p>
+          </table>
         </div>
-    </ng-template>
+      } @else {
+        <div class="loader-container">
+          <div class="spinner"></div>
+          <p>Cargando usuarios...</p>
+        </div>
+      }
 
-    <!-- Image Zoom Modal -->
-    <div class="modal-overlay image-zoom-overlay" *ngIf="isZoomModalOpen" (click)="closeImageZoom()">
-        <div class="zoom-modal-content" (click)="$event.stopPropagation()">
+
+      <!-- Image Zoom Modal -->
+      @if (isZoomModalOpen) {
+        <div class="modal-overlay image-zoom-overlay" (click)="closeImageZoom()">
+          <div class="zoom-modal-content" (click)="$event.stopPropagation()">
             <button class="close-zoom-btn" (click)="closeImageZoom()">&times;</button>
             <img [src]="zoomedImageURL" alt="Zoomed Profile Foto">
+          </div>
         </div>
+      }
     </div>
-</div>

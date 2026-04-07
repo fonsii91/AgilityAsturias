@@ -1,14 +1,14 @@
-import { Component, Input } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input } from '@angular/core';
+
 
 @Component({
   selector: 'app-skeleton-loader',
-  imports: [CommonModule],
+  imports: [],
   templateUrl: './skeleton-loader.html',
   styleUrl: './skeleton-loader.css',
 })
 export class SkeletonLoader {
-  @Input() width: string = '100%';
-  @Input() height: string = '20px';
-  @Input() shape: 'rect' | 'circle' = 'rect';
+  readonly width = input<string>('100%');
+  readonly height = input<string>('20px');
+  readonly shape = input<'rect' | 'circle'>('rect');
 }

@@ -1,60 +1,66 @@
 <div class="auth-container">
-    <div class="auth-card">
-        <div class="logo-area">
-            <div class="logo-circle">
-                <span class="material-icons">pets</span>
-            </div>
-            <h2>Bienvenido</h2>
-            <p>Inicia sesión en Agility Asturias</p>
-        </div>
-
-        <div *ngIf="!authService.currentUserSignal()" class="auth-form-container">
-            <form [formGroup]="loginForm" (ngSubmit)="login()" class="auth-form">
-                <div class="form-group">
-                    <label for="email">Correo Electrónico</label>
-                    <div class="input-wrapper">
-                        <span class="material-icons">email</span>
-                        <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <div class="input-wrapper">
-                        <span class="material-icons">lock</span>
-                        <input type="password" id="password" formControlName="password" placeholder="••••••••">
-                    </div>
-                </div>
-
-                <div *ngIf="errorMessage()" class="error-message">
-                    <span class="material-icons">error_outline</span>
-                    {{ errorMessage() }}
-                </div>
-
-                <button type="submit" class="btn-primary" [disabled]="loginForm.invalid || isLoading()">
-                    <span *ngIf="isLoading()" class="spinner"></span>
-                    {{ isLoading() ? 'Iniciando...' : 'Iniciar Sesión' }}
-                </button>
-            </form>
-
-            <div class="auth-footer">
-                <p>¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a></p>
-                <p class="forgot-password">¿Has olvidado tu contraseña? Contacta con la administración del club.</p>
-            </div>
-        </div>
-
-        <div *ngIf="authService.currentUserSignal() as user" class="user-info">
-            <div class="user-avatar">
-                <img [src]="user.photo_url || 'assets/default-avatar.png'" alt="User photo">
-            </div>
-            <div class="user-details">
-                <p class="name">{{ user.name }}</p>
-                <p class="email">{{ user.email }}</p>
-                <p class="role" *ngIf="user.role !== 'user'">{{ user.role | titlecase }}</p>
-            </div>
-            <button class="btn-logout" (click)="logout()">
-                <span class="material-icons">logout</span> Cerrar Sesión
-            </button>
-        </div>
+  <div class="auth-card">
+    <div class="logo-area">
+      <div class="logo-circle">
+        <span class="material-icons">pets</span>
+      </div>
+      <h2>Bienvenido</h2>
+      <p>Inicia sesión en Agility Asturias</p>
     </div>
+
+    @if (!authService.currentUserSignal()) {
+      <div class="auth-form-container">
+        <form [formGroup]="loginForm" (ngSubmit)="login()" class="auth-form">
+          <div class="form-group">
+            <label for="email">Correo Electrónico</label>
+            <div class="input-wrapper">
+              <span class="material-icons">email</span>
+              <input type="email" id="email" formControlName="email" placeholder="ejemplo@correo.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <div class="input-wrapper">
+              <span class="material-icons">lock</span>
+              <input type="password" id="password" formControlName="password" placeholder="••••••••">
+            </div>
+          </div>
+          @if (errorMessage()) {
+            <div class="error-message">
+              <span class="material-icons">error_outline</span>
+              {{ errorMessage() }}
+            </div>
+          }
+          <button type="submit" class="btn-primary" [disabled]="loginForm.invalid || isLoading()">
+            @if (isLoading()) {
+              <span class="spinner"></span>
+            }
+            {{ isLoading() ? 'Iniciando...' : 'Iniciar Sesión' }}
+          </button>
+        </form>
+        <div class="auth-footer">
+          <p>¿No tienes cuenta? <a routerLink="/register">Regístrate aquí</a></p>
+          <p class="forgot-password">¿Has olvidado tu contraseña? Contacta con la administración del club.</p>
+        </div>
+      </div>
+    }
+
+    @if (authService.currentUserSignal(); as user) {
+      <div class="user-info">
+        <div class="user-avatar">
+          <img [src]="user.photo_url || 'assets/default-avatar.png'" alt="User photo">
+        </div>
+        <div class="user-details">
+          <p class="name">{{ user.name }}</p>
+          <p class="email">{{ user.email }}</p>
+          @if (user.role !== 'user') {
+            <p class="role">{{ user.role | titlecase }}</p>
+          }
+        </div>
+        <button class="btn-logout" (click)="logout()">
+          <span class="material-icons">logout</span> Cerrar Sesión
+        </button>
+      </div>
+    }
+  </div>
 </div>

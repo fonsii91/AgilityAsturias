@@ -1,5 +1,5 @@
 import { Component, signal, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { GalleryService, GalleryPhoto } from '../../services/gallery.service';
@@ -11,7 +11,7 @@ import { ConfirmDialog, ConfirmDialogData } from '../shared/confirm-dialog/confi
 @Component({
     selector: 'app-galeria',
     standalone: true,
-    imports: [CommonModule, MatDialogModule],
+    imports: [MatDialogModule],
     templateUrl: './galeria.component.html',
     styleUrl: './galeria.component.css',
     animations: [

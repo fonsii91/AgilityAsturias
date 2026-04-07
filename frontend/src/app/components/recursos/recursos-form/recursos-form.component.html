@@ -1,58 +1,68 @@
 <div class="form-container">
-    <h2>{{ isEditing ? 'Editar Recurso' : 'Añadir Nuevo Recurso' }}</h2>
-    
-    <form [formGroup]="resourceForm" (ngSubmit)="onSubmit()">
-        <div class="form-group">
-            <label>Título *</label>
-            <input type="text" formControlName="title" placeholder="Ej: Dieta para cachorros" class="form-control">
-        </div>
+  <h2>{{ isEditing ? 'Editar Recurso' : 'Añadir Nuevo Recurso' }}</h2>
 
-        <div class="form-group">
-            <label>Descripción</label>
-            <textarea formControlName="description" rows="3" placeholder="Descripción breve..." class="form-control"></textarea>
-        </div>
+  <form [formGroup]="resourceForm" (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Título *</label>
+      <input type="text" formControlName="title" placeholder="Ej: Dieta para cachorros" class="form-control">
+    </div>
 
-        <div class="form-group">
-            <label>Categoría *</label>
-            <select formControlName="category" class="form-control">
-                <option value="">Selecciona una categoría</option>
-                <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
-            </select>
-        </div>
+    <div class="form-group">
+      <label>Descripción</label>
+      <textarea formControlName="description" rows="3" placeholder="Descripción breve..." class="form-control"></textarea>
+    </div>
 
-        <div class="form-group">
-            <label>Nivel *</label>
-            <select formControlName="level" class="form-control">
-                <option value="">Selecciona un nivel</option>
-                <option *ngFor="let lvl of levels" [value]="lvl.value">{{ lvl.label }}</option>
-            </select>
-        </div>
+    <div class="form-group">
+      <label>Categoría *</label>
+      <select formControlName="category" class="form-control">
+        <option value="">Selecciona una categoría</option>
+        @for (cat of categories; track cat) {
+          <option [value]="cat.value">{{ cat.label }}</option>
+        }
+      </select>
+    </div>
 
-        <div class="form-group">
-            <label>Tipo de Recurso *</label>
-            <select formControlName="type" class="form-control">
-                <option value="document">Documento (PDF, Word, etc.)</option>
-                <option value="video">Enlace a Vídeo (YouTube, Vimeo...)</option>
-                <option value="link">Enlace a Web</option>
-            </select>
-        </div>
+    <div class="form-group">
+      <label>Nivel *</label>
+      <select formControlName="level" class="form-control">
+        <option value="">Selecciona un nivel</option>
+        @for (lvl of levels; track lvl) {
+          <option [value]="lvl.value">{{ lvl.label }}</option>
+        }
+      </select>
+    </div>
 
-        <div class="form-group" *ngIf="resourceForm.get('type')?.value === 'document'">
-            <label>Archivo *</label>
-            <input type="file" (change)="onFileSelected($event)" class="form-control" [required]="!isEditing">
-            <small *ngIf="isEditing">Sube un archivo nuevo para reemplazar el actual.</small>
-        </div>
+    <div class="form-group">
+      <label>Tipo de Recurso *</label>
+      <select formControlName="type" class="form-control">
+        <option value="document">Documento (PDF, Word, etc.)</option>
+        <option value="video">Enlace a Vídeo (YouTube, Vimeo...)</option>
+        <option value="link">Enlace a Web</option>
+      </select>
+    </div>
 
-        <div class="form-group" *ngIf="resourceForm.get('type')?.value !== 'document'">
-            <label>URL / Enlace *</label>
-            <input type="url" formControlName="url" placeholder="https://..." class="form-control">
-        </div>
+    @if (resourceForm.get('type')?.value === 'document') {
+      <div class="form-group">
+        <label>Archivo *</label>
+        <input type="file" (change)="onFileSelected($event)" class="form-control" [required]="!isEditing">
+        @if (isEditing) {
+          <small>Sube un archivo nuevo para reemplazar el actual.</small>
+        }
+      </div>
+    }
 
-        <div class="form-actions">
-            <button type="button" class="btn-cancel" routerLink="/recursos">Cancelar</button>
-            <button type="submit" class="btn-submit" [disabled]="resourceForm.invalid || isSubmitting || (resourceForm.get('type')?.value === 'document' && !selectedFile && !isEditing)">
-                {{ isSubmitting ? 'Guardando...' : 'Guardar' }}
-            </button>
-        </div>
-    </form>
+    @if (resourceForm.get('type')?.value !== 'document') {
+      <div class="form-group">
+        <label>URL / Enlace *</label>
+        <input type="url" formControlName="url" placeholder="https://..." class="form-control">
+      </div>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" routerLink="/recursos">Cancelar</button>
+      <button type="submit" class="btn-submit" [disabled]="resourceForm.invalid || isSubmitting || (resourceForm.get('type')?.value === 'document' && !selectedFile && !isEditing)">
+        {{ isSubmitting ? 'Guardando...' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
 </div>

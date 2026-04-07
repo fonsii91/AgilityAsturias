@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { ReservationService } from '../../services/reservation.service';
 import { AuthService } from '../../services/auth.service';
 import { DogService } from '../../services/dog.service';
@@ -11,7 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
     selector: 'app-ranking',
     standalone: true,
-    imports: [CommonModule, FichaPerroComponent, MatTooltipModule],
+    imports: [FichaPerroComponent, MatTooltipModule],
     templateUrl: './ranking.component.html',
     styleUrls: ['./ranking.component.css']
 })

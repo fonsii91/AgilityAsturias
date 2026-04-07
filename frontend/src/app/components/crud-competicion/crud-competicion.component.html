@@ -1,160 +1,176 @@
 <div class="crud-container">
-    <div class="header">
-        <h2>Gestión de Eventos</h2>
-        <button class="btn btn-primary" (click)="initNewCompetition()" *ngIf="!showForm()">
-            <span>+</span> Nuevo Evento
-        </button>
-        <button class="btn btn-secondary" (click)="toggleView()" *ngIf="showForm()">
-            ← Volver al Listado
-        </button>
-    </div>
+  <div class="header">
+    <h2>Gestión de Eventos</h2>
+    @if (!showForm()) {
+      <button class="btn btn-primary" (click)="initNewCompetition()">
+        <span>+</span> Nuevo Evento
+      </button>
+    }
+    @if (showForm()) {
+      <button class="btn btn-secondary" (click)="toggleView()">
+        ← Volver al Listado
+      </button>
+    }
+  </div>
 
-    <!-- LIST VIEW -->
-    <div class="list-view" *ngIf="!showForm()">
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Lugar</th>
-                        <th>Fecha Evento</th>
-                        <th>Cierre Inscripción</th>
-                        <th style="width: 150px;">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr *ngFor="let comp of competitions()">
-                        <td [class.border-comp]="!comp.tipo || comp.tipo === 'competicion'"
-                            [class.border-other]="comp.tipo === 'otros'">
-                            <strong>{{ comp.nombre || comp.lugar }}</strong>
-                            <div *ngIf="comp.nombre && comp.lugar"
-                                style="font-size: 0.85em; color: #666; font-weight: normal;">{{ comp.lugar }}</div>
-                        </td>
-                        <td>
-                            {{ comp.fechaEvento | date:'dd/MM/yyyy' }}
-                            <span *ngIf="comp.fechaFinEvento && comp.fechaFinEvento !== comp.fechaEvento">
-                                - {{ comp.fechaFinEvento | date:'dd/MM/yyyy' }}
-                            </span>
-                        </td>
-                        <td>{{ comp.fechaLimite | date:'dd/MM/yyyy' }}</td>
-                        <td class="actions">
-                            <button class="btn-icon edit" (click)="editCompetition(comp)" title="Editar">
-                                <mat-icon>edit</mat-icon>
-                            </button>
-                            <button class="btn-icon delete" (click)="deleteCompetition(comp.id)" title="Eliminar">
-                                <mat-icon>delete</mat-icon>
-                            </button>
-                        </td>
-                    </tr>
-                    <tr *ngIf="competitions().length === 0">
-                        <td colspan="5" class="empty-msg">
-                            No hay eventos registrados actualmente.
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+  <!-- LIST VIEW -->
+  @if (!showForm()) {
+    <div class="list-view">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Lugar</th>
+              <th>Fecha Evento</th>
+              <th>Cierre Inscripción</th>
+              <th style="width: 150px;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (comp of competitions(); track comp) {
+              <tr>
+                <td [class.border-comp]="!comp.tipo || comp.tipo === 'competicion'"
+                  [class.border-other]="comp.tipo === 'otros'">
+                  <strong>{{ comp.nombre || comp.lugar }}</strong>
+                  @if (comp.nombre && comp.lugar) {
+                    <div
+                    style="font-size: 0.85em; color: #666; font-weight: normal;">{{ comp.lugar }}</div>
+                  }
+                </td>
+                <td>
+                  {{ comp.fechaEvento | date:'dd/MM/yyyy' }}
+                  @if (comp.fechaFinEvento && comp.fechaFinEvento !== comp.fechaEvento) {
+                    <span>
+                      - {{ comp.fechaFinEvento | date:'dd/MM/yyyy' }}
+                    </span>
+                  }
+                </td>
+                <td>{{ comp.fechaLimite | date:'dd/MM/yyyy' }}</td>
+                <td class="actions">
+                  <button class="btn-icon edit" (click)="editCompetition(comp)" title="Editar">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button class="btn-icon delete" (click)="deleteCompetition(comp.id)" title="Eliminar">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            }
+            @if (competitions().length === 0) {
+              <tr>
+                <td colspan="5" class="empty-msg">
+                  No hay eventos registrados actualmente.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
+  <!-- FORM VIEW -->
+  @if (showForm()) {
+    <div class="form-view">
+      <h3 class="form-header">{{ isEditing() ? 'Editar Evento' : 'Nuevo Evento' }}</h3>
+      <form [formGroup]="competitionForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+          <label for="tipo">Tipo de Evento</label>
+          <select id="tipo" formControlName="tipo" class="form-control">
+            <option value="competicion">Competición Agility</option>
+            <option value="otros">Otro Evento</option>
+          </select>
         </div>
-    </div>
-
-    <!-- FORM VIEW -->
-    <div class="form-view" *ngIf="showForm()">
-        <h3 class="form-header">{{ isEditing() ? 'Editar Evento' : 'Nuevo Evento' }}</h3>
-
-        <form [formGroup]="competitionForm" (ngSubmit)="onSubmit()">
-
-            <div class="form-group">
-                <label for="tipo">Tipo de Evento</label>
-                <select id="tipo" formControlName="tipo" class="form-control">
-                    <option value="competicion">Competición Agility</option>
-                    <option value="otros">Otro Evento</option>
-                </select>
+        <div class="form-group">
+          <label for="nombre">Nombre del Evento</label>
+          <input type="text" id="nombre" formControlName="nombre" class="form-control"
+            [ngClass]="{ 'is-invalid': submitted && f['nombre'].errors }"
+            placeholder="Ej: Competición Regional Agility">
+            @if (submitted && f['nombre'].errors) {
+              <div class="invalid-feedback">
+                El nombre del evento es requerido.
+              </div>
+            }
+          </div>
+          <div class="form-group">
+            <label for="lugar">Lugar del Evento</label>
+            <input type="text" id="lugar" formControlName="lugar" class="form-control"
+              placeholder="Ej: Polideportivo Gijón">
             </div>
-
-            <div class="form-group">
-                <label for="nombre">Nombre del Evento</label>
-                <input type="text" id="nombre" formControlName="nombre" class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && f['nombre'].errors }"
-                    placeholder="Ej: Competición Regional Agility">
-                <div *ngIf="submitted && f['nombre'].errors" class="invalid-feedback">
-                    El nombre del evento es requerido.
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="lugar">Lugar del Evento</label>
-                <input type="text" id="lugar" formControlName="lugar" class="form-control"
-                    placeholder="Ej: Polideportivo Gijón">
-            </div>
-
             <div class="form-row">
-                <div class="form-group col">
-                    <label for="fechaEvento">Fecha Inicio</label>
-                    <input type="date" id="fechaEvento" formControlName="fechaEvento" class="form-control"
-                        [ngClass]="{ 'is-invalid': submitted && f['fechaEvento'].errors }">
-                    <div *ngIf="submitted && f['fechaEvento'].errors" class="invalid-feedback">
-                        La fecha de inicio es requerida.
+              <div class="form-group col">
+                <label for="fechaEvento">Fecha Inicio</label>
+                <input type="date" id="fechaEvento" formControlName="fechaEvento" class="form-control"
+                  [ngClass]="{ 'is-invalid': submitted && f['fechaEvento'].errors }">
+                  @if (submitted && f['fechaEvento'].errors) {
+                    <div class="invalid-feedback">
+                      La fecha de inicio es requerida.
                     </div>
+                  }
                 </div>
                 <div class="form-group col">
-                    <label for="fechaFinEvento">Fecha Fin</label>
-                    <input type="date" id="fechaFinEvento" formControlName="fechaFinEvento" class="form-control"
-                        placeholder="Opcional">
+                  <label for="fechaFinEvento">Fecha Fin</label>
+                  <input type="date" id="fechaFinEvento" formControlName="fechaFinEvento" class="form-control"
+                    placeholder="Opcional">
+                  </div>
                 </div>
-            </div>
-
-            <div class="form-row">
-                <div class="form-group col">
+                <div class="form-row">
+                  <div class="form-group col">
                     <label for="fechaLimite">Fecha Límite de Inscripción</label>
                     <input type="date" id="fechaLimite" formControlName="fechaLimite" class="form-control">
+                  </div>
                 </div>
-            </div>
-
-            <div class="form-group">
-                <label for="formaPago">Forma de Pago</label>
-                <textarea id="formaPago" formControlName="formaPago" class="form-control" rows="3"
-                    placeholder="Instrucciones de pago..."></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="enlace">Enlace Inscripción</label>
-                <input type="url" id="enlace" formControlName="enlace" class="form-control"
+                <div class="form-group">
+                  <label for="formaPago">Forma de Pago</label>
+                  <textarea id="formaPago" formControlName="formaPago" class="form-control" rows="3"
+                  placeholder="Instrucciones de pago..."></textarea>
+                </div>
+                <div class="form-group">
+                  <label for="enlace">Enlace Inscripción</label>
+                  <input type="url" id="enlace" formControlName="enlace" class="form-control"
                     [ngClass]="{ 'is-invalid': submitted && f['enlace'].errors }" placeholder="https://...">
-                <div *ngIf="submitted && f['enlace'].errors?.['pattern']" class="invalid-feedback">
-                    Se requiere una URL válida (http:// o https://).
+                    @if (submitted && f['enlace'].errors?.['pattern']) {
+                      <div class="invalid-feedback">
+                        Se requiere una URL válida (http:// o https://).
+                      </div>
+                    }
+                  </div>
+                  <div class="form-group">
+                    <label for="cartel">Cartel (Imagen)</label>
+                    <input type="file" id="cartel" (change)="onFileSelected($event)" accept="image/*" class="form-control">
+                    @if (f['cartel'].value) {
+                      <div class="mt-2">
+                        <img [src]="f['cartel'].value" alt="Preview"
+                          style="max-height: 150px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        </div>
+                      }
+                    </div>
+                    <div class="form-actions">
+                      <button type="submit" class="btn btn-success">
+                        {{ isEditing() ? 'Guardar Cambios' : 'Crear Evento' }}
+                      </button>
+                      <button type="button" class="btn btn-cancel" (click)="toggleView()">
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
                 </div>
+              }
             </div>
 
-            <div class="form-group">
-                <label for="cartel">Cartel (Imagen)</label>
-                <input type="file" id="cartel" (change)="onFileSelected($event)" accept="image/*" class="form-control">
-                <div *ngIf="f['cartel'].value" class="mt-2">
-                    <img [src]="f['cartel'].value" alt="Preview"
-                        style="max-height: 150px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <!-- Delete Confirmation Modal -->
+            @if (showDeleteModal()) {
+              <div class="modal-overlay">
+                <div class="modal-content">
+                  <h3>
+                    <mat-icon class="modal-icon">delete</mat-icon>
+                    Eliminar Competición
+                  </h3>
+                  <p>¿Estás seguro de que deseas eliminar esta competición? Esta acción no se puede deshacer.</p>
+                  <div class="modal-actions">
+                    <button class="btn-cancel-modal" (click)="cancelDelete()">Cancelar</button>
+                    <button class="btn-delete-confirm" (click)="confirmDelete()">Eliminar</button>
+                  </div>
                 </div>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn btn-success">
-                    {{ isEditing() ? 'Guardar Cambios' : 'Crear Evento' }}
-                </button>
-                <button type="button" class="btn btn-cancel" (click)="toggleView()">
-                    Cancelar
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal-overlay" *ngIf="showDeleteModal()">
-    <div class="modal-content">
-        <h3>
-            <mat-icon class="modal-icon">delete</mat-icon>
-            Eliminar Competición
-        </h3>
-        <p>¿Estás seguro de que deseas eliminar esta competición? Esta acción no se puede deshacer.</p>
-        <div class="modal-actions">
-            <button class="btn-cancel-modal" (click)="cancelDelete()">Cancelar</button>
-            <button class="btn-delete-confirm" (click)="confirmDelete()">Eliminar</button>
-        </div>
-    </div>
-</div>
+              </div>
+            }

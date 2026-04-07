@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, SimpleChanges, OnChanges, inject } from '@angular/core';
+import { Component, Input, SimpleChanges, OnChanges, inject, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Dog } from '../../models/dog.model';
@@ -17,11 +17,11 @@ import { getEmojiForCategory } from '../../utils/point-categories';
 })
 export class FichaPerroComponent implements OnChanges {
     @Input({ required: true }) dog!: Dog;
-    @Input() isOpen = false;
-    @Input() startInEditMode = false;
+    readonly isOpen = input(false);
+    readonly startInEditMode = input(false);
 
-    @Output() close = new EventEmitter<void>();
-    @Output() save = new EventEmitter<Partial<Dog>>();
+    readonly close = output<void>();
+    readonly save = output<Partial<Dog>>();
 
     dogService = inject(DogService);
     imageCompressor = inject(ImageCompressorService);
@@ -36,7 +36,7 @@ export class FichaPerroComponent implements OnChanges {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['isOpen'] && changes['isOpen'].currentValue) {
-            this.isEditing = this.startInEditMode;
+            this.isEditing = this.startInEditMode();
         }
 
         if (this.dog) {
@@ -76,6 +76,7 @@ export class FichaPerroComponent implements OnChanges {
     }
 
     closeModal() {
+        // TODO: The 'emit' function requires a mandatory void argument
         this.close.emit();
     }
 

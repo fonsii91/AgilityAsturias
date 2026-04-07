@@ -1,319 +1,346 @@
 <div class="video-gallery-container">
 
-    <!-- Controles flotantes superiores -->
-    <div class="floating-top-controls">
-        <select [(ngModel)]="filterDogId" (change)="applyFilters()" class="stylish-dog-select">
-            <option value="">🐶 Todos los perros</option>
-            <option *ngFor="let dog of sortedDogs" [value]="dog.id">
-                {{ (dog && hasDogUser(dog, currentUserId)) ? '🐾 ' + dog.name : dog.name }}
-            </option>
-        </select>
+  <!-- Controles flotantes superiores -->
+  <div class="floating-top-controls">
+    <select [(ngModel)]="filterDogId" (change)="applyFilters()" class="stylish-dog-select">
+      <option value="">🐶 Todos los perros</option>
+      @for (dog of sortedDogs; track dog) {
+        <option [value]="dog.id">
+          {{ (dog && hasDogUser(dog, currentUserId)) ? '🐾 ' + dog.name : dog.name }}
+        </option>
+      }
+    </select>
 
-        <button class="floating-filter-btn" (click)="toggleFilters()" [class.active]="isFiltersOpen" aria-label="Filtros Avanzados" title="Filtros">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="filter-icon">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
-            </svg>
-        </button>
-    </div>
+    <button class="floating-filter-btn" (click)="toggleFilters()" [class.active]="isFiltersOpen" aria-label="Filtros Avanzados" title="Filtros">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="filter-icon">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+      </svg>
+    </button>
+  </div>
 
-    <div class="action-top-bar">
-        <div class="search-filters-group">
-            <div class="search-bar">
-                <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar vídeos..." class="search-input"
-                    (keyup.enter)="applyFilters()">
-                <button class="search-btn" (click)="applyFilters()" aria-label="Buscar">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="search-icon">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                    </svg>
-                </button>
-            </div>
-            <!-- El botón de filtros ahora está junto al selector de perros en la parte superior -->
+  <div class="action-top-bar">
+    <div class="search-filters-group">
+      <div class="search-bar">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Buscar vídeos..." class="search-input"
+          (keyup.enter)="applyFilters()">
+          <button class="search-btn" (click)="applyFilters()" aria-label="Buscar">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="search-icon">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </button>
+          </div>
+          <!-- El botón de filtros ahora está junto al selector de perros en la parte superior -->
         </div>
 
         <a routerLink="/galeria-videos/subir" class="btn-primary-add">
-            <span class="material-icons">add_circle_outline</span>
-            <span>Subir Vídeo</span>
+          <span class="material-icons">add_circle_outline</span>
+          <span>Subir Vídeo</span>
         </a>
-    </div>
+      </div>
 
-    <div class="advanced-filters-panel" *ngIf="isFiltersOpen">
-
-
-        <div class="filter-group">
+      @if (isFiltersOpen) {
+        <div class="advanced-filters-panel">
+          <div class="filter-group">
             <label>Fecha de subida</label>
             <select [(ngModel)]="filterDateRange" (change)="applyFilters()" class="filter-select">
-                <option value="">Cualquier momento</option>
-                <option value="week">Última semana</option>
-                <option value="month">Último mes</option>
-                <option value="3months">Últimos 3 meses</option>
-                <option value="6months">Últimos 6 meses</option>
-                <option value="year">Último año</option>
+              <option value="">Cualquier momento</option>
+              <option value="week">Última semana</option>
+              <option value="month">Último mes</option>
+              <option value="3months">Últimos 3 meses</option>
+              <option value="6months">Últimos 6 meses</option>
+              <option value="year">Último año</option>
             </select>
-        </div>
-
-        <div class="filter-group">
+          </div>
+          <div class="filter-group">
             <label>Ordenar por</label>
             <select [(ngModel)]="activeSort" (change)="applyFilters()" class="filter-select">
-                <option value="latest">Más recientes</option>
-                <option value="popular">Más populares</option>
+              <option value="latest">Más recientes</option>
+              <option value="popular">Más populares</option>
             </select>
-        </div>
-
-
-
-        <div class="filter-group">
+          </div>
+          <div class="filter-group">
             <label>Evento / Competición</label>
             <select [(ngModel)]="filterCompetitionId" (change)="applyFilters()" class="filter-select">
-                <option value="">Todos los eventos</option>
-                <option *ngFor="let comp of compService.getCompetitions()()" [value]="comp.id">{{ comp.nombre ||
-                    comp.lugar }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : '' }}</option>
+              <option value="">Todos los eventos</option>
+              @for (comp of compService.getCompetitions()(); track comp) {
+                <option [value]="comp.id">{{ comp.nombre ||
+                comp.lugar }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : '' }}</option>
+              }
             </select>
+          </div>
         </div>
-    </div>
+      }
 
-    <!-- Skeleton Inicial -->
-    <div *ngIf="isLoading && videos.length === 0" class="video-grid">
-        <div *ngFor="let i of [1,2,3,4,5,6]" class="video-card skeleton-card">
-            <div class="skeleton-cover"></div>
+      <!-- Skeleton Inicial -->
+      @if (isLoading && videos.length === 0) {
+        <div class="video-grid">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="video-card skeleton-card">
+              <div class="skeleton-cover"></div>
+            </div>
+          }
         </div>
-    </div>
+      }
 
-    <div *ngIf="!isLoading && videos.length === 0" class="empty-state">
-        <p>No hay vídeos disponibles.</p>
-    </div>
+      @if (!isLoading && videos.length === 0) {
+        <div class="empty-state">
+          <p>No hay vídeos disponibles.</p>
+        </div>
+      }
 
-    <div *ngIf="!isLoading && videos.length > 0" class="video-grid">
-        <div *ngFor="let video of videos" class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id && player.isVideoActive}">
-            <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path" [coverImageUrl]="video.dog?.photo_url">
-            </app-smart-video-player>
-
-            <!-- LARGE COVER OVERLAY: Visible only when NOT playing -->
-            <div class="video-cover-overlay" *ngIf="!player.isVideoActive">
-                <!-- Stacked Actions on the Right -->
-                <div class="floating-actions-right">
+      @if (!isLoading && videos.length > 0) {
+        <div class="video-grid">
+          @for (video of videos; track video) {
+            <div class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id && player.isVideoActive}">
+              <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path" [coverImageUrl]="video.dog?.photo_url">
+              </app-smart-video-player>
+              <!-- LARGE COVER OVERLAY: Visible only when NOT playing -->
+              @if (!player.isVideoActive) {
+                <div class="video-cover-overlay">
+                  <!-- Stacked Actions on the Right -->
+                  <div class="floating-actions-right">
                     <div class="dog-avatar-wrapper" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
-                        title="Ver perfil de {{video.dog?.name}}">
-                        <img *ngIf="video.dog?.photo_url; else defaultDogIconCover" [src]="video.dog?.photo_url"
-                            alt="{{ video.dog?.name }}" class="dog-avatar-img">
-                        <ng-template #defaultDogIconCover>
-                            <div class="dog-avatar-placeholder">
-                                <span class="material-icons">pets</span>
-                            </div>
-                        </ng-template>
+                      title="Ver perfil de {{video.dog?.name}}">
+                      @if (video.dog?.photo_url) {
+                        <img [src]="video.dog?.photo_url"
+                          alt="{{ video.dog?.name }}" class="dog-avatar-img">
+                      } @else {
+                        <div class="dog-avatar-placeholder">
+                          <span class="material-icons">pets</span>
+                        </div>
+                      }
                     </div>
-
                     <button class="action-bubble" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
-                        <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
-                            'favorite_border' }}</span>
-                        <span class="action-count">{{ video.likes_count || 0 }}</span>
+                      <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
+                      'favorite_border' }}</span>
+                      <span class="action-count">{{ video.likes_count || 0 }}</span>
                     </button>
-
-                    <button *ngIf="video.status === 'local'" (click)="downloadVideo($event, video)"
+                    @if (video.status === 'local') {
+                      <button (click)="downloadVideo($event, video)"
                         class="action-bubble" title="Descargar">
                         <span class="material-icons">download</span>
-                    </button>
-
-                    <button *ngIf="canModifyVideo(video)"
+                      </button>
+                    }
+                    @if (canModifyVideo(video)) {
+                      <button
                         (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
                         <span class="material-icons">edit</span>
-                    </button>
-
-                    <button *ngIf="canModifyVideo(video)"
+                      </button>
+                    }
+                    @if (canModifyVideo(video)) {
+                      <button
                         (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
                         <span class="material-icons">delete</span>
-                    </button>
-
-                    <span *ngIf="video.status === 'in_queue' || video.status === 'failed'" class="status-indicator"
+                      </button>
+                    }
+                    @if (video.status === 'in_queue' || video.status === 'failed') {
+                      <span class="status-indicator"
                         [ngClass]="{'status-local': video.status === 'in_queue', 'status-error': video.status === 'failed'}"
                         [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
                         <span class="material-icons">{{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline'
-                            }}</span>
-                    </span>
-                </div>
-
-                <div class="center-event-cover">
-                    <span *ngIf="video.competition" class="event-name-huge" [title]="video.competition.nombre">
-                        <span class="material-icons comp-icon-huge">emoji_events</span> 
+                        }}</span>
+                      </span>
+                    }
+                  </div>
+                  <div class="center-event-cover">
+                    @if (video.competition) {
+                      <span class="event-name-huge" [title]="video.competition.nombre">
+                        <span class="material-icons comp-icon-huge">emoji_events</span>
                         <span>{{ video.competition.nombre }}</span>
-                    </span>
-                    <span *ngIf="!video.competition" class="event-name-huge training-text">
-                        <span class="material-icons comp-icon-huge">fitness_center</span> 
+                      </span>
+                    }
+                    @if (!video.competition) {
+                      <span class="event-name-huge training-text">
+                        <span class="material-icons comp-icon-huge">fitness_center</span>
                         <span>Entrenamiento</span>
-                    </span>
-                </div>
-
-                <div class="center-bottom-cover">
+                      </span>
+                    }
+                  </div>
+                  <div class="center-bottom-cover">
                     <div class="cover-badges-row">
-                        <span class="date-badge-cover-huge">
-                            <span class="material-icons date-icon-huge">calendar_month</span>
-                            {{ video.date | date:'dd/MM/yyyy' }}
-                        </span>
+                      <span class="date-badge-cover-huge">
+                        <span class="material-icons date-icon-huge">calendar_month</span>
+                        {{ video.date | date:'dd/MM/yyyy' }}
+                      </span>
                     </div>
                     <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-                        {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+                      {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
                     </div>
-                </div>
-
-                <div class="video-uploader-cover-small">
+                  </div>
+                  <div class="video-uploader-cover-small">
                     Subido por {{ video.user?.name || 'Usuario' }}
-                </div>
-                <div class="dog-name-cover-small" (click)="openDogProfile($event, video.dog)" style="cursor: pointer" title="Ver perfil de {{video.dog?.name}}">
+                  </div>
+                  <div class="dog-name-cover-small" (click)="openDogProfile($event, video.dog)" style="cursor: pointer" title="Ver perfil de {{video.dog?.name}}">
                     {{ video.dog?.name }}
+                  </div>
                 </div>
-            </div>
-
-            <!-- ORIGINAL PLAYER OVERLAY: Visible only when PLAYING -->
-            <div class="video-info-overlay" *ngIf="player.isVideoActive">
-                <!-- Bottom Left Info -->
-                <div class="bottom-info-left">
+              }
+              <!-- ORIGINAL PLAYER OVERLAY: Visible only when PLAYING -->
+              @if (player.isVideoActive) {
+                <div class="video-info-overlay">
+                  <!-- Bottom Left Info -->
+                  <div class="bottom-info-left">
                     <p class="dog-name-row">
-                        <span class="dog-name" (click)="openDogProfile($event, video.dog)" style="cursor: pointer">@{{
-                            video.dog?.name }}</span>
-                        <span *ngIf="video.competition" class="competition-badge" [title]="video.competition.nombre">
-                            <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre
-                                }}</span>
-                        </span>
-                    </p>
-                    <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-                        {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
-                    </h3>
-                    <p class="video-description">Subido por {{ video.user?.name || 'Usuario' }} • {{ video.date |
-                        date:'dd/MM/yy' }}</p>
+                      <span class="dog-name" (click)="openDogProfile($event, video.dog)" style="cursor: pointer">@{{
+                      video.dog?.name }}</span>
+                      @if (video.competition) {
+                        <span class="competition-badge" [title]="video.competition.nombre">
+                          <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre
+                        }}</span>
+                      </span>
+                    }
+                  </p>
+                  <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+                    {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+                  </h3>
+                  <p class="video-description">Subido por {{ video.user?.name || 'Usuario' }} • {{ video.date |
+                  date:'dd/MM/yy' }}</p>
                 </div>
-
                 <!-- Stacked Actions on the Right -->
                 <div class="floating-actions-right">
-                    <div class="dog-avatar-wrapper" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
-                        title="Ver perfil de {{video.dog?.name}}">
-                        <img *ngIf="video.dog?.photo_url; else defaultDogIcon" [src]="video.dog?.photo_url"
-                            alt="{{ video.dog?.name }}" class="dog-avatar-img">
-                        <ng-template #defaultDogIcon>
-                            <div class="dog-avatar-placeholder">
-                                <span class="material-icons">pets</span>
-                            </div>
-                        </ng-template>
-                    </div>
-
-                    <button class="action-bubble" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
-                        <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
-                            'favorite_border' }}</span>
-                        <span class="action-count">{{ video.likes_count || 0 }}</span>
+                  <div class="dog-avatar-wrapper" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
+                    title="Ver perfil de {{video.dog?.name}}">
+                    @if (video.dog?.photo_url) {
+                      <img [src]="video.dog?.photo_url"
+                        alt="{{ video.dog?.name }}" class="dog-avatar-img">
+                    } @else {
+                      <div class="dog-avatar-placeholder">
+                        <span class="material-icons">pets</span>
+                      </div>
+                    }
+                  </div>
+                  <button class="action-bubble" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
+                    <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
+                    'favorite_border' }}</span>
+                    <span class="action-count">{{ video.likes_count || 0 }}</span>
+                  </button>
+                  @if (video.status === 'local') {
+                    <button (click)="downloadVideo($event, video)"
+                      class="action-bubble" title="Descargar">
+                      <span class="material-icons">download</span>
                     </button>
-
-                    <button *ngIf="video.status === 'local'" (click)="downloadVideo($event, video)"
-                        class="action-bubble" title="Descargar">
-                        <span class="material-icons">download</span>
+                  }
+                  @if (canModifyVideo(video)) {
+                    <button
+                      (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
+                      <span class="material-icons">edit</span>
                     </button>
-
-                    <button *ngIf="canModifyVideo(video)"
-                        (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
-                        <span class="material-icons">edit</span>
+                  }
+                  @if (canModifyVideo(video)) {
+                    <button
+                      (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
+                      <span class="material-icons">delete</span>
                     </button>
-
-                    <button *ngIf="canModifyVideo(video)"
-                        (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
-                        <span class="material-icons">delete</span>
-                    </button>
-
-                    <span *ngIf="video.status === 'in_queue' || video.status === 'failed'" class="status-indicator"
-                        [ngClass]="{'status-local': video.status === 'in_queue', 'status-error': video.status === 'failed'}"
-                        [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
-                        <span class="material-icons">{{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline'
-                            }}</span>
+                  }
+                  @if (video.status === 'in_queue' || video.status === 'failed') {
+                    <span class="status-indicator"
+                      [ngClass]="{'status-local': video.status === 'in_queue', 'status-error': video.status === 'failed'}"
+                      [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
+                      <span class="material-icons">{{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline'
+                      }}</span>
                     </span>
+                  }
                 </div>
-            </div>
-        </div>
-    </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
 
     <!-- Controles de Paginación -->
-    <div *ngIf="totalPages > 1 && !isLoading" class="pagination-controls">
+    @if (totalPages > 1 && !isLoading) {
+      <div class="pagination-controls">
         <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)" class="pagination-btn">
-            <span class="material-icons">chevron_left</span> Anterior
+          <span class="material-icons">chevron_left</span> Anterior
         </button>
-        
         <span class="pagination-info">Página {{ currentPage }} de {{ totalPages }}</span>
-        
         <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)" class="pagination-btn">
-            Siguiente <span class="material-icons">chevron_right</span>
+          Siguiente <span class="material-icons">chevron_right</span>
         </button>
-    </div>
+      </div>
+    }
 
-</div>
+  </div>
 
-<!-- Modal de Confirmación de Borrado -->
-<div class="modal-overlay" *ngIf="videoToDelete">
-    <div class="modal-content" (click)="$event.stopPropagation()">
+  <!-- Modal de Confirmación de Borrado -->
+  @if (videoToDelete) {
+    <div class="modal-overlay">
+      <div class="modal-content" (click)="$event.stopPropagation()">
         <div class="modal-icon-wrapper">
-            <span class="material-icons">warning</span>
+          <span class="material-icons">warning</span>
         </div>
         <h3>Eliminar Vídeo</h3>
         <p>¿Estás seguro de que deseas eliminar el vídeo <strong>"{{ videoToDelete.title || videoToDelete.dog?.name
-                }}"</strong>? Esta acción no se puede deshacer.</p>
+        }}"</strong>? Esta acción no se puede deshacer.</p>
         <div class="modal-actions">
-            <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
-            <button class="btn-danger" (click)="confirmDelete()">Sí, Eliminar</button>
+          <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
+          <button class="btn-danger" (click)="confirmDelete()">Sí, Eliminar</button>
         </div>
+      </div>
     </div>
-</div>
+  }
 
-<!-- Modal de Edición de Vídeo -->
-<div class="modal-overlay" *ngIf="videoToEdit">
-    <div class="modal-content edit-modal-content" (click)="$event.stopPropagation()">
+  <!-- Modal de Edición de Vídeo -->
+  @if (videoToEdit) {
+    <div class="modal-overlay">
+      <div class="modal-content edit-modal-content" (click)="$event.stopPropagation()">
         <div class="modal-header">
-            <h3><span class="material-icons edit-header-icon">edit</span> Detalles del Vídeo</h3>
-            <button class="close-btn" (click)="closeEditModal()">&times;</button>
+          <h3><span class="material-icons edit-header-icon">edit</span> Detalles del Vídeo</h3>
+          <button class="close-btn" (click)="closeEditModal()">&times;</button>
         </div>
-
         <form (ngSubmit)="saveVideoChanges()">
-            <div class="form-group">
-                <label class="form-label">Título (Opcional)</label>
-                <input type="text" name="title" [(ngModel)]="editData.title" placeholder="Título del vídeo"
-                    class="form-input">
+          <div class="form-group">
+            <label class="form-label">Título (Opcional)</label>
+            <input type="text" name="title" [(ngModel)]="editData.title" placeholder="Título del vídeo"
+              class="form-input">
             </div>
-
             <div class="form-group">
-                <label class="form-label">Perro *</label>
-                <div class="select-wrapper">
-                    <select name="dog_id" [(ngModel)]="editData.dog_id" required class="form-input">
-                        <option value="">Selecciona un perro...</option>
-                        <option *ngFor="let dog of sortedDogs" [value]="dog.id">
-                            {{ (dog && hasDogUser(dog, currentUserId)) ? '🐾 ' + dog.name : dog.name }}
-                        </option>
-                    </select>
-                </div>
+              <label class="form-label">Perro *</label>
+              <div class="select-wrapper">
+                <select name="dog_id" [(ngModel)]="editData.dog_id" required class="form-input">
+                  <option value="">Selecciona un perro...</option>
+                  @for (dog of sortedDogs; track dog) {
+                    <option [value]="dog.id">
+                      {{ (dog && hasDogUser(dog, currentUserId)) ? '🐾 ' + dog.name : dog.name }}
+                    </option>
+                  }
+                </select>
+              </div>
             </div>
-
             <div class="form-group">
-                <label class="form-label">Competición / Evento (Opcional)</label>
-                <div class="select-wrapper">
-                    <select name="competition_id" [(ngModel)]="editData.competition_id" class="form-input">
-                        <option value="">Ninguna / Entrenamiento</option>
-                        <option *ngFor="let comp of compService.getCompetitions()()" [value]="comp.id">{{ comp.nombre ||
-                            comp.lugar }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : '' }}</option>
-                    </select>
-                </div>
+              <label class="form-label">Competición / Evento (Opcional)</label>
+              <div class="select-wrapper">
+                <select name="competition_id" [(ngModel)]="editData.competition_id" class="form-input">
+                  <option value="">Ninguna / Entrenamiento</option>
+                  @for (comp of compService.getCompetitions()(); track comp) {
+                    <option [value]="comp.id">{{ comp.nombre ||
+                    comp.lugar }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : '' }}</option>
+                  }
+                </select>
+              </div>
             </div>
-
             <div class="form-group" style="margin-bottom: 2rem;">
-                <label class="form-label">Fecha del Vídeo *</label>
-                <input type="date" name="date" [(ngModel)]="editData.date" required class="form-input">
+              <label class="form-label">Fecha del Vídeo *</label>
+              <input type="date" name="date" [(ngModel)]="editData.date" required class="form-input">
             </div>
-
             <div class="modal-actions">
-                <button type="button" class="btn-cancel" (click)="closeEditModal()"
-                    [disabled]="isSavingEdit">Cancelar</button>
-                <button type="submit" class="btn-primary" [disabled]="isSavingEdit">
-                    {{ isSavingEdit ? 'Guardando...' : 'Guardar' }}
-                </button>
+              <button type="button" class="btn-cancel" (click)="closeEditModal()"
+              [disabled]="isSavingEdit">Cancelar</button>
+              <button type="submit" class="btn-primary" [disabled]="isSavingEdit">
+                {{ isSavingEdit ? 'Guardando...' : 'Guardar' }}
+              </button>
             </div>
-        </form>
-    </div>
-</div>
+          </form>
+        </div>
+      </div>
+    }
 
-<!-- Modal Ficha de Perro -->
-<app-ficha-perro *ngIf="selectedDogForProfile" [dog]="selectedDogForProfile" [isOpen]="isDogProfileOpen"
-    (close)="closeDogProfile()">
-</app-ficha-perro>
+    <!-- Modal Ficha de Perro -->
+    @if (selectedDogForProfile) {
+      <app-ficha-perro [dog]="selectedDogForProfile" [isOpen]="isDogProfileOpen"
+        (close)="closeDogProfile()">
+      </app-ficha-perro>
+    }

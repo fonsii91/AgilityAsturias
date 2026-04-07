@@ -1,163 +1,219 @@
 <mat-toolbar class="app-toolbar">
-    <div class="logo-area">
-        <button class="mobile-menu-btn" (click)="toggleMenu()">
-            <span class="bar"></span>
-            <span class="bar"></span>
-            <span class="bar"></span>
-        </button>
-        <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo" class="nav-logo" routerLink="/">
-        <h1 class="nav-title" routerLink="/">Agility Asturias</h1>
-    </div>
+  <div class="logo-area">
+    <button class="mobile-menu-btn" (click)="toggleMenu()">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+    <img src="Images/Agility_Asturias_logo.jpg" alt="Agility Asturias Logo" class="nav-logo" routerLink="/">
+    <h1 class="nav-title" routerLink="/">Agility Asturias</h1>
+  </div>
 
-    <!-- Spacer to push items to the right -->
-    <span class="toolbar-spacer"></span>
+  <!-- Spacer to push items to the right -->
+  <span class="toolbar-spacer"></span>
 
-    <nav class="desktop-nav">
-        <ul>
-            <li *ngIf="!authService.userProfileSignal()"><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
-            <li *ngIf="authService.isMember()"><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span>
-                    Reservas</a>
-            </li>
-            <li *ngIf="authService.isMember()"><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
-                    Clasificación</a></li>
-            <li *ngIf="!authService.userProfileSignal()"><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
-                    Galería</a></li>
-            <li *ngIf="authService.isMember()"><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
-                    Vídeos</a></li>
-            <li *ngIf="authService.isMember()"><a routerLink="/calendario" routerLinkActive="active-route"><span
-                        class="material-icons">calendar_month</span> Calendario</a>
-            </li>
-            <li *ngIf="authService.isStaff()"><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span
-                        class="material-icons">sports_score</span> Eventos</a>
-            </li>
-            <li *ngIf="!authService.userProfileSignal()"><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span>
-                    Contacto</a></li>
-            <li *ngIf="!authService.userProfileSignal()"><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span>
-                    Novedades</a></li>
-            
-            <!-- Explorar Dropdown for Logged In Users -->
-            <li class="nav-dropdown" *ngIf="authService.userProfileSignal()">
-                <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span class="material-icons arrow">expand_more</span></a>
-                <ul class="dropdown-menu-list">
-                    <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
-                    <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
-                    <li><a routerLink="/recursos" routerLinkActive="active-route"><span class="material-icons">folder_shared</span> Recursos</a></li>
-                    <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span> Novedades</a></li>
-                    <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
+  <nav class="desktop-nav">
+    <ul>
+      @if (!authService.userProfileSignal()) {
+        <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
+      }
+      @if (authService.isMember()) {
+        <li><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span>
+      Reservas</a>
+    </li>
+  }
+  @if (authService.isMember()) {
+    <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
+  Clasificación</a></li>
+}
+@if (!authService.userProfileSignal()) {
+  <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
+Galería</a></li>
+}
+@if (authService.isMember()) {
+  <li><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
+Vídeos</a></li>
+}
+@if (authService.isMember()) {
+  <li><a routerLink="/calendario" routerLinkActive="active-route"><span
+  class="material-icons">calendar_month</span> Calendario</a>
+</li>
+}
+@if (authService.isStaff()) {
+  <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span
+  class="material-icons">sports_score</span> Eventos</a>
+</li>
+}
+@if (!authService.userProfileSignal()) {
+  <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span>
+Contacto</a></li>
+}
+@if (!authService.userProfileSignal()) {
+  <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span>
+Novedades</a></li>
+}
 
-    <!-- User Section -->
-    <div class="auth-section">
-        <!-- Login Button -->
-        <a *ngIf="!authService.userProfileSignal()" routerLink="/login" (click)="closeMenu()" class="login-btn">
-            Iniciar Sesión
-        </a>
+<!-- Explorar Dropdown for Logged In Users -->
+@if (authService.userProfileSignal()) {
+  <li class="nav-dropdown">
+    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span class="material-icons arrow">expand_more</span></a>
+    <ul class="dropdown-menu-list">
+      <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
+      <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
+      <li><a routerLink="/recursos" routerLinkActive="active-route"><span class="material-icons">folder_shared</span> Recursos</a></li>
+      <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span> Novedades</a></li>
+      <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
+    </ul>
+  </li>
+}
+</ul>
+</nav>
 
-        <!-- Notifications Dropdown -->
-        <div class="notification-container" *ngIf="authService.userProfileSignal()">
-            <button class="notification-btn" (click)="toggleNotifications($event)">
-                <span class="material-icons">notifications</span>
-                <span class="badge" *ngIf="notificationService.unreadCountSignal() > 0">
-                    {{notificationService.unreadCountSignal()}}
-                </span>
+<!-- User Section -->
+<div class="auth-section">
+  <!-- Login Button -->
+  @if (!authService.userProfileSignal()) {
+    <a routerLink="/login" (click)="closeMenu()" class="login-btn">
+      Iniciar Sesión
+    </a>
+  }
+
+  <!-- Notifications Dropdown -->
+  @if (authService.userProfileSignal()) {
+    <div class="notification-container">
+      <button class="notification-btn" (click)="toggleNotifications($event)">
+        <span class="material-icons">notifications</span>
+        @if (notificationService.unreadCountSignal() > 0) {
+          <span class="badge">
+            {{notificationService.unreadCountSignal()}}
+          </span>
+        }
+      </button>
+      <div class="notification-menu" [class.show]="isNotificationsOpen">
+        <div class="notification-header">
+          <p>Notificaciones</p>
+          @if (notificationService.unreadCountSignal() > 0) {
+            <button class="mark-all-btn" (click)="markAllAsRead()"
+              >
+              Marcar todas leídas
             </button>
-            <div class="notification-menu" [class.show]="isNotificationsOpen">
-                <div class="notification-header">
-                    <p>Notificaciones</p>
-                    <button class="mark-all-btn" (click)="markAllAsRead()"
-                        *ngIf="notificationService.unreadCountSignal() > 0">
-                        Marcar todas leídas
-                    </button>
-                </div>
-                <div class="notification-list">
-                    <div class="notification-item" *ngFor="let notif of notificationService.notificationsSignal()"
-                        [class.read]="notif.read_at"
-                        (click)="handleNotificationClick(notif)">
-
+          }
+        </div>
+        <div class="notification-list">
+          @for (notif of notificationService.notificationsSignal(); track notif) {
+            <div class="notification-item"
+              [class.read]="notif.read_at"
+              (click)="handleNotificationClick(notif)">
                         <div class="notif-icon-container" [ngClass]="{
                                 'event-icon': notif.type.includes('NewEventNotification') || notif.data.type === 'new_event', 
                                 'point-icon': notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point',
                                 'cancel-icon': notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled',
                                 'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled'
                             }">
-                            <span class="material-icons"
-                                *ngIf="notif.type.includes('NewEventNotification') || notif.data.type === 'new_event'">event_available</span>
-                            <span class="material-icons"
-                                *ngIf="notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point'">emoji_events</span>
-                            <span class="material-icons"
-                                *ngIf="notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled'">event_busy</span>
-                            <span class="material-icons"
-                                *ngIf="!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled'">notifications</span>
-                        </div>
-
-                        <div class="notif-content">
-                            <p class="notif-message">{{ notif.data.message }}</p>
-                            <span class="notif-time"><span class="material-icons time-icon">schedule</span> {{
-                                notif.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
-                        </div>
-                    </div>
-                    <div class="notification-empty" *ngIf="notificationService.notificationsSignal().length === 0">
-                        No tienes notificaciones nuevas
-                    </div>
-                </div>
+                @if (notif.type.includes('NewEventNotification') || notif.data.type === 'new_event') {
+                  <span class="material-icons"
+                  >event_available</span>
+                }
+                @if (notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point') {
+                  <span class="material-icons"
+                  >emoji_events</span>
+                }
+                @if (notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled') {
+                  <span class="material-icons"
+                  >event_busy</span>
+                }
+                @if (!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled') {
+                  <span class="material-icons"
+                  >notifications</span>
+                }
+              </div>
+              <div class="notif-content">
+                <p class="notif-message">{{ notif.data.message }}</p>
+                <span class="notif-time"><span class="material-icons time-icon">schedule</span> {{
+              notif.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
             </div>
-        </div>
-
-        <!-- Logged In User Dropdown -->
-        <div class="user-dropdown-container" *ngIf="authService.userProfileSignal() as user">
-            <button class="user-avatar-btn" (click)="toggleUserMenu($event)">
-                <img *ngIf="user.photoURL; else defaultAvatar" [src]="user.photoURL" alt="User" class="nav-user-img"
-                    referrerpolicy="no-referrer">
-                <ng-template #defaultAvatar>
-                    <div class="nav-user-img default-avatar-placeholder">
-                        {{ user.name.charAt(0) || 'U' }}
-                    </div>
-                </ng-template>
-                <span class="dropdown-arrow">▼</span>
-            </button>
-
-            <!-- Dropdown Menu -->
-            <div class="user-dropdown-menu" [class.show]="isUserMenuOpen">
-                <div class="user-header">
-                    <p class="name">{{ user.displayName }}</p>
-                    <p class="email">{{ user.email }}</p>
-                </div>
-                <div class="dropdown-divider"></div>
-                <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item"><span
-                        class="material-icons">pets</span> Mi Perfil</a>
-                <a *ngIf="authService.isMember()" routerLink="/mis-reservas" (click)="closeMenu()"
-                    class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
-
-                <div class="dropdown-divider" *ngIf="authService.isStaff()"></div>
-                <a *ngIf="authService.isStaff()" routerLink="/admin/asistencia" (click)="closeMenu()"
-                    class="dropdown-item staff-item">
-                    <span class="material-icons">fact_check</span> Verificar Asistencia
-                </a>
-                <a *ngIf="authService.isStaff()" routerLink="/gestionar-miembros" (click)="closeMenu()"
-                    class="dropdown-item staff-item">
-                    <span class="material-icons">people</span> Gestión de Miembros
-                </a>
-                <a *ngIf="authService.isStaff()" routerLink="/info-reservas" (click)="closeMenu()"
-                    class="dropdown-item staff-item">
-                    <span class="material-icons">visibility</span> Monitor Reservas
-                </a>
-                <a *ngIf="authService.isStaff()" (click)="openExtraPointsDialog()"
-                    class="dropdown-item staff-item" style="cursor: pointer;">
-                    <span class="material-icons">military_tech</span> Puntos Extra
-                </a>
-
-                <div class="dropdown-divider" *ngIf="authService.isAdmin()"></div>
-                <a *ngIf="authService.isAdmin()" routerLink="/admin/usuarios" (click)="closeMenu()"
-                    class="dropdown-item admin-item">
-                    <span class="material-icons">admin_panel_settings</span> Administrar Sistema
-                </a>
-                <button (click)="logout()" class="dropdown-item logout-item"><span class="material-icons">logout</span>
-                    Cerrar Sesión</button>
-            </div>
-            <div class="dropdown-backdrop" *ngIf="isUserMenuOpen || isNotificationsOpen" (click)="closeMenu()"></div>
-        </div>
+          </div>
+        }
+        @if (notificationService.notificationsSignal().length === 0) {
+          <div class="notification-empty">
+            No tienes notificaciones nuevas
+          </div>
+        }
+      </div>
     </div>
+  </div>
+}
+
+<!-- Logged In User Dropdown -->
+@if (authService.userProfileSignal(); as user) {
+  <div class="user-dropdown-container">
+    <button class="user-avatar-btn" (click)="toggleUserMenu($event)">
+      @if (user.photoURL) {
+        <img [src]="user.photoURL" alt="User" class="nav-user-img"
+          referrerpolicy="no-referrer">
+      } @else {
+        <div class="nav-user-img default-avatar-placeholder">
+          {{ user.name.charAt(0) || 'U' }}
+        </div>
+      }
+      <span class="dropdown-arrow">▼</span>
+    </button>
+    <!-- Dropdown Menu -->
+    <div class="user-dropdown-menu" [class.show]="isUserMenuOpen">
+      <div class="user-header">
+        <p class="name">{{ user.displayName }}</p>
+        <p class="email">{{ user.email }}</p>
+      </div>
+      <div class="dropdown-divider"></div>
+      <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item"><span
+      class="material-icons">pets</span> Mi Perfil</a>
+      @if (authService.isMember()) {
+        <a routerLink="/mis-reservas" (click)="closeMenu()"
+          class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
+        }
+        @if (authService.isStaff()) {
+          <div class="dropdown-divider"></div>
+        }
+        @if (authService.isStaff()) {
+          <a routerLink="/admin/asistencia" (click)="closeMenu()"
+            class="dropdown-item staff-item">
+            <span class="material-icons">fact_check</span> Verificar Asistencia
+          </a>
+        }
+        @if (authService.isStaff()) {
+          <a routerLink="/gestionar-miembros" (click)="closeMenu()"
+            class="dropdown-item staff-item">
+            <span class="material-icons">people</span> Gestión de Miembros
+          </a>
+        }
+        @if (authService.isStaff()) {
+          <a routerLink="/info-reservas" (click)="closeMenu()"
+            class="dropdown-item staff-item">
+            <span class="material-icons">visibility</span> Monitor Reservas
+          </a>
+        }
+        @if (authService.isStaff()) {
+          <a (click)="openExtraPointsDialog()"
+            class="dropdown-item staff-item" style="cursor: pointer;">
+            <span class="material-icons">military_tech</span> Puntos Extra
+          </a>
+        }
+        @if (authService.isAdmin()) {
+          <div class="dropdown-divider"></div>
+        }
+        @if (authService.isAdmin()) {
+          <a routerLink="/admin/usuarios" (click)="closeMenu()"
+            class="dropdown-item admin-item">
+            <span class="material-icons">admin_panel_settings</span> Administrar Sistema
+          </a>
+        }
+        <button (click)="logout()" class="dropdown-item logout-item"><span class="material-icons">logout</span>
+      Cerrar Sesión</button>
+    </div>
+    @if (isUserMenuOpen || isNotificationsOpen) {
+      <div class="dropdown-backdrop" (click)="closeMenu()"></div>
+    }
+  </div>
+}
+</div>
 </mat-toolbar>

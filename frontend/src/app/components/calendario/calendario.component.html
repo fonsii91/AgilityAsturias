@@ -1,359 +1,439 @@
 <div class="calendar-container">
-    <div class="calendar-header">
-        <div class="year-navigation">
-            <button class="nav-btn" (click)="changeYear(-1)">
-                <span class="material-icons-outlined">&lt;</span>
-            </button>
-            <h1>{{ currentYear() }}</h1>
-            <button class="nav-btn" (click)="changeYear(1)">
-                <span class="material-icons-outlined">&gt;</span>
-            </button>
-        </div>
-
-        <div class="calendar-legend">
-            <div class="legend-item">
-                <span class="dot competition-dot"></span>
-                <span>Competición</span>
-            </div>
-            <div class="legend-item">
-                <span class="dot other-dot"></span>
-                <span>Otros Eventos</span>
-            </div>
-            <div class="legend-item" *ngIf="authService.currentUserSignal()">
-                <span class="dot attending-dot"></span>
-                <span>Asistiré</span>
-            </div>
-            <div class="legend-item">
-                <span class="dot today-dot"></span>
-                <span>Hoy</span>
-            </div>
-        </div>
+  <div class="calendar-header">
+    <div class="year-navigation">
+      <button class="nav-btn" (click)="changeYear(-1)">
+        <span class="material-icons-outlined">&lt;</span>
+      </button>
+      <h1>{{ currentYear() }}</h1>
+      <button class="nav-btn" (click)="changeYear(1)">
+        <span class="material-icons-outlined">&gt;</span>
+      </button>
     </div>
 
-    <div class="months-grid">
-        <div class="month-card" *ngFor="let month of months(); let i = index" [id]="'month-' + i">
-            <h2>{{ month.name }}</h2>
-            <div class="weekdays">
-                <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
-            </div>
-            <div class="days-grid">
-                <div *ngFor="let day of month.days" class="day" [class.other-month]="day.isOtherMonth"
-                    [class.weekend]="day.isWeekend" [class.competition]="day.isCompetition"
-                    [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
-                    [class.attending]="day.isAttending"
-                    (click)="(day.competitions.length > 0 || day.deadlines.length > 0) && openModal(day)">
-                    <span *ngIf="!day.isOtherMonth">{{ day.date | date:'d' }}</span>
-
-                    <!-- Attending Badge Indicator -->
-                    <div *ngIf="day.isAttending && !day.isOtherMonth" class="attending-badge" title="Asistiré">
-                        <span class="material-icons-outlined" style="font-size: 11px; font-weight: 900;">check</span>
-                    </div>
-
-                    <!-- Deadline Indicator with Tooltip -->
-                    <div *ngIf="day.deadlines.length > 0 && !day.isOtherMonth" class="deadline-dot">
-                        <div class="deadline-tooltip">
-                            <div *ngFor="let dl of day.deadlines">
-                                ⚠️ Cierre: {{ dl.nombre || dl.lugar }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="calendar-legend">
+      <div class="legend-item">
+        <span class="dot competition-dot"></span>
+        <span>Competición</span>
+      </div>
+      <div class="legend-item">
+        <span class="dot other-dot"></span>
+        <span>Otros Eventos</span>
+      </div>
+      @if (authService.currentUserSignal()) {
+        <div class="legend-item">
+          <span class="dot attending-dot"></span>
+          <span>Asistiré</span>
         </div>
+      }
+      <div class="legend-item">
+        <span class="dot today-dot"></span>
+        <span>Hoy</span>
+      </div>
     </div>
+  </div>
 
-    <!-- Details Modal -->
-    <div class="modal-overlay" *ngIf="isModalOpen" (click)="closeModal()">
-        <div class="modal-content glass-effect" (click)="$event.stopPropagation()">
-            <button class="close-btn" (click)="closeModal()">&times;</button>
-
-            <!-- List of Competitions and Deadlines (if multiple/mixed items) -->
-            <div *ngIf="!selectedCompetition && (selectedCompetitions.length > 0 || selectedDeadlines.length > 0)"
-                class="competition-list-view">
-                <h3>📅 Eventos del Día</h3>
-                <div class="events-list">
-                    <div *ngFor="let comp of selectedCompetitions" class="event-card-preview"
-                        (click)="selectCompetitionFromList(comp)"
-                        [style.border-left]="comp.isAttending ? '4px solid #e65100' : (comp.tipo === 'otros' ? '4px solid var(--other-bg)' : '4px solid var(--accent-color)')">
-                        <div class="event-preview-header">
-                            <span class="event-name">{{ comp.nombre || comp.lugar }}</span>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <span class="event-type-badge" *ngIf="comp.isAttending"
-                                    style="background: linear-gradient(135deg, #e65100 0%, #ff9800 100%); color: white;">
-                                    Asistiré
-                                </span>
-                                <span class="event-type-badge" [class.type-other]="comp.tipo === 'otros'">
-                                    {{ comp.tipo === 'otros' ? 'Otro' : 'Competición' }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="event-preview-location">📍 {{ comp.lugar }}</div>
-                    </div>
-
-                    <!-- Deadlines integrated as list items -->
-                    <div *ngFor="let dl of selectedDeadlines" class="event-card-preview deadline-preview"
-                        (click)="selectCompetitionFromList(dl)"
-                        style="border-left: 4px solid #d32f2f; background: #fff5f5;">
-                        <div class="event-preview-header" style="justify-content: flex-start; gap: 0.5rem;">
-                            <span class="material-icons-outlined"
-                                style="color: #d32f2f; font-size: 1.2rem;">warning</span>
-                            <span class="event-name" style="color: #d32f2f; font-weight: 600;">Cierre inscripción: {{
-                                dl.nombre || dl.lugar }}</span>
-                        </div>
-                    </div>
+  <div class="months-grid">
+    @for (month of months(); track month; let i = $index) {
+      <div class="month-card" [id]="'month-' + i">
+        <h2>{{ month.name }}</h2>
+        <div class="weekdays">
+          <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span>S</span><span>D</span>
+        </div>
+        <div class="days-grid">
+          @for (day of month.days; track day) {
+            <div class="day" [class.other-month]="day.isOtherMonth"
+              [class.weekend]="day.isWeekend" [class.competition]="day.isCompetition"
+              [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
+              [class.attending]="day.isAttending"
+              (click)="(day.competitions.length > 0 || day.deadlines.length > 0) && openModal(day)">
+              @if (!day.isOtherMonth) {
+                <span>{{ day.date | date:'d' }}</span>
+              }
+              <!-- Attending Badge Indicator -->
+              @if (day.isAttending && !day.isOtherMonth) {
+                <div class="attending-badge" title="Asistiré">
+                  <span class="material-icons-outlined" style="font-size: 11px; font-weight: 900;">check</span>
                 </div>
+              }
+              <!-- Deadline Indicator with Tooltip -->
+              @if (day.deadlines.length > 0 && !day.isOtherMonth) {
+                <div class="deadline-dot">
+                  <div class="deadline-tooltip">
+                    @for (dl of day.deadlines; track dl) {
+                      <div>
+                        ⚠️ Cierre: {{ dl.nombre || dl.lugar }}
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
             </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
 
-            <!-- Competition Details -->
-            <div *ngIf="selectedCompetition" class="competition-details">
-                <button *ngIf="selectedCompetitions.length > 1" class="back-btn" (click)="backToList()">
-                    &larr; Volver al listado
+  <!-- Details Modal -->
+  @if (isModalOpen) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-content glass-effect" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="closeModal()">&times;</button>
+        <!-- List of Competitions and Deadlines (if multiple/mixed items) -->
+        @if (!selectedCompetition && (selectedCompetitions.length > 0 || selectedDeadlines.length > 0)) {
+          <div
+            class="competition-list-view">
+            <h3>📅 Eventos del Día</h3>
+            <div class="events-list">
+              @for (comp of selectedCompetitions; track comp) {
+                <div class="event-card-preview"
+                  (click)="selectCompetitionFromList(comp)"
+                  [style.border-left]="comp.isAttending ? '4px solid #e65100' : (comp.tipo === 'otros' ? '4px solid var(--other-bg)' : '4px solid var(--accent-color)')">
+                  <div class="event-preview-header">
+                    <span class="event-name">{{ comp.nombre || comp.lugar }}</span>
+                    <div style="display: flex; gap: 0.5rem;">
+                      @if (comp.isAttending) {
+                        <span class="event-type-badge"
+                          style="background: linear-gradient(135deg, #e65100 0%, #ff9800 100%); color: white;">
+                          Asistiré
+                        </span>
+                      }
+                      <span class="event-type-badge" [class.type-other]="comp.tipo === 'otros'">
+                        {{ comp.tipo === 'otros' ? 'Otro' : 'Competición' }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="event-preview-location">📍 {{ comp.lugar }}</div>
+                </div>
+              }
+              <!-- Deadlines integrated as list items -->
+              @for (dl of selectedDeadlines; track dl) {
+                <div class="event-card-preview deadline-preview"
+                  (click)="selectCompetitionFromList(dl)"
+                  style="border-left: 4px solid #d32f2f; background: #fff5f5;">
+                  <div class="event-preview-header" style="justify-content: flex-start; gap: 0.5rem;">
+                    <span class="material-icons-outlined"
+                    style="color: #d32f2f; font-size: 1.2rem;">warning</span>
+                    <span class="event-name" style="color: #d32f2f; font-weight: 600;">Cierre inscripción: {{
+                    dl.nombre || dl.lugar }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+        <!-- Competition Details -->
+        @if (selectedCompetition) {
+          <div class="competition-details">
+            @if (selectedCompetitions.length > 1) {
+              <button class="back-btn" (click)="backToList()">
+                &larr; Volver al listado
+              </button>
+            }
+            @if (authService.currentUserSignal()) {
+              <div class="modal-tabs">
+                <button class="modal-tab" [class.active]="activeModalTab === 'info'" (click)="switchTab('info')">
+                  <span class="material-icons-outlined">info</span> Info
                 </button>
-
-                <div class="modal-tabs" *ngIf="authService.currentUserSignal()">
-                    <button class="modal-tab" [class.active]="activeModalTab === 'info'" (click)="switchTab('info')">
-                        <span class="material-icons-outlined">info</span> Info
-                    </button>
-                    <button class="modal-tab" [class.active]="activeModalTab === 'asistencia'"
-                        (click)="switchTab('asistencia')">
-                        <span class="material-icons-outlined">how_to_reg</span> Asistencia
-                    </button>
+                <button class="modal-tab" [class.active]="activeModalTab === 'asistencia'"
+                  (click)="switchTab('asistencia')">
+                  <span class="material-icons-outlined">how_to_reg</span> Asistencia
+                </button>
+              </div>
+            }
+            <!-- Info Tab Content -->
+            @if (activeModalTab === 'info') {
+              <div class="tab-content">
+                <div class="modal-header">
+                  <div class="modal-title-row">
+                    <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
+                    <div class="modal-date-badge"
+                      [style.background]="selectedCompetition.isAttending ? 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)' : (selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)')"
+                      [style.color]="selectedCompetition.isAttending ? 'white' : (selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)')">
+                      {{ selectedCompetition.fechaEvento | date:'d MMM' }}
+                      @if (selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !== selectedCompetition.fechaEvento) {
+                        <span
+                          >
+                          - {{ selectedCompetition.fechaFinEvento | date:'d MMM' }}
+                        </span>
+                      }
+                    </div>
+                  </div>
                 </div>
-
-                <!-- Info Tab Content -->
-                <div class="tab-content" *ngIf="activeModalTab === 'info'">
-                    <div class="modal-header">
-                        <div class="modal-title-row">
-                            <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
-                            <div class="modal-date-badge"
-                                [style.background]="selectedCompetition.isAttending ? 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)' : (selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)')"
-                                [style.color]="selectedCompetition.isAttending ? 'white' : (selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)')">
-                                {{ selectedCompetition.fechaEvento | date:'d MMM' }}
-                                <span
-                                    *ngIf="selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !== selectedCompetition.fechaEvento">
-                                    - {{ selectedCompetition.fechaFinEvento | date:'d MMM' }}
+                <div class="modal-body">
+                  <div class="info-grid">
+                    @if (selectedCompetition.lugar) {
+                      <div class="info-item full-width">
+                        <span class="label">Ubicación</span>
+                        <div class="location-value">
+                          <span class="material-icons-outlined"
+                          style="color: #e53935; font-size: 1.2rem; vertical-align: middle;">location_on</span>
+                          <span style="vertical-align: middle;">{{ selectedCompetition.lugar }}</span>
+                        </div>
+                      </div>
+                    }
+                    @if (selectedCompetition.fechaLimite) {
+                      <div class="info-item">
+                        <span class="label">Cierre Inscripción</span>
+                        <span class="value">{{ selectedCompetition.fechaLimite | date:'shortDate' }}</span>
+                      </div>
+                    }
+                    @if (selectedCompetition.formaPago) {
+                      <div class="info-item full-width">
+                        <span class="label">Forma de Pago</span>
+                        <div class="payment-info">{{ selectedCompetition.formaPago }}</div>
+                      </div>
+                    }
+                  </div>
+                  @if (selectedCompetition.cartel) {
+                    <div class="poster-container">
+                      <img [src]="selectedCompetition.cartel" alt="Cartel" class="modal-poster"
+                        (click)="expandImage()" title="Click para ampliar">
+                        <div class="expand-hint">Click para ampliar</div>
+                      </div>
+                    }
+                  </div>
+                  @if (selectedCompetition.enlace) {
+                    <div class="modal-actions">
+                      <a [href]="selectedCompetition.enlace" target="_blank" class="event-link">
+                        <span class="material-icons-outlined"
+                        style="font-size: 1.2rem; vertical-align: middle;">open_in_new</span>
+                        Ir a la inscripción
+                      </a>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+          <!-- Attendance Tab Content -->
+          @if (activeModalTab === 'asistencia' && authService.currentUserSignal()) {
+            <div class="tab-content">
+              <!-- Premium Attendance Section -->
+              <div class="attendance-section">
+                <div class="attendance-card">
+                  <!-- State 1: Not attending -->
+                  @if (!isConfirmingAttendance && !selectedCompetition.isAttending) {
+                    <div class="attendance-prompt"
+                      >
+                      @if (selectedCompetition.attendingDogIds?.length > 0) {
+                        <div class="attendance-icon">
+                          <span class="material-icons-outlined" style="color: #e65100;">info</span>
+                        </div>
+                      }
+                      @if (!selectedCompetition.attendingDogIds?.length) {
+                        <div class="attendance-icon">
+                          <span class="material-icons-outlined">celebration</span>
+                        </div>
+                      }
+                      @if (selectedCompetition.attendingDogIds?.length > 0) {
+                        <h4>¡Perro ya inscrito!</h4>
+                      }
+                      @if (!selectedCompetition.attendingDogIds?.length) {
+                        <h4>¿Te apuntas?</h4>
+                      }
+                      @if (selectedCompetition.attendingDogIds?.length > 0) {
+                        <p>Un co-guía ya ha inscrito a vuestro perro. ¿Tú también vas a asistir como guía o espectador?</p>
+                      }
+                      @if (!selectedCompetition.attendingDogIds?.length) {
+                        <p>Únete a este evento y hazle saber a los demás que vas a ir.</p>
+                      }
+                      <button class="btn-primary-action" (click)="startAttendance()">
+                        <span class="material-icons-outlined">how_to_reg</span> ¡Asistiré!
+                      </button>
+                    </div>
+                  }
+                  <!-- State 2: Attending (but not editing) -->
+                  @if (!isConfirmingAttendance && selectedCompetition.isAttending) {
+                    <div class="attendance-confirmed"
+                      >
+                      <div class="success-banner">
+                        <span class="material-icons-outlined">check_circle</span>
+                        <div>
+                          <strong>¡Confirmado!</strong>
+                          <span>Vas a ir a este evento.</span>
+                        </div>
+                      </div>
+                      <div class="attendance-secondary-actions">
+                        <button class="btn-outline-action" (click)="startAttendance()">
+                          <span class="material-icons-outlined">edit_calendar</span> Modificar perretes
+                        </button>
+                        <button class="btn-danger-action" (click)="removeAttendance()">
+                          <span class="material-icons-outlined">event_busy</span> Cancelar asistencia
+                        </button>
+                      </div>
+                    </div>
+                  }
+                  <!-- State 3: Editing/Confirming Form -->
+                  @if (isConfirmingAttendance) {
+                    <div class="attendance-form-premium">
+                      <h4>¿Quiénes te acompañan?</h4>
+                      <p class="subtitle">Selecciona los perros que irán contigo:</p>
+                      @if (userDogs() && userDogs().length > 0) {
+                        <div class="dogs-grid">
+                          @for (dog of userDogs(); track dog) {
+                            <div class="dog-card"
+                              [class.selected]="selectedDogIds.has(dog.id)" (click)="toggleDog(dog.id)">
+                              <div class="dog-card-avatar">
+                                @if (dog.photo_url) {
+                                  <img [src]="dog.photo_url" referrerpolicy="no-referrer">
+                                }
+                                @if (!dog.photo_url) {
+                                  <div class="default-dog-icon">🐕</div>
+                                }
+                                @if (selectedDogIds.has(dog.id)) {
+                                  <div class="check-overlay">
+                                    <span class="material-icons-outlined">check</span>
+                                  </div>
+                                }
+                              </div>
+                              <span class="dog-name" style="display: block; line-height: 1.2;">{{ dog.name }}</span>
+                              @if (!selectedCompetition.isAttending && selectedCompetition.attendingDogIds?.includes(dog.id)) {
+                                <span style="font-size: 0.7rem; color: #e65100; font-weight: bold; text-align: center;"
+                                  >
+                                  Apuntado por<br>co-guía
                                 </span>
+                              }
                             </div>
+                          }
                         </div>
-                    </div>
-
-                    <div class="modal-body">
-                        <div class="info-grid">
-                            <div class="info-item full-width" *ngIf="selectedCompetition.lugar">
-                                <span class="label">Ubicación</span>
-                                <div class="location-value">
-                                    <span class="material-icons-outlined"
-                                        style="color: #e53935; font-size: 1.2rem; vertical-align: middle;">location_on</span>
-                                    <span style="vertical-align: middle;">{{ selectedCompetition.lugar }}</span>
+                      }
+                      @if (!userDogs() || userDogs().length === 0) {
+                        <p class="no-dogs-msg">No tienes perros
+                        registrados.</p>
+                      }
+                      @if (getEventDays(selectedCompetition).length > 1) {
+                        <h4 style="margin-top: 1.5rem;">📅 ¿Qué días asistirás?</h4>
+                        <p class="subtitle" style="margin-bottom: 8px;">Este evento dura varios días. <strong style="color: #e65100;">Debes seleccionar al menos un día</strong> para confirmar tu asistencia:</p>
+                        @if (selectedAttendanceDays.size === 0) {
+                          <div style="background-color: #fff3e0; border-left: 4px solid #ff9800; padding: 8px 12px; font-size: 0.85rem; color: #e65100; margin-bottom: 12px; border-radius: 4px; display: inline-flex; align-items: center;">
+                            <span class="material-icons-outlined" style="font-size: 1rem; margin-right: 6px;">info</span>
+                            <span>Haz clic en los días a los que tienes pensado ir.</span>
+                          </div>
+                        }
+                        <div class="days-selectable-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 1.5rem;">
+                          @for (day of getEventDays(selectedCompetition); track day) {
+                            <div class="day-large-card"
+                              (click)="toggleAttendanceDay(formatDateToIso(day))"
+                              style="padding: 12px; border-radius: 12px; border: 2px solid; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; position: relative; overflow: hidden; background: white; user-select: none;"
+                              [style.borderColor]="selectedAttendanceDays.has(formatDateToIso(day)) ? '#e65100' : '#e0e0e0'"
+                              [style.boxShadow]="selectedAttendanceDays.has(formatDateToIso(day)) ? '0 4px 12px rgba(230, 81, 0, 0.15)' : 'none'"
+                              [style.transform]="selectedAttendanceDays.has(formatDateToIso(day)) ? 'translateY(-2px)' : 'none'">
+                              <!-- Top Accent Line for Selected State -->
+                              @if (selectedAttendanceDays.has(formatDateToIso(day))) {
+                                <div style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);"></div>
+                              }
+                              <!-- Day name (Mon, Tue) -->
+                              <div style="font-size: 0.8rem; color: #666; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 4px; margin-bottom: 2px;">{{ day | date:'EEEE' }}</div>
+                              <!-- Day number (15) -->
+                              <div style="font-size: 1.8rem; font-weight: 900; line-height: 1; margin-bottom: 2px; transition: color 0.2s;"
+                                [style.color]="selectedAttendanceDays.has(formatDateToIso(day)) ? '#e65100' : '#333'">
+                                {{ day | date:'d' }}
+                              </div>
+                              <!-- Month name (Mar) -->
+                              <div style="font-size: 0.85rem; color: #888; font-weight: 500;">{{ day | date:'MMM' }}</div>
+                              <!-- Checkmark Badge -->
+                              @if (selectedAttendanceDays.has(formatDateToIso(day))) {
+                                <div style="position: absolute; bottom: 8px; right: 8px; background: #e65100; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(230, 81, 0, 0.3);">
+                                  <span class="material-icons-outlined" style="font-size: 14px; font-weight: 900;">check</span>
                                 </div>
+                              }
                             </div>
-                            <div class="info-item" *ngIf="selectedCompetition.fechaLimite">
-                                <span class="label">Cierre Inscripción</span>
-                                <span class="value">{{ selectedCompetition.fechaLimite | date:'shortDate' }}</span>
-                            </div>
-                            <div class="info-item full-width" *ngIf="selectedCompetition.formaPago">
-                                <span class="label">Forma de Pago</span>
-                                <div class="payment-info">{{ selectedCompetition.formaPago }}</div>
-                            </div>
+                          }
                         </div>
-
-                        <div class="poster-container" *ngIf="selectedCompetition.cartel">
-                            <img [src]="selectedCompetition.cartel" alt="Cartel" class="modal-poster"
-                                (click)="expandImage()" title="Click para ampliar">
-                            <div class="expand-hint">Click para ampliar</div>
-                        </div>
+                      }
+                      <div class="form-actions-premium">
+                        <button class="btn-cancel" (click)="cancelAttendanceForm()">Cancelar</button>
+                        <button class="btn-save" (click)="confirmAttendance()">Guardar Asistencia</button>
+                      </div>
                     </div>
-
-                    <div class="modal-actions" *ngIf="selectedCompetition.enlace">
-                        <a [href]="selectedCompetition.enlace" target="_blank" class="event-link">
-                            <span class="material-icons-outlined"
-                                style="font-size: 1.2rem; vertical-align: middle;">open_in_new</span>
-                            Ir a la inscripción
-                        </a>
-                    </div>
+                  }
                 </div>
-            </div>
-
-            <!-- Attendance Tab Content -->
-            <div class="tab-content" *ngIf="activeModalTab === 'asistencia' && authService.currentUserSignal()">
-                <!-- Premium Attendance Section -->
-                <div class="attendance-section">
-                    <div class="attendance-card">
-                        <!-- State 1: Not attending -->
-                        <div class="attendance-prompt"
-                            *ngIf="!isConfirmingAttendance && !selectedCompetition.isAttending">
-                            <div class="attendance-icon" *ngIf="selectedCompetition.attendingDogIds?.length > 0">
-                                <span class="material-icons-outlined" style="color: #e65100;">info</span>
-                            </div>
-                            <div class="attendance-icon" *ngIf="!selectedCompetition.attendingDogIds?.length">
-                                <span class="material-icons-outlined">celebration</span>
-                            </div>
-                            
-                            <h4 *ngIf="selectedCompetition.attendingDogIds?.length > 0">¡Perro ya inscrito!</h4>
-                            <h4 *ngIf="!selectedCompetition.attendingDogIds?.length">¿Te apuntas?</h4>
-                            
-                            <p *ngIf="selectedCompetition.attendingDogIds?.length > 0">Un co-guía ya ha inscrito a vuestro perro. ¿Tú también vas a asistir como guía o espectador?</p>
-                            <p *ngIf="!selectedCompetition.attendingDogIds?.length">Únete a este evento y hazle saber a los demás que vas a ir.</p>
-                            
-                            <button class="btn-primary-action" (click)="startAttendance()">
-                                <span class="material-icons-outlined">how_to_reg</span> ¡Asistiré!
-                            </button>
-                        </div>
-
-                        <!-- State 2: Attending (but not editing) -->
-                        <div class="attendance-confirmed"
-                            *ngIf="!isConfirmingAttendance && selectedCompetition.isAttending">
-                            <div class="success-banner">
-                                <span class="material-icons-outlined">check_circle</span>
-                                <div>
-                                    <strong>¡Confirmado!</strong>
-                                    <span>Vas a ir a este evento.</span>
-                                </div>
-                            </div>
-                            <div class="attendance-secondary-actions">
-                                <button class="btn-outline-action" (click)="startAttendance()">
-                                    <span class="material-icons-outlined">edit_calendar</span> Modificar perretes
-                                </button>
-                                <button class="btn-danger-action" (click)="removeAttendance()">
-                                    <span class="material-icons-outlined">event_busy</span> Cancelar asistencia
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- State 3: Editing/Confirming Form -->
-                        <div class="attendance-form-premium" *ngIf="isConfirmingAttendance">
-                            <h4>¿Quiénes te acompañan?</h4>
-                            <p class="subtitle">Selecciona los perros que irán contigo:</p>
-
-                            <div class="dogs-grid" *ngIf="userDogs() && userDogs().length > 0">
-                                <div class="dog-card" *ngFor="let dog of userDogs()"
-                                    [class.selected]="selectedDogIds.has(dog.id)" (click)="toggleDog(dog.id)">
-                                    <div class="dog-card-avatar">
-                                        <img *ngIf="dog.photo_url" [src]="dog.photo_url" referrerpolicy="no-referrer">
-                                        <div *ngIf="!dog.photo_url" class="default-dog-icon">🐕</div>
-                                        <div class="check-overlay" *ngIf="selectedDogIds.has(dog.id)">
-                                            <span class="material-icons-outlined">check</span>
-                                        </div>
-                                    </div>
-                                    <span class="dog-name" style="display: block; line-height: 1.2;">{{ dog.name }}</span>
-                                    <span style="font-size: 0.7rem; color: #e65100; font-weight: bold; text-align: center;" 
-                                          *ngIf="!selectedCompetition.isAttending && selectedCompetition.attendingDogIds?.includes(dog.id)">
-                                        Apuntado por<br>co-guía
-                                    </span>
-                                </div>
-                            </div>
-                            <p *ngIf="!userDogs() || userDogs().length === 0" class="no-dogs-msg">No tienes perros
-                                registrados.</p>
-
-                            <ng-container *ngIf="getEventDays(selectedCompetition).length > 1">
-                                <h4 style="margin-top: 1.5rem;">📅 ¿Qué días asistirás?</h4>
-                                <p class="subtitle" style="margin-bottom: 8px;">Este evento dura varios días. <strong style="color: #e65100;">Debes seleccionar al menos un día</strong> para confirmar tu asistencia:</p>
-                                
-                                <div *ngIf="selectedAttendanceDays.size === 0" style="background-color: #fff3e0; border-left: 4px solid #ff9800; padding: 8px 12px; font-size: 0.85rem; color: #e65100; margin-bottom: 12px; border-radius: 4px; display: inline-flex; align-items: center;">
-                                    <span class="material-icons-outlined" style="font-size: 1rem; margin-right: 6px;">info</span>
-                                    <span>Haz clic en los días a los que tienes pensado ir.</span>
-                                </div>
-                                
-                                <div class="days-selectable-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px; margin-bottom: 1.5rem;">
-                                    <div class="day-large-card" *ngFor="let day of getEventDays(selectedCompetition)"
-                                        (click)="toggleAttendanceDay(formatDateToIso(day))"
-                                        style="padding: 12px; border-radius: 12px; border: 2px solid; cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; position: relative; overflow: hidden; background: white; user-select: none;"
-                                        [style.borderColor]="selectedAttendanceDays.has(formatDateToIso(day)) ? '#e65100' : '#e0e0e0'"
-                                        [style.boxShadow]="selectedAttendanceDays.has(formatDateToIso(day)) ? '0 4px 12px rgba(230, 81, 0, 0.15)' : 'none'"
-                                        [style.transform]="selectedAttendanceDays.has(formatDateToIso(day)) ? 'translateY(-2px)' : 'none'">
-                                        
-                                        <!-- Top Accent Line for Selected State -->
-                                        <div *ngIf="selectedAttendanceDays.has(formatDateToIso(day))" style="position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);"></div>
-                                        
-                                        <!-- Day name (Mon, Tue) -->
-                                        <div style="font-size: 0.8rem; color: #666; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 4px; margin-bottom: 2px;">{{ day | date:'EEEE' }}</div>
-                                        
-                                        <!-- Day number (15) -->
-                                        <div style="font-size: 1.8rem; font-weight: 900; line-height: 1; margin-bottom: 2px; transition: color 0.2s;"
-                                             [style.color]="selectedAttendanceDays.has(formatDateToIso(day)) ? '#e65100' : '#333'">
-                                            {{ day | date:'d' }}
-                                        </div>
-                                        
-                                        <!-- Month name (Mar) -->
-                                        <div style="font-size: 0.85rem; color: #888; font-weight: 500;">{{ day | date:'MMM' }}</div>
-                                        
-                                        <!-- Checkmark Badge -->
-                                        <div *ngIf="selectedAttendanceDays.has(formatDateToIso(day))" style="position: absolute; bottom: 8px; right: 8px; background: #e65100; color: white; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(230, 81, 0, 0.3);">
-                                            <span class="material-icons-outlined" style="font-size: 14px; font-weight: 900;">check</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </ng-container>
-
-                            <div class="form-actions-premium">
-                                <button class="btn-cancel" (click)="cancelAttendanceForm()">Cancelar</button>
-                                <button class="btn-save" (click)="confirmAttendance()">Guardar Asistencia</button>
-                            </div>
-                        </div>
+                <!-- Attendees Viewer Accordion -->
+                <div class="attendees-container">
+                  <div class="attendees-header" (click)="toggleAttendeesView()">
+                    <div class="attendees-title">
+                      <span class="material-icons-outlined">groups</span>
+                      <span>Asistentes al evento</span>
                     </div>
-
-                    <!-- Attendees Viewer Accordion -->
-                    <div class="attendees-container">
-                        <div class="attendees-header" (click)="toggleAttendeesView()">
-                            <div class="attendees-title">
-                                <span class="material-icons-outlined">groups</span>
-                                <span>Asistentes al evento</span>
-                            </div>
-                            <span class="material-icons-outlined chevron" [class.open]="viewingAttendees">
-                                expand_more
-                            </span>
+                    <span class="material-icons-outlined chevron" [class.open]="viewingAttendees">
+                      expand_more
+                    </span>
+                  </div>
+                  @if (viewingAttendees) {
+                    <div class="attendees-content">
+                      @if (isLoadingAttendees) {
+                        <div class="loading-state-premium">
+                          <div class="spinner"></div> <span>Cargando asistentes...</span>
                         </div>
-
-                        <div class="attendees-content" *ngIf="viewingAttendees">
-                            <div *ngIf="isLoadingAttendees" class="loading-state-premium">
-                                <div class="spinner"></div> <span>Cargando asistentes...</span>
-                            </div>
-
-                            <div *ngIf="!isLoadingAttendees && attendees.length === 0" class="empty-state-premium">
-                                <div class="empty-icon">👻</div>
-                                <p>Aún no hay nadie apuntado.</p>
-                                <span>¡Sé el primero en confirmar tu asistencia!</span>
-                            </div>
-
-                            <div class="attendees-list-premium" *ngIf="!isLoadingAttendees && attendees.length > 0">
-                                <div class="attendee-row" *ngFor="let attendee of attendees">
-                                    <div class="attendee-info">
-                                        <img [src]="attendee.photo_url || 'assets/default-user.png'"
-                                            class="attendee-avatar" referrerpolicy="no-referrer">
-                                        <div style="display: flex; flex-direction: column;">
-                                            <span class="attendee-name">{{ attendee.name }}</span>
-                                            <div *ngIf="attendee.dias_asistencia?.length > 0" style="font-size: 0.8rem; color: #666; margin-top: 2px;">
-                                                <span class="material-icons-outlined" style="font-size: 0.8rem; vertical-align: middle; margin-right: 2px;">event</span>
-                                                <span *ngFor="let day of attendee.dias_asistencia; let last = last" style="vertical-align: middle; text-transform: capitalize;">
-                                                    {{ day | date:'EEEE d' }}<span *ngIf="!last">, </span>
-                                                </span>
-                                            </div>
-                                        </div>
+                      }
+                      @if (!isLoadingAttendees && attendees.length === 0) {
+                        <div class="empty-state-premium">
+                          <div class="empty-icon">👻</div>
+                          <p>Aún no hay nadie apuntado.</p>
+                          <span>¡Sé el primero en confirmar tu asistencia!</span>
+                        </div>
+                      }
+                      @if (!isLoadingAttendees && attendees.length > 0) {
+                        <div class="attendees-list-premium">
+                          @for (attendee of attendees; track attendee) {
+                            <div class="attendee-row">
+                              <div class="attendee-info">
+                                <img [src]="attendee.photo_url || 'assets/default-user.png'"
+                                  class="attendee-avatar" referrerpolicy="no-referrer">
+                                  <div style="display: flex; flex-direction: column;">
+                                    <span class="attendee-name">{{ attendee.name }}</span>
+                                    @if (attendee.dias_asistencia?.length > 0) {
+                                      <div style="font-size: 0.8rem; color: #666; margin-top: 2px;">
+                                        <span class="material-icons-outlined" style="font-size: 0.8rem; vertical-align: middle; margin-right: 2px;">event</span>
+                                        @for (day of attendee.dias_asistencia; track day; let last = $last) {
+                                          <span style="vertical-align: middle; text-transform: capitalize;">
+                                            {{ day | date:'EEEE d' }}@if (!last) {
+                                            <span>, </span>
+                                          }
+                                        </span>
+                                      }
                                     </div>
-                                    <div class="attendee-dogs-list" *ngIf="attendee.attending_dogs?.length > 0">
-                                        <div class="dog-chip" *ngFor="let dog of attendee.attending_dogs">
-                                            <img *ngIf="dog.photo_url" [src]="dog.photo_url"
-                                                referrerpolicy="no-referrer">
-                                            <div *ngIf="!dog.photo_url" class="chip-default-icon">🐕</div>
-                                            <span>{{ dog.name }}</span>
-                                        </div>
-                                    </div>
+                                  }
                                 </div>
+                              </div>
+                              @if (attendee.attending_dogs?.length > 0) {
+                                <div class="attendee-dogs-list">
+                                  @for (dog of attendee.attending_dogs; track dog) {
+                                    <div class="dog-chip">
+                                      @if (dog.photo_url) {
+                                        <img [src]="dog.photo_url"
+                                          referrerpolicy="no-referrer">
+                                      }
+                                      @if (!dog.photo_url) {
+                                        <div class="chip-default-icon">🐕</div>
+                                      }
+                                      <span>{{ dog.name }}</span>
+                                    </div>
+                                  }
+                                </div>
+                              }
                             </div>
+                          }
                         </div>
+                      }
                     </div>
+                  }
                 </div>
+              </div>
             </div>
+          }
         </div>
+      </div>
+    }
+  </div>
 
-
-    </div>
-</div>
-
-<!-- Expanded Image Overlay -->
-<div class="image-overlay" *ngIf="isImageExpanded" (click)="closeImage()">
-    <button class="close-overlay-btn">&times;</button>
-    <div class="image-wrapper">
+  <!-- Expanded Image Overlay -->
+  @if (isImageExpanded) {
+    <div class="image-overlay" (click)="closeImage()">
+      <button class="close-overlay-btn">&times;</button>
+      <div class="image-wrapper">
         <img [src]="selectedCompetition.cartel" alt="Cartel Ampliado">
+      </div>
     </div>
-</div>
+  }

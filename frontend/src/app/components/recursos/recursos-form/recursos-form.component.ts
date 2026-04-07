@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ResourceService, RESOURCE_CATEGORIES, RESOURCE_LEVELS } from '../../../services/resource.service';
@@ -7,7 +7,7 @@ import { ResourceService, RESOURCE_CATEGORIES, RESOURCE_LEVELS } from '../../../
 @Component({
   selector: 'app-recursos-form',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule],
+  imports: [RouterModule, ReactiveFormsModule],
   templateUrl: './recursos-form.component.html',
   styleUrls: ['./recursos-form.component.scss']
 })

@@ -1,65 +1,81 @@
 <div class="resources-container">
-    <div class="header-section">
-        <h1>Material y Recursos</h1>
-        <p class="subtitle">Documentos, vídeos y enlaces de interés compartidos por el staff</p>
+  <div class="header-section">
+    <h1>Material y Recursos</h1>
+    <p class="subtitle">Documentos, vídeos y enlaces de interés compartidos por el staff</p>
+  </div>
+
+  <div class="controls-section">
+    <div class="filter-group">
+      <span class="material-icons filter-icon">filter_list</span>
+      <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="category-select" style="margin-right: 10px;">
+        <option value="">Todas las categorías</option>
+        @for (cat of categories; track cat) {
+          <option [value]="cat.value">{{ cat.label }}</option>
+        }
+      </select>
+      <select [(ngModel)]="selectedLevel" (change)="onLevelChange()" class="category-select">
+        @for (lvl of levels; track lvl) {
+          <option [value]="lvl.value">{{ lvl.label }}</option>
+        }
+      </select>
     </div>
 
-    <div class="controls-section">
-        <div class="filter-group">
-            <span class="material-icons filter-icon">filter_list</span>
-            <select [(ngModel)]="selectedCategory" (change)="onCategoryChange()" class="category-select" style="margin-right: 10px;">
-                <option value="">Todas las categorías</option>
-                <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
-            </select>
-            <select [(ngModel)]="selectedLevel" (change)="onLevelChange()" class="category-select">
-                <option *ngFor="let lvl of levels" [value]="lvl.value">{{ lvl.label }}</option>
-            </select>
-        </div>
-
-        <div style="display: flex; gap: 10px;">
-            <button (click)="loadResources()" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer;">
-                <span class="material-icons" style="font-size: 18px;">refresh</span>
-                <span>Recargar</span>
-            </button>
-            <button *ngIf="canManage()" routerLink="/recursos/nuevo" class="btn-primary-add">
-                <span class="material-icons">add_circle_outline</span>
-                <span>Añadir Recurso</span>
-            </button>
-        </div>
+    <div style="display: flex; gap: 10px;">
+      <button (click)="loadResources()" class="btn-secondary" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer;">
+        <span class="material-icons" style="font-size: 18px;">refresh</span>
+        <span>Recargar</span>
+      </button>
+      @if (canManage()) {
+        <button routerLink="/recursos/nuevo" class="btn-primary-add">
+          <span class="material-icons">add_circle_outline</span>
+          <span>Añadir Recurso</span>
+        </button>
+      }
     </div>
+  </div>
 
-    <div *ngIf="isLoading" class="loading-state">
-        <p>Cargando recursos...</p>
+  @if (isLoading) {
+    <div class="loading-state">
+      <p>Cargando recursos...</p>
     </div>
+  }
 
-    <div *ngIf="!isLoading && resources().length === 0" class="empty-state">
-        <span class="material-icons empty-icon">folder_open</span>
-        <p>No hay recursos disponibles en esta categoría.</p>
+  @if (!isLoading && resources().length === 0) {
+    <div class="empty-state">
+      <span class="material-icons empty-icon">folder_open</span>
+      <p>No hay recursos disponibles en esta categoría.</p>
     </div>
+  }
 
-    <div *ngIf="!isLoading && resources().length > 0" class="resources-grid">
-        <div *ngFor="let resource of resources()" class="resource-card compact-horizontal" (click)="openResource(resource)">
-            <div class="resource-icon-side" [ngClass]="resource.type">
-                <span class="material-icons">{{ getIconForType(resource.type) }}</span>
+  @if (!isLoading && resources().length > 0) {
+    <div class="resources-grid">
+      @for (resource of resources(); track resource) {
+        <div class="resource-card compact-horizontal" (click)="openResource(resource)">
+          <div class="resource-icon-side" [ngClass]="resource.type">
+            <span class="material-icons">{{ getIconForType(resource.type) }}</span>
+          </div>
+          <div class="resource-body">
+            <h3 class="resource-title" [title]="resource.title">{{ resource.title }}</h3>
+            <div class="resource-badges">
+              <span class="badge category-badge">{{ getCategoryLabel(resource.category) }}</span>
+              @if (resource.level && resource.level !== 'all') {
+                <span class="badge level-badge">{{ getLevelLabel(resource.level) }}</span>
+              }
             </div>
-            
-            <div class="resource-body">
-                <h3 class="resource-title" [title]="resource.title">{{ resource.title }}</h3>
-                <div class="resource-badges">
-                    <span class="badge category-badge">{{ getCategoryLabel(resource.category) }}</span>
-                    <span class="badge level-badge" *ngIf="resource.level && resource.level !== 'all'">{{ getLevelLabel(resource.level) }}</span>
-                </div>
+          </div>
+          <!-- Absolute positioned actions for staff -->
+          @if (canManage()) {
+            <div class="staff-actions">
+              <button class="action-btn edit-btn" [routerLink]="['/recursos/editar', resource.id]" (click)="$event.stopPropagation()" title="Editar">
+                <span class="material-icons">edit</span>
+              </button>
+              <button class="action-btn delete-btn" (click)="deleteResource($event, resource)" title="Eliminar">
+                <span class="material-icons">delete</span>
+              </button>
             </div>
-
-            <!-- Absolute positioned actions for staff -->
-            <div class="staff-actions" *ngIf="canManage()">
-                <button class="action-btn edit-btn" [routerLink]="['/recursos/editar', resource.id]" (click)="$event.stopPropagation()" title="Editar">
-                    <span class="material-icons">edit</span>
-                </button>
-                <button class="action-btn delete-btn" (click)="deleteResource($event, resource)" title="Eliminar">
-                    <span class="material-icons">delete</span>
-                </button>
-            </div>
+          }
         </div>
+      }
     </div>
+  }
 </div>

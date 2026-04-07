@@ -1,58 +1,71 @@
-import { Component, Input, OnInit, inject, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, Input, OnInit, inject, ElementRef, input, viewChild } from '@angular/core';
+
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-smart-video-player',
   standalone: true,
-  imports: [CommonModule],
+  imports: [],
   styleUrl: './smart-video-player.component.css',
   template: `
     <div class="video-wrapper" [class.is-youtube]="youtubeUrl" [class.is-active]="isVideoActive">
-
+    
       <!-- Video Cover / Poster -->
-      <div class="poster-cover" *ngIf="!isVideoActive" (click)="startPlayback()">
-         <img *ngIf="coverImageUrl" [src]="coverImageUrl" class="poster-image" alt="Video cover">
-         <div *ngIf="!coverImageUrl" class="poster-placeholder">
-            <span class="material-icons">pets</span>
-         </div>
-         <div class="poster-overlay-gradient"></div>
-         <span class="material-icons play-icon-massive">play_circle_outline</span>
-      </div>
-
-      <iframe *ngIf="youtubeUrl && hasStarted" [src]="autoplayYoutubeUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="video-iframe"></iframe>
-
-      <ng-container *ngIf="!youtubeUrl && localUrl">
-        <video #localVideo [src]="localUrl" class="video-local" playsinline webkit-playsinline loop preload="metadata" 
-               (playing)="isPlaying = true" (pause)="isPlaying = false" (timeupdate)="onTimeUpdate($event)" (click)="togglePlay()"></video>
-        
-        <div class="custom-play-overlay" *ngIf="!isPlaying && isVideoActive" (click)="togglePlay()">
-          <span class="material-icons play-icon-large">play_arrow</span>
+      @if (!isVideoActive) {
+        <div class="poster-cover" (click)="startPlayback()">
+          @if (coverImageUrl) {
+            <img [src]="coverImageUrl" class="poster-image" alt="Video cover">
+          }
+          @if (!coverImageUrl) {
+            <div class="poster-placeholder">
+              <span class="material-icons">pets</span>
+            </div>
+          }
+          <div class="poster-overlay-gradient"></div>
+          <span class="material-icons play-icon-massive">play_circle_outline</span>
         </div>
-
-        <div class="custom-progress-hitbox" *ngIf="isVideoActive" (click)="seekVideo($event)">
-          <div class="custom-progress-container">
-            <div class="custom-progress-fill" [style.width.%]="progress"></div>
+      }
+    
+      @if (youtubeUrl && hasStarted) {
+        <iframe [src]="autoplayYoutubeUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="video-iframe"></iframe>
+      }
+    
+      @if (!youtubeUrl && localUrl) {
+        <video #localVideo [src]="localUrl" class="video-local" playsinline webkit-playsinline loop preload="metadata"
+        (playing)="isPlaying = true" (pause)="isPlaying = false" (timeupdate)="onTimeUpdate($event)" (click)="togglePlay()"></video>
+        @if (!isPlaying && isVideoActive) {
+          <div class="custom-play-overlay" (click)="togglePlay()">
+            <span class="material-icons play-icon-large">play_arrow</span>
           </div>
+        }
+        @if (isVideoActive) {
+          <div class="custom-progress-hitbox" (click)="seekVideo($event)">
+            <div class="custom-progress-container">
+              <div class="custom-progress-fill" [style.width.%]="progress"></div>
+            </div>
+          </div>
+        }
+        @if (isVideoActive) {
+          <button class="fullscreen-btn" (click)="toggleFullscreen($event)">
+            <span class="material-icons">fullscreen</span>
+          </button>
+        }
+      }
+    
+      @if (!youtubeUrl && !localUrl) {
+        <div class="video-unavailable">
+          Vídeo no disponible
         </div>
-
-        <button class="fullscreen-btn" *ngIf="isVideoActive" (click)="toggleFullscreen($event)">
-          <span class="material-icons">fullscreen</span>
-        </button>
-      </ng-container>
-
-      <div *ngIf="!youtubeUrl && !localUrl" class="video-unavailable">
-        Vídeo no disponible
-      </div>
+      }
     </div>
-  `
+    `
 })
 export class SmartVideoPlayerComponent implements OnInit {
   @Input() coverImageUrl?: string;
-  @Input() youtubeId?: string;
-  @Input() localPath?: string;
-  @ViewChild('localVideo') localVideoRef?: ElementRef<HTMLVideoElement>;
+  readonly youtubeId = input<string>();
+  readonly localPath = input<string>();
+  readonly localVideoRef = viewChild<ElementRef<HTMLVideoElement>>('localVideo');
 
   private sanitizer = inject(DomSanitizer);
 
@@ -68,20 +81,23 @@ export class SmartVideoPlayerComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.youtubeId) {
-      this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${this.youtubeId}?playsinline=1&rel=0&modestbranding=1`);
-      this.autoplayYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${this.youtubeId}?playsinline=1&rel=0&modestbranding=1&autoplay=1`);
-    } else if (this.localPath) {
-      this.localUrl = `${environment.apiUrl.replace('/api', '')}/storage/${this.localPath}`;
+    const youtubeId = this.youtubeId();
+    const localPath = this.localPath();
+    if (youtubeId) {
+      this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${youtubeId}?playsinline=1&rel=0&modestbranding=1`);
+      this.autoplayYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${youtubeId}?playsinline=1&rel=0&modestbranding=1&autoplay=1`);
+    } else if (localPath) {
+      this.localUrl = `${environment.apiUrl.replace('/api', '')}/storage/${localPath}`;
     }
   }
 
   startPlayback() {
     this.hasStarted = true;
-    if (this.youtubeId) {
+    const localVideoRef = this.localVideoRef();
+    if (this.youtubeId()) {
       // YouTube iframe will start rendering and autoplay
-    } else if (this.localVideoRef) {
-      const video = this.localVideoRef.nativeElement;
+    } else if (localVideoRef) {
+      const video = localVideoRef.nativeElement;
       video.play().catch(e => console.error('Play error:', e));
     }
   }
@@ -89,8 +105,9 @@ export class SmartVideoPlayerComponent implements OnInit {
   togglePlay() {
     if (this.youtubeUrl) return;
 
-    if (this.localVideoRef) {
-      const video = this.localVideoRef.nativeElement;
+    const localVideoRef = this.localVideoRef();
+    if (localVideoRef) {
+      const video = localVideoRef.nativeElement;
       if (video.paused) {
         video.play().catch(e => console.error('Auto-play prevented:', e));
       } else {
@@ -108,8 +125,9 @@ export class SmartVideoPlayerComponent implements OnInit {
 
   seekVideo(event: MouseEvent) {
     event.stopPropagation();
-    if (!this.localVideoRef) return;
-    const video = this.localVideoRef.nativeElement;
+    const localVideoRef = this.localVideoRef();
+    if (!localVideoRef) return;
+    const video = localVideoRef.nativeElement;
     if (!video.duration) return;
 
     const container = event.currentTarget as HTMLElement;
@@ -124,8 +142,9 @@ export class SmartVideoPlayerComponent implements OnInit {
 
   toggleFullscreen(event: Event) {
     event.stopPropagation();
-    if (!this.localVideoRef) return;
-    const videoNode = this.localVideoRef.nativeElement;
+    const localVideoRef = this.localVideoRef();
+    if (!localVideoRef) return;
+    const videoNode = localVideoRef.nativeElement;
 
     if (!document.fullscreenElement) {
       if (videoNode.requestFullscreen) {
