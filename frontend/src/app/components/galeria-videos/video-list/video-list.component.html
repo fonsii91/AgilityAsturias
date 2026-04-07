@@ -250,15 +250,29 @@
       </div>
     }
 
-    <!-- Controles de Paginación -->
+    <!-- Controles de Paginación Númerica -->
     @if (totalPages > 1 && !isLoading) {
-      <div class="pagination-controls">
-        <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)" class="pagination-btn">
-          <span class="material-icons">chevron_left</span> Anterior
+      <div class="pagination-controls numeric-pagination">
+        <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)" class="pagination-btn nav-btn">
+          <span class="material-icons">chevron_left</span>
         </button>
-        <span class="pagination-info">Página {{ currentPage }} de {{ totalPages }}</span>
-        <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)" class="pagination-btn">
-          Siguiente <span class="material-icons">chevron_right</span>
+        
+        <div class="pagination-pages">
+          @for (page of pageNumbers; track page) {
+            @if (page === '...') {
+              <span class="pagination-dots">...</span>
+            } @else {
+              <button class="pagination-number" 
+                      [class.active]="currentPage === page" 
+                      (click)="goToPage(page)">
+                {{ page }}
+              </button>
+            }
+          }
+        </div>
+
+        <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)" class="pagination-btn nav-btn">
+          <span class="material-icons">chevron_right</span>
         </button>
       </div>
     }

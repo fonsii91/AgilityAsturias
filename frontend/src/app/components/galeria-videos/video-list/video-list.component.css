@@ -1256,46 +1256,81 @@ select.form-input {
     box-shadow: none;
 }
 
-/* Controles de Paginación */
-.pagination-controls {
+/* Controles de Paginación Numérica */
+.pagination-controls.numeric-pagination {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
     margin: 2rem 0 3rem 0;
     width: 100%;
     grid-column: 1 / -1;
 }
 
-.pagination-btn {
+.pagination-controls .nav-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
     background-color: transparent;
     border: 2px solid var(--primary-blue, #0073CF);
     color: var(--primary-blue, #0073CF);
-    border-radius: 9999px;
-    font-weight: 600;
-    font-size: 0.95rem;
+    border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
-.pagination-btn:hover:not(:disabled) {
+.pagination-controls .nav-btn:hover:not(:disabled) {
     background-color: var(--primary-blue, #0073CF);
     color: white;
 }
 
-.pagination-btn:disabled {
+.pagination-controls .nav-btn:disabled {
     border-color: #ccc;
     color: #999;
     cursor: not-allowed;
     background-color: #f5f5f5;
 }
 
-.pagination-info {
+.pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pagination-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    color: #444;
+    font-weight: 600;
     font-size: 1rem;
-    color: #555;
-    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pagination-number:hover {
+    background-color: #f0f8ff;
+    border-color: var(--primary-blue, #0073CF);
+    color: var(--primary-blue, #0073CF);
+}
+
+.pagination-number.active {
+    background-color: var(--primary-blue, #0073CF);
+    border-color: var(--primary-blue, #0073CF);
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 115, 207, 0.3);
+}
+
+.pagination-dots {
+    color: #666;
+    font-weight: bold;
+    padding: 0 0.25rem;
 }

@@ -109,8 +109,25 @@ export class VideoListComponent implements OnInit {
         });
     }
 
-    goToPage(page: number) {
-        if (page >= 1 && page <= this.totalPages && page !== this.currentPage) {
+    get pageNumbers(): (number|string)[] {
+        const pages: (number|string)[] = [];
+        const maxPagesToShow = 5;
+        if (this.totalPages <= maxPagesToShow) {
+            for (let i = 1; i <= this.totalPages; i++) pages.push(i);
+        } else {
+            if (this.currentPage <= 3) {
+                pages.push(1, 2, 3, 4, '...', this.totalPages);
+            } else if (this.currentPage > this.totalPages - 3) {
+                pages.push(1, '...', this.totalPages - 3, this.totalPages - 2, this.totalPages - 1, this.totalPages);
+            } else {
+                pages.push(1, '...', this.currentPage - 1, this.currentPage, this.currentPage + 1, '...', this.totalPages);
+            }
+        }
+        return pages;
+    }
+
+    goToPage(page: number | string) {
+        if (typeof page === 'number' && page >= 1 && page <= this.totalPages && page !== this.currentPage) {
             this.loadVideos(page);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
