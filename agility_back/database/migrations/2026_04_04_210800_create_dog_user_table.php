@@ -24,17 +24,17 @@ return new class extends Migration
         DB::statement('INSERT INTO dog_user (dog_id, user_id, created_at, updated_at) SELECT id, user_id, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP FROM dogs WHERE user_id IS NOT NULL AND user_id IN (SELECT id FROM users)');
 
         // 3. Drop user_id from dogs table
-        Schema::table('dogs', function (Blueprint $table) {
-            if (Schema::hasColumn('dogs', 'user_id')) {
-                // Ignore dropForeign errors if the FK is already gone
-                try {
-                    $table->dropForeign(['user_id']);
-                } catch (\Exception $e) {
-                    // Foreign key might not exist
-                }
+        try {
+            DB::statement('ALTER TABLE dogs DROP FOREIGN KEY dogs_user_id_foreign');
+        } catch (\Exception $e) {
+            // Foreign key might not exist, proceed
+        }
+
+        if (Schema::hasColumn('dogs', 'user_id')) {
+            Schema::table('dogs', function (Blueprint $table) {
                 $table->dropColumn('user_id');
-            }
-        });
+            });
+        }
     }
 
     /**
