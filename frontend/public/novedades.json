@@ -13,30 +13,30 @@
     "version": "1.1.0",
     "date": "2026-04-07",
     "features": [
-      "¡Nueva sección retrospectiva de Novedades (Release Notes) para que estés siempre al día de nuestras mejoras con un estilo visual premium!",
-      "Mejora en la usabilidad y experiencia de usuario implementando restricciones seguras en la cesión de perros compartidos.",
-      "Rediseño visual general en componentes, implementando un diseño más limpio y eliminando etiquetas redundantes ('Mañana' y 'Tarde') en el panel de reservas."
+      "¡Nueva sección de Novedades para que estés siempre al día de todo lo que añadimos a la App de un solo vistazo!",
+      "Mejorada la seguridad y facilidad de uso a la hora de compartir el perfil de un mismo perro con tu pareja u otros familiares.",
+      "¡Un buen lavado de cara! Hemos limpiado el diseño general de casi todas las pantallas para hacerlo más agradable a la vista y menos lioso."
     ],
     "bugfixes": [
-      "Solucionado un problema al intentar anular la asistencia a competiciones con perros en régimen de copropiedad (1:M a N:M).",
-      "Corregida la lógica automática de selección de eventos en la Galería de Vídeos para fechas compuestas o rangos amplios.",
-      "Añadido un paso de seguridad y confirmación antes de eliminar permanentemente a un perro del sistema ('Escribe BORRAR')."
+      "Solucionado el fallo que te impedía desapuntarte de una competición si el perro apuntado era compartido.",
+      "Arreglada la selección de fechas en la Galería de Vídeos para que vuelva a funcionar correctamente con competiciones que duran todo el fin de semana.",
+      "Añadido un escudo de seguridad: ahora para eliminar a un perro tendrás que confirmarlo escribiendo 'BORRAR' para evitar perder todos tus datos por un despiste."
     ],
     "warnings": [
-      "La nueva funcionalidad de compartir perros (copropiedad N:M) ha requerido cambios arquitectónicos complejos profundos. Es posible que algunas funciones que antes operaban con normalidad se vean momentáneamente afectadas. Si te topas con algún error inusual, por favor repórtaselo inmediatamente al administrador."
+      "¡Aviso importante! Permitir que el perfil de un mismo perro lo compartan varias familias ha sido un desafío tremendo bajo el capó. Hemos rematado todo lo posible, pero si ves algo raro o algún botón que no va como antes, avisa al administrador."
     ]
   },
   {
     "version": "1.0.5",
     "date": "2026-03-25",
     "features": [
-      "Implementado el sistema de notificaciones Push Global. ¡Ahora estarás conectado en tiempo real al club!",
-      "Lanzado el nuevo sistema de Cancelación de Clases permitiendo ajustes flexibles en el calendario y notificación directa.",
-      "Paginado optimizado de alta velocidad desplegado en nuestro apartado de 'Cine Agility' ('Galería de Videos')."
+      "¡Llegan los avisos directos! Las notificaciones del club ahora podrán saltar en tu móvil como un aviso normal para mantenerte hiperconectado.",
+      "Los entrenadores ya pueden cancelar el entrenamiento de un solo día o reorganizar clases sin borrar todo el calendario del mes.",
+      "Cambiado el tablón de nuestra sección 'Cine Agility' por sistemas de 'Páginas' para que tu móvil no sufra intentando cargar todos los vídeos del tirón."
     ],
     "bugfixes": [
-      "Refinado el comportamiento de las tarjetas de notificaciones para ser marcadas como leídas de forma más intuitiva.",
-      "Optimización masiva en la recuperación de eventos de cara al servidor de Contabo."
+      "Rediseñado el sistema de notificaciones: Ahora cuando toques una alarma, se marcará suavemente como leída en lugar de desaparecer sin dejar rastro de forma brusca.",
+      "Hemos dado una inyección de velocidad a las conexiones del servidor para que todo cargue algo más ligero en tus madrugadas."
     ]
   }
 ]
