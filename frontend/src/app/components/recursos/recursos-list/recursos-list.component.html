@@ -32,13 +32,13 @@
         <p>Cargando recursos...</p>
     </div>
 
-    <div *ngIf="!isLoading && resources.length === 0" class="empty-state">
+    <div *ngIf="!isLoading && resources().length === 0" class="empty-state">
         <span class="material-icons empty-icon">folder_open</span>
         <p>No hay recursos disponibles en esta categoría.</p>
     </div>
 
-    <div *ngIf="!isLoading && resources.length > 0" class="resources-grid">
-        <div *ngFor="let resource of resources" class="resource-card compact-horizontal" (click)="openResource(resource)">
+    <div *ngIf="!isLoading && resources().length > 0" class="resources-grid">
+        <div *ngFor="let resource of resources()" class="resource-card compact-horizontal" (click)="openResource(resource)">
             <div class="resource-icon-side" [ngClass]="resource.type">
                 <span class="material-icons">{{ getIconForType(resource.type) }}</span>
             </div>

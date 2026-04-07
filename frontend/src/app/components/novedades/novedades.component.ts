@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
@@ -19,14 +19,14 @@ export interface ReleaseNote {
   styleUrls: ['./novedades.component.css']
 })
 export class NovedadesComponent implements OnInit {
-  releases: ReleaseNote[] = [];
+  releases = signal<ReleaseNote[]>([]);
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
     this.http.get<ReleaseNote[]>('novedades.json').subscribe({
       next: (data) => {
-        this.releases = data;
+        this.releases.set(data);
       },
       error: (err) => {
         console.error('Error loading Novedades', err);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,7 +14,7 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./recursos-list.component.scss']
 })
 export class RecursosListComponent implements OnInit {
-  resources: Resource[] = [];
+  resources = signal<Resource[]>([]);
   categories = RESOURCE_CATEGORIES;
   levels = RESOURCE_LEVELS;
   selectedCategory: string = '';
@@ -34,7 +34,7 @@ export class RecursosListComponent implements OnInit {
     this.isLoading = true;
     this.resourceService.getResources(this.selectedCategory, this.selectedLevel).subscribe({
       next: (data: Resource[]) => {
-        this.resources = data;
+        this.resources.set(data);
         this.isLoading = false;
       },
       error: (err: any) => {

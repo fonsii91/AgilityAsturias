@@ -5,7 +5,7 @@
     </div>
 
     <div class="timeline">
-        <div class="timeline-item animate-slide-up" *ngFor="let release of releases; let i = index"
+        <div class="timeline-item animate-slide-up" *ngFor="let release of releases(); let i = index"
             [style.animation-delay]="i * 100 + 'ms'">
             <div class="timeline-icon">
                 <mat-icon>rocket_launch</mat-icon>
@@ -50,7 +50,7 @@
             </div>
         </div>
 
-        <div class="timeline-item" *ngIf="releases.length === 0">
+        <div class="timeline-item" *ngIf="releases().length === 0">
             <div class="timeline-icon empty">
                 <mat-icon>info</mat-icon>
             </div>
