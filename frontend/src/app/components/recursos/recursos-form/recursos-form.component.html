@@ -1,5 +1,5 @@
 <div class="form-container">
-  <h2>{{ isEditing ? 'Editar Recurso' : 'Añadir Nuevo Recurso' }}</h2>
+  <h2>{{ isEditing() ? 'Editar Recurso' : 'Añadir Nuevo Recurso' }}</h2>
 
   <form [formGroup]="resourceForm" (ngSubmit)="onSubmit()">
     <div class="form-group">
@@ -44,8 +44,8 @@
     @if (resourceForm.get('type')?.value === 'document') {
       <div class="form-group">
         <label>Archivo *</label>
-        <input type="file" (change)="onFileSelected($event)" class="form-control" [required]="!isEditing">
-        @if (isEditing) {
+        <input type="file" (change)="onFileSelected($event)" class="form-control" [required]="!isEditing()">
+        @if (isEditing()) {
           <small>Sube un archivo nuevo para reemplazar el actual.</small>
         }
       </div>
@@ -60,8 +60,8 @@
 
     <div class="form-actions">
       <button type="button" class="btn-cancel" routerLink="/recursos">Cancelar</button>
-      <button type="submit" class="btn-submit" [disabled]="resourceForm.invalid || isSubmitting || (resourceForm.get('type')?.value === 'document' && !selectedFile && !isEditing)">
-        {{ isSubmitting ? 'Guardando...' : 'Guardar' }}
+      <button type="submit" class="btn-submit" [disabled]="resourceForm.invalid || isSubmitting() || (resourceForm.get('type')?.value === 'document' && !selectedFile() && !isEditing())">
+        {{ isSubmitting() ? 'Guardando...' : 'Guardar' }}
       </button>
     </div>
   </form>

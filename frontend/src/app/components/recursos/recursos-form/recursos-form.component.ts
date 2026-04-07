@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -15,10 +15,11 @@ export class RecursosFormComponent implements OnInit {
   resourceForm: FormGroup;
   categories = RESOURCE_CATEGORIES;
   levels = RESOURCE_LEVELS;
-  isEditing = false;
-  resourceId: number | null = null;
-  selectedFile: File | null = null;
-  isSubmitting = false;
+  
+  isEditing = signal(false);
+  resourceId = signal<number | null>(null);
+  selectedFile = signal<File | null>(null);
+  isSubmitting = signal(false);
 
   constructor(
     private fb: FormBuilder,
@@ -39,10 +40,10 @@ export class RecursosFormComponent implements OnInit {
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.isEditing = true;
-      this.resourceId = +id;
+      this.isEditing.set(true);
+      this.resourceId.set(+id);
       this.resourceService.getResources().subscribe((resources: any[]) => {
-          const res = resources.find((r: any) => r.id === this.resourceId);
+          const res = resources.find((r: any) => r.id === this.resourceId());
           if (res) {
               this.resourceForm.patchValue({
                   title: res.title,
@@ -70,14 +71,14 @@ export class RecursosFormComponent implements OnInit {
   onFileSelected(event: any): void {
     const file = event.target.files[0];
     if (file) {
-      this.selectedFile = file;
+      this.selectedFile.set(file);
     }
   }
 
   onSubmit(): void {
     if (this.resourceForm.invalid) return;
 
-    this.isSubmitting = true;
+    this.isSubmitting.set(true);
     const formData = new FormData();
     const values = this.resourceForm.value;
 
@@ -91,18 +92,18 @@ export class RecursosFormComponent implements OnInit {
         formData.append('url', values.url);
     }
 
-    if (values.type === 'document' && this.selectedFile) {
-        formData.append('file', this.selectedFile);
+    if (values.type === 'document' && this.selectedFile()) {
+        formData.append('file', this.selectedFile() as File);
     }
 
-    if (this.isEditing && this.resourceId) {
-        this.resourceService.updateResource(this.resourceId, formData).subscribe({
+    if (this.isEditing() && this.resourceId()) {
+        this.resourceService.updateResource(this.resourceId()!, formData).subscribe({
             next: () => {
                 this.router.navigate(['/recursos']);
             },
             error: (err: any) => {
                 console.error(err);
-                setTimeout(() => this.isSubmitting = false);
+                setTimeout(() => this.isSubmitting.set(false));
             }
         });
     } else {
@@ -112,7 +113,7 @@ export class RecursosFormComponent implements OnInit {
             },
             error: (err: any) => {
                 console.error(err);
-                setTimeout(() => this.isSubmitting = false);
+                setTimeout(() => this.isSubmitting.set(false));
             }
         });
     }

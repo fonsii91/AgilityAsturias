@@ -34,20 +34,20 @@
     </div>
   </div>
 
-  @if (isLoading) {
+  @if (isLoading()) {
     <div class="loading-state">
       <p>Cargando recursos...</p>
     </div>
   }
 
-  @if (!isLoading && resources().length === 0) {
+  @if (!isLoading() && resources().length === 0) {
     <div class="empty-state">
       <span class="material-icons empty-icon">folder_open</span>
       <p>No hay recursos disponibles en esta categoría.</p>
     </div>
   }
 
-  @if (!isLoading && resources().length > 0) {
+  @if (!isLoading() && resources().length > 0) {
     <div class="resources-grid">
       @for (resource of resources(); track resource) {
         <div class="resource-card compact-horizontal" (click)="openResource(resource)">

@@ -17,9 +17,10 @@ export class RecursosListComponent implements OnInit {
   resources = signal<Resource[]>([]);
   categories = RESOURCE_CATEGORIES;
   levels = RESOURCE_LEVELS;
-  selectedCategory: string = '';
-  selectedLevel: string = 'all';
-  isLoading = true;
+  
+  selectedCategory = signal<string>('');
+  selectedLevel = signal<string>('all');
+  isLoading = signal(true);
 
   constructor(
     private resourceService: ResourceService,
@@ -31,15 +32,15 @@ export class RecursosListComponent implements OnInit {
   }
 
   loadResources(): void {
-    this.isLoading = true;
-    this.resourceService.getResources(this.selectedCategory, this.selectedLevel).subscribe({
+    this.isLoading.set(true);
+    this.resourceService.getResources(this.selectedCategory(), this.selectedLevel()).subscribe({
       next: (data: Resource[]) => {
         this.resources.set(data);
-        this.isLoading = false;
+        this.isLoading.set(false);
       },
       error: (err: any) => {
         console.error('Error loading resources', err);
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }
