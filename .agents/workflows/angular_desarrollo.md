@@ -83,3 +83,10 @@ this.http.get<Item[]>('/api/items').subscribe({
 ```
 
 **Si no sigues estas pautas, Angular fallará en repintar la vista tras resoluciones asíncronas.** ¡Piensa siempre en "Zoneless"!
+
+## 4. Arquitectura White-Label (Multi-tenant)
+El proyecto ha sido preparado para servir a múltiples clubes cambiando únicamente el archivo de entorno. **NUNCA HARDCODEES** detalles de identidad visual en los componentes de Angular recién creados o al modificar los existentes.
+
+### Reglas para Estilos y Textos (Branding):
+1.  **Textos e Imágenes**: Importa y utiliza `environment.clubConfig` para inyectar dinámicamente nombres de clubes (`clubConfig.name`), logos (`clubConfig.logoPath`), y redes sociales. No escribas explícitamente "Agility Asturias" en el HTML.
+2.  **Lógica de Estilos**: Usa las variables nativas CSS inyectadas globalmente (`var(--primary-blue)`, `var(--accent-orange)`) introducidas por el `app.component`. **No utilices estilos inline con colores fijos** ni intentes reimplementar colores fuera de estas variables, ya que el theme cambiará según el entorno del club montado.

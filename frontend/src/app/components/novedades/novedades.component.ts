@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
+import { environment } from '../../../environments/environment';
 
 export interface ReleaseNote {
   version: string;
@@ -20,6 +21,7 @@ export interface ReleaseNote {
 })
 export class NovedadesComponent implements OnInit {
   releases = signal<ReleaseNote[]>([]);
+  clubConfig = environment.clubConfig;
 
   constructor(private http: HttpClient) {}
 

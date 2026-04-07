@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { SuggestionService } from '../../../services/suggestion.service';
+import { environment } from '../../../../environments/environment';
 
 
 @Component({
@@ -16,6 +17,7 @@ export class SugerenciaDialog {
   type: 'bug' | 'suggestion' = 'suggestion';
   content: string = '';
   isSubmitting = false;
+  clubConfig = environment.clubConfig;
 
   constructor(
     public dialogRef: MatDialogRef<SugerenciaDialog>,

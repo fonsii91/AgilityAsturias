@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-gestionar-miembros',
@@ -14,6 +15,7 @@ import { ToastService } from '../../services/toast.service';
 export class GestionarMiembrosComponent implements OnInit {
   authService = inject(AuthService);
   toastService = inject(ToastService);
+  clubConfig = environment.clubConfig;
 
   users = signal<UserProfile[]>([]);
   loading = signal<boolean>(true);

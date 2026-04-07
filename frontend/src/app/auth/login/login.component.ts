@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterLink } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-login',
@@ -15,6 +16,7 @@ export class LoginComponent {
     authService = inject(AuthService);
     private fb = inject(FormBuilder);
     private router = inject(Router);
+    clubConfig = environment.clubConfig;
 
     loginForm = this.fb.group({
         email: ['', [Validators.required, Validators.email]],

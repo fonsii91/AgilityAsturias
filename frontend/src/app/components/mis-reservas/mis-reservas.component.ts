@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { ReservationService } from '../../services/reservation.service';
 import { AuthService } from '../../services/auth.service';
 import { Reservation } from '../../models/reservation.model';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-mis-reservas',
@@ -15,6 +16,7 @@ import { Reservation } from '../../models/reservation.model';
 export class MisReservasComponent {
     private reservationService = inject(ReservationService);
     private authService = inject(AuthService);
+    clubConfig = environment.clubConfig;
 
     todayStr = new Date().toISOString().split('T')[0];
 

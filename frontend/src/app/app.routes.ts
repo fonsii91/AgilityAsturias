@@ -1,4 +1,9 @@
-import { Routes } from '@angular/router';
+import { Routes, ResolveFn } from '@angular/router';
+import { environment } from '../environments/environment';
+
+const titleResolver: ResolveFn<string> = (route, state) => {
+    return `${route.data?.['pageTitle']} | ${environment.clubConfig.name}`;
+};
 import { LoginComponent } from './auth/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { authGuard } from './guards/auth.guard';
@@ -10,132 +15,132 @@ export const routes: Routes = [
     {
         path: '',
         component: HomeComponent,
-        title: 'Inicio | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'reservas',
         loadComponent: () => import('./reservas/gestionar-reservas/gestionar-reservas.component').then(m => m.GestionarReservasComponent),
         canActivate: [memberGuard],
-        title: 'Reservas | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'mis-reservas',
         loadComponent: () => import('./components/mis-reservas/mis-reservas.component').then(m => m.MisReservasComponent),
         canActivate: [memberGuard],
-        title: 'Mis Reservas | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'contacto',
         loadComponent: () => import('./components/contacto/contacto.component').then(m => m.ContactoComponent),
-        title: 'Contacto | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'galeria',
         loadComponent: () => import('./components/galeria/galeria.component').then(m => m.GaleriaComponent),
-        title: 'Galería | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'calendario',
         loadComponent: () => import('./components/calendario/calendario.component').then(m => m.CalendarioComponent),
         canActivate: [memberGuard],
-        title: 'Calendario | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'admin/sugerencias',
         loadComponent: () => import('./components/admin-sugerencias/admin-sugerencias').then(m => m.AdminSugerencias),
         canActivate: [adminGuard],
-        title: 'Sugerencias | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'gestionar-competiciones',
         loadComponent: () => import('./components/crud-competicion/crud-competicion.component').then(m => m.CrudCompeticionComponent),
         canActivate: [staffGuard],
-        title: 'Gestión Competiciones | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'gestionar-miembros',
         loadComponent: () => import('./components/gestionar-miembros/gestionar-miembros').then(m => m.GestionarMiembrosComponent),
         canActivate: [staffGuard],
-        title: 'Gestión Miembros | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'info-reservas',
         loadComponent: () => import('./components/info-reservas/info-reservas.component').then(m => m.InfoReservasComponent),
         canActivate: [staffGuard],
-        title: 'Info Reservas | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'perfil',
         loadComponent: () => import('./components/perfil/perfil').then(m => m.Perfil),
         canActivate: [authGuard],
-        title: 'Mi Perfil | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'admin/usuarios',
         loadComponent: () => import('./components/admin-usuarios/admin-usuarios').then(m => m.AdminUsuariosComponent),
         canActivate: [adminGuard],
-        title: 'Admin Usuarios | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'ranking',
         loadComponent: () => import('./components/ranking/ranking.component').then(m => m.RankingComponent),
         canActivate: [memberGuard],
-        title: 'Ranking | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'admin/asistencia',
         loadComponent: () => import('./components/attendance-verification/attendance-verification.component').then(m => m.AttendanceVerificationComponent),
         canActivate: [staffGuard],
-        title: 'Verificar Asistencia | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'login',
         component: LoginComponent,
-        title: 'Iniciar Sesión | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'reset-password',
         loadComponent: () => import('./components/reset-password/reset-password').then(m => m.ResetPasswordComponent),
-        title: 'Restablecer Contraseña | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'register',
         loadComponent: () => import('./auth/register/register.component').then(m => m.RegisterComponent),
-        title: 'Registrarse | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'galeria-videos',
         loadComponent: () => import('./components/galeria-videos/video-list/video-list.component').then(m => m.VideoListComponent),
         canActivate: [authGuard],
-        title: 'Cine Agility | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'galeria-videos/subir',
         loadComponent: () => import('./components/galeria-videos/upload-video/upload-video.component').then(m => m.UploadVideoComponent),
         canActivate: [authGuard],
-        title: 'Subir Vídeo | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'recursos',
         loadComponent: () => import('./components/recursos/recursos-list/recursos-list.component').then(m => m.RecursosListComponent),
         canActivate: [authGuard],
-        title: 'Recursos | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'recursos/nuevo',
         loadComponent: () => import('./components/recursos/recursos-form/recursos-form.component').then(m => m.RecursosFormComponent),
         canActivate: [staffGuard],
-        title: 'Añadir Recurso | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'recursos/editar/:id',
         loadComponent: () => import('./components/recursos/recursos-form/recursos-form.component').then(m => m.RecursosFormComponent),
         canActivate: [staffGuard],
-        title: 'Editar Recurso | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'novedades',
         loadComponent: () => import('./components/novedades/novedades.component').then(m => m.NovedadesComponent),
-        title: 'Novedades | Agility Asturias'
+        title: titleResolver, data: { pageTitle: '' }
     }
 ];

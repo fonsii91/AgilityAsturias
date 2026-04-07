@@ -12,6 +12,7 @@ import { ToastService } from './services/toast.service';
 import { SwUpdate } from '@angular/service-worker';
 
 import { DogService } from './services/dog.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +21,7 @@ import { DogService } from './services/dog.service';
   styleUrl: './app.css'
 })
 export class App implements OnInit, OnDestroy {
-  protected readonly title = signal('AgilityAsturias');
+  protected readonly title = signal(environment.clubConfig?.name || 'Agility Asturias');
   authService = inject(AuthService);
   private toastService = inject(ToastService);
   private swUpdate = inject(SwUpdate);
@@ -48,8 +49,17 @@ export class App implements OnInit, OnDestroy {
       });
   }
 
-  // Load dogs when user is logged in
   ngOnInit() {
+      // Inject CSS properties from club config
+      if (environment.clubConfig?.colors) {
+        document.documentElement.style.setProperty('--primary-blue', environment.clubConfig.colors.primary);
+        document.documentElement.style.setProperty('--accent-orange', environment.clubConfig.colors.accent);
+        if (environment.clubConfig.colors.warn) {
+            document.documentElement.style.setProperty('--error-color', environment.clubConfig.colors.warn);
+            document.documentElement.style.setProperty('--danger', environment.clubConfig.colors.warn);
+        }
+      }
+
       if (this.authService.isLoggedIn()) {
           this.dogService.loadUserDogs();
       }

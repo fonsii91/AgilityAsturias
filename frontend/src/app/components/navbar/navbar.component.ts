@@ -7,6 +7,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DarPuntosExtraDialogComponent } from '../dar-puntos-extra-dialog/dar-puntos-extra-dialog.component';
 import { SugerenciaDialog } from '../sugerencias/sugerencia-dialog/sugerencia-dialog';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-navbar',
@@ -22,6 +23,7 @@ export class NavbarComponent {
     notificationService = inject(NotificationService);
     router = inject(Router);
     dialog = inject(MatDialog);
+    clubConfig = environment.clubConfig;
 
     toggleSidenav = output<void>();
 

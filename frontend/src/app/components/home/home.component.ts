@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Location as AngularLocation } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
     selector: 'app-home',
@@ -12,6 +13,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class HomeComponent {
     authService = inject(AuthService);
+    clubConfig = environment.clubConfig;
     isChecking = false;
 
     constructor(private location: AngularLocation) { }

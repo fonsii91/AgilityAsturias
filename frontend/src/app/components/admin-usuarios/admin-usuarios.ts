@@ -2,6 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-admin-usuarios',
@@ -13,6 +14,7 @@ import { ToastService } from '../../services/toast.service';
 export class AdminUsuariosComponent implements OnInit {
   authService = inject(AuthService);
   toastService = inject(ToastService);
+  clubConfig = environment.clubConfig;
 
   users = signal<UserProfile[]>([]);
   loading = signal<boolean>(true);

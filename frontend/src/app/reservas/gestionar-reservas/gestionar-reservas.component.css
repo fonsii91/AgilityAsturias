@@ -1247,10 +1247,16 @@ h2 {
     font-size: 18px;
 }
 
-.btn-icon-staff.cancel:hover {
+.btn-icon-staff.cancel {
     color: #ef4444;
     background: #fef2f2;
     border-color: #fca5a5;
+}
+
+.btn-icon-staff.cancel:hover {
+    color: #dc2626;
+    background: #fee2e2;
+    border-color: #f87171;
 }
 
 .btn-icon-staff.restore {
