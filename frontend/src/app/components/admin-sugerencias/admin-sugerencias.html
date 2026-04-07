@@ -1,0 +1,59 @@
+<div class="admin-container">
+  <div class="header-section">
+    <h1>Administración de Sugerencias y Errores</h1>
+    <div class="filter-controls">
+      <button class="filter-btn" [class.active]="filter() === 'pending'" (click)="setFilter('pending')">Pendientes</button>
+      <button class="filter-btn" [class.active]="filter() === 'resolved'" (click)="setFilter('resolved')">Resueltos</button>
+      <button class="filter-btn" [class.active]="filter() === 'all'" (click)="setFilter('all')">Todos</button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="material-icons spin">refresh</span> Cargando reportes...
+    </div>
+  }
+
+  @if (!isLoading() && filteredSuggestions().length === 0) {
+    <div class="empty-state">
+      <span class="material-icons">sentiment_satisfied_alt</span>
+      <p>No hay reportes {{ filter() === 'pending' ? 'pendientes' : filter() === 'resolved' ? 'resueltos' : '' }} en este momento.</p>
+    </div>
+  }
+
+  @if (!isLoading() && filteredSuggestions().length > 0) {
+    <div class="suggestions-grid">
+      @for (suggestion of filteredSuggestions(); track suggestion.id) {
+        <div class="suggestion-card" [ngClass]="suggestion.type">
+          <div class="card-header">
+            <div class="badge" [ngClass]="suggestion.type">
+              <span class="material-icons">{{ suggestion.type === 'bug' ? 'bug_report' : 'lightbulb' }}</span>
+              {{ suggestion.type === 'bug' ? 'Bug' : 'Sugerencia' }}
+            </div>
+            <div class="status-badge" [ngClass]="suggestion.status">
+              {{ suggestion.status === 'pending' ? 'Pendiente' : 'Resuelto' }}
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <p class="content">{{ suggestion.content }}</p>
+          </div>
+
+          <div class="card-footer">
+            <div class="meta-info">
+              <span class="author"><span class="material-icons">person</span> {{ suggestion.user?.name || 'Usuario desconocido' }}</span>
+              <span class="date"><span class="material-icons">event</span> {{ suggestion.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            
+            @if (suggestion.status === 'pending') {
+              <button class="btn-resolve" 
+                      (click)="markAsResolved(suggestion.id)">
+                <span class="material-icons">check_circle</span> Marcar Resuelto
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
