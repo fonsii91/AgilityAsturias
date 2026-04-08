@@ -1,6 +1,7 @@
 import { Component, signal, computed, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { ReservationService } from '../../services/reservation.service';
 import { DogService } from '../../services/dog.service';
@@ -13,7 +14,7 @@ import { ToastService } from '../../services/toast.service';
 @Component({
     selector: 'app-gestionar-reservas',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, MatIconModule],
     templateUrl: './gestionar-reservas.component.html',
     styleUrl: './gestionar-reservas.component.css'
 })

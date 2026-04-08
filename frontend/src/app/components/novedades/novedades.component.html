@@ -1,4 +1,7 @@
-<div class="novedades-container animate-fade-in">
+<div class="novedades-container animate-fade-in"
+  [style.--club-primary]="clubConfig.colors.primary"
+  [style.--club-accent]="clubConfig.colors.accent"
+  [style.--club-warn]="clubConfig.colors.warn">
   <div class="novedades-header">
     <h1>Novedades y Actualizaciones</h1>
     <p>Mantente al día con las últimas mejoras, correcciones y nuevas funcionalidades de {{ clubConfig.name }}.</p>

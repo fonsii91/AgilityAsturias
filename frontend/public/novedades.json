@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.1.2",
+    "date": "2026-04-08",
+    "features": [
+      "Hemos mejorado el diseño del apartado de Reservas sustituyendo los antiguos emoticonos por iconos profesionales, dotando a la aplicación de un aspecto mucho más pulido y moderno.",
+      "La sección de Novedades ahora se adapta automáticamente a los colores oficiales del club, ofreciendo una experiencia mucho más inmersiva, atractiva y uniforme con la marca."
+    ]
+  },
+  {
     "version": "1.1.1",
     "date": "2026-04-07",
     "features": [

@@ -8,7 +8,7 @@
     @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
       <button
         class="btn-edit-schedule" (click)="openManageModal()">
-        ⚙️ Editar Horario
+        <span class="material-icons" style="font-size: 18px; vertical-align: text-bottom; margin-right: 4px;">settings</span> Editar Horario
       </button>
     }
   </div>
@@ -111,7 +111,7 @@
                           <div class="attendee-dogs">
                             @for (dog of res.selectedDogs; track dog) {
                               <span class="dog-tag">
-                                🐾
+                                <span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">pets</span>
                                 @if (dog.image) {
                                   <span class="dog-name-link"
                                   (click)="enlargeImage(dog.image)">{{ dog.name }}</span>
@@ -158,14 +158,14 @@
 @if (isModalOpen) {
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <h3>📅 Confirmar Reserva</h3>
+      <h3><span class="material-icons" style="vertical-align: text-bottom; margin-right: 8px;">event_available</span> Confirmar Reserva</h3>
       <p>¿Quieres reservar plaza para el <strong>{{ selectedSlotForBooking?.day }}</strong> a las <strong>{{
     selectedSlotForBooking?.start_time }}</strong>?</p>
     <div class="dog-selection">
       <p style="margin: 0 0 1rem 0; font-weight: 600; color: #555;">Selecciona los perretes que vendrán:</p>
       @if (myDogs().length === 0) {
         <div class="no-dogs-warning">
-          <p>⚠️ No tienes perros registrados.</p>
+          <p><span class="material-icons" style="vertical-align: text-bottom; color: #ff9800; margin-right: 4px;">warning</span> No tienes perros registrados.</p>
           <a routerLink="/perfil" (click)="closeModal()">Ir a mi perfil para añadir uno</a>
         </div>
       }
@@ -173,7 +173,7 @@
         @for (dog of myDogs(); track dog) {
           <label class="dog-checkbox">
             <input type="checkbox" [checked]="selectedDogIds.has(dog.id)" (change)="toggleDogSelection(dog.id)">
-            <span class="dog-label">🐾 {{ dog.name }}</span>
+            <span class="dog-label"><span class="material-icons" style="font-size: 16px; vertical-align: text-bottom; margin-right: 4px;">pets</span> {{ dog.name }}</span>
           </label>
         }
       </div>
@@ -193,7 +193,7 @@
 @if (isCancelModalOpen) {
   <div class="modal-backdrop" (click)="closeCancelModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <h3>😢 Cancelar Reserva</h3>
+      <h3><span class="material-icons" style="vertical-align: text-bottom; color: #f44336; margin-right: 8px;">sentiment_dissatisfied</span> Cancelar Reserva</h3>
       <div class="modal-body">
         <p class="confirm-message">¿Estás seguro de que quieres cancelar tu reserva para el <strong>{{
         selectedSlotForCancellation?.day }}</strong> a las <strong>{{
