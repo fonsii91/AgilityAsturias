@@ -199,4 +199,47 @@ class VideoController extends Controller
 
         return response()->download(storage_path("app/public/{$video->local_path}"), $filename);
     }
+
+    public function stats()
+    {
+        $statusCounts = Video::selectRaw('status, count(*) as count')
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $totalLocal = $statusCounts['local'] ?? 0;
+        $totalYoutube = $statusCounts['on_youtube'] ?? 0;
+        $totalQueue = $statusCounts['in_queue'] ?? 0;
+        $totalFailed = $statusCounts['failed'] ?? 0;
+
+        $failedVideos = Video::with(['dog:id,name', 'user:id,name'])
+            ->where('status', 'failed')
+            ->get(['id', 'title', 'date', 'youtube_error', 'dog_id', 'user_id']);
+
+        return response()->json([
+            'counts' => [
+                'local' => $totalLocal,
+                'on_youtube' => $totalYoutube,
+                'in_queue' => $totalQueue,
+                'failed' => $totalFailed,
+                'total' => $totalLocal + $totalYoutube + $totalQueue + $totalFailed
+            ],
+            'failed_videos' => $failedVideos
+        ]);
+    }
+
+    public function retryUpload($id)
+    {
+        $video = Video::findOrFail($id);
+
+        if ($video->status !== 'failed') {
+            return response()->json(['message' => 'Video is not in failed state'], 400);
+        }
+
+        $video->update([
+            'status' => 'local',
+            'youtube_error' => null
+        ]);
+
+        return response()->json(['message' => 'Video requeued successfully']);
+    }
 }

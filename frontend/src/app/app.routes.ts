@@ -52,6 +52,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'admin/videos',
+        loadComponent: () => import('./components/admin-videos-stats/admin-videos-stats.component').then(m => m.AdminVideosStatsComponent),
+        canActivate: [adminGuard],
+        title: 'Estadísticas de Vídeos | Agility Asturias'
+    },
+    {
         path: 'gestionar-competiciones',
         loadComponent: () => import('./components/crud-competicion/crud-competicion.component').then(m => m.CrudCompeticionComponent),
         canActivate: [staffGuard],

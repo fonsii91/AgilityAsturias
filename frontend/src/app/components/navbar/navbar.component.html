@@ -211,6 +211,12 @@ Novedades</a></li>
           </a>
         }
         @if (authService.isAdmin()) {
+          <a routerLink="/admin/videos" (click)="closeMenu()"
+            class="dropdown-item admin-item">
+            <span class="material-icons">video_library</span> Seguimiento Vídeos
+          </a>
+        }
+        @if (authService.isAdmin()) {
           <a routerLink="/admin/sugerencias" (click)="closeMenu()"
             class="dropdown-item admin-item">
             <span class="material-icons">report_problem</span> Sugerencias

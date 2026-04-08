@@ -98,6 +98,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/suggestions', [SuggestionController::class, 'index']);
         Route::post('/admin/suggestions/{id}/resolve', [SuggestionController::class, 'resolve']);
 
+        // Videos (Admin)
+        Route::get('/admin/videos/stats', [VideoController::class, 'stats']);
+        Route::post('/admin/videos/{id}/retry', [VideoController::class, 'retryUpload']);
+
     });
 
 

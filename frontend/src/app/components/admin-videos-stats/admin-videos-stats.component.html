@@ -1,0 +1,96 @@
+<div class="admin-stats-container fade-in">
+  <h2>Seguimiento de Vídeos a YouTube</h2>
+  <p class="subtitle">Visión general del proceso automático de sincronización de vídeos.</p>
+  
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+  
+  @if (stats(); as data) {
+    <div class="stats-cards-grid">
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon local-icon">sd_storage</mat-icon>
+        <div class="stat-content">
+          <h3>Local</h3>
+          <p class="stat-number">{{ data.counts.local }}</p>
+          <p class="stat-desc">Esperando en disco y no encolados</p>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon queue-icon">hourglass_top</mat-icon>
+        <div class="stat-content">
+          <h3>En Cola</h3>
+          <p class="stat-number">{{ data.counts.in_queue }}</p>
+          <p class="stat-desc">Actualmente subiéndose</p>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-icon class="stat-icon youtube-icon">youtube_searched_for</mat-icon>
+        <div class="stat-content">
+          <h3>Subidos a YouTube</h3>
+          <p class="stat-number">{{ data.counts.on_youtube }}</p>
+          <p class="stat-desc">Liberando espacio en disco</p>
+        </div>
+      </mat-card>
+
+      <mat-card class="stat-card" [class.error-card]="data.counts.failed > 0">
+        <mat-icon class="stat-icon error-icon">error_outline</mat-icon>
+        <div class="stat-content">
+          <h3>Fallidos</h3>
+          <p class="stat-number">{{ data.counts.failed }}</p>
+          <p class="stat-desc">Errores al intentar subir</p>
+        </div>
+      </mat-card>
+    </div>
+
+    @if (data.failed_videos.length > 0) {
+      <div class="failed-videos-section">
+        <h3>Vídeos con Errores</h3>
+        <div class="table-overlay">
+          <table mat-table [dataSource]="data.failed_videos" class="mat-elevation-z8">
+            <ng-container matColumnDef="title">
+              <th mat-header-cell *matHeaderCellDef> Título </th>
+              <td mat-cell *matCellDef="let video"> {{video.title || 'Sin Título'}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="dog_name">
+              <th mat-header-cell *matHeaderCellDef> Perro </th>
+              <td mat-cell *matCellDef="let video"> {{video.dog?.name}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef> Fecha </th>
+              <td mat-cell *matCellDef="let video"> {{video.date | date:'dd/MM/yyyy'}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="youtube_error">
+              <th mat-header-cell *matHeaderCellDef> Motivo del Fallo </th>
+              <td mat-cell *matCellDef="let video" class="error-text"> {{video.youtube_error || 'Desconocido'}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Acciones </th>
+              <td mat-cell *matCellDef="let video">
+                <button mat-icon-button color="primary" (click)="retryUpload(video)" matTooltip="Reintentar subida">
+                  <mat-icon>refresh</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+      </div>
+    } @else {
+      @if (data.counts.failed === 0 && !loading()) {
+        <div class="all-good-alert">
+          <mat-icon>check_circle</mat-icon>
+          <p>La cola de subida funciona perfectamente. Ningún vídeo presenta errores.</p>
+        </div>
+      }
+    }
+  }
+</div>

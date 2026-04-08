@@ -53,4 +53,12 @@ export class VideoService {
     toggleLike(id: number): Observable<any> {
         return this.http.post<any>(`${this.apiUrl}/${id}/toggle-like`, {});
     }
+
+    getAdminVideoStats(): Observable<any> {
+        return this.http.get<any>(`${environment.apiUrl}/admin/videos/stats`);
+    }
+
+    retryVideoUpload(id: number): Observable<any> {
+        return this.http.post<any>(`${environment.apiUrl}/admin/videos/${id}/retry`, {});
+    }
 }

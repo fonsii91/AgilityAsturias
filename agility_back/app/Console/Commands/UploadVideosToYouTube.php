@@ -56,7 +56,10 @@ class UploadVideosToYouTube extends Command
                 // Ensure file exists
                 if (!$video->local_path || !Storage::disk('public')->exists($video->local_path)) {
                     \Illuminate\Support\Facades\Log::error("File not found for video ID: {$video->id}");
-                    $video->update(['status' => 'failed']);
+                    $video->update([
+                        'status' => 'failed',
+                        'youtube_error' => 'Local file not found'
+                    ]);
                     continue;
                 }
 
@@ -112,7 +115,8 @@ class UploadVideosToYouTube extends Command
 
                     $video->update([
                         'youtube_id' => $status['id'],
-                        'status' => 'on_youtube'
+                        'status' => 'on_youtube',
+                        'youtube_error' => null
                     ]);
                 }
             } catch (\Exception $e) {
@@ -121,9 +125,15 @@ class UploadVideosToYouTube extends Command
                 // Si el error es por límite de subida diario de Youtube (uploadLimitExceeded), 
                 // lo marcamos como 'local' para que el CRON lo vuelva a intentar mañana cuando se reinicie la cuota.
                 if (str_contains($e->getMessage(), 'uploadLimitExceeded') || str_contains($e->getMessage(), 'quota')) {
-                    $video->update(['status' => 'local']);
+                    $video->update([
+                        'status' => 'local',
+                        'youtube_error' => null
+                    ]);
                 } else {
-                    $video->update(['status' => 'failed']);
+                    $video->update([
+                        'status' => 'failed',
+                        'youtube_error' => $e->getMessage()
+                    ]);
                 }
             }
         }

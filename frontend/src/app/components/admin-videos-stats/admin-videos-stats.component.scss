@@ -1,0 +1,131 @@
+.admin-stats-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  h2 {
+    color: var(--text-color, #2c3e50);
+    margin-bottom: 0.5rem;
+    font-size: 2rem;
+  }
+
+  .subtitle {
+    color: var(--text-light, #606f7b);
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+
+  .stats-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+
+    .stat-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 1.5rem;
+      border-radius: 12px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+
+      &.error-card {
+        border-left: 4px solid var(--error-color, #e74c3c);
+      }
+
+      .stat-icon {
+        font-size: 3rem;
+        width: 3rem;
+        height: 3rem;
+        margin-right: 1.5rem;
+        
+        &.local-icon { color: var(--info-color, #3498db); }
+        &.queue-icon { color: var(--warning-color, #f39c12); }
+        &.youtube-icon { color: #ff0000; }
+        &.error-icon { color: var(--error-color, #e74c3c); }
+      }
+
+      .stat-content {
+        flex: 1;
+
+        h3 {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.1rem;
+          color: var(--text-light, #606f7b);
+        }
+
+        .stat-number {
+          margin: 0;
+          font-size: 2.5rem;
+          font-weight: bold;
+          color: var(--text-color, #2c3e50);
+        }
+
+        .stat-desc {
+          margin: 0.5rem 0 0 0;
+          font-size: 0.85rem;
+          color: var(--text-lighter, #8795a1);
+        }
+      }
+    }
+  }
+
+  .failed-videos-section {
+    h3 {
+      color: var(--text-color, #2c3e50);
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--error-color, #e74c3c);
+      padding-bottom: 0.5rem;
+      display: inline-block;
+    }
+
+    .table-overlay {
+      overflow-x: auto;
+      border-radius: 8px;
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+
+        th {
+          background-color: var(--surface-hover, #f8f9fa);
+          color: var(--text-color, #2c3e50);
+          font-weight: 600;
+        }
+
+        .error-text {
+          color: var(--error-color, #e74c3c);
+          max-width: 300px;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
+  .all-good-alert {
+    display: flex;
+    align-items: center;
+    background-color: rgba(46, 204, 113, 0.1);
+    color: var(--success-color, #27ae60);
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid var(--success-color, #27ae60);
+
+    mat-icon {
+      margin-right: 1rem;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+  }
+}

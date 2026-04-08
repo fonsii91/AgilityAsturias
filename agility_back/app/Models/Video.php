@@ -16,6 +16,7 @@ class Video extends Model
         'date',
         'local_path',
         'youtube_id',
+        'youtube_error',
         'status',
         'title'
     ];
