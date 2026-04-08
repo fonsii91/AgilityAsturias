@@ -54,17 +54,15 @@ export class AdminVideosStatsComponent implements OnInit {
   }
 
   retryUpload(video: any) {
-    if (confirm(`¿Estás seguro de reintentar la subida del vídeo "${video.title || video.dog?.name}"?`)) {
-      this.videoService.retryVideoUpload(video.id).subscribe({
-        next: (res) => {
-          this.toastService.success('Vídeo encolado nuevamente para subir.');
-          this.loadStats();
-        },
-        error: (err) => {
-          console.error('Error al reintentar vídeo', err);
-          this.toastService.error('Error al reintentar subir el vídeo.');
-        }
-      });
-    }
+    this.videoService.retryVideoUpload(video.id).subscribe({
+      next: (res) => {
+        this.toastService.success('Vídeo encolado nuevamente para subir.');
+        this.loadStats();
+      },
+      error: (err) => {
+        console.error('Error al reintentar vídeo', err);
+        this.toastService.error('Error al reintentar subir el vídeo.');
+      }
+    });
   }
 }
