@@ -1,125 +1,158 @@
 <div class="public-video-gallery-container container">
-  <div class="gallery-header">
+  <div class="gallery-header" style="position: relative;">
+    @if (authService.isStaff() || authService.isAdmin()) {
+    <button class="help-btn" (click)="openHelpModal()" title="Instrucciones para el Staff">
+      <span class="material-icons">help_outline</span> Instrucciones
+    </button>
+    }
     <h2 class="section-title">Videoteca Pública</h2>
-    <p class="section-subtitle">Disfruta de los mejores vídeos de nuestros entrenamientos y competiciones.</p>
+    <p class="section-subtitle">Disfruta de los vídeos de nuestros entrenamientos y competiciones.</p>
   </div>
 
   @if (isLoading && videos.length === 0) {
-    <div class="video-grid">
-      @for (i of [1,2,3,4,5,6]; track i) {
-        <div class="video-card skeleton-card">
-          <div class="skeleton-cover"></div>
-        </div>
-      }
+  <div class="video-grid">
+    @for (i of [1,2,3,4,5,6]; track i) {
+    <div class="video-card skeleton-card">
+      <div class="skeleton-cover"></div>
     </div>
+    }
+  </div>
   }
 
   @if (!isLoading && videos.length === 0) {
-    <div class="empty-state">
-      <div class="empty-icon-wrapper">
-        <span class="material-icons">videocam_off</span>
-      </div>
-      <p>No hay vídeos publicados en este momento.</p>
+  <div class="empty-state">
+    <div class="empty-icon-wrapper">
+      <span class="material-icons">videocam_off</span>
     </div>
+    <p>No hay vídeos publicados en este momento.</p>
+  </div>
   }
 
   @if (!isLoading && videos.length > 0) {
-    <div class="video-grid">
-      @for (video of videos; track video) {
-        <div class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id && player.isVideoActive}">
-          
-          @if (authService.isStaff() || authService.isAdmin()) {
-            <div class="admin-quick-actions" style="position: absolute; top: 1rem; right: 1rem; z-index: 20;">
-              <button class="action-bubble action-delete" (click)="removeFromPublic($event, video)" title="Ocultar vídeo de la vista pública">
-                <span class="material-icons">public_off</span>
-              </button>
-            </div>
-          }
+  <div class="video-grid">
+    @for (video of videos; track video) {
+    <div class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id && player.isVideoActive}">
 
-          <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path" [coverImageUrl]="video.dog?.photo_url">
-          </app-smart-video-player>
-          
-          <!-- LARGE COVER OVERLAY: Visible only when NOT playing -->
-          @if (!player.isVideoActive) {
-            <div class="video-cover-overlay">
-              <div class="center-event-cover">
-                @if (video.competition) {
-                  <span class="event-name-huge" [title]="video.competition.nombre">
-                    <span class="material-icons comp-icon-huge">emoji_events</span>
-                    <span>{{ video.competition.nombre }}</span>
-                  </span>
-                }
-                @if (!video.competition) {
-                  <span class="event-name-huge training-text">
-                    <span class="material-icons comp-icon-huge">fitness_center</span>
-                    <span>Entrenamiento</span>
-                  </span>
-                }
-              </div>
-              <div class="center-bottom-cover">
-                <div class="cover-badges-row">
-                  <span class="date-badge-cover-huge">
-                    <span class="material-icons date-icon-huge">calendar_month</span>
-                    {{ video.date | date:'dd/MM/yyyy' }}
-                  </span>
-                </div>
-                <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-                  {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
-                </div>
-              </div>
-              <div class="dog-name-cover-small" title="Ver perfil de {{video.dog?.name}}">
-                {{ video.dog?.name }}
-              </div>
-            </div>
+      @if (authService.isStaff() || authService.isAdmin()) {
+      <div class="admin-quick-actions" style="position: absolute; top: 1rem; right: 1rem; z-index: 20;">
+        <button class="action-bubble action-delete" (click)="removeFromPublic($event, video)"
+          title="Ocultar vídeo de la vista pública">
+          <span class="material-icons">public_off</span>
+        </button>
+      </div>
+      }
+
+      <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path"
+        [coverImageUrl]="video.dog?.photo_url">
+      </app-smart-video-player>
+
+      <!-- LARGE COVER OVERLAY: Visible only when NOT playing -->
+      @if (!player.isVideoActive) {
+      <div class="video-cover-overlay">
+        <div class="center-event-cover">
+          @if (video.competition) {
+          <span class="event-name-huge" [title]="video.competition.nombre">
+            <span class="material-icons comp-icon-huge">emoji_events</span>
+            <span>{{ video.competition.nombre }}</span>
+          </span>
           }
-          
-          <!-- ORIGINAL PLAYER OVERLAY: Visible only when PLAYING -->
-          @if (player.isVideoActive) {
-            <div class="video-info-overlay">
-              <div class="bottom-info-left">
-                <p class="dog-name-row">
-                  <span class="dog-name">@{{ video.dog?.name }}</span>
-                  @if (video.competition) {
-                    <span class="competition-badge" [title]="video.competition.nombre">
-                      <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre }}</span>
-                    </span>
-                  }
-                </p>
-                <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-                  {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
-                </h3>
-              </div>
-            </div>
+          @if (!video.competition) {
+          <span class="event-name-huge training-text">
+            <span class="material-icons comp-icon-huge">fitness_center</span>
+            <span>Entrenamiento</span>
+          </span>
           }
         </div>
+        <div class="center-bottom-cover">
+          <div class="cover-badges-row">
+            <span class="date-badge-cover-huge">
+              <span class="material-icons date-icon-huge">calendar_month</span>
+              {{ video.date | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+          <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+          </div>
+        </div>
+        <div class="dog-name-cover-small" title="Ver perfil de {{video.dog?.name}}">
+          {{ video.dog?.name }}
+        </div>
+      </div>
+      }
+
+      <!-- ORIGINAL PLAYER OVERLAY: Visible only when PLAYING -->
+      @if (player.isVideoActive) {
+      <div class="video-info-overlay">
+        <div class="bottom-info-left">
+          <p class="dog-name-row">
+            <span class="dog-name">@{{ video.dog?.name }}</span>
+            @if (video.competition) {
+            <span class="competition-badge" [title]="video.competition.nombre">
+              <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre }}</span>
+            </span>
+            }
+          </p>
+          <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+          </h3>
+        </div>
+      </div>
       }
     </div>
+    }
+  </div>
   }
 
   <!-- Controles de Paginación Númerica -->
   @if (totalPages > 1 && !isLoading) {
-    <div class="pagination-controls numeric-pagination">
-      <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)" class="pagination-btn nav-btn">
-        <span class="material-icons">chevron_left</span>
-      </button>
-      
-      <div class="pagination-pages">
-        @for (page of pageNumbers; track page) {
-          @if (page === '...') {
-            <span class="pagination-dots">...</span>
-          } @else {
-            <button class="pagination-number" 
-                    [class.active]="currentPage === page" 
-                    (click)="goToPage(page)">
-              {{ page }}
-            </button>
-          }
-        }
-      </div>
+  <div class="pagination-controls numeric-pagination">
+    <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)" class="pagination-btn nav-btn">
+      <span class="material-icons">chevron_left</span>
+    </button>
 
-      <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)" class="pagination-btn nav-btn">
-        <span class="material-icons">chevron_right</span>
+    <div class="pagination-pages">
+      @for (page of pageNumbers; track page) {
+      @if (page === '...') {
+      <span class="pagination-dots">...</span>
+      } @else {
+      <button class="pagination-number" [class.active]="currentPage === page" (click)="goToPage(page)">
+        {{ page }}
       </button>
+      }
+      }
     </div>
+
+    <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)" class="pagination-btn nav-btn">
+      <span class="material-icons">chevron_right</span>
+    </button>
+  </div>
+  }
+
+  @if (isHelpModalOpen) {
+  <div class="modal-overlay" (click)="closeHelpModal($event)">
+    <div class="modal-content help-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>¿Cómo funciona la Videoteca?</h3>
+        <button class="close-btn" (click)="closeHelpModal()">&times;</button>
+      </div>
+      <div class="modal-body text-left">
+        <div class="staff-instructions">
+          <h4>🎓 Gestión de la Videoteca Pública:</h4>
+          <p style="margin-bottom: 1rem;"><strong>Estos vídeos son públicos y cualquiera puede verlos (aunque no esté
+              registrado en la aplicación) y sirven como escaparate del club en internet.</strong></p>
+          <ul>
+            <li><strong>Para añadir un vídeo:</strong> Ve a la pestaña privada de <em>Vídeos</em> (la galería interna).
+              Allí encontrarás un botón con el icono del mundo (<span class="material-icons"
+                style="font-size: 16px; vertical-align: bottom;">public</span>) en cada vídeo para hacer que se muestre
+              en esta vitrina.</li>
+            <li><strong>Para quitar un vídeo:</strong> Puedes hacerlo desde la galería general de <em>Vídeos</em>, o
+              directamente desde aquí, pulsando el botón flotante rojo (<span class="material-icons"
+                style="font-size: 16px; vertical-align: bottom; color: #e74c3c;">public_off</span>) que aparece sobre
+              cada vídeo en la esquina superior derecha.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
   }
 </div>
