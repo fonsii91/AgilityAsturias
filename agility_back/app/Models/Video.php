@@ -18,7 +18,15 @@ class Video extends Model
         'youtube_id',
         'youtube_error',
         'status',
-        'title'
+        'title',
+        'is_public',
+        'in_public_gallery',
+        'youtube_error'
+    ];
+
+    protected $casts = [
+        'is_public' => 'boolean',
+        'in_public_gallery' => 'boolean',
     ];
 
     public function dog()

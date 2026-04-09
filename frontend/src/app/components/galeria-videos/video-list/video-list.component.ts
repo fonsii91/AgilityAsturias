@@ -166,6 +166,26 @@ export class VideoListComponent implements OnInit {
         });
     }
 
+    togglePublicGallery(event: Event, video: Video) {
+        event.stopPropagation();
+        const originallyInPublic = video.in_public_gallery;
+        video.in_public_gallery = !originallyInPublic;
+
+        this.videoService.togglePublicGallery(video.id).subscribe({
+            next: (res: any) => {
+                video.in_public_gallery = res.in_public_gallery;
+                this.toastService.success(video.in_public_gallery ? 'Vídeo añadido a la galería pública' : 'Vídeo retirado de la galería pública');
+                this.cdr.detectChanges();
+            },
+            error: (err: any) => {
+                console.error('Error toggling public gallery', err);
+                video.in_public_gallery = originallyInPublic;
+                this.toastService.error('Error al actualizar el estado en la galería pública');
+                this.cdr.detectChanges();
+            }
+        });
+    }
+
     getDownloadUrl(video: Video): string {
         if (!video.id) return '#';
         return `${environment.apiUrl}/videos/${video.id}/download`;
@@ -225,6 +245,19 @@ export class VideoListComponent implements OnInit {
         if (role === 'admin' || role === 'staff') return true;
 
         if (video.user_id == userId) return true;
+        if (video.dog?.users && video.dog.users.some(u => u.id == userId)) return true;
+
+        return false;
+    }
+
+    canEditPrivacy(video: Video | null): boolean {
+        if (!video) return false;
+        const userId = this.currentUserId;
+        if (!userId) return false;
+
+        const role = this.authService.currentUserSignal()?.role;
+        if (role === 'admin' || role === 'staff') return true;
+
         if (video.dog?.users && video.dog.users.some(u => u.id == userId)) return true;
 
         return false;
@@ -290,7 +323,8 @@ export class VideoListComponent implements OnInit {
             title: video.title || '',
             date: video.date || '',
             dog_id: video.dog_id || (video.dog ? video.dog.id : ''),
-            competition_id: video.competition_id || (video.competition ? video.competition.id : '')
+            competition_id: video.competition_id || (video.competition ? video.competition.id : ''),
+            is_public: video.is_public !== undefined ? video.is_public : true
         };
         this.cdr.detectChanges();
     }

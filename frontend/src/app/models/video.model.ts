@@ -16,6 +16,8 @@ export interface Video {
     updated_at?: string;
     likes_count?: number;
     is_liked_by_user?: boolean;
+    is_public?: boolean;
+    in_public_gallery?: boolean;
 
     // Relaciones
     dog?: Dog;

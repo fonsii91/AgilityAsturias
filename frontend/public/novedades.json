@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.1.3",
+    "date": "2026-04-10",
+    "features": [
+      "¡Nueva Videoteca Pública! Ahora hemos estrenado un espacio para mostrar los mejores vídeos, permitiendo al mismo tiempo a la administración y al Staff ocultar o recuperar instantáneamente cualquier vídeo con un solo toque.",
+      "Hemos fortalecido la privacidad del club: la sección de Novedades ahora es de acceso exclusivo para nuestros miembros y equipo, ocultándola de los visitantes externos.",
+      "¡Se acabó el lío de los nombres repetidos! Ahora al subir un vídeo o al querer compartir tu perrito con un familiar, te enseñaremos los nombres de sus actuales dueños entre paréntesis al lado del de tu animal. Así nunca te equivocarás al seleccionarlo en la lista."
+    ]
+  },
+  {
     "version": "1.1.2",
     "date": "2026-04-08",
     "features": [

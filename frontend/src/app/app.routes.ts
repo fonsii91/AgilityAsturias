@@ -40,6 +40,11 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'videos-publicos',
+        loadComponent: () => import('./components/galeria-videos-publica/galeria-videos-publica.component').then(m => m.GaleriaVideosPublicaComponent),
+        title: titleResolver, data: { pageTitle: '' }
+    },
+    {
         path: 'calendario',
         loadComponent: () => import('./components/calendario/calendario.component').then(m => m.CalendarioComponent),
         canActivate: [memberGuard],
@@ -147,6 +152,7 @@ export const routes: Routes = [
     {
         path: 'novedades',
         loadComponent: () => import('./components/novedades/novedades.component').then(m => m.NovedadesComponent),
+        canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: '' }
     }
 ];

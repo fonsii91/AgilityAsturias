@@ -15,7 +15,7 @@ class DogController extends Controller
      */
     public function index(Request $request)
     {
-        return $request->user()->dogs()->with(['users:id,name', 'pointHistories' => function ($query) {
+        return $request->user()->dogs()->with(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->orderBy('name', 'asc')->get();
     }
@@ -25,7 +25,7 @@ class DogController extends Controller
      */
     public function all()
     {
-        return Dog::with(['users:id,name', 'pointHistories' => function ($query) {
+        return Dog::with(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->orderBy('name', 'asc')->get();
     }
@@ -45,7 +45,7 @@ class DogController extends Controller
         ]);
 
         $dog = $request->user()->dogs()->create($validated);
-        $dog->load('users:id,name');
+        $dog->load('users:id,name,email');
 
         return response()->json($dog, 201);
     }
@@ -55,7 +55,7 @@ class DogController extends Controller
      */
     public function show(string $id)
     {
-        return Auth::user()->dogs()->with(['users:id,name', 'pointHistories' => function ($query) {
+        return Auth::user()->dogs()->with(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->findOrFail($id);
     }
@@ -78,7 +78,7 @@ class DogController extends Controller
 
         $dog->update($validated);
 
-        $dog->load(['users:id,name', 'pointHistories' => function ($query) {
+        $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 
@@ -126,7 +126,7 @@ class DogController extends Controller
             $dog->save();
         }
 
-        $dog->load(['users:id,name', 'pointHistories' => function ($query) {
+        $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 
@@ -157,7 +157,7 @@ class DogController extends Controller
             $owner->notify(new DogExtraPointNotification($dog, $request->points, $request->category));
         }
 
-        $dog->load(['users:id,name', 'pointHistories' => function ($query) {
+        $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }]);
 
@@ -193,7 +193,7 @@ class DogController extends Controller
 
         return response()->json([
             'message' => 'Perro compartido exitosamente con ' . $userToShareWith->name,
-            'dog' => $dog->load(['users:id,name', 'pointHistories' => function ($query) {
+            'dog' => $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             }])
         ]);

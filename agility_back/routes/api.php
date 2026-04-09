@@ -29,6 +29,7 @@ Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
+Route::get('/public-videos', [VideoController::class, 'publicIndex']);
 Route::get('/videos/{id}/download', [VideoController::class, 'download']);
 
 // Backup endpoint to run scheduler from web via URL (bypassing CLI permission denied)
@@ -72,6 +73,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/resources', [ResourceController::class, 'store']);
         Route::post('/resources/{id}', [ResourceController::class, 'update']);
         Route::post('/resources/{id}/delete', [ResourceController::class, 'destroy']);
+
+        // Videos (Admin/Staff)
+        Route::post('/videos/{id}/toggle-public-gallery', [VideoController::class, 'togglePublicGallery']);
 
         // Ranking moved to general authenticated routes
 

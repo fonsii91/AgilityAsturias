@@ -43,7 +43,8 @@ export class UploadVideoComponent implements OnInit {
             dog_id: ['', Validators.required],
             competition_id: [''],
             date: ['', Validators.required],
-            title: ['']
+            title: [''],
+            is_public: [true]
         });
 
         effect(() => {
@@ -96,6 +97,11 @@ export class UploadVideoComponent implements OnInit {
     hasDogUser(dog: any, userId: number | null): boolean {
         if (!dog?.users || !userId) return false;
         return dog.users.some((u: any) => u.id == userId);
+    }
+
+    getDogOwners(dog: any): string {
+        if (!dog?.users || dog.users.length === 0) return 'Sin dueño';
+        return dog.users.map((u: any) => u.name).join(', ');
     }
 
     onFileSelected(event: any) {
@@ -292,6 +298,7 @@ export class UploadVideoComponent implements OnInit {
 
         formData.append('date', this.uploadForm.get('date')?.value);
         formData.append('title', this.uploadForm.get('title')?.value || '');
+        formData.append('is_public', this.uploadForm.get('is_public')?.value ? '1' : '0');
         formData.append('video', finalFile);
 
         this.videoService.uploadVideo(formData).subscribe({

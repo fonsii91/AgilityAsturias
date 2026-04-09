@@ -29,6 +29,8 @@
 @if (!authService.userProfileSignal()) {
   <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
 Galería</a></li>
+  <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span>
+Videoteca</a></li>
 }
 @if (authService.isMember()) {
   <li><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
@@ -48,7 +50,7 @@ Vídeos</a></li>
   <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span>
 Contacto</a></li>
 }
-@if (!authService.userProfileSignal()) {
+@if (authService.isMember()) {
   <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span>
 Novedades</a></li>
 }
@@ -60,8 +62,11 @@ Novedades</a></li>
     <ul class="dropdown-menu-list">
       <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
       <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
+      <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
       <li><a routerLink="/recursos" routerLinkActive="active-route"><span class="material-icons">folder_shared</span> Recursos</a></li>
-      <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span> Novedades</a></li>
+      @if (authService.isMember()) {
+        <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span> Novedades</a></li>
+      }
       <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
     </ul>
   </li>

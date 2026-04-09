@@ -61,4 +61,12 @@ export class VideoService {
     retryVideoUpload(id: number): Observable<any> {
         return this.http.post<any>(`${environment.apiUrl}/admin/videos/${id}/retry`, {});
     }
+
+    getPublicVideos(page: number = 1): Observable<any> {
+        return this.http.get<any>(`${environment.apiUrl}/public-videos?page=${page}`);
+    }
+
+    togglePublicGallery(id: number): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/${id}/toggle-public-gallery`, {});
+    }
 }

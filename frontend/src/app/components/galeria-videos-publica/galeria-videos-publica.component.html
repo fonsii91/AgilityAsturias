@@ -1,0 +1,125 @@
+<div class="public-video-gallery-container container">
+  <div class="gallery-header">
+    <h2 class="section-title">Videoteca Pública</h2>
+    <p class="section-subtitle">Disfruta de los mejores vídeos de nuestros entrenamientos y competiciones.</p>
+  </div>
+
+  @if (isLoading && videos.length === 0) {
+    <div class="video-grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="video-card skeleton-card">
+          <div class="skeleton-cover"></div>
+        </div>
+      }
+    </div>
+  }
+
+  @if (!isLoading && videos.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon-wrapper">
+        <span class="material-icons">videocam_off</span>
+      </div>
+      <p>No hay vídeos publicados en este momento.</p>
+    </div>
+  }
+
+  @if (!isLoading && videos.length > 0) {
+    <div class="video-grid">
+      @for (video of videos; track video) {
+        <div class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id && player.isVideoActive}">
+          
+          @if (authService.isStaff() || authService.isAdmin()) {
+            <div class="admin-quick-actions" style="position: absolute; top: 1rem; right: 1rem; z-index: 20;">
+              <button class="action-bubble action-delete" (click)="removeFromPublic($event, video)" title="Ocultar vídeo de la vista pública">
+                <span class="material-icons">public_off</span>
+              </button>
+            </div>
+          }
+
+          <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path" [coverImageUrl]="video.dog?.photo_url">
+          </app-smart-video-player>
+          
+          <!-- LARGE COVER OVERLAY: Visible only when NOT playing -->
+          @if (!player.isVideoActive) {
+            <div class="video-cover-overlay">
+              <div class="center-event-cover">
+                @if (video.competition) {
+                  <span class="event-name-huge" [title]="video.competition.nombre">
+                    <span class="material-icons comp-icon-huge">emoji_events</span>
+                    <span>{{ video.competition.nombre }}</span>
+                  </span>
+                }
+                @if (!video.competition) {
+                  <span class="event-name-huge training-text">
+                    <span class="material-icons comp-icon-huge">fitness_center</span>
+                    <span>Entrenamiento</span>
+                  </span>
+                }
+              </div>
+              <div class="center-bottom-cover">
+                <div class="cover-badges-row">
+                  <span class="date-badge-cover-huge">
+                    <span class="material-icons date-icon-huge">calendar_month</span>
+                    {{ video.date | date:'dd/MM/yyyy' }}
+                  </span>
+                </div>
+                <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+                  {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+                </div>
+              </div>
+              <div class="dog-name-cover-small" title="Ver perfil de {{video.dog?.name}}">
+                {{ video.dog?.name }}
+              </div>
+            </div>
+          }
+          
+          <!-- ORIGINAL PLAYER OVERLAY: Visible only when PLAYING -->
+          @if (player.isVideoActive) {
+            <div class="video-info-overlay">
+              <div class="bottom-info-left">
+                <p class="dog-name-row">
+                  <span class="dog-name">@{{ video.dog?.name }}</span>
+                  @if (video.competition) {
+                    <span class="competition-badge" [title]="video.competition.nombre">
+                      <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre }}</span>
+                    </span>
+                  }
+                </p>
+                <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+                  {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+                </h3>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Controles de Paginación Númerica -->
+  @if (totalPages > 1 && !isLoading) {
+    <div class="pagination-controls numeric-pagination">
+      <button [disabled]="currentPage === 1" (click)="goToPage(currentPage - 1)" class="pagination-btn nav-btn">
+        <span class="material-icons">chevron_left</span>
+      </button>
+      
+      <div class="pagination-pages">
+        @for (page of pageNumbers; track page) {
+          @if (page === '...') {
+            <span class="pagination-dots">...</span>
+          } @else {
+            <button class="pagination-number" 
+                    [class.active]="currentPage === page" 
+                    (click)="goToPage(page)">
+              {{ page }}
+            </button>
+          }
+        }
+      </div>
+
+      <button [disabled]="currentPage === totalPages" (click)="goToPage(currentPage + 1)" class="pagination-btn nav-btn">
+        <span class="material-icons">chevron_right</span>
+      </button>
+    </div>
+  }
+</div>

@@ -117,6 +117,13 @@
                       'favorite_border' }}</span>
                       <span class="action-count">{{ video.likes_count || 0 }}</span>
                     </button>
+                    @if (authService.isStaff() || authService.isAdmin()) {
+                      <button (click)="togglePublicGallery($event, video)"
+                        class="action-bubble" title="{{ video.in_public_gallery ? 'Quitar de galería pública' : 'Mostrar en galería pública' }}"
+                        [ngClass]="{'active-public': video.in_public_gallery}">
+                        <span class="material-icons" [style.color]="video.in_public_gallery ? '#1abc9c' : 'inherit'">public</span>
+                      </button>
+                    }
                     @if (video.status === 'local') {
                       <button (click)="downloadVideo($event, video)"
                         class="action-bubble" title="Descargar">
@@ -216,6 +223,13 @@
                     'favorite_border' }}</span>
                     <span class="action-count">{{ video.likes_count || 0 }}</span>
                   </button>
+                  @if (authService.isStaff() || authService.isAdmin()) {
+                    <button (click)="togglePublicGallery($event, video)"
+                      class="action-bubble" title="{{ video.in_public_gallery ? 'Quitar de galería pública' : 'Mostrar en galería pública' }}"
+                      [ngClass]="{'active-public': video.in_public_gallery}">
+                      <span class="material-icons" [style.color]="video.in_public_gallery ? '#1abc9c' : 'inherit'">public</span>
+                    </button>
+                  }
                   @if (video.status === 'local') {
                     <button (click)="downloadVideo($event, video)"
                       class="action-bubble" title="Descargar">
@@ -340,6 +354,20 @@
               <label class="form-label">Fecha del Vídeo *</label>
               <input type="date" name="date" [(ngModel)]="editData.date" required class="form-input">
             </div>
+            @if (canEditPrivacy(videoToEdit)) {
+              <div class="form-group" style="margin-bottom: 2rem;">
+                <label class="form-label">Privacidad</label>
+                <div class="select-wrapper">
+                  <select name="is_public" [(ngModel)]="editData.is_public" class="form-input">
+                    <option [ngValue]="true">Público</option>
+                    <option [ngValue]="false">Privado</option>
+                  </select>
+                </div>
+                <small style="color: var(--text-light); margin-top: 0.5rem; display: block;">
+                  Si es privado, solo los dueños del perro podrán verlo en la galería.
+                </small>
+              </div>
+            }
             <div class="modal-actions">
               <button type="button" class="btn-cancel" (click)="closeEditModal()"
               [disabled]="isSavingEdit">Cancelar</button>

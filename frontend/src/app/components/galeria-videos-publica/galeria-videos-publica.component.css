@@ -1,0 +1,318 @@
+.public-video-gallery-container {
+    padding: 2rem 1rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.gallery-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--text-color, #1a1a1a);
+    margin-bottom: 1rem;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: var(--primary-color, #3498db);
+    border-radius: 2px;
+}
+
+.section-subtitle {
+    color: var(--text-muted, #666);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    margin: 2rem auto;
+    max-width: 500px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.empty-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background: rgba(var(--primary-color-rgb, 52, 152, 219), 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+}
+
+.empty-icon-wrapper .material-icons {
+    font-size: 40px;
+    color: var(--primary-color, #3498db);
+}
+
+.empty-state p {
+    color: var(--text-color, #333);
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+/* El resto de estilos se heredarán de video-list.component.css 
+   si están definidos globalmente. Como puede no ser así, importaremos
+   los estilos necesarios de la grid aquí también para asegurar consistencia */
+
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    padding: 1rem 0;
+}
+
+.video-card {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #000;
+    aspect-ratio: 9/16;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.video-card:hover {
+    transform: translateY(-8px) scale(1.02);
+}
+
+@media (min-width: 768px) {
+    .video-card.is-youtube {
+        aspect-ratio: 16/9;
+        grid-column: span 2;
+    }
+}
+
+.video-cover-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.4) 0%,
+        rgba(0,0,0,0.1) 40%,
+        rgba(0,0,0,0.7) 100%
+    );
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+}
+
+.center-event-cover {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.event-name-huge {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    padding: 0.75rem 1.5rem;
+    border-radius: 30px;
+    border: 1px solid rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.center-bottom-cover {
+    margin-top: auto;
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.date-badge-cover-huge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.video-title-cover-bottom {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    line-height: 1.3;
+}
+
+.dog-name-cover-small {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 1.5rem;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+}
+
+.video-info-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 40%);
+}
+
+.bottom-info-left {
+    margin-bottom: 1rem;
+}
+
+.dog-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.dog-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+.competition-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: var(--accent-color, #e74c3c);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.video-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: white;
+    margin: 0;
+    line-height: 1.4;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* Pagination Styles (reused) */
+.pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding: 1rem;
+}
+
+.pagination-controls.numeric-pagination {
+    gap: 0.5rem;
+    background: white;
+    border-radius: 30px;
+    padding: 0.5rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.pagination-pages {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.pagination-number, .nav-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: var(--text-color, #333);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pagination-number:hover:not(.active) {
+    background: var(--bg-hover, #f0f0f0);
+}
+
+.pagination-number.active {
+    background: var(--primary-color, #3498db);
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 10px rgba(var(--primary-color-rgb, 52, 152, 219), 0.3);
+}
+
+.nav-btn {
+    background: var(--bg-hover, #f0f0f0);
+}
+
+.nav-btn:hover:not(:disabled) {
+    background: var(--primary-color, #3498db);
+    color: white;
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.action-bubble {
+    background: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.action-bubble:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+}
+
+.action-bubble.action-delete {
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+}

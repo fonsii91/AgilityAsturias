@@ -116,7 +116,7 @@
                           <select [(ngModel)]="shareEmail" class="form-input" style="width: 100%; margin-bottom: 0.8rem;">
                             <option value="" disabled selected>-- Elige un usuario --</option>
                             @for (user of usersList; track user) {
-                              <option [value]="user.email">{{ user.name }}</option>
+                              <option [value]="user.email">{{ user.name }} ({{ user.email }})</option>
                             }
                           </select>
                           <div style="display: flex; gap: 10px;">

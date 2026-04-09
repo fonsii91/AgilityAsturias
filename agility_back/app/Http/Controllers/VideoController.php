@@ -12,6 +12,23 @@ class VideoController extends Controller
     {
         $query = Video::query()->with(['dog.users:id,name', 'user', 'competition']);
 
+        // Filtro de privacidad
+        if (auth()->check()) {
+            $userId = auth()->id();
+            $userRole = auth()->user()->role;
+            
+            if (!in_array($userRole, ['admin', 'staff'])) {
+                $query->where(function ($q) use ($userId) {
+                    $q->where('is_public', true)
+                      ->orWhereHas('dog.users', function ($qDogUser) use ($userId) {
+                          $qDogUser->where('users.id', $userId);
+                      });
+                });
+            }
+        } else {
+            $query->where('is_public', true);
+        }
+
         if ($request->has('search') && $request->search) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
@@ -103,7 +120,8 @@ class VideoController extends Controller
             'competition_id' => 'nullable|exists:competitions,id',
             'date' => 'required|date',
             'video' => 'required|file|mimes:mp4,mov,avi,wmv,webm|max:512000', // 500MB
-            'title' => 'nullable|string|max:255'
+            'title' => 'nullable|string|max:255',
+            'is_public' => 'nullable|boolean'
         ]);
 
         $path = $request->file('video')->store('videos', 'public');
@@ -115,7 +133,8 @@ class VideoController extends Controller
             'date' => $request->date,
             'title' => $request->title,
             'local_path' => $path,
-            'status' => 'local'
+            'status' => 'local',
+            'is_public' => $request->has('is_public') ? filter_var($request->is_public, FILTER_VALIDATE_BOOLEAN) : true
         ]);
 
         return response()->json($video->load(['dog.users:id,name', 'user', 'competition']), 201);
@@ -136,15 +155,24 @@ class VideoController extends Controller
             'dog_id' => 'required|exists:dogs,id',
             'competition_id' => 'nullable|exists:competitions,id',
             'date' => 'required|date',
-            'title' => 'nullable|string|max:255'
+            'title' => 'nullable|string|max:255',
+            'is_public' => 'nullable|boolean'
         ]);
 
-        $video->update([
+        $updateData = [
             'dog_id' => $request->dog_id,
             'competition_id' => $request->competition_id,
             'date' => $request->date,
             'title' => $request->title,
-        ]);
+        ];
+
+        if ($request->has('is_public')) {
+            if ($isDogOwner || in_array($user->role, ['admin', 'staff'])) {
+                $updateData['is_public'] = filter_var($request->is_public, FILTER_VALIDATE_BOOLEAN);
+            }
+        }
+
+        $video->update($updateData);
 
         return response()->json($video->load(['dog.users:id,name', 'user', 'competition']));
     }
@@ -241,5 +269,29 @@ class VideoController extends Controller
         ]);
 
         return response()->json(['message' => 'Video requeued successfully']);
+    }
+    
+    public function publicIndex(Request $request)
+    {
+        $query = Video::query()->with(['dog:id,name,photo_url', 'competition:id,nombre,fecha_evento'])
+                     ->where('in_public_gallery', true)
+                     ->where('is_public', true); // Must be explicitly public
+
+        $videos = $query->latest()->paginate(20);
+        return response()->json($videos);
+    }
+
+    public function togglePublicGallery($id)
+    {
+        $video = Video::findOrFail($id);
+        
+        // This is protected by middleware role:admin,staff in api.php
+        $video->in_public_gallery = !$video->in_public_gallery;
+        $video->save();
+
+        return response()->json([
+            'message' => 'Video gallery visibility updated', 
+            'in_public_gallery' => $video->in_public_gallery
+        ]);
     }
 }
