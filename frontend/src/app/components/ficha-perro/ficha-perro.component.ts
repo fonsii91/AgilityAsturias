@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges, OnChanges, inject, input, output } from '@angular/core';
+import { Component, Input, SimpleChanges, OnChanges, inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Dog } from '../../models/dog.model';

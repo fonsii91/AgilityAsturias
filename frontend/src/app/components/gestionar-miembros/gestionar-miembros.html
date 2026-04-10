@@ -1,15 +1,17 @@
 <div class="admin-container">
   <div class="header">
-    <h1>Gestión de Miembros</h1>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <h1>Gestión Miembros</h1>
+      <button class="help-btn" (click)="openHelpModal()" title="Instrucciones" style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 6px 12px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">
+        <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
+      </button>
+    </div>
     <div class="stats">
       <span>Usuarios: {{ displayUsers().length }}</span>
     </div>
   </div>
 
-  <div class="info-banner">
-    <span class="material-icons info-icon">info</span>
-    <p>Aquí puedes gestionar quién tiene acceso como "Miembro" (y por tanto, a las funciones de miembro).</p>
-  </div>
+
 
   @if (!loading()) {
     <div class="table-container glass-effect">
@@ -45,7 +47,7 @@
                       <div class="action-buttons-wrapper">
                         <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
                           class="role-select">
-                          <option value="user">Usuario</option>
+                          <option value="user">Inactivo</option>
                           <option value="member">Miembro</option>
                           <option value="staff">Staff</option>
                         </select>
@@ -61,7 +63,7 @@
                     </td>
                     <td>
                       <span class="badge" [class]="user.role">
-                        {{ user.role | titlecase }}
+                        {{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase) }}
                       </span>
                     </td>
                     <td class="email-cell">{{ user.email }}</td>
@@ -118,6 +120,85 @@
                   <span class="spinner-small"></span>
                 }
                 {{ isDeleting() ? 'Eliminando...' : 'Sí, Eliminar' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Help Modal (Instrucciones) -->
+      @if (isHelpModalOpen) {
+        <div class="modal-overlay help-modal-overlay" (click)="closeHelpModal()">
+          <div class="modal-content help-modal-content" (click)="$event.stopPropagation()">
+            <button class="close-btn help-close-btn" (click)="closeHelpModal()">&times;</button>
+            
+            <div class="help-header">
+              <span class="material-icons help-header-icon">help_outline</span>
+              <h2>Instrucciones de Gestión y Roles</h2>
+            </div>
+            
+            <p class="help-intro">
+              Esta sección es el panel de control administrativo donde puedes administrar las cuentas de todas las personas registradas en la aplicación.
+            </p>
+
+            <h3 class="help-section-title">Niveles de Acceso (Roles)</h3>
+            <ul class="help-list">
+              <li>
+                <span class="material-icons icon-inactive">person</span>
+                <div class="help-list-content">
+                  <strong>Inactivo (Nivel Básico)</strong>
+                  <p>Estado al registrarse o dar de baja. Carecen de acceso interno al club.</p>
+                </div>
+              </li>
+              <li>
+                <span class="material-icons icon-member">star</span>
+                <div class="help-list-content">
+                  <strong>Miembro (Nivel Activo)</strong>
+                  <p>Rol normal para alumnos y socios. Funciones completas desbloqueadas: pueden realizar sus reservas, ver el calendario, acceder a los recursos privados y la galería de vídeos, y participar en el ranking.</p>
+                </div>
+              </li>
+              <li>
+                <span class="material-icons icon-staff">admin_panel_settings</span>
+                <div class="help-list-content">
+                  <strong>Staff (Nivel Administrativo)</strong>
+                  <p>Rol para entrenadores y equipo técnico. Tienen todo lo del miembro y además herramientas de gestión (menú Staff: pasar lista, crear competiciones, gestionar miembros, añadir puntos).</p>
+                </div>
+              </li>
+            </ul>
+
+            <h3 class="help-section-title">Acciones Principales</h3>
+            <ul class="help-list custom-actions-list">
+              <li>
+                <span class="material-icons icon-sync">sync_alt</span>
+                <span class="action-desc"><strong>Cambiar Rol:</strong> Usa el menú desplegable junto al nombre para ascender o cambiar el nivel de una persona inmediatamente (ej. de Inactivo a Miembro).</span>
+              </li>
+              <li>
+                <span class="material-icons icon-key">key</span>
+                <span class="action-desc"><strong>Recuperar Contraseña:</strong> El botón de la llave genera un enlace de recuperación seguro y lo copia al portapapeles. Luego, pásaselo a esa persona.</span>
+              </li>
+              <li>
+                <span class="material-icons icon-delete">delete</span>
+                <span class="action-desc"><strong>Eliminar (Papelera):</strong> Borra la cuenta permanentemente, junto con todos sus perros, reservas y asistencias. Acción irreversible.</span>
+              </li>
+              <li>
+                <span class="material-icons icon-zoom">zoom_in</span>
+                <span class="action-desc"><strong>Ver Foto:</strong> Haz clic en la miniatura de cualquier persona para ver su foto de perfil ampliada.</span>
+              </li>
+            </ul>
+
+            <div class="help-alert" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 12px; margin-top: 24px; display: flex; gap: 12px; align-items: flex-start;">
+              <span class="material-icons" style="color: #16a34a; font-size: 24px; margin-top: 2px;">lightbulb</span>
+              <div>
+                <strong style="color: #166534; display: block; margin-bottom: 6px; font-size: 1.05rem;">Consejo: Conservar el historial de un ex-miembro</strong>
+                <p style="margin: 0; color: #15803d; font-size: 0.95rem; line-height: 1.5;">
+                  Si alguien abandona el club temporalmente, <strong>NO lo elimines</strong> con la papelera, ya que perderás sus métricas y perros. En su lugar, simplemente bájale el rol a <strong>"Inactivo"</strong>. Esto bloqueará su acceso a la app, pero sus datos y reservas anteriores quedarán intactos para vuestras estadísticas (y listos para reactivarse si vuelve).
+                </p>
+              </div>
+            </div>
+
+            <div class="modal-actions help-actions">
+              <button class="btn-cancel" (click)="closeHelpModal()">
+                Entendido
               </button>
             </div>
           </div>

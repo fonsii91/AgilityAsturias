@@ -1,29 +1,40 @@
-<h2 mat-dialog-title>Reportar Bug o Sugerencia</h2>
+<div mat-dialog-title style="padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 0;">
+  <h3 style="margin: 0; color: var(--primary-color, #0073CF); display: flex; align-items: center; gap: 8px; font-size: 1.25rem; font-weight: bold;">
+    <span class="material-icons" style="color: var(--accent-color, #F6D312);">campaign</span> Sugerencias y Reportes
+  </h3>
+  <button mat-dialog-close title="Cerrar" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #999; padding: 0;">&times;</button>
+</div>
+
 <mat-dialog-content>
-  <p class="dialog-description">
-    Ayúdanos a mejorar {{ clubConfig.name }}. ¿Has encontrado algún fallo o tienes una idea para una nueva funcionalidad?
+  <p class="dialog-description" style="margin-bottom: 20px; color: #666; font-size: 14px;">
+    ¿Has encontrado algún fallo en <strong>{{ clubConfig.name }}</strong> o tienes una idea para una nueva funcionalidad? ¡Cuéntanoslo!
   </p>
 
-  <div class="form-group">
-    <label for="type">Tipo de reporte</label>
+  <div class="form-group" style="margin-bottom: 20px;">
+    <label for="type" style="display: block; font-weight: 500; margin-bottom: 8px;">Tipo de reporte</label>
     <select id="type" [(ngModel)]="type" class="form-control">
-      <option value="suggestion">Sugerencia de mejora</option>
-      <option value="bug">Reportar un error (Bug)</option>
+      <option value="suggestion">💡 Sugerencia de mejora</option>
+      <option value="bug">🐛 Reportar un error (Bug)</option>
     </select>
   </div>
 
-  <div class="form-group">
-    <label for="content">Descripción</label>
-    <textarea id="content" [(ngModel)]="content" rows="4" class="form-control" 
+  <div class="form-group" style="margin-bottom: 20px;">
+    <label for="content" style="display: block; font-weight: 500; margin-bottom: 8px;">Descripción</label>
+    <textarea id="content" [(ngModel)]="content" rows="4" class="form-control" style="resize: vertical; min-height: 100px;"
       placeholder="Describe con detalle tu sugerencia o el error que has encontrado..."
       maxlength="1000"></textarea>
-    <div class="char-count">{{content.length}}/1000</div>
+    <div class="char-count" style="text-align: right; font-size: 12px; margin-top: 4px;"
+         [style.color]="content.length > 900 ? 'var(--error-color, #e53e3e)' : '#888'"
+         [style.font-weight]="content.length > 900 ? 'bold' : 'normal'">
+      {{content.length}}/1000
+    </div>
   </div>
 
 </mat-dialog-content>
 <mat-dialog-actions align="end">
   <button mat-button (click)="cancel()" class="btn btn-secondary">Cancelar</button>
-  <button mat-button (click)="submit()" color="primary" class="btn btn-primary" [disabled]="!content || isSubmitting">
+  <button mat-button (click)="submit()" color="primary" class="btn btn-primary" [disabled]="!content || isSubmitting" style="display: flex; align-items: center; justify-content: center; gap: 6px;">
+    <span class="material-icons spinning" *ngIf="isSubmitting" style="font-size: 18px;">autorenew</span>
     {{ isSubmitting ? 'Enviando...' : 'Enviar Reporte' }}
   </button>
 </mat-dialog-actions>

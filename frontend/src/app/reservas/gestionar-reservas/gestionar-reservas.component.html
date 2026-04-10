@@ -197,7 +197,7 @@
       @if (availableDogsForBooking().length === 0) {
         <div class="no-dogs-warning">
           <p><span class="material-icons" style="vertical-align: text-bottom; color: #ff9800; margin-right: 4px;">warning</span> No hay perros registrados.</p>
-          @if (!selectedUserId) {
+          @if (!selectedUserId()) {
             <a routerLink="/perfil" (click)="closeModal()">Ir a mi perfil para añadir uno</a>
           }
         </div>

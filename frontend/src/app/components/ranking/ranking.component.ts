@@ -26,6 +26,7 @@ export class RankingComponent {
     
     selectedDogModal = signal<any | null>(null);
     fichaModalOpen = signal(false);
+    isHelpModalOpen = signal(false);
 
     constructor() {
         this.loadRanking();
@@ -103,6 +104,16 @@ export class RankingComponent {
         this.fichaModalOpen.set(false);
         this.selectedDogModal.set(null);
         document.body.style.overflow = 'auto'; // Restore scrolling
+    }
+
+    openHelpModal() {
+        this.isHelpModalOpen.set(true);
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeHelpModal() {
+        this.isHelpModalOpen.set(false);
+        document.body.style.overflow = 'auto';
     }
 
     async saveDogFicha(updatedData: any) {

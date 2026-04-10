@@ -7,34 +7,46 @@
       <!-- Mobile Navigation Links -->
       <nav class="mobile-nav">
         <ul>
-          @if (!authService.userProfileSignal()) {
-            <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenido</a></li>
+          @if (!authService.isMember()) {
+            <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenida</a></li>
           }
           @if (authService.isMember()) {
+            <li class="mobile-nav-divider">General</li>
             <li><a routerLink="/reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">event</span> Reservas</a></li>
-          }
-          @if (authService.isMember()) {
+            <li><a routerLink="/calendario" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">calendar_month</span> Calendario</a></li>
             <li><a routerLink="/ranking" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">emoji_events</span> Clasificación</a></li>
+            <li><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">movie</span> Vídeos</a></li>
           }
-          @if (!authService.userProfileSignal()) {
+
+          @if (!authService.isMember()) {
             <li><a routerLink="/galeria" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">photo_library</span> Galería</a></li>
             <li><a routerLink="/videos-publicos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">videocam</span> Videoteca</a></li>
           }
-          @if (authService.isMember()) {
-            <li><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">movie</span> Vídeos</a></li>
-          }
-          @if (authService.isMember()) {
-            <li><a routerLink="/calendario" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">calendar_month</span> Calendario</a></li>
-          }
-          @if (authService.isStaff()) {
-            <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">sports_score</span> Eventos</a></li>
-          }
-          @if (!authService.userProfileSignal()) {
+
+          @if (!authService.isMember()) {
             <li><a routerLink="/contacto" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">contact_support</span> Contacto</a></li>
           }
 
+          <!-- Staff Section -->
+          @if (authService.isStaff()) {
+            <li class="mobile-nav-divider">Staff</li>
+            <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">sports_score</span> Eventos</a></li>
+            <li><a routerLink="/info-reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">visibility</span> Monitor Reservas</a></li>
+            <li><a routerLink="/admin/asistencia" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">fact_check</span> Verificar Asistencia</a></li>
+            <li><a (click)="openExtraPointsDialog(); sidenav.close()" style="cursor: pointer;"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
+            <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">people</span> Gestión Miembros</a></li>
+          }
+
+          <!-- Administrar Section -->
+          @if (authService.isAdmin()) {
+            <li class="mobile-nav-divider">Administrar</li>
+            <li><a routerLink="/admin/usuarios" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">admin_panel_settings</span> Roles</a></li>
+            <li><a routerLink="/admin/videos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">video_library</span> Revisar vídeos</a></li>
+            <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">report_problem</span> Ver sugerencias</a></li>
+          }
+
           <!-- Explorar and Area Pública for logged-in users -->
-          @if (authService.userProfileSignal()) {
+          @if (authService.isMember()) {
             <li class="mobile-nav-divider">Explorar</li>
             <li><a routerLink="/recursos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">folder_shared</span> Recursos</a></li>
             @if (authService.isMember()) {
@@ -42,7 +54,7 @@
             }
 
             <li class="mobile-nav-divider">Pública</li>
-            <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenido</a></li>
+            <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenida</a></li>
             <li><a routerLink="/galeria" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">photo_library</span> Galería</a></li>
             <li><a routerLink="/videos-publicos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">videocam</span> Videoteca</a></li>
             <li><a routerLink="/contacto" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">contact_support</span> Contacto</a></li>

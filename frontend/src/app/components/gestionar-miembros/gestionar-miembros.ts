@@ -79,7 +79,7 @@ export class GestionarMiembrosComponent implements OnInit {
 
       // Map roles to spanish for the toast
       const roleMap: any = {
-        'user': 'Usuario',
+        'user': 'Inactivo',
         'member': 'Miembro',
         'staff': 'Staff'
       };
@@ -147,6 +147,19 @@ export class GestionarMiembrosComponent implements OnInit {
   closeImageZoom() {
     this.isZoomModalOpen = false;
     this.zoomedImageURL = null;
+    document.body.style.overflow = 'auto';
+  }
+
+  // Help Modal State
+  isHelpModalOpen = false;
+
+  openHelpModal() {
+    this.isHelpModalOpen = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeHelpModal() {
+    this.isHelpModalOpen = false;
     document.body.style.overflow = 'auto';
   }
 }

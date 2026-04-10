@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
@@ -7,7 +8,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-admin-usuarios',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './admin-usuarios.html',
   styleUrl: './admin-usuarios.css'
 })
@@ -47,7 +48,14 @@ export class AdminUsuariosComponent implements OnInit {
         users.map(u => u.uid === user.uid ? { ...u, role: role } : u)
       );
 
-      this.toastService.success(`Rol de ${user.displayName} actualizado a ${role}`);
+      const roleMap: any = {
+        'user': 'Inactivo',
+        'member': 'Miembro',
+        'staff': 'Staff',
+        'admin': 'Admin'
+      };
+
+      this.toastService.success(`Rol de ${user.displayName} actualizado a ${roleMap[role]}`);
     } catch (error: any) {
       console.error('Error updating role', error);
 

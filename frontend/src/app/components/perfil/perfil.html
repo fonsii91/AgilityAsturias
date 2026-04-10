@@ -29,7 +29,7 @@
             }
           </div>
           <p>{{ user.email }}</p>
-          <span class="role-badge" [ngClass]="user.role">{{ user.role | titlecase }}</span>
+          <span class="role-badge" [ngClass]="user.role">{{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase) }}</span>
         </div>
       </div>
       <div class="dogs-section">

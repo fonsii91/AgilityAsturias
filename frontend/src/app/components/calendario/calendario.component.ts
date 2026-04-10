@@ -58,6 +58,7 @@ export class CalendarioComponent implements AfterViewInit {
     selectedCompetitions: any[] = []; // List to show in modal if multiple
     selectedDeadlines: any[] = [];
     isModalOpen = false;
+    isHelpModalOpen = false;
     activeModalTab: 'info' | 'asistencia' = 'info'; // Tab state
 
     // Attendance state
@@ -67,8 +68,8 @@ export class CalendarioComponent implements AfterViewInit {
     selectedDogIds = new Set<number>();
     selectedAttendanceDays = new Set<string>();
     viewingAttendees = false;
-    attendees: any[] = [];
-    isLoadingAttendees = false;
+    attendees = signal<any[]>([]);
+    isLoadingAttendees = signal<boolean>(false);
     userDogs = this.dogService.getDogs();
     cdr = inject(ChangeDetectorRef);
     ngZone = inject(NgZone);
@@ -126,7 +127,7 @@ export class CalendarioComponent implements AfterViewInit {
     resetAttendanceState() {
         this.isConfirmingAttendance = false;
         this.viewingAttendees = false;
-        this.attendees = [];
+        this.attendees.set([]);
         this.selectedDogIds.clear();
         this.selectedAttendanceDays.clear();
         if (this.selectedCompetition?.attendingDogIds) {
@@ -223,10 +224,24 @@ export class CalendarioComponent implements AfterViewInit {
 
         this.isConfirmingAttendance = false;
         this.viewingAttendees = false;
-        this.attendees = [];
+        this.attendees.set([]);
         this.selectedAttendanceDays.clear();
 
         document.body.style.overflow = 'auto';
+    }
+
+    openHelpModal() {
+        this.isHelpModalOpen = true;
+    }
+
+    closeHelpModal(event?: Event) {
+        if (event) {
+            if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
+                this.isHelpModalOpen = false;
+            }
+        } else {
+            this.isHelpModalOpen = false;
+        }
     }
 
     // Attendance Methods
@@ -350,19 +365,19 @@ export class CalendarioComponent implements AfterViewInit {
     }
 
     async loadAttendees() {
-        this.isLoadingAttendees = true;
+        this.isLoadingAttendees.set(true);
         this.cdr.detectChanges();
         try {
             const result = await this.competitionService.getAttendees(this.selectedCompetition.id);
             this.ngZone.run(() => {
-                this.attendees = result;
-                this.isLoadingAttendees = false;
+                this.attendees.set(result);
+                this.isLoadingAttendees.set(false);
                 this.cdr.detectChanges();
             });
         } catch (e) {
             console.error('Error fetching attendees', e);
             this.ngZone.run(() => {
-                this.isLoadingAttendees = false;
+                this.isLoadingAttendees.set(false);
                 this.cdr.detectChanges();
             });
         }

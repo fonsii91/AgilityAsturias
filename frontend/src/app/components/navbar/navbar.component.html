@@ -14,45 +14,60 @@
 
   <nav class="desktop-nav">
     <ul>
-      @if (!authService.userProfileSignal()) {
-        <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
+      @if (!authService.isMember()) {
+        <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
       }
-      @if (authService.isMember()) {
-        <li><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span>
-      Reservas</a>
-    </li>
-  }
-  @if (authService.isMember()) {
-    <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
-  Clasificación</a></li>
-}
-@if (!authService.userProfileSignal()) {
-  <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
-Galería</a></li>
-  <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span>
-Videoteca</a></li>
-}
+<!-- General Dropdown for Logged In Members -->
 @if (authService.isMember()) {
-  <li><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
-Vídeos</a></li>
+  <li class="nav-dropdown">
+    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">apps</span> General <span class="material-icons arrow">expand_more</span></a>
+    <ul class="dropdown-menu-list">
+      <li><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span> Reservas</a></li>
+      <li><a routerLink="/calendario" routerLinkActive="active-route"><span class="material-icons">calendar_month</span> Calendario</a></li>
+      <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span> Clasificación</a></li>
+      <li><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span> Vídeos</a></li>
+    </ul>
+  </li>
 }
-@if (authService.isMember()) {
-  <li><a routerLink="/calendario" routerLinkActive="active-route"><span
-  class="material-icons">calendar_month</span> Calendario</a>
-</li>
+
+@if (!authService.isMember()) {
+  <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
+  <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
 }
-@if (authService.isStaff()) {
-  <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span
-  class="material-icons">sports_score</span> Eventos</a>
-</li>
-}
-@if (!authService.userProfileSignal()) {
+
+@if (!authService.isMember()) {
   <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span>
 Contacto</a></li>
 }
 
+<!-- Staff Dropdown for Staff Users -->
+@if (authService.isStaff()) {
+  <li class="nav-dropdown">
+    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">badge</span> Staff <span class="material-icons arrow">expand_more</span></a>
+    <ul class="dropdown-menu-list">
+      <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span class="material-icons">sports_score</span> Eventos</a></li>
+      <li><a routerLink="/info-reservas" routerLinkActive="active-route"><span class="material-icons">visibility</span> Monitor Reservas</a></li>
+      <li><a routerLink="/admin/asistencia" routerLinkActive="active-route"><span class="material-icons">fact_check</span> Verificar Asistencia</a></li>
+      <li><a (click)="openExtraPointsDialog()" style="cursor: pointer;"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
+      <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route"><span class="material-icons">people</span> Gestión Miembros</a></li>
+    </ul>
+  </li>
+}
+
+<!-- Administrar Dropdown for Admin Users -->
+@if (authService.isAdmin()) {
+  <li class="nav-dropdown">
+    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">admin_panel_settings</span> Administrar <span class="material-icons arrow">expand_more</span></a>
+    <ul class="dropdown-menu-list">
+      <li><a routerLink="/admin/usuarios" routerLinkActive="active-route"><span class="material-icons">admin_panel_settings</span> Roles</a></li>
+      <li><a routerLink="/admin/videos" routerLinkActive="active-route"><span class="material-icons">video_library</span> Revisar vídeos</a></li>
+      <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route"><span class="material-icons">report_problem</span> Ver sugerencias</a></li>
+    </ul>
+  </li>
+}
+
 <!-- Explorar Dropdown for Logged In Users -->
-@if (authService.userProfileSignal()) {
+@if (authService.isMember()) {
   <li class="nav-dropdown">
     <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span class="material-icons arrow">expand_more</span></a>
     <ul class="dropdown-menu-list">
@@ -65,11 +80,11 @@ Contacto</a></li>
 }
 
 <!-- Pública Dropdown for Logged In Users -->
-@if (authService.userProfileSignal()) {
+@if (authService.isMember()) {
   <li class="nav-dropdown">
     <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Pública <span class="material-icons arrow">expand_more</span></a>
     <ul class="dropdown-menu-list">
-      <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
+      <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
       <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
       <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
       <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
@@ -189,54 +204,11 @@ Contacto</a></li>
         <a (click)="openSugerenciaDialog()" class="dropdown-item" style="cursor: pointer;">
           <span class="material-icons">bug_report</span> Sugerencias / Bugs
         </a>
-        @if (authService.isStaff()) {
-          <div class="dropdown-divider"></div>
-        }
-        @if (authService.isStaff()) {
-          <a routerLink="/admin/asistencia" (click)="closeMenu()"
-            class="dropdown-item staff-item">
-            <span class="material-icons">fact_check</span> Verificar Asistencia
-          </a>
-        }
-        @if (authService.isStaff()) {
-          <a routerLink="/gestionar-miembros" (click)="closeMenu()"
-            class="dropdown-item staff-item">
-            <span class="material-icons">people</span> Gestión de Miembros
-          </a>
-        }
-        @if (authService.isStaff()) {
-          <a routerLink="/info-reservas" (click)="closeMenu()"
-            class="dropdown-item staff-item">
-            <span class="material-icons">visibility</span> Monitor Reservas
-          </a>
-        }
-        @if (authService.isStaff()) {
-          <a (click)="openExtraPointsDialog()"
-            class="dropdown-item staff-item" style="cursor: pointer;">
-            <span class="material-icons">military_tech</span> Puntos Extra
-          </a>
-        }
+
         @if (authService.isAdmin()) {
           <div class="dropdown-divider"></div>
         }
-        @if (authService.isAdmin()) {
-          <a routerLink="/admin/usuarios" (click)="closeMenu()"
-            class="dropdown-item admin-item">
-            <span class="material-icons">admin_panel_settings</span> Administrar Sistema
-          </a>
-        }
-        @if (authService.isAdmin()) {
-          <a routerLink="/admin/videos" (click)="closeMenu()"
-            class="dropdown-item admin-item">
-            <span class="material-icons">video_library</span> Seguimiento Vídeos
-          </a>
-        }
-        @if (authService.isAdmin()) {
-          <a routerLink="/admin/sugerencias" (click)="closeMenu()"
-            class="dropdown-item admin-item">
-            <span class="material-icons">report_problem</span> Sugerencias
-          </a>
-        }
+
         <button (click)="logout()" class="dropdown-item logout-item"><span class="material-icons">logout</span>
       Cerrar Sesión</button>
     </div>

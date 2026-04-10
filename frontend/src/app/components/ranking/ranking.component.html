@@ -1,109 +1,196 @@
 <div class="ranking-container">
 
+  <div class="ranking-header-actions"
+    style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-top: 10px;">
+    <button class="help-btn" (click)="openHelpModal()" title="Instrucciones"
+      style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+      <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
+    </button>
+  </div>
+
   @if (isLoading()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Cargando clasificación...</p>
-    </div>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando clasificación...</p>
+  </div>
   }
 
   @if (!isLoading() && ranking().length === 0) {
-    <div class="empty-state">
-      <p>Aún no hay puntos registrados. ¡Sé el primero!</p>
-    </div>
+  <div class="empty-state">
+    <p>Aún no hay puntos registrados. ¡Sé el primero!</p>
+  </div>
   }
 
   @if (!isLoading() && ranking().length > 0) {
-    <div class="ranking-content">
-      <div class="ranking-list glass-effect">
-        @for (dog of ranking(); track dog; let i = $index) {
-          <div class="ranking-row" [class.top-rank]="i < 3"
-            [class.highlight-user-dog]="hasDogUser(dog, authService.currentUserSignal()?.id)" (click)="openFicha(dog)" style="cursor: pointer;">
-            <div class="rank-position">
-              @if (i === 0) {
-                <span class="medal-icon">🥇</span>
-              }
-              @if (i === 1) {
-                <span class="medal-icon">🥈</span>
-              }
-              @if (i === 2) {
-                <span class="medal-icon">🥉</span>
-              }
-              @if (i > 2) {
-                <span class="number">{{ i + 1 }}</span>
-              }
-            </div>
-            <div class="user-avatar-small">
-              <!-- Standard size for everyone -->
-              <img [src]="dog.photo_url || 'Images/Agility_Asturias_logo.jpg'" alt="Dog"
-                onError="this.src='Images/Agility_Asturias_logo.jpg'">
-              </div>
-              <div class="user-info">
-                <div class="name-container">
-                  <span class="user-name" [class.bold]="i < 3">{{ dog.name }}</span>
-                  @if (dog.position_change !== 0 && dog.position_change !== 'NEW') {
-                    <!-- Position Up -->
-                    @if (dog.position_change > 0) {
-                      <div class="position-badge position-up"
-                        title="Puestos subidos en el último día">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20"
-                          fill="currentColor">
-                          <path fill-rule="evenodd"
-                            d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
-                            clip-rule="evenodd" />
-                          </svg>
-                          <span>+{{ dog.position_change }}</span>
-                        </div>
-                      }
-                      <!-- Position Down -->
-                      @if (dog.position_change < 0) {
-                        <div class="position-badge position-down"
-                          title="Puestos bajados en el último día">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                              d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z"
-                              clip-rule="evenodd" />
-                            </svg>
-                            <span>{{ dog.position_change }}</span>
-                          </div>
-                        }
-                      }
-                      @if (dog.position_change === 'NEW') {
-                        <div class="position-badge position-new"
-                          title="Nueva entrada en el ranking">
-                          <span>NUEVO</span>
-                        </div>
-                      }
-                    </div>
-                    @if (dog.users) {
-                      <span class="owner-name">{{ getOwnerNames(dog) }}</span>
-                    }
-                  </div>
-                  @if (dog.recentEmojis && dog.recentEmojis.length > 0) {
-                    <div class="recent-emojis">
-                      @for (item of dog.recentEmojis; track item) {
-                        <span class="recent-emoji" [matTooltip]="item.category"
-                          matTooltipPosition="above">
-                          {{ item.emoji }}
-                        </span>
-                      }
-                    </div>
-                  }
-                  <div class="points-badge">
-                    <span class="points">{{ dog.points }}</span>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        }
+  <div class="ranking-content">
+    <div class="ranking-list glass-effect">
+      @for (dog of ranking(); track dog; let i = $index) {
+      <div class="ranking-row" [class.top-rank]="i < 3"
+        [class.highlight-user-dog]="hasDogUser(dog, authService.currentUserSignal()?.id)" (click)="openFicha(dog)"
+        style="cursor: pointer;">
 
+        <div class="rank-position">
+          @if (i === 0) {
+          <span class="medal-icon">🥇</span>
+          }
+          @if (i === 1) {
+          <span class="medal-icon">🥈</span>
+          }
+          @if (i === 2) {
+          <span class="medal-icon">🥉</span>
+          }
+          @if (i > 2) {
+          <span class="number">{{ i + 1 }}</span>
+          }
+        </div>
+
+        <div class="user-avatar-small">
+          <!-- Standard size for everyone -->
+          <img [src]="dog.photo_url || 'Images/Agility_Asturias_logo.jpg'" alt="Dog"
+            onError="this.src='Images/Agility_Asturias_logo.jpg'">
+        </div>
+
+        <div class="user-info">
+          <div class="name-container">
+            <span class="user-name" [class.bold]="i < 3">{{ dog.name }}</span>
+            @if (dog.position_change !== 0 && dog.position_change !== 'NEW') {
+            <!-- Position Up -->
+            @if (dog.position_change > 0) {
+            <div class="position-badge position-up" title="Puestos subidos en el último día">
+              <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                  clip-rule="evenodd" />
+              </svg>
+              <span>+{{ dog.position_change }}</span>
+            </div>
+            }
+            <!-- Position Down -->
+            @if (dog.position_change < 0) { <div class="position-badge position-down"
+              title="Puestos bajados en el último día">
+              <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                  d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z"
+                  clip-rule="evenodd" />
+              </svg>
+              <span>{{ dog.position_change }}</span>
+          </div>
+          }
+          }
+          @if (dog.position_change === 'NEW') {
+          <div class="position-badge position-new" title="Nueva entrada en el ranking">
+            <span>NUEVO</span>
+          </div>
+          }
+        </div> <!-- Cierra name-container -->
+        @if (dog.users) {
+        <span class="owner-name">{{ getOwnerNames(dog) }}</span>
+        }
+      </div> <!-- Cierra user-info -->
+
+      @if (dog.recentEmojis && dog.recentEmojis.length > 0) {
+      <div class="recent-emojis">
+        @for (item of dog.recentEmojis; track item) {
+        <span class="recent-emoji" [matTooltip]="item.category" matTooltipPosition="above">
+          {{ item.emoji }}
+        </span>
+        }
+      </div>
+      }
+
+      <div class="points-badge">
+        <span class="points">{{ dog.points }}</span>
       </div>
 
-      <!-- Ficha Perro Modal -->
-      @if (selectedDogModal()) {
-        <app-ficha-perro [dog]="selectedDogModal()" [isOpen]="fichaModalOpen()"
-          (close)="closeFicha()" (save)="saveDogFicha($event)">
-        </app-ficha-perro>
+    </div> <!-- Cierra ranking-row -->
+    }
+  </div> <!-- Cierra ranking-list -->
+</div> <!-- Cierra ranking-content -->
+} <!-- Cierra if de len > 0 -->
+
+<!-- Ficha Perro Modal -->
+@if (selectedDogModal()) {
+<app-ficha-perro [dog]="selectedDogModal()" [isOpen]="fichaModalOpen()" (close)="closeFicha()"
+  (save)="saveDogFicha($event)">
+</app-ficha-perro>
+}
+
+<!-- Help Modal -->
+@if (isHelpModalOpen()) {
+<div class="modal-overlay" (click)="closeHelpModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <h2 class="modal-title">
+        <span class="material-icons title-icon">military_tech</span> Clasificación y Puntos
+      </h2>
+      <button class="close-button" (click)="closeHelpModal()" title="Cerrar">&times;</button>
+    </div>
+
+    <div class="modal-body">
+      <div class="gamification-box">
+        <p>
+          <strong>
+            <span class="material-icons box-icon">sports_esports</span> ¿Qué es la "Gamificación"?
+          </strong>
+          Nuestra clasificación aplica mecánicas de juego en el club. Gana puntos participando y esfuérzate para subir
+          de puesto. Una forma genial de premiar la constancia y mantener la motivación.
+        </p>
+      </div>
+
+      <h4 class="section-title">
+        <span class="material-icons">group</span> Reglas para Miembros
+      </h4>
+
+      <ul class="rules-list">
+        <li class="rule-card">
+          <span class="material-icons icon-green">check_circle</span>
+          <div class="rule-text"><strong>Asistencia:</strong> Gana puntos al confirmar tu asistencia a los
+            entrenamientos.</div>
+        </li>
+        <li class="rule-card">
+          <span class="material-icons icon-gold">emoji_events</span>
+          <div class="rule-text"><strong>Competiciones:</strong> Consigue puntos asistiendo a competiciones y según el
+            puesto en el que quedes.</div>
+        </li>
+        <li class="rule-card">
+          <span class="material-icons icon-orange">star</span>
+          <div class="rule-text"><strong>Logros Extra:</strong> El equipo del club puede regalar puntos extra por buenas
+            acciones o méritos.</div>
+        </li>
+        <li class="rule-card">
+          <span class="material-icons icon-blue">trending_up</span>
+          <div class="rule-text"><strong>Tu progreso:</strong> Visualiza a los 3 mejores con sus medallas, iconos de
+            tendencia, y emojis con vuestros últimos logros recientes.</div>
+        </li>
+        <li class="rule-card">
+          <span class="material-icons icon-purple">pets</span>
+          <div class="rule-text"><strong>Perfil:</strong> Pulsa sobre cualquier perro de la clasificación para
+            ver su "ficha" y conocerle mejor.</div>
+        </li>
+      </ul>
+
+      @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+      <div class="staff-section-box">
+        <h4 class="staff-title">
+          <span class="material-icons">admin_panel_settings</span> Herramientas Staff
+        </h4>
+        <ul class="staff-rules-list">
+          <li>
+            <span class="material-icons">groups</span>
+            <span><strong>Fidelización:</strong> Aprovecha el "Engagement". A los miembros les encanta ver subir de
+              puesto a sus perros.</span>
+          </li>
+          <li>
+            <span class="material-icons">exposure</span>
+            <span><strong>Moderar Puntuación:</strong> Tienes el poder de sumar o restar puntos libremente. Úsalo con
+              sabiduría.</span>
+          </li>
+        </ul>
+      </div>
       }
+    </div>
+  </div>
+</div>
+}
+</div>

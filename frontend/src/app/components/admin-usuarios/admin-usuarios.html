@@ -33,7 +33,7 @@
                   <td>
                     <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
                       class="role-select">
-                      <option value="user">Usuario</option>
+                      <option value="user">Inactivo</option>
                       <option value="member">Miembro</option>
                       <option value="staff">Staff</option>
                       <option value="admin">Admin</option>
@@ -41,7 +41,7 @@
                   </td>
                   <td>{{ user.email }}</td>
                   <td>
-                    <span class="badge" [class]="user.role">{{ user.role }}</span>
+                    <span class="badge" [class]="user.role">{{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase) }}</span>
                   </td>
                 </tr>
               }

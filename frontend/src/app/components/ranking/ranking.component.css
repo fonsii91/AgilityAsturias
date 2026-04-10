@@ -424,3 +424,212 @@
 .close-btn:hover {
     background: rgba(255, 255, 255, 0.4);
 }
+
+/* Modal Instructions Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.75rem;
+    border-bottom: 2px solid #f8fafc;
+    background: #ffffff;
+}
+
+.modal-title {
+    margin: 0; 
+    color: var(--primary-color, #1e3a8a); 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 1.25rem; 
+    font-weight: 700;
+}
+
+.title-icon {
+    color: var(--accent-color, #eab308);
+}
+
+.close-button {
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.close-button:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.modal-body {
+    text-align: left; 
+    padding: 1.75rem;
+}
+
+.gamification-box {
+    background: #f8fafc; 
+    border-radius: 12px; 
+    padding: 16px; 
+    margin-bottom: 24px; 
+    border: 1px solid #e2e8f0;
+}
+
+.gamification-box p {
+    margin: 0; 
+    line-height: 1.6; 
+    color: #475569; 
+    font-size: 0.95rem;
+}
+
+.gamification-box strong {
+    color: #1e293b; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    margin-bottom: 8px;
+}
+
+.box-icon {
+    font-size: 18px; 
+    color: #3b82f6;
+}
+
+.section-title {
+    margin: 0 0 16px 0; 
+    color: #1e293b; 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.section-title .material-icons {
+    font-size: 20px; 
+    color: #10b981;
+}
+
+.rules-list {
+    list-style: none; 
+    padding: 0; 
+    margin: 0 0 28px 0; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px;
+}
+
+.rule-card {
+    display: flex; 
+    gap: 14px; 
+    align-items: flex-start; 
+    padding: 14px; 
+    border-radius: 10px; 
+    background: #ffffff; 
+    border: 1px solid #e2e8f0; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.01); 
+    transition: all 0.2s ease;
+}
+
+.rule-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    border-color: #cbd5e1;
+}
+
+.rule-text {
+    font-size: 0.95rem; 
+    line-height: 1.5;
+    color: #475569;
+}
+
+.rule-text strong {
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.icon-green { color: #10b981; margin-top: 2px; }
+.icon-gold { color: #f59e0b; margin-top: 2px; }
+.icon-orange { color: #f97316; margin-top: 2px; }
+.icon-blue { color: #3b82f6; margin-top: 2px; }
+.icon-purple { color: #a855f7; margin-top: 2px; }
+
+.staff-section-box {
+    background: #fef2f2; 
+    border: 1px solid #fecaca; 
+    border-radius: 12px; 
+    padding: 18px;
+    margin-top: 10px;
+}
+
+.staff-title {
+    margin: 0 0 14px 0; 
+    color: #b91c1c; 
+    display: flex; 
+    align-items: center; 
+    gap: 6px; 
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+.staff-title .material-icons {
+    font-size: 20px;
+}
+
+.staff-rules-list {
+    list-style: none; 
+    padding: 0; 
+    margin: 0; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    color: #7f1d1d; 
+    font-size: 0.95rem;
+}
+
+.staff-rules-list li {
+    display: flex; 
+    gap: 10px; 
+    align-items: flex-start;
+    line-height: 1.4;
+}
+
+.staff-rules-list li .material-icons {
+    font-size: 18px; 
+    margin-top: 2px; 
+    color: #ef4444;
+}

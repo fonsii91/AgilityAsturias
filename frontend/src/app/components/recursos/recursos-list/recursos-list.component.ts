@@ -21,6 +21,7 @@ export class RecursosListComponent implements OnInit {
   selectedCategory = signal<string>('');
   selectedLevel = signal<string>('all');
   isLoading = signal(true);
+  isHelpModalOpen = signal(false);
 
   constructor(
     private resourceService: ResourceService,
@@ -90,5 +91,13 @@ export class RecursosListComponent implements OnInit {
         this.loadResources();
       });
     }
+  }
+
+  openHelpModal(): void {
+    this.isHelpModalOpen.set(true);
+  }
+
+  closeHelpModal(): void {
+    this.isHelpModalOpen.set(false);
   }
 }

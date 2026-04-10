@@ -42,6 +42,7 @@ export class VideoListComponent implements OnInit {
 
     selectedDogForProfile: Dog | null = null;
     isDogProfileOpen = false;
+    isHelpModalOpen = false;
 
     searchQuery: string = '';
     filterDateRange: string = '';
@@ -58,6 +59,20 @@ export class VideoListComponent implements OnInit {
 
     toggleFilters() {
         this.isFiltersOpen = !this.isFiltersOpen;
+    }
+
+    openHelpModal() {
+        this.isHelpModalOpen = true;
+    }
+
+    closeHelpModal(event?: Event) {
+        if (event) {
+            if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
+                this.isHelpModalOpen = false;
+            }
+        } else {
+            this.isHelpModalOpen = false;
+        }
     }
 
     get sortedDogs(): Dog[] {
