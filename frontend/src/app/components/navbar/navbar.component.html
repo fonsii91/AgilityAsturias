@@ -50,23 +50,28 @@ Vídeos</a></li>
   <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span>
 Contacto</a></li>
 }
-@if (authService.isMember()) {
-  <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span>
-Novedades</a></li>
-}
 
 <!-- Explorar Dropdown for Logged In Users -->
 @if (authService.userProfileSignal()) {
   <li class="nav-dropdown">
     <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span class="material-icons arrow">expand_more</span></a>
     <ul class="dropdown-menu-list">
-      <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
-      <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
-      <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
       <li><a routerLink="/recursos" routerLinkActive="active-route"><span class="material-icons">folder_shared</span> Recursos</a></li>
       @if (authService.isMember()) {
         <li><a routerLink="/novedades" routerLinkActive="active-route"><span class="material-icons">new_releases</span> Novedades</a></li>
       }
+    </ul>
+  </li>
+}
+
+<!-- Pública Dropdown for Logged In Users -->
+@if (authService.userProfileSignal()) {
+  <li class="nav-dropdown">
+    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Pública <span class="material-icons arrow">expand_more</span></a>
+    <ul class="dropdown-menu-list">
+      <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenido</a></li>
+      <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
+      <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
       <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
     </ul>
   </li>
@@ -113,7 +118,8 @@ Novedades</a></li>
                                 'event-icon': notif.type.includes('NewEventNotification') || notif.data.type === 'new_event', 
                                 'point-icon': notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point',
                                 'cancel-icon': notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled',
-                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled'
+                                'suggestion-icon': notif.type.includes('NewSuggestionNotification') || notif.data.type === 'new_suggestion',
+                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' && !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion'
                             }">
                 @if (notif.type.includes('NewEventNotification') || notif.data.type === 'new_event') {
                   <span class="material-icons"
@@ -127,7 +133,11 @@ Novedades</a></li>
                   <span class="material-icons"
                   >event_busy</span>
                 }
-                @if (!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled') {
+                @if (notif.type.includes('NewSuggestionNotification') || notif.data.type === 'new_suggestion') {
+                  <span class="material-icons"
+                  >bug_report</span>
+                }
+                @if (!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' && !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion') {
                   <span class="material-icons"
                   >notifications</span>
                 }

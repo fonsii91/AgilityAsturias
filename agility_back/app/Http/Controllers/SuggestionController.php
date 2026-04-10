@@ -45,6 +45,10 @@ class SuggestionController extends Controller
                 'status' => 'pending',
             ]);
 
+            // Notify all admin users
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewSuggestionNotification($suggestion));
+
             return response()->json(['message' => 'Reporte enviado con éxito', 'data' => $suggestion], 201);
         } catch (\Exception $e) {
             Log::error('Error creating suggestion: ' . $e->getMessage());

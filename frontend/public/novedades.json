@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.1.5",
+    "date": "2026-04-10",
+    "features": [
+      "Hemos implementado unas reglas más robustas para las reservas: ahora nadie se quedará sin hueco por culpa de las cancelaciones en el último segundo. No se podrá reservar ni cancelar plaza a la clase si quedan menos de 24 horas.",
+      "¡No te preocupes por equivocarte! Si le das a cancelar reserva sin querer, a partir de ahora disfrutarás de un margen mágico de 15 minutos en el que el sistema te perdonará y te permitirá volver a coger la misma plaza aunque falten menos de 24h.",
+      "Hemos otorgado poderes especiales de gestión al equipo del club para asistirte mejor. El Staff ya puede crear, modificar el aforo máximo, o eliminar por lluvia cualquier clase. Asimismo, también podrán apuntarte personalmente o desapuntarte ignorando todo tipo de reglas de aforo o límites de tiempo.",
+      "Añadido un pequeño botón de 'Instrucciones' en la aplicación para que puedas resolver rápidamente cualquier cuestión sobre cómo funcionan y cómo se reponen las reservas."
+    ],
+    "bugfixes": [
+      "Reparado de forma definitiva el problema técnico que surgía a veces cuando un entrenador intentaba reasignar manualmente a un integrante a una clase."
+    ]
+  },
+  {
     "version": "1.1.4",
     "date": "2026-04-10",
     "bugfixes": [

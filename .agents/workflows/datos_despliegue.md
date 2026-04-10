@@ -1,5 +1,5 @@
 ---
-name: datos producción
+name: datos despliegue
 description: Datos para desplegar en producción el proyecto
 ---
 

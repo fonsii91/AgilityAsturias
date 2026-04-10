@@ -4,13 +4,18 @@
       <h2>Gestionar Reservas</h2>
       <p class="subtitle">Selecciona una franja horaria para reservar tu clase de Agility.</p>
     </div>
-    <!-- ADMIN/STAFF ONLY: Edit Schedule Button -->
-    @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
-      <button
-        class="btn-edit-schedule" (click)="openManageModal()">
-        <span class="material-icons" style="font-size: 18px; vertical-align: text-bottom; margin-right: 4px;">settings</span> Editar Horario
+    <!-- ADMIN/STAFF ONLY: Edit Schedule & Help Buttons -->
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <button class="help-btn" (click)="openHelpModal()" title="Instrucciones sobre Reservas" style="background: transparent; border: 1px solid #e2e8f0; border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+        <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
       </button>
-    }
+      @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+        <button
+          class="btn-edit-schedule" (click)="openManageModal()">
+          <span class="material-icons" style="font-size: 18px; vertical-align: text-bottom; margin-right: 4px;">settings</span> Editar Horario
+        </button>
+      }
+    </div>
   </div>
 
   <div class="week-selector">
@@ -103,11 +108,19 @@
                           @if (res.userImage) {
                             <img [src]="res.userImage" alt="User">
                           } @else {
-                            <img src="assets/images/logo.png" alt="Logo" class="default-logo">
+                            <span class="material-icons" style="font-size: 24px; color: white;">person</span>
                           }
                         </div>
-                        <div class="attendee-info">
-                          <span class="attendee-name">{{ res.userName }}</span>
+                        <div class="attendee-info" style="flex: 1;">
+                          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <span class="attendee-name">{{ res.userName }}</span>
+                            @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+                              <button class="btn-icon-action delete" style="padding: 2px; height: 24px; width: 24px; color: #f44336; flex-shrink: 0;"
+                                (click)="openStaffDeleteUserModal(slot.id, slot.date, res.userId, res.userName)" title="Eliminar reservas de este miembro">
+                                <span class="material-icons" style="font-size: 18px;">delete_outline</span>
+                              </button>
+                            }
+                          </div>
                           <div class="attendee-dogs">
                             @for (dog of res.selectedDogs; track dog) {
                               <span class="dog-tag">
@@ -135,14 +148,15 @@
                 @if (slot.isBookedByCurrentUser) {
                   <button class="btn-action btn-cancel-card"
                     (click)="openCancelModal(slot)">
-                    Cancelar Reserva
+                    Cancelar Mi Reserva
                   </button>
                 }
-                <!-- Show Book button if NOT booked by user -->
-                @if (!slot.isBookedByCurrentUser) {
+                <!-- Show Book button if NOT booked by user OR if user is staff -->
+                @if (!slot.isBookedByCurrentUser || ['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
                   <button class="btn-action btn-book"
-                    [disabled]="(slot.currentBookings || 0) >= slot.max_bookings" (click)="bookSlot(slot)">
-                    {{ (slot.currentBookings || 0) >= slot.max_bookings ? 'Sin Plazas' : 'Reservar Plaza' }}
+                    [disabled]="!['admin', 'staff'].includes(authService.currentUserSignal()?.role || '') && (slot.currentBookings || 0) >= slot.max_bookings" (click)="bookSlot(slot)"
+                    [style.marginTop]="slot.isBookedByCurrentUser ? '0.5rem' : '0'">
+                    {{ (!['admin', 'staff'].includes(authService.currentUserSignal()?.role || '') && (slot.currentBookings || 0) >= slot.max_bookings) ? 'Sin Plazas' : (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '') && slot.isBookedByCurrentUser ? 'Añadir (Staff)' : 'Reservar Plaza') }}
                   </button>
                 }
               }
@@ -159,18 +173,37 @@
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <h3><span class="material-icons" style="vertical-align: text-bottom; margin-right: 8px;">event_available</span> Confirmar Reserva</h3>
-      <p>¿Quieres reservar plaza para el <strong>{{ selectedSlotForBooking?.day }}</strong> a las <strong>{{
-    selectedSlotForBooking?.start_time }}</strong>?</p>
+      <p>¿Quieres reservar plaza para el <strong>{{ selectedSlotForBooking()?.day }}</strong> a las <strong>{{
+    selectedSlotForBooking()?.start_time }}</strong>?</p>
     <div class="dog-selection">
+      @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+        <div class="admin-user-selector" style="margin-bottom: 1.5rem; padding: 1rem; background: #f0f4f8; border-radius: 8px; border-left: 4px solid #1976d2;">
+          <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #1976d2;">
+            <span class="material-icons" style="vertical-align: text-bottom; margin-right: 4px;">admin_panel_settings</span> Reservar para miembro (Staff)
+          </p>
+          <div class="select-wrapper" style="background: white;">
+            <select [ngModel]="selectedUserId()" (ngModelChange)="onUserChange($event)" class="modern-input">
+              <option [ngValue]="null">Reservar para mí</option>
+              @for (u of adminUsers(); track u.id) {
+                <option [ngValue]="u.id">{{ u.name }}</option>
+              }
+            </select>
+            <span class="material-icons select-icon">expand_more</span>
+          </div>
+        </div>
+      }
+
       <p style="margin: 0 0 1rem 0; font-weight: 600; color: #555;">Selecciona los perretes que vendrán:</p>
-      @if (myDogs().length === 0) {
+      @if (availableDogsForBooking().length === 0) {
         <div class="no-dogs-warning">
-          <p><span class="material-icons" style="vertical-align: text-bottom; color: #ff9800; margin-right: 4px;">warning</span> No tienes perros registrados.</p>
-          <a routerLink="/perfil" (click)="closeModal()">Ir a mi perfil para añadir uno</a>
+          <p><span class="material-icons" style="vertical-align: text-bottom; color: #ff9800; margin-right: 4px;">warning</span> No hay perros registrados.</p>
+          @if (!selectedUserId) {
+            <a routerLink="/perfil" (click)="closeModal()">Ir a mi perfil para añadir uno</a>
+          }
         </div>
       }
       <div class="dog-checkboxes">
-        @for (dog of myDogs(); track dog) {
+        @for (dog of availableDogsForBooking(); track dog) {
           <label class="dog-checkbox">
             <input type="checkbox" [checked]="selectedDogIds.has(dog.id)" (change)="toggleDogSelection(dog.id)">
             <span class="dog-label"><span class="material-icons" style="font-size: 16px; vertical-align: text-bottom; margin-right: 4px;">pets</span> {{ dog.name }}</span>
@@ -181,7 +214,7 @@
     <div class="modal-actions">
       <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
       <button class="btn-confirm" (click)="confirmBooking()"
-        [disabled]="(myDogs().length > 0 && selectedDogIds.size === 0) || isSubmitting()">
+        [disabled]="(availableDogsForBooking().length > 0 && selectedDogIds.size === 0) || isSubmitting()">
         {{ isSubmitting() ? 'Reservando...' : 'Confirmar Reserva' }}
       </button>
     </div>
@@ -385,3 +418,64 @@
       </div>
     </div>
   }
+
+  <!-- Admin User Delete Modal -->
+  @if (isUserDeleteModalOpen) {
+    <div class="modal-backdrop" (click)="closeStaffDeleteUserModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3><span class="material-icons" style="vertical-align: text-bottom; color: #f44336; margin-right: 8px;">person_remove</span> Eliminar Reservas de Miembro</h3>
+        <div class="modal-body">
+          <p class="confirm-message">¿Estás seguro de que quieres eliminar TODAS las reservas de <strong>{{ userToDelete?.userName }}</strong> para la clase del <strong>{{ userToDelete?.date | date:'dd/MM' }}</strong>?</p>
+          <p class="note warning">Esta acción no se puede deshacer e ignorará la regla de las 24 horas.</p>
+        </div>
+        <div class="modal-actions" style="margin-top: 1.5rem;">
+          <button class="btn-secondary" (click)="closeStaffDeleteUserModal()">Cancelar</button>
+          <button class="btn-confirm btn-delete-action" (click)="confirmStaffDeleteUser()" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Eliminando...' : 'Sí, eliminar reservas' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Help Modal -->
+  @if (isHelpModalOpen) {
+    <div class="modal-backdrop" (click)="closeHelpModal($event)">
+      <div class="modal-content large-modal" style="max-height: 80vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+        <div class="modal-header header-light" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0;">
+          <h3 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons" style="color: #3b82f6;">help_outline</span> Guía de Reservas
+          </h3>
+          <button class="btn-icon close-btn" (click)="closeHelpModal()" title="Cerrar" style="background: transparent; border: none; cursor: pointer;">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <div class="modal-body" style="padding: 1.5rem; color: #334155; line-height: 1.6;">
+          
+          <h4 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">1. Reglas para los Socios</h4>
+          <ul style="padding-left: 20px; margin-bottom: 1.5rem;">
+            <li><strong>Regla de Cierre (24 Horas):</strong> No es posible apuntarse ni cancelar una reserva mediante la app si faltan menos de 24 horas para que empiece la clase.</li>
+            <li><strong>El Margen de Cortesía (15 Minutos):</strong> Si un socio cancela una plaza por error, dispone de 15 minutos exactos para rectificar y volverse a apuntar mágicamente, incluso rompiendo la regla de las 24 horas. Pasados esos 15 minutos, la plaza queda liberada definitivamente.</li>
+            <li>Los miembros normales solo pueden apuntar a sus propios perros y gestionar sus propias reservas.</li>
+          </ul>
+
+          @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+            <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">2. Opciones de Administrador y Staff</h4>
+            <ul style="padding-left: 20px; margin-bottom: 1.5rem;">
+              <li><strong>Inscripción Ilimitada:</strong> El Staff ignora cualquier bloqueo de tiempo (24h) y de aforos completos. Podéis pulsar el botón de 'Reservar' de forma ilimitada. Si desplegáis la lista de usuarios, podréis buscar el nombre de otro socio y apuntar a los perros que queráis en su nombre.</li>
+              <li><strong>Desapuntar Rápidamente:</strong> Si desplegáis la lista de <i>"Ver asistentes"</i> en una clase, hay una papelera roja al lado de cada persona. Al pulsarla, eliminaréis a esa persona de la clase junto a todos sus perros ignorando la regla de las 24 horas.</li>
+              <li><strong>Cancelar Clases por Lluvia:</strong> En la cabecera de cada tarjeta existe un botón rojo para "Anular Clase". La franja se coloreará en rojo y los socios perderán la reserva con una notificación. Podéis usar el botón de nuevo parar restaurar la normalidad.</li>
+            </ul>
+
+            <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">3. Gestión del Horario (Largo Plazo)</h4>
+            <p style="margin-bottom: 0.5rem; color: #475569;">Esta herramienta está en la esquina de arriba a la derecha y sirve para programar y editar la estructura base del club.</p>
+            <ul style="padding-left: 20px; margin-bottom: 0;">
+              <li><strong>Crear nueva clase:</strong> Te permite designar un horario fijo y aforo a los Lunes (por ejemplo). Se aplicará para todos los lunes del año.</li>
+              <li><strong>Modificar Aforo:</strong> Te permite editar las plazas con el lápiz verde. El sistema aplicará el nuevo límite de reservas instantaneamente para que pueda apuntarse más gente.</li>
+              <li><strong>Eliminar Clase:</strong> Usando la papelera borrarás de forma fulminante la ficha del sistema. Se perderán las reservas pasadas o futuras y la hora desaparecerá para los usuarios.</li>
+            </ul>
+          }
+        </div>
+      </div>
+    </div>
+  }

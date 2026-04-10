@@ -27,9 +27,44 @@ export class GestionarReservasComponent {
 
     // Modal state
     isModalOpen = false;
+    isHelpModalOpen = false;
     isSubmitting = signal(false);
-    selectedSlotForBooking: (TimeSlot & { date: string }) | null = null;
+    selectedSlotForBooking = signal<(TimeSlot & { date: string }) | null>(null);
     myDogs = this.dogService.getDogs();
+    
+    // Admin state
+    adminUsers = signal<{id: number, name: string, email: string}[]>([]);
+    selectedUserId = signal<number | null>(null);
+    
+    availableDogsForBooking = computed(() => {
+        const currentUser = this.authService.currentUserSignal();
+        if (!currentUser) return [];
+        
+        let dogsArray = [];
+        if (['admin', 'staff'].includes(currentUser.role) && this.selectedUserId()) {
+            const all = this.dogService.getAllDogs()();
+            dogsArray = all.filter(d => (d as any).users?.some((u: any) => u.id === Number(this.selectedUserId())));
+        } else {
+            dogsArray = this.myDogs();
+        }
+
+        const currentSlot = this.selectedSlotForBooking();
+        if (currentSlot) {
+            const slotData = this.slots().find(s => s.id === currentSlot.id);
+            if (slotData && slotData.reservations) {
+                const reservedNames = new Set<string>();
+                slotData.reservations.forEach((r: any) => {
+                    if (r.selectedDogs) {
+                        r.selectedDogs.forEach((dog: any) => reservedNames.add(dog.name));
+                    }
+                });
+                dogsArray = dogsArray.filter(d => !reservedNames.has(d.name));
+            }
+        }
+
+        return dogsArray;
+    });
+
     selectedDogIds: Set<number> = new Set(); // Store Dog IDs
 
     // UI State for expanding attendees
@@ -40,6 +75,11 @@ export class GestionarReservasComponent {
 
     // Dynamic definition of slots
     timeSlots = this.timeSlotService.getTimeSlots();
+
+    onUserChange(userId: number | null) {
+        this.selectedUserId.set(userId);
+        this.selectedDogIds = new Set();
+    }
 
     // Image Modal State
     enlargedImageStr: string | null = null;
@@ -59,6 +99,10 @@ export class GestionarReservasComponent {
             const user = this.authService.currentUserSignal();
             if (user) {
                 this.dogService.loadUserDogs();
+                if (['admin', 'staff'].includes(user.role)) {
+                    this.authService.getMinimalUsers().then(users => this.adminUsers.set(users));
+                    this.dogService.loadAllDogs();
+                }
             }
         });
 
@@ -144,6 +188,7 @@ export class GestionarReservasComponent {
 
             if (slotAvailability && slotAvailability.attendees) {
                 allAttendees = slotAvailability.attendees.map((a: any) => ({
+                    userId: a.user_id,
                     userName: a.user_name,
                     userImage: a.user_image,
                     selectedDogs: a.dogs // already an array of { name, image } from backend
@@ -155,6 +200,7 @@ export class GestionarReservasComponent {
                     const uName = r.userName || 'Usuario';
                     if (!myGroups.has(uName)) {
                         myGroups.set(uName, {
+                            userId: r.userId,
                             userName: uName,
                             userImage: r.user?.photo_url || null, // Assuming user relationship has photo_url if loaded
                             selectedDogs: []
@@ -296,18 +342,38 @@ export class GestionarReservasComponent {
             return;
         }
 
-        if (slot.currentBookings! >= slot.max_bookings) {
-            this.toastService.error('Esta clase está completa.');
-            return;
-        }
+        const isAdminOrStaff = ['admin', 'staff'].includes(user.role || '');
 
-        if (slot.isBookedByCurrentUser) {
-            this.toastService.info('Ya tienes una reserva en este horario.');
-            return;
+        if (!isAdminOrStaff) {
+            if (slot.currentBookings! >= slot.max_bookings) {
+                this.toastService.error('Esta clase está completa.');
+                return;
+            }
+
+            if (slot.isBookedByCurrentUser) {
+                this.toastService.info('Ya tienes una reserva en este horario.');
+                return;
+            }
+
+            // Check 24 hour rule for booking
+            const slotDateTime = new Date(`${slot.date}T${slot.start_time}`);
+            const now = new Date();
+            const diffMs = slotDateTime.getTime() - now.getTime();
+            const diffHours = diffMs / (1000 * 60 * 60);
+
+            if (diffHours < 24) {
+                // Check margin of 15 mins past the 24 hour limit
+                const limitTime = new Date(slotDateTime.getTime() - (24 * 60 * 60 * 1000) + (15 * 60 * 1000));
+                if (now > limitTime) {
+                    this.toastService.warning('Las reservas se cierran 24 horas antes de su comienzo.');
+                    return;
+                }
+            }
         }
 
         // Open modal
-        this.selectedSlotForBooking = slot;
+        this.selectedSlotForBooking.set(slot);
+        this.selectedUserId.set(null); // Reset target user
         this.selectedDogIds.clear(); // Reset selection
         this.isSubmitting.set(false); // Reset submission state
         this.isModalOpen = true;
@@ -335,12 +401,27 @@ export class GestionarReservasComponent {
 
     closeModal() {
         this.isModalOpen = false;
-        this.selectedSlotForBooking = null;
+        this.selectedSlotForBooking.set(null);
         this.isSubmitting.set(false);
     }
 
+    openHelpModal() {
+        this.isHelpModalOpen = true;
+    }
+
+    closeHelpModal(event?: Event) {
+        if (event) {
+            // Solo cerramos si hacen clic en el fondo oscuro
+            if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
+                this.isHelpModalOpen = false;
+            }
+        } else {
+            this.isHelpModalOpen = false;
+        }
+    }
+
     async confirmBooking() {
-        if (!this.selectedSlotForBooking || this.isSubmitting()) return;
+        if (!this.selectedSlotForBooking() || this.isSubmitting()) return;
 
         if (this.selectedDogIds.size === 0) {
             this.toastService.warning('Por favor, selecciona al menos un perro.');
@@ -352,9 +433,11 @@ export class GestionarReservasComponent {
 
         const userName = user.name || 'Usuario';
 
+        const isAdminOrStaff = ['admin', 'staff'].includes(user.role || '');
+
         // 1. Find the current slot state in the computed "slots()"
-        const currentSlotState = this.slots().find(s => s.id === this.selectedSlotForBooking!.id);
-        if (currentSlotState) {
+        const currentSlotState = this.slots().find(s => s.id === this.selectedSlotForBooking()!.id);
+        if (currentSlotState && !isAdminOrStaff) {
             const dogsCount = this.selectedDogIds.size;
             if (currentSlotState.currentBookings! + dogsCount > currentSlotState.max_bookings) {
                 const available = currentSlotState.max_bookings - currentSlotState.currentBookings!;
@@ -365,13 +448,15 @@ export class GestionarReservasComponent {
 
         this.isSubmitting.set(true);
 
+        const targetUserId = this.selectedUserId() ? Number(this.selectedUserId()) : user.id;
+
         try {
             const selectedDogsList = Array.from(this.selectedDogIds);
 
             await this.reservationService.addReservation({
-                slotId: this.selectedSlotForBooking.id,
-                userId: user.id,
-                date: this.selectedSlotForBooking.date,
+                slotId: this.selectedSlotForBooking()!.id,
+                userId: targetUserId,
+                date: this.selectedSlotForBooking()!.date,
                 dogIds: selectedDogsList
             });
             this.closeModal();
@@ -475,6 +560,39 @@ export class GestionarReservasComponent {
         } catch (error) {
             console.error(error);
             this.toastService.error('Error al modificar el estado de la clase.');
+        } finally {
+            this.isSubmitting.set(false);
+        }
+    }
+
+    // Admin User Deletion Modal
+    userToDelete: { slotId: number, date: string, userId: number, userName: string } | null = null;
+    isUserDeleteModalOpen = false;
+
+    openStaffDeleteUserModal(slotId: number, date: string, userId: number, userName: string) {
+        this.userToDelete = { slotId, date, userId, userName };
+        this.isUserDeleteModalOpen = true;
+    }
+
+    closeStaffDeleteUserModal() {
+        this.isUserDeleteModalOpen = false;
+        this.userToDelete = null;
+    }
+
+    async confirmStaffDeleteUser() {
+        if (!this.userToDelete) return;
+        this.isSubmitting.set(true);
+        try {
+            await this.reservationService.deleteBlock(
+                this.userToDelete.slotId,
+                this.userToDelete.date,
+                this.userToDelete.userId
+            );
+            this.toastService.success(`Plazas de ${this.userToDelete.userName} liberadas.`);
+            this.closeStaffDeleteUserModal();
+        } catch (error) {
+            console.error(error);
+            this.toastService.error('Error al liberar plazas del usuario.');
         } finally {
             this.isSubmitting.set(false);
         }

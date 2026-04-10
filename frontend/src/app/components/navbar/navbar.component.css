@@ -554,6 +554,11 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     color: #f44336;
 }
 
+.notif-icon-container.suggestion-icon {
+    background-color: #ffe8d6;
+    color: #d35400; /* nice orange for bug/suggestion */
+}
+
 .notif-icon-container.default-icon {
     background-color: #f3e5f5;
     color: #8e24aa;

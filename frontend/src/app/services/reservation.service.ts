@@ -101,9 +101,13 @@ export class ReservationService {
         });
     }
 
-    deleteBlock(slotId: number, date: string) {
+    deleteBlock(slotId: number, date: string, targetUserId?: number) {
         return new Promise<void>((resolve, reject) => {
-            this.http.post<void>(`${this.apiUrl}/block/delete?slot_id=${slotId}&date=${date}`, {}).subscribe({
+            let url = `${this.apiUrl}/block/delete?slot_id=${slotId}&date=${date}`;
+            if (targetUserId) {
+                url += `&user_id=${targetUserId}`;
+            }
+            this.http.post<void>(url, {}).subscribe({
                 next: () => {
                     this.fetchReservations();
                     this.fetchAvailability();

@@ -16,7 +16,9 @@ class ReservationController extends Controller
         // Admin/Staff sees all
         $user = $request->user();
         if ($user->role === 'admin' || $user->role === 'staff') {
-            return Reservation::with(['user', 'timeSlot', 'dog.users:id'])->get();
+            return Reservation::with(['user', 'timeSlot', 'dog.users:id'])
+                ->where('status', 'active')
+                ->get();
         }
 
         // Standard user only sees their own (fallback for index)
@@ -37,6 +39,7 @@ class ReservationController extends Controller
                           $qDogUser->where('users.id', $userId);
                       });
             })
+            ->where('status', 'active')
             ->get();
     }
 
@@ -49,6 +52,7 @@ class ReservationController extends Controller
         // Fetch reservations from today onwards with relationships
         $reservations = Reservation::with(['user', 'timeSlot', 'dog'])
             ->where('date', '>=', now()->toDateString())
+            ->where('status', 'active')
             ->get();
 
         // Group by slot and date
@@ -70,6 +74,7 @@ class ReservationController extends Controller
             $availability[$key]['count'] += 1;
 
             // Group attendees by user to match the frontend expected structure
+            $userId = $reservation->user ? $reservation->user->id : null;
             $userName = $reservation->user ? $reservation->user->name : 'Usuario';
             $userImage = $reservation->user ? $reservation->user->photo_url : null;
             $dogName = $reservation->dog ? $reservation->dog->name : 'Perro Desconocido';
@@ -77,7 +82,7 @@ class ReservationController extends Controller
 
             $foundUserIdx = -1;
             foreach ($availability[$key]['attendees'] as $idx => $attendee) {
-                if ($attendee['user_name'] === $userName) {
+                if ($attendee['user_id'] === $userId) {
                     $foundUserIdx = $idx;
                     break;
                 }
@@ -85,6 +90,7 @@ class ReservationController extends Controller
 
             if ($foundUserIdx === -1) {
                 $availability[$key]['attendees'][] = [
+                    'user_id' => $userId,
                     'user_name' => $userName,
                     'user_image' => $userImage,
                     'dogs' => [
@@ -115,6 +121,50 @@ class ReservationController extends Controller
             'dog_ids.*' => 'exists:dogs,id'
         ]);
 
+        $user = $request->user();
+        $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
+
+        if (!$isAdminOrStaff) {
+            // SECURITY CHECK: Members can only book for themselves
+            if ($user->id != $validated['user_id']) {
+                return response()->json([
+                    'message' => 'No puedes crear reservas para otros usuarios.'
+                ], 403);
+            }
+
+            // SECURITY CHECK: Members can only book their own dogs
+            $myDogs = $user->dogs()->pluck('dogs.id')->toArray();
+            foreach ($validated['dog_ids'] as $dogId) {
+                if (!in_array($dogId, $myDogs)) {
+                    return response()->json([
+                        'message' => 'Uno o más perros seleccionados no están asociados a tu cuenta.'
+                    ], 403);
+                }
+            }
+
+            // 24-HOUR RULE FOR BOOKING
+            $timeSlot = \App\Models\TimeSlot::find($validated['slot_id']);
+            if ($timeSlot) {
+                $slotDateTime = \Carbon\Carbon::parse($validated['date'] . ' ' . $timeSlot->start_time);
+                // Si la diferencia es menor a 24h significa que ya ha pasado el límite normal
+                if (now()->diffInHours($slotDateTime, false) < 24) {
+                    // Check if they have a recently cancelled reservation for this strict window
+                    $recentCancel = \App\Models\Reservation::where('user_id', $validated['user_id'])
+                        ->where('slot_id', $validated['slot_id'])
+                        ->whereDate('date', $validated['date'])
+                        ->where('status', 'cancelled')
+                        ->where('updated_at', '>=', now()->subMinutes(15))
+                        ->exists();
+
+                    if (!$recentCancel) {
+                        return response()->json([
+                            'message' => 'No puedes reservar con menos de 24 horas de antelación.'
+                        ], 422);
+                    }
+                }
+            }
+        }
+
         // EXCEPTION CHECK
         $isCancelled = \App\Models\TimeSlotException::where('slot_id', $validated['slot_id'])
             ->whereDate('date', $validated['date'])
@@ -131,6 +181,7 @@ class ReservationController extends Controller
         $existingReservations = Reservation::where('slot_id', $validated['slot_id'])
             ->whereDate('date', $validated['date'])
             ->whereIn('dog_id', $validated['dog_ids'])
+            ->where('status', 'active')
             ->get();
 
         if ($existingReservations->count() > 0) {
@@ -228,7 +279,7 @@ class ReservationController extends Controller
             }
         }
 
-        $reservation->delete();
+        $reservation->update(['status' => 'cancelled', 'updated_at' => now()]);
 
         return response()->noContent();
     }
@@ -240,20 +291,38 @@ class ReservationController extends Controller
     {
         $request->validate([
             'slot_id' => 'required|exists:time_slots,id',
-            'date' => 'required|date'
+            'date' => 'required|date',
+            'user_id' => 'nullable|exists:users,id' // Target user to delete (admin only)
         ]);
 
         $user = $request->user();
         $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
+        
+        $targetUserId = $user->id;
         $myDogs = $user->dogs()->pluck('dogs.id')->toArray();
 
-        $reservationsToDelete = Reservation::where('slot_id', $request->slot_id)
-            ->whereDate('date', $request->date)
-            ->where(function($query) use ($user, $myDogs) {
-                $query->where('user_id', $user->id)
-                      ->orWhereIn('dog_id', $myDogs);
-            })
-            ->get();
+        // If a specific user is targeted and the requester is admin/staff
+        if ($request->has('user_id') && $isAdminOrStaff) {
+            $targetUserId = $request->user_id;
+            // Admin doesn't need to specify myDogs when deleting, all dogs associated to target user should be deleted.
+            // But to match behavior, we can fetch target user's dogs or simply delete all reservations for target user in this slot.
+            // Actually, if we just use user_id, that's enough because reservations are linked to user_id.
+            $reservationsToDelete = Reservation::where('slot_id', $request->slot_id)
+                ->whereDate('date', $request->date)
+                ->where('user_id', $targetUserId)
+                ->where('status', 'active')
+                ->get();
+        } else {
+            // Normal user behavior: cancel their own reservations or co-owned dogs
+            $reservationsToDelete = Reservation::where('slot_id', $request->slot_id)
+                ->whereDate('date', $request->date)
+                ->where('status', 'active')
+                ->where(function($query) use ($targetUserId, $myDogs) {
+                    $query->where('user_id', $targetUserId)
+                          ->orWhereIn('dog_id', $myDogs);
+                })
+                ->get();
+        }
 
         if ($reservationsToDelete->isEmpty()) {
             return response()->noContent();
@@ -283,7 +352,7 @@ class ReservationController extends Controller
             }
         }
 
-        Reservation::whereIn('id', $reservationsToDelete->pluck('id'))->delete();
+        Reservation::whereIn('id', $reservationsToDelete->pluck('id'))->update(['status' => 'cancelled', 'updated_at' => now()]);
 
         return response()->noContent();
     }
