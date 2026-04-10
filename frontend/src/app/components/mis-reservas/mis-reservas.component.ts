@@ -41,6 +41,7 @@ export class MisReservasComponent {
                 };
                 return timeToMins(a.startTime || '') - timeToMins(b.startTime || '');
             });
+    });
 
     // Reservas agrupadas por perrito y hora para hoy (por si va con varios perros a la misma hora)
     todayTimeSlots = computed(() => {
