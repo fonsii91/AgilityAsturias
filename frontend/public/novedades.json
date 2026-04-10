@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.1.6",
+    "date": "2026-04-11",
+    "features": [
+      "¡Nunca más te quedes con dudas! Hemos añadido botones de 'Instrucciones' en todas las pantallas principales (Calendario, Ranking, Miembros...) para explicarte de forma sencilla cómo funciona cada apartado.",
+      "Rediseñado y mejorado visualmente el panel de buzón de sugerencias para que contactarnos sea aún más cómodo."
+    ]
+  },
+  {
     "version": "1.1.5",
     "date": "2026-04-10",
     "features": [
