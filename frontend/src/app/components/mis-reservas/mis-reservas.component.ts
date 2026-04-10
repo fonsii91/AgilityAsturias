@@ -33,8 +33,14 @@ export class MisReservasComponent {
     todayReservations = computed(() => {
         return this.myReservations()
             .filter(r => r.date === this.todayStr)
-            .sort((a, b) => (a.startTime || '').localeCompare(b.startTime || ''));
-    });
+            .sort((a, b) => {
+                const timeToMins = (t: string) => {
+                    if (!t) return 0;
+                    const parts = t.split(':').map(Number);
+                    return (parts[0] || 0) * 60 + (parts[1] || 0);
+                };
+                return timeToMins(a.startTime || '') - timeToMins(b.startTime || '');
+            });
 
     // Reservas agrupadas por perrito y hora para hoy (por si va con varios perros a la misma hora)
     todayTimeSlots = computed(() => {
@@ -47,8 +53,13 @@ export class MisReservasComponent {
             map.get(time)!.push(r);
         });
 
+        const timeToMins = (t: string) => {
+            if (!t) return 0;
+            const parts = t.split(':').map(Number);
+            return (parts[0] || 0) * 60 + (parts[1] || 0);
+        };
         return Array.from(map.entries())
-            .sort((a, b) => a[0].localeCompare(b[0]))
+            .sort((a, b) => timeToMins(a[0]) - timeToMins(b[0]))
             .map(([time, reservations]) => {
                 const dogs = reservations.map(r => r.dog?.name).filter(n => n) as string[];
                 return {
@@ -81,8 +92,13 @@ export class MisReservasComponent {
                     timeMap.get(time)!.push(r);
                 });
 
+                const timeToMins = (t: string) => {
+                    if (!t) return 0;
+                    const parts = t.split(':').map(Number);
+                    return (parts[0] || 0) * 60 + (parts[1] || 0);
+                };
                 const timeSlots = Array.from(timeMap.entries())
-                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .sort((a, b) => timeToMins(a[0]) - timeToMins(b[0]))
                     .map(([time, reservations]) => {
                         const dogs = reservations.map(r => r.dog?.name).filter(n => n) as string[];
                         return { time, dogs };

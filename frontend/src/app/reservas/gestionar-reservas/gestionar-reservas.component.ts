@@ -165,7 +165,8 @@ export class GestionarReservasComponent {
         const todayStr = `${yyyy}-${mm}-${dd}`;
 
         const mappedSlots = this.timeSlots().map(slot => {
-            const slotDate = weekDates[slot.day];
+            const normalizedDay = slot.day === 'Sabado' ? 'Sábado' : slot.day;
+            const slotDate = weekDates[normalizedDay] || weekDates['Lunes']; // Fallback to avoid crashes
 
             // 1. Find My Reservations (for "isBookedByCurrentUser" and attendees list if admin/self)
             const slotMyReservations = reservations.filter(r => {
@@ -243,11 +244,22 @@ export class GestionarReservasComponent {
     groupedSlots = computed(() => {
         const slots = this.slots();
         // Define info for all days we want to show, ordered.
-        const daysOrder = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+        const daysOrder = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
         return daysOrder.map(day => {
-            const daySlots = slots.filter(s => s.day === day);
+            const daySlots = slots.filter(s => {
+                const normDay = s.day === 'Sabado' ? 'Sábado' : s.day;
+                return normDay === day;
+            });
             if (daySlots.length === 0) return null;
+
+            // Sort explicitly by start_time numerically
+            const timeToMins = (t: string) => {
+                if (!t) return 0;
+                const parts = t.split(':').map(Number);
+                return (parts[0] || 0) * 60 + (parts[1] || 0);
+            };
+            daySlots.sort((a, b) => timeToMins(a.start_time) - timeToMins(b.start_time));
 
             // Determine period based on the first slot's start time
             // Example assumption: if first slot starts before 16:00, it's mainly Morning/Day

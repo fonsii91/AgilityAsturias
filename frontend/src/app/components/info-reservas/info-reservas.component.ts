@@ -36,8 +36,13 @@ export class InfoReservasComponent {
             map.get(time)!.push(r);
         });
 
+        const timeToMins = (t: string) => {
+            if (!t) return 0;
+            const parts = t.split(':').map(Number);
+            return (parts[0] || 0) * 60 + (parts[1] || 0);
+        };
         return Array.from(map.entries())
-            .sort((a, b) => a[0].localeCompare(b[0]))
+            .sort((a, b) => timeToMins(a[0]) - timeToMins(b[0]))
             .map(([time, reservations]) => {
                 const userMap = new Map<string, string[]>();
                 reservations.forEach(r => {
@@ -66,7 +71,6 @@ export class InfoReservasComponent {
             dateMap.get(date)!.push(r);
         });
 
-        // Transform to Date -> TimeSlots structure
         return Array.from(dateMap.entries())
             .sort((a, b) => a[0].localeCompare(b[0]))
             .map(([date, dayReservations]) => {
@@ -78,8 +82,13 @@ export class InfoReservasComponent {
                     timeMap.get(time)!.push(r);
                 });
 
+                const timeToMins = (t: string) => {
+                    if (!t) return 0;
+                    const parts = t.split(':').map(Number);
+                    return (parts[0] || 0) * 60 + (parts[1] || 0);
+                };
                 const timeSlots = Array.from(timeMap.entries())
-                    .sort((a, b) => a[0].localeCompare(b[0]))
+                    .sort((a, b) => timeToMins(a[0]) - timeToMins(b[0]))
                     .map(([time, reservations]) => {
                         const userMap = new Map<string, string[]>();
                         reservations.forEach(r => {
