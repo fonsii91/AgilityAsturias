@@ -1,9 +1,19 @@
 [
   {
+    "version": "1.1.8",
+    "date": "2026-04-11",
+    "features": [
+      "¡Tu perro, tus reglas! Hemos diseñado una jerarquía de familia inteligente donde el creador original del perfil del perro guarda el poder absoluto. Así nos aseguramos de que nadie a quien hayas invitado pueda borrar a tu peludo.",
+      "¡Despídete de los borrados accidentales! Si compartes tu perro con familiares o amigos, ellos en vez del temido botón de eliminar ahora solo tendrán la opción de 'Desvincularse', garantizando que toda la carrera e historial de tu perro permanezca siempre a salvo.",
+      "Hemos vestido la sección 'Mis Perros' a la última moda con un panel mucho más elegante, fácil de tocar con el dedo y visualmente armónico con los colores del club.",
+      "Añadido un pequeño botón de 'Instrucciones' dentro de tus Perros para explicar de forma sencilla todos esos detalles que siempre te rondan la cabeza (como el chip, el pedigree o quién ve qué)."
+    ]
+  },
+  {
     "version": "1.1.7",
     "date": "2026-04-11",
     "features": [
-      "¡Orden perfecto garantizado! Hemos ajustado el calendario de reservas para asegurarnos de que todas las clases y franjas horarias se muestren estrictamente ordenadas siempre, para que así sea más fácil encajar tus planes diarios."
+      "Hemos ajustado el calendario de reservas para asegurarnos de que todas las clases y franjas horarias se muestren estrictamente ordenadas siempre, para que así sea más fácil encajar tus planes diarios."
     ],
     "bugfixes": [
       "Los fines de semana vuelven a ser visibles con normalidad tras subsanar un pequeño contratiempo que escondía los sábados en algunas ocasiones."

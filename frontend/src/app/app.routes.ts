@@ -93,6 +93,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'gestionar-perros',
+        loadComponent: () => import('./components/gestionar-perros/gestionar-perros.component').then(m => m.GestionarPerrosComponent),
+        canActivate: [authGuard],
+        title: titleResolver, data: { pageTitle: 'Mis Perros' }
+    },
+    {
         path: 'admin/usuarios',
         loadComponent: () => import('./components/admin-usuarios/admin-usuarios').then(m => m.AdminUsuariosComponent),
         canActivate: [adminGuard],

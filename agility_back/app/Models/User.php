@@ -57,7 +57,7 @@ class User extends Authenticatable
      */
     public function dogs()
     {
-        return $this->belongsToMany(Dog::class);
+        return $this->belongsToMany(Dog::class)->withPivot('is_primary_owner');
     }
 
     /**

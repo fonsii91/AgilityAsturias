@@ -5,172 +5,68 @@
         <div class="header-title-group">
           <div class="header-photo-container">
             @if (dog.photo_url) {
-              <img [src]="dog.photo_url" alt="Foto de {{ dog.name }}" class="header-photo"
-                [class.clickable-image]="!isEditing" (click)="!isEditing && openImageModal()">
+              <img [src]="dog.photo_url" alt="Foto de {{ dog.name }}" class="header-photo clickable-image" (click)="openImageModal(); $event.stopPropagation()">
             }
             @if (!dog.photo_url) {
               <div class="header-dog-icon">🐕</div>
             }
-            <!-- Camera button for editing -->
-            @if (isEditing) {
-              <label class="camera-btn-edit-small" title="Cambiar foto">
-                <span class="material-icons-outlined camera-icon-xs">photo_camera</span>
-                <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
-              </label>
-            }
           </div>
-          @if (!isEditing) {
-            <h3>{{ dog.name }}</h3>
-          }
-          @if (isEditing) {
-            <h3>Editar Perfil ✏️</h3>
-          }
+          <h3>{{ dog.name }}</h3>
         </div>
         <div class="header-actions">
-          @if (!isEditing && isOwner()) {
-            <button class="edit-btn" (click)="toggleEdit()" title="Editar Ficha">
-              <span class="material-icons-outlined">edit</span>
-            </button>
-          }
           <button class="close-btn" (click)="closeModal()">&times;</button>
         </div>
       </div>
       <div class="modal-body ficha-body">
         <div class="dog-details">
-          <!-- Display Mode -->
-          @if (!isEditing) {
-            @if (dog.breed) {
-              <div class="detail-item">
-                <span class="detail-label">Raza:</span>
-                <span class="detail-value">{{ dog.breed }}</span>
-              </div>
-            }
-            @if (dog.birth_date) {
-              <div class="detail-item">
-                <span class="detail-label">Edad:</span>
-                <span class="detail-value">{{ getFormattedAge() }}</span>
-              </div>
-            }
-            @if (isOwner()) {
-              <div class="detail-item">
-                <span class="detail-label">Caducidad Licencia Agility:</span>
-                <span class="detail-value">{{ getFormattedLicenseExpirationDate() }}</span>
-              </div>
-            }
-            @if (dog.microchip && isOwner()) {
-              <div class="detail-item">
-                <span class="detail-label">Microchip:</span>
-                <span class="detail-value">{{ dog.microchip }}</span>
-              </div>
-            }
-            @if (dog.pedigree && isOwner()) {
-              <div class="detail-item">
-                <span class="detail-label">Libro de Orígenes:</span>
-                <span class="detail-value">{{ dog.pedigree }}</span>
-              </div>
-            }
+          @if (dog.breed) {
+            <div class="detail-item">
+              <span class="detail-label">Raza:</span>
+              <span class="detail-value">{{ dog.breed }}</span>
+            </div>
           }
-          <!-- Edit Mode -->
-          @if (isEditing) {
-            <div class="edit-form-group">
-              <label class="form-label">Nombre *</label>
-              <input type="text" class="form-input" [(ngModel)]="editForm.name" placeholder="Nombre del perro">
+          @if (dog.birth_date) {
+            <div class="detail-item">
+              <span class="detail-label">Edad:</span>
+              <span class="detail-value">{{ getFormattedAge() }}</span>
             </div>
-            <div class="edit-form-group">
-              <label class="form-label">Raza</label>
-              <input type="text" class="form-input" [(ngModel)]="editForm.breed" placeholder="Raza">
-            </div>
-            <div class="edit-form-group">
-              <label class="form-label">Fecha de Nacimiento</label>
-              <input type="date" class="form-input" [(ngModel)]="editForm.birth_date">
-            </div>
-            <div class="edit-form-group">
-              <label class="form-label">Caducidad Licencia Agility</label>
-              <input type="date" class="form-input" [(ngModel)]="editForm.license_expiration_date">
-            </div>
-            <div class="edit-form-group">
-              <label class="form-label">Microchip (15 caracteres)</label>
-              <input type="text" class="form-input" [(ngModel)]="editForm.microchip" maxlength="15"
-                placeholder="Ej: 981100000000000">
-              </div>
-              <div class="edit-form-group">
-                <label class="form-label">Libro de Orígenes</label>
-                <input type="text" class="form-input" [(ngModel)]="editForm.pedigree" placeholder="LOE, LOC, etc.">
-              </div>
-              <!-- Acciones de Dueño: Compartir -->
-              @if (isOwner()) {
-                <div class="dog-actions-footer" style="margin-top: 1.5rem; margin-bottom: 2rem; text-align: center;">
-                  @if (!isSharing) {
-                    <button class="btn-secondary" (click)="toggleShare()" style="width: 100%; border: 1px solid var(--primary-color); border-radius: var(--border-radius); padding: 0.5rem; color: var(--primary-color); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                      <span class="material-icons-outlined" style="font-size: 18px;">group_add</span> Compartir Perro con Familiar
-                    </button>
-                  }
-                  @if (isSharing) {
-                    <div class="share-dog-panel glass-effect" style="margin-top: 1rem; padding: 1rem; border-radius: var(--border-radius); text-align: left;">
-                      <h5 style="margin-bottom: 0.8rem; font-size: 0.95rem; color: var(--text-color);">Reasignar Pista (Vincular Familiar):</h5>
-                      @if (isFetchingUsers) {
-                        <div class="loading-text" style="font-size: 0.85rem; color: #666;">Cargando usuarios...</div>
-                      }
-                      @if (!isFetchingUsers) {
-                        <div>
-                          <select [(ngModel)]="shareEmail" class="form-input" style="width: 100%; margin-bottom: 0.8rem;">
-                            <option value="" disabled selected>-- Elige un usuario --</option>
-                            @for (user of usersList; track user) {
-                              <option [value]="user.email">{{ user.name }} ({{ user.email }})</option>
-                            }
-                          </select>
-                          <div style="display: flex; gap: 10px;">
-                            <button (click)="toggleShare()" style="flex: 1; padding: 0.5rem; background: #e0e0e0; color: #333; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
-                            <button (click)="submitShare()" [disabled]="!shareEmail" style="flex: 1; padding: 0.5rem; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer;" [style.opacity]="!shareEmail ? 0.5 : 1">Vincular</button>
-                          </div>
-                        </div>
-                      }
+          }
+          
+          <div class="point-history-section">
+            <h4 class="history-title">Historial de Puntos <span class="points-badge">{{ dog.points || 0 }} pts</span></h4>
+            @if (dog.pointHistories && dog.pointHistories.length > 0) {
+              <div class="history-list">
+                @for (history of dog.pointHistories; track history) {
+                  <div class="history-item">
+                    <div class="history-info">
+                      <span class="history-category">
+                        <span class="emoji-badge">{{ getEmoji(history.category, history.points) }}</span>
+                        {{ history.category }}
+                      </span>
+                      <span class="history-date">{{ getFormattedHistoryDate(history.created_at) }}</span>
                     </div>
-                  }
-                </div>
-              }
-              <div class="edit-actions-bottom">
-                <button class="btn-cancel" (click)="toggleEdit()">Cancelar Formulario</button>
-                <button class="btn-save" (click)="saveChanges()" [disabled]="!editForm.name?.trim()">Guardar Cambios</button>
-              </div>
-            }
-            <!-- Point History -->
-            @if (!isEditing) {
-              <div class="point-history-section">
-                <h4 class="history-title">Historial de Puntos <span class="points-badge">{{ dog.points || 0 }} pts</span></h4>
-                @if (dog.pointHistories && dog.pointHistories.length > 0) {
-                  <div class="history-list">
-                    @for (history of dog.pointHistories; track history) {
-                      <div class="history-item">
-                        <div class="history-info">
-                          <span class="history-category">
-                            <span class="emoji-badge">{{ getEmoji(history.category, history.points) }}</span>
-                            {{ history.category }}
-                          </span>
-                          <span class="history-date">{{ getFormattedHistoryDate(history.created_at) }}</span>
-                        </div>
-                        <div class="history-points" [ngClass]="{'positive': history.points > 0, 'negative': history.points < 0}">
-                          {{ history.points > 0 ? '+' : '' }}{{ history.points }}
-                        </div>
-                      </div>
-                    }
+                    <div class="history-points" [ngClass]="{'positive': history.points > 0, 'negative': history.points < 0}">
+                      {{ history.points > 0 ? '+' : '' }}{{ history.points }}
+                    </div>
                   </div>
-                } @else {
-                  <p class="no-history-msg">No hay registro de puntos todavía.</p>
                 }
               </div>
+            } @else {
+              <p class="no-history-msg">No hay registro de puntos todavía.</p>
             }
           </div>
         </div>
       </div>
-      <!-- Image Modal -->
-      @if (imageModalOpen) {
-        <div class="modal-overlay image-modal-overlay" (click)="closeImageModal($event)">
-          <button class="close-image-btn" (click)="closeImageModal($event)">&times;</button>
-          @if (dog.photo_url) {
-            <img [src]="dog.photo_url" class="full-size-image" (click)="stopPropagation($event)">
-          }
-        </div>
-      }
     </div>
-  }
+    
+    <!-- Image Modal -->
+    @if (imageModalOpen) {
+      <div class="modal-overlay image-modal-overlay" (click)="closeImageModal($event)">
+        <button class="close-image-btn" (click)="closeImageModal($event)">&times;</button>
+        @if (dog.photo_url) {
+          <img [src]="dog.photo_url" class="full-size-image" (click)="stopPropagation($event)">
+        }
+      </div>
+    }
+  </div>
+}

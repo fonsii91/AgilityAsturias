@@ -241,8 +241,8 @@ a:hover {
     color: #a0aec0;
 }
 
-/* Button & Spinner */
-.btn-primary {
+/* Auth Button & Spinner */
+.auth-card .btn-primary {
     width: 100%;
     padding: 14px;
     background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
@@ -263,7 +263,7 @@ a:hover {
     overflow: hidden;
 }
 
-.btn-primary::after {
+.auth-card .btn-primary::after {
     content: '';
     position: absolute;
     top: 0;
@@ -274,21 +274,21 @@ a:hover {
     transition: 0.5s;
 }
 
-.btn-primary:hover:not(:disabled)::after {
+.auth-card .btn-primary:hover:not(:disabled)::after {
     left: 100%;
 }
 
-.btn-primary:hover:not(:disabled) {
+.auth-card .btn-primary:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 8px 15px rgba(0, 115, 207, 0.3);
 }
 
-.btn-primary:active:not(:disabled) {
+.auth-card .btn-primary:active:not(:disabled) {
     transform: translateY(0);
     box-shadow: 0 2px 4px rgba(0, 115, 207, 0.2);
 }
 
-.btn-primary:disabled {
+.auth-card .btn-primary:disabled {
     background: #cbd5e0;
     cursor: not-allowed;
     box-shadow: none;
@@ -446,7 +446,7 @@ a:hover {
     box-shadow: 0 2px 4px rgba(246, 211, 18, 0.3);
 }
 
-.btn-logout {
+.auth-card .btn-logout {
     width: 100%;
     margin-top: 2rem;
     padding: 12px;
@@ -463,7 +463,7 @@ a:hover {
     transition: all 0.2s;
 }
 
-.btn-logout:hover {
+.auth-card .btn-logout:hover {
     background: #fff5f5;
     color: var(--error-color);
     border-color: #fed7d7;

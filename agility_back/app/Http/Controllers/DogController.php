@@ -40,11 +40,11 @@ class DogController extends Controller
             'breed' => 'nullable|string',
             'birth_date' => 'nullable|date',
             'license_expiration_date' => 'nullable|date',
-            'microchip' => 'nullable|string|max:15',
+            'microchip' => 'nullable|string|max:30',
             'pedigree' => 'nullable|string',
         ]);
 
-        $dog = $request->user()->dogs()->create($validated);
+        $dog = $request->user()->dogs()->create($validated, ['is_primary_owner' => true]);
         $dog->load('users:id,name,email');
 
         return response()->json($dog, 201);
@@ -72,7 +72,7 @@ class DogController extends Controller
             'breed' => 'nullable|string',
             'birth_date' => 'nullable|date',
             'license_expiration_date' => 'nullable|date',
-            'microchip' => 'nullable|string|max:15',
+            'microchip' => 'nullable|string|max:30',
             'pedigree' => 'nullable|string',
         ]);
 
@@ -92,13 +92,15 @@ class DogController extends Controller
     {
         $dog = Auth::user()->dogs()->withCount('users')->findOrFail($id);
 
-        if ($dog->users_count > 1) {
-            // Si hay compartición, simplemente nos desvinculamos
+        // Si el usuario actual no es el dueño primario, solo se desvincula
+        if (!$dog->pivot->is_primary_owner) {
             $dog->users()->detach(Auth::id());
-        } else {
-            // Si somos el único dueño, borramos el perro del sistema
-            $dog->delete();
+            return response()->noContent();
         }
+
+        // Si es el dueño primario pero hay otros dueños (opcional: podríamos forzar a que desvincule a todos primero, 
+        // pero como es dueño primario, borrará el perro para todos).
+        $dog->delete();
 
         return response()->noContent();
     }
@@ -189,10 +191,43 @@ class DogController extends Controller
             return response()->json(['message' => 'Este usuario ya es co-dueño del perro.'], 422);
         }
 
-        $dog->users()->attach($userToShareWith->id);
+        $dog->users()->attach($userToShareWith->id, ['is_primary_owner' => false]);
 
         return response()->json([
             'message' => 'Perro compartido exitosamente con ' . $userToShareWith->name,
+            'dog' => $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            }])
+        ]);
+    }
+
+    /**
+     * Unshare a dog from a user.
+     */
+    public function unshare(Request $request, string $id)
+    {
+        $dog = Auth::user()->dogs()->findOrFail($id);
+
+        // Solo el dueño principal puede expulsar a otros
+        if (!$dog->pivot->is_primary_owner) {
+            return response()->json(['message' => 'Solo el dueño principal puede revocar accesos.'], 403);
+        }
+
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+        ]);
+
+        $userIdToRemove = $validated['user_id'];
+
+        // No puede expulsarse a sí mismo por aquí (para eso está destroy)
+        if ($userIdToRemove == Auth::id()) {
+            return response()->json(['message' => 'No puedes revocar tu propio acceso. Usa Eliminar en su lugar.'], 422);
+        }
+
+        $dog->users()->detach($userIdToRemove);
+
+        return response()->json([
+            'message' => 'Acceso revocado exitosamente',
             'dog' => $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             }])

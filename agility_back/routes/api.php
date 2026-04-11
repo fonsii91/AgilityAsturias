@@ -129,6 +129,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/dogs', [DogController::class, 'store']);
         Route::get('/dogs/{id}', [DogController::class, 'show']);
         Route::post('/dogs/{id}/share', [DogController::class, 'share']);
+        Route::post('/dogs/{id}/unshare', [DogController::class, 'unshare']);
         // Notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);

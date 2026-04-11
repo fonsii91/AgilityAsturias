@@ -139,4 +139,17 @@ export class DogService {
             });
         });
     }
+
+    removeShare(dogId: number, userId: number) {
+        return new Promise<Dog>((resolve, reject) => {
+            this.http.post<{message: string; dog: Dog}>(`${this.apiUrl}/${dogId}/unshare`, { user_id: userId }).subscribe({
+                next: (res) => {
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
+                    resolve(res.dog);
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
 }

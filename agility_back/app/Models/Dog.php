@@ -24,7 +24,7 @@ class Dog extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)->withPivot('is_primary_owner');
     }
 
     public function reservations()
@@ -45,5 +45,35 @@ class Dog extends Model
     public function pointHistories()
     {
         return $this->hasMany(PointHistory::class);
+    }
+
+    /**
+     * Override toArray to ensure private data is only exposed to the owners.
+     */
+    public function toArray()
+    {
+        $array = parent::toArray();
+        
+        $userId = auth()->id();
+        $isOwner = false;
+
+        if ($userId) {
+            if ($this->relationLoaded('users')) {
+                $isOwner = $this->users->contains('id', $userId);
+            } else {
+                $isOwner = \Illuminate\Support\Facades\DB::table('dog_user')
+                            ->where('dog_id', $this->id)
+                            ->where('user_id', $userId)
+                            ->exists();
+            }
+        }
+
+        if (!$isOwner) {
+            unset($array['microchip']);
+            unset($array['pedigree']);
+            unset($array['license_expiration_date']);
+        }
+
+        return $array;
     }
 }

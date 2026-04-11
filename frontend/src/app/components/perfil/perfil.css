@@ -1,19 +1,20 @@
 .perfil-container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 2rem auto;
-    padding: 2rem;
+    padding: 0;
     background-color: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
 .profile-header {
     display: flex;
     align-items: center;
-    gap: 20px;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 2rem;
+    gap: 30px;
+    padding: 3rem 2rem;
+    background: linear-gradient(180deg, rgba(240,244,248,1) 0%, rgba(255,255,255,1) 100%);
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .avatar-container {
@@ -22,12 +23,34 @@
 }
 
 .profile-avatar {
-    width: 80px;
-    height: 80px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--accent-orange);
+    border: 4px solid var(--accent-orange);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     flex-shrink: 0;
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+
+.spin-icon {
+    animation: spin 1s linear infinite;
+    color: var(--primary-blue);
+    font-size: 2rem;
+}
+
+@keyframes spin {
+    100% { transform: rotate(360deg); }
 }
 
 .camera-btn {
@@ -97,18 +120,24 @@
 }
 
 .edit-name-input {
-    padding: 6px 10px;
-    border: 1px solid var(--primary-blue);
-    border-radius: 6px;
-    font-size: 1.1rem;
+    padding: 8px 12px;
+    border: 2px solid var(--primary-blue);
+    border-radius: 8px;
+    font-size: 1.2rem;
     font-weight: bold;
     color: #333;
-    width: 200px;
+    width: 250px;
+    transition: box-shadow 0.2s;
+}
+
+.edit-name-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 68, 148, 0.2);
 }
 
 .edit-actions {
     display: flex;
-    gap: 5px;
+    gap: 8px;
 }
 
 .btn-check,
@@ -116,14 +145,21 @@
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 4px;
-    transition: transform 0.1s;
+    transition: transform 0.2s;
+}
+
+.btn-check span,
+.btn-cancel-edit span {
+    font-size: 1.8rem;
 }
 
 .btn-check:hover,
 .btn-cancel-edit:hover {
-    transform: scale(1.2);
+    transform: scale(1.1);
 }
 
 .profile-info p {
@@ -160,78 +196,79 @@
     color: #2e7d32;
 }
 
-/* Dogs Section */
-.dogs-section h3 {
-    margin-top: 0;
+.dogs-section {
+    padding: 1rem 2rem 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.section-title {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
     color: #333;
     font-size: 1.5rem;
 }
 
 .section-desc {
-    color: #777;
+    color: #64748b;
     margin-bottom: 1.5rem;
+    font-size: 0.95rem;
 }
 
-.add-dog-form {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 2rem;
-}
-
-.add-dog-form input {
-    flex: 1;
-    padding: 12px 15px;
-    /* Larger touch target */
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
-    min-width: 0;
-    /* Important for flex container shrinking */
-}
-
-.btn-add {
-    background-color: var(--primary-blue);
+.btn-primary {
     color: white;
     border: none;
-    padding: 0 20px;
-    border-radius: 6px;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s;
-    white-space: nowrap;
+    font-weight: 600;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
 }
 
-.btn-add:hover:not(:disabled) {
-    background-color: #004494;
-    /* Darker blue */
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.btn-add:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
-
-.dogs-list {
+.dogs-grid {
     display: grid;
-    gap: 10px;
-    grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
-    /* Stack on mobile, grid on desktop if needed */
+    gap: 15px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 .dog-card {
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.dog-card-content {
     display: flex;
     align-items: center;
-    background-color: #f9f9f9;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #eee;
-    transition: transform 0.2s;
+    padding: 1rem;
+    gap: 15px;
 }
 
 .dog-card:hover {
-    transform: translateY(-2px);
-    /* Vertical movement is better on mobile */
-    border-color: #ddd;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0,0,0,0.05);
 }
 
 .dog-icon-container {
@@ -242,68 +279,64 @@
 }
 
 .dog-avatar {
-    width: 50px;
-    height: 50px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--accent-orange);
     display: block;
 }
 
-.camera-btn-dog {
-    position: absolute;
-    bottom: -5px;
-    right: -5px;
-    background-color: var(--primary-blue);
-    color: white;
+.dog-icon-placeholder {
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
+    background-color: rgba(0,0,0,0.04);
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    font-size: 10px;
-    border: 2px solid white;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
 }
 
-.camera-btn-dog:hover {
-    transform: scale(1.1);
-    background-color: #004494;
-}
-
-.camera-icon-small {
-    font-size: 16px;
-}
-
-.dog-icon {
-    font-size: 1.5rem;
-    background-color: white;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+.dog-icon-placeholder span {
+    font-size: 28px;
+    opacity: 0.7;
 }
 
 .dog-info {
     flex: 1;
     min-width: 0;
-    /* Fix flex child overflow */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .dog-name {
     font-weight: bold;
-    font-size: 1.1rem;
-    color: #333;
+    font-size: 1.15rem;
+    color: #1e293b;
     display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.dog-breed {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.dog-action-icon {
+    display: flex;
+    align-items: center;
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s ease;
+}
+
+.dog-card:hover .dog-action-icon {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .btn-edit-dog,
@@ -325,11 +358,18 @@
 
 .empty-state {
     text-align: center;
-    padding: 2rem;
-    color: #999;
-    font-style: italic;
-    background-color: #f9f9f9;
-    border-radius: 8px;
+    padding: 3rem 2rem;
+    color: #64748b;
+    background-color: #f8fafc;
+    border-radius: 12px;
+    border: 2px dashed #e2e8f0;
+    grid-column: 1 / -1;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    color: #cbd5e1;
+    margin-bottom: 1rem;
 }
 
 .clickable-image {
@@ -539,11 +579,12 @@
         flex-direction: column;
         text-align: center;
         gap: 15px;
+        padding: 2rem 1.5rem;
     }
 
     .profile-avatar {
-        width: 100px;
-        height: 100px;
+        width: 90px;
+        height: 90px;
     }
 
     .profile-info h2 {

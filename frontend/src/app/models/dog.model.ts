@@ -7,7 +7,7 @@ export interface Dog {
     microchip?: string;
     pedigree?: string;
     photo_url?: string;
-    users?: Array<{ id: number; name: string }>;
+    users?: Array<{ id: number; name: string; email?: string; pivot?: { is_primary_owner: boolean } }>;
     points?: number;
     pointHistories?: Array<{
         id: number;

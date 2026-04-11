@@ -1,0 +1,411 @@
+<div class="gestion-container">
+  <div class="gestion-header">
+    <div class="header-titles">
+      <h2 style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <span class="material-icons-outlined">pets</span> Mis Perros
+        <button class="help-btn" (click)="openHelpModal()" title="Instrucciones"
+          style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 4px 12px; display: inline-flex; align-items: center; gap: 4px; justify-content: center; color: var(--text-color, #64748b); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-left: 0.5rem;">
+          <span class="material-icons" style="font-size: 16px;">help_outline</span> Instrucciones
+        </button>
+      </h2>
+      <p>Añade y actualiza la información de tus compañeros caninos</p>
+    </div>
+
+    @if (!isAddingNew() && !selectedDog()) {
+    <button class="btn-primary add-btn" (click)="startAddDog()" [style.background-color]="clubTheme.primary">
+      <span class="material-icons">add</span> Añadir Perro
+    </button>
+    }
+  </div>
+
+  <div class="gestion-content" [class.show-form]="isAddingNew() || selectedDog()">
+
+    <!-- Lado Izquierdo: Listado de perros (Se oculta en móvil si hay formulario activo) -->
+    <div class="dog-list-panel" [class.hidden-mobile]="isAddingNew() || selectedDog()">
+      @if (dogs().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons-outlined empty-icon">sentiment_dissatisfied</span>
+        <p>Todavía no has registrado ningún perro.</p>
+      </div>
+      }
+
+      @for (dog of dogs(); track dog.id) {
+      <div class="dog-list-card" [class.active]="selectedDog()?.id === dog.id" (click)="editDog(dog)">
+        <div class="dog-avatar-container">
+          @if (dog.photo_url) {
+          <img [src]="dog.photo_url" [alt]="dog.name" class="list-avatar">
+          } @else {
+          <div class="list-avatar-placeholder">🐕</div>
+          }
+        </div>
+        <div class="dog-list-info" style="flex: 1;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h4 style="margin: 0; font-size: 1rem;">{{ dog.name }}</h4>
+            <span style="font-size: 0.75rem; color: #64748b;">{{ calculateAge(dog.birth_date) }}</span>
+          </div>
+
+          <div class="dog-tags" style="margin-top: 0.2rem;">
+            @if (dog.breed) { <span class="tag-badge breed">{{ dog.breed }}</span> }
+            @if (!dog.microchip) { <span class="tag-badge warning" title="Falta Microchip"
+              style="background:#fee2e2;color:#b91c1c;"><span class="material-icons"
+                style="font-size:0.8rem">warning</span> Chip</span> }
+            <span class="tag-badge points" [style.background-color]="clubTheme.accent"
+              style="color:white; font-weight: bold;">{{ dog.points || 0 }} pts</span>
+          </div>
+
+          <div class="progress-bar-container"
+            style="margin-top: 0.5rem; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; position: relative;">
+            <div class="progress-bar-fill" [style.width.%]="calculateProgress(dog)"
+              [style.background]="calculateProgress(dog) === 100 ? '#22c55e' : clubTheme.primary"
+              style="height: 100%; transition: width 0.5s ease;">
+            </div>
+          </div>
+        </div>
+        <span class="material-icons chevron-icon">chevron_right</span>
+      </div>
+      }
+    </div>
+
+    <!-- Lado Derecho: Formulario (Solo visible si hay perro seleccionado o añadiendo) -->
+    @if (isAddingNew() || selectedDog()) {
+    <div class="dog-form-panel glass-effect slide-in">
+      <div class="panel-header">
+        <h3 style="flex:1; text-align: center; padding-left: 2rem;">
+          {{ isAddingNew() ? 'Añadir Nuevo Perro' : 'Editar Perfil de ' + selectedDog()?.name }}
+        </h3>
+        <button class="btn-icon-close" (click)="cancelEdit()">
+          <span class="material-icons-outlined" style="font-size: 1.3rem;">close</span>
+        </button>
+      </div>
+
+      <div class="form-tabs-container">
+        <div class="form-tabs">
+          <button class="tab-btn" [class.active]="activeTab() === 'publico'" (click)="activeTab.set('publico')"
+            [style.color]="activeTab() === 'publico' ? clubTheme.primary : ''"
+            [style.border-bottom-color]="activeTab() === 'publico' ? clubTheme.primary : 'transparent'">
+            <span class="material-icons-outlined">public</span> Púb.
+          </button>
+          <button class="tab-btn" [class.active]="activeTab() === 'privado'" (click)="activeTab.set('privado')"
+            [style.color]="activeTab() === 'privado' ? clubTheme.primary : ''"
+            [style.border-bottom-color]="activeTab() === 'privado' ? clubTheme.primary : 'transparent'">
+            <span class="material-icons-outlined">lock</span> Priv.
+          </button>
+          @if (!isAddingNew()) {
+          <button class="tab-btn" [class.active]="activeTab() === 'familia'" (click)="activeTab.set('familia')"
+            [style.color]="activeTab() === 'familia' ? clubTheme.primary : ''"
+            [style.border-bottom-color]="activeTab() === 'familia' ? clubTheme.primary : 'transparent'">
+            <span class="material-icons-outlined">family_restroom</span> Fam.
+          </button>
+          }
+        </div>
+      </div>
+
+      <div class="form-scrollable-body">
+        @if (activeTab() === 'publico') {
+        <div class="photo-section">
+          <div class="photo-preview-wrapper" [class.no-photo]="!previewUrl()">
+            @if (isUploadingPhoto()) {
+            <div class="upload-overlay"
+              style="position:absolute; top:0; left:0; right:0; bottom:0; background:rgba(255,255,255,0.7); display:flex; align-items:center; justify-content:center; border-radius:50%; z-index:2;">
+              <span class="material-icons-outlined"
+                style="animation: spin 1s linear infinite; color: var(--primary-blue);">sync</span>
+            </div>
+            }
+            @if (previewUrl()) {
+            <img [src]="previewUrl()" alt="Previsualización" class="dog-preview-img">
+            } @else {
+            <span class="material-icons-outlined placeholder-icon">add_a_photo</span>
+            }
+            <label class="camera-floating-btn" title="Subir foto" [style.background]="clubTheme.primary">
+              <span class="material-icons">camera_alt</span>
+              <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+            </label>
+          </div>
+          <p class="photo-help-text">Sube una foto cuadrada para que luzca perfecta.</p>
+        </div>
+
+        <div class="two-col-grid">
+          <div class="form-group required">
+            <label>Nombre del Perro</label>
+            <div class="input-with-icon">
+              <span class="material-icons-outlined input-icon">badge</span>
+              <input type="text" [(ngModel)]="formData().name" placeholder="P. ej. Toby" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Raza</label>
+            <div class="input-with-icon">
+              <span class="material-icons-outlined input-icon">category</span>
+              <input type="text" [(ngModel)]="formData().breed"
+                placeholder="Si es mestizo, déjalo en blanco o indícalo">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label>Fecha de Nacimiento</label>
+            <input type="date" [(ngModel)]="formData().birth_date" class="date-input">
+          </div>
+        </div>
+        }
+
+        @if (activeTab() === 'privado') {
+        <div class="advanced-section">
+          <p class="privacy-note"><span class="material-icons-outlined">info</span> Estos datos son totalmente
+            confidenciales y sólo son visibles para ti.</p>
+
+          <div class="two-col-grid">
+            <div class="form-group full-width">
+              <label>Nº Microchip</label>
+              <input type="text" [(ngModel)]="formData().microchip"
+                placeholder="Código de 15 dígitos u otros (max 30 caract.)" maxlength="30">
+            </div>
+
+            <h4 class="section-divider">Datos Federativos y Competición</h4>
+
+            <div class="form-group">
+              <label>Vencimiento de Licencia</label>
+              <input type="date" [(ngModel)]="formData().license_expiration_date" class="date-input">
+            </div>
+
+            <div class="form-group">
+              <label>Número de Pedigree / LOE</label>
+              <input type="text" [(ngModel)]="formData().pedigree" placeholder="LOE-0000000">
+            </div>
+          </div>
+
+          @if (selectedDog()) {
+          <div
+            style="margin-top: 3rem; padding: 1.5rem; border-radius: 12px; background: #fef2f2; border: 1px solid #fecaca;">
+            <h4 style="color: #b91c1c; margin: 0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+              <span class="material-icons-outlined">warning</span> {{ isPrimaryOwner() ? 'Zona de Peligro' : 'Renunciar
+              al acceso' }}
+            </h4>
+            <p style="font-size: 0.85rem; color: #991b1b; margin: 0 0 1rem 0;">
+              @if (isPrimaryOwner()) {
+              Eliminar el perfil es una acción destructiva e irremediable. Borrará todo el historial, participaciones y
+              reservas vinculadas a este perro en el sistema.
+              } @else {
+              Al desvincularte, dejarás de tener acceso al perfil de este perro. El animal seguirá existiendo en el
+              sistema para el dueño original.
+              }
+            </p>
+            <button class="btn-danger-outline" (click)="promptDelete($event)"
+              style="background: white; width: 100%; justify-content: center;">
+              <span class="material-icons-outlined">{{ isPrimaryOwner() ? 'delete_forever' : 'person_remove' }}</span>
+              {{ isPrimaryOwner() ? 'Eliminar a ' : 'Desvincularme de ' }} {{ selectedDog()?.name }}
+            </button>
+          </div>
+          }
+        </div>
+        }
+
+        @if (activeTab() === 'familia' && !isAddingNew()) {
+        <div class="advanced-section fade-in">
+          <h4 class="section-divider">Co-dueños (Familia)</h4>
+          <div class="info-note" [style.border-left-color]="clubTheme.primary">
+            <span class="material-icons-outlined" [style.color]="clubTheme.primary">info</span>
+            <p>Invita a otras personas introduciendo el email con el que se han registrado en la web.</p>
+          </div>
+
+          <div class="form-group full-width" style="margin-bottom: 2rem;">
+            <label>Vincular a un nuevo usuario</label>
+            <div class="input-group-action">
+              <input type="email" [(ngModel)]="shareEmail" placeholder="Email del usuario titular">
+              <button class="btn-primary" [style.background]="clubTheme.primary" (click)="shareDog()"
+                [disabled]="!shareEmail().trim()">
+                Compartir
+              </button>
+            </div>
+          </div>
+
+          <h4 class="section-divider">Tienen acceso actual:</h4>
+          <div class="owners-list">
+            @for(owner of selectedDog()?.users; track owner.id) {
+            <div class="user-chip">
+              <div class="user-chip-avatar" [style.background]="clubTheme.primary">
+                {{ owner.name.substring(0,2).toUpperCase() }}
+              </div>
+              <div style="flex: 1;">
+                <p style="margin:0; font-weight:600; font-size:0.95rem;">
+                  {{ owner.name }}
+                  @if (owner.pivot?.is_primary_owner) {
+                  <span
+                    style="font-size: 0.7rem; background: #e2e8f0; padding: 2px 6px; border-radius: 12px; margin-left: 5px;">Original</span>
+                  }
+                </p>
+                <p style="margin:0; font-size:0.8rem; color:#64748b;">{{ owner.email }}</p>
+              </div>
+
+              @if (isPrimaryOwner() && owner.id !== authService.currentUserSignal()?.id) {
+              <button class="btn-icon-close" style="position: static; transform: none; color: #ef4444;"
+                (click)="removeShareUser(owner.id, owner.name)" title="Revocar acceso">
+                <span class="material-icons-outlined" style="font-size: 1.2rem;">person_remove</span>
+              </button>
+              }
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+
+      <div class="form-actions-footer" style="justify-content: flex-end;">
+        <div class="right-actions">
+          <button class="btn-cancel" (click)="cancelEdit()">Cancelar</button>
+          <button class="btn-save" (click)="saveDog()" [disabled]="!formData().name?.trim()"
+            [style.background]="clubTheme.primary">
+            <span class="material-icons">save</span> {{ isAddingNew() ? 'Registrar Perro' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Delete Modal Confirmation -->
+  @if (deleteModalOpen()) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="modal-content glass-effect delete-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="danger-title">{{ isPrimaryOwner() ? '¿Eliminar a ' : '¿Desvincularme de ' }}{{ selectedDog()?.name
+          }}?</h3>
+        <button class="close-btn" (click)="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        @if (isPrimaryOwner()) {
+        <p>Estás a punto de borrar todos los datos de <strong>{{ selectedDog()?.name }}</strong> del sistema.</p>
+        <p class="note warning"><span class="material-icons-outlined">warning</span> Esta acción <strong>no se puede
+            deshacer</strong> y perderás su historial de puntos y reservas asociadas.</p>
+        } @else {
+        <p>Estás a punto de renunciar a la co-propiedad y borrar de tu lista a <strong>{{ selectedDog()?.name
+            }}</strong>.</p>
+        <p class="note warning"><span class="material-icons-outlined">warning</span> Tú perderás su acceso localmente,
+          pero el dueño original mantendrá el perro y su historial intacto.</p>
+        }
+
+        <div class="delete-confirm-input">
+          <label>Escribe "{{ isPrimaryOwner() ? 'BORRAR' : 'DESVINCULAR' }}" para confirmar:</label>
+          <input type="text" [(ngModel)]="deleteConfirmText"
+            [placeholder]="isPrimaryOwner() ? 'BORRAR' : 'DESVINCULAR'">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="closeDeleteModal()">Cancelar</button>
+        <button class="btn-confirm-delete" (click)="confirmDelete()"
+          [disabled]="deleteConfirmText() !== (isPrimaryOwner() ? 'BORRAR' : 'DESVINCULAR')">
+          {{ isPrimaryOwner() ? 'Sí, Eliminar Definitivamente' : 'Sí, Desvincularme del Perro' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Modal de Instrucciones -->
+  @if (isHelpModalOpen()) {
+  <div class="modal-overlay" style="z-index: 1050; padding: 1rem; display: flex; box-sizing: border-box;"
+    (click)="closeHelpModal()">
+    <div class="modal-content glass-effect help-modal" (click)="$event.stopPropagation()"
+      style="max-width: 600px; width: 100%; margin: auto; padding: 0; border-radius: 12px; overflow: hidden; background: white; text-align: left; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+      <div class="modal-header"
+        style="padding: 1.5rem; display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; align-items: center; background: #f8fafc;">
+        <h3 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+          <span class="material-icons-outlined" [style.color]="clubTheme.primary">menu_book</span> Guía de Gestión
+        </h3>
+        <button class="close-btn" (click)="closeHelpModal()"
+          style="background: transparent; border: none; font-size: 1.5rem; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; color: #64748b; transition: background 0.2s;">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 1.5rem; max-height: 65vh; overflow-y: auto;">
+        <p style="margin-top: 0; color: #475569; font-size: 0.95rem; line-height: 1.6;">
+          Bienvenido a la gestión de tu manada. Desde aquí puedes mantener actualizados todos los datos de tus perros,
+          subir sus mejores fotos y organizar quién tiene acceso a ellos.
+        </p>
+
+        <h4
+          style="margin: 1.5rem 0 1rem 0; color: #334155; font-size: 1.1rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 0.5rem;">
+          Ajustes y Reglas de la Plataforma</h4>
+
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 1.5rem;">
+          <li style="display: flex; gap: 12px; align-items: flex-start;">
+            <div
+              style="background: #e0f2fe; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <span class="material-icons-outlined" style="color: #0284c7; font-size: 1.3rem;">public</span>
+            </div>
+            <div style="flex: 1;">
+              <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Datos Públicos</strong>
+              <span style="color: #475569; font-size: 0.9rem; line-height: 1.5;">El <span class="chipi">nombre</span>,
+                la <span class="chipi">raza</span>,
+                la
+                <span class="chipi">edad</span> y la <span class="chipi">foto</span> conforman la tarjeta de
+                presentación de tu perro visible en la
+                aplicación
+                por el resto de miembros. Por otro lado, los <em>puntos de
+                  ranking</em> solo te los puede otorgar o modificar un miembro del Staff mediante eventos o hitos
+                de tu perro.</span>
+            </div>
+          </li>
+
+          <li style="display: flex; gap: 12px; align-items: flex-start;">
+            <div
+              style="background: #f3e8ff; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <span class="material-icons-outlined" style="color: #9333ea; font-size: 1.3rem;">lock</span>
+            </div>
+            <div style="flex: 1;">
+              <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Datos Privados</strong>
+              <span style="color: #475569; font-size: 0.9rem; line-height: 1.6;">
+                Tus números de <span class="chipi">Microchip</span> y <span class="chipi">LOE</span> jamás se utilizan
+                funcionalmente dentro de la
+                aplicación. Están ahí únicamente para ti, listos y accesibles para cuando necesites consultarlos. Toda
+                esta información la guardamos <strong>protegida</strong> en nuestra base de datos y es
+                <b>confidencial</b>.<br><br>
+                Además, si introduces una <span class="chipi">Fecha de Licencia</span>, el sistema activará una alarma
+                automática para
+                avisarte antes de que caduque para que recuerdes renovarla a tiempo.
+              </span>
+            </div>
+          </li>
+
+          <li style="display: flex; gap: 12px; align-items: flex-start;">
+            <div
+              style="background: #dcfce7; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <span class="material-icons-outlined" style="color: #16a34a; font-size: 1.3rem;">family_restroom</span>
+            </div>
+            <div style="flex: 1;">
+              <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Familia y Copropietarios</strong>
+              <span style="color: #475569; font-size: 0.9rem; line-height: 1.5;">Si compartes tu perro con otro miembro
+                de la pista, pásale una invitación introduciendo su email registrado. ¡Así lo tendréis los dos en
+                vuen vuestra lista!</span>
+            </div>
+          </li>
+
+          <li style="display: flex; gap: 12px; align-items: flex-start;">
+            <div
+              style="background: #fee2e2; padding: 6px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+              <span class="material-icons-outlined" style="color: #dc2626; font-size: 1.3rem;">warning</span>
+            </div>
+            <div style="flex: 1;">
+              <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Poderes jerárquicos sobre el
+                perro</strong>
+              <span style="color: #475569; font-size: 0.9rem; line-height: 1.5;">El rango de <span
+                  class="chipi">Original</span>
+                lo recibe exclusivamente el primer dueño que registra al perro. Este <em>Dueño Original</em> es el amo
+                absoluto: controla con quién comparte, a quién expulsa y es el único capaz de Borrar completamente al
+                animal de la App. Si te han invitado como Familiar e intentas borrarlo, el sistema solo te desvinculará
+                a
+                ti mismo por seguridad, manteniendo al perro de tu amigo a salvo intacto.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="modal-actions"
+        style="padding: 1.5rem; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+        <button class="btn-primary" [style.background]="clubTheme.primary"
+          style="padding: 0.7rem 1.5rem; border: none; border-radius: 8px; color: white; font-weight: 600; cursor: pointer; transition: transform 0.2s ease, opacity 0.2s;"
+          (click)="closeHelpModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
+  }
+</div>
