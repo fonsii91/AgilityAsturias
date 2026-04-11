@@ -9,9 +9,10 @@
       <button class="help-btn" (click)="openHelpModal()" title="Instrucciones sobre Reservas" style="background: transparent; border: 1px solid #e2e8f0; border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.2s;">
         <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
       </button>
+
       @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
         <button
-          class="btn-edit-schedule" (click)="openManageModal()">
+          class="btn-edit-schedule" routerLink="/gestionar-horarios">
           <span class="material-icons" style="font-size: 18px; vertical-align: text-bottom; margin-right: 4px;">settings</span> Editar Horario
         </button>
       }
@@ -243,127 +244,7 @@
 </div>
 }
 
-<!-- Management Modal (Admin/Staff) -->
-@if (isManageModalOpen) {
-  <div class="modal-backdrop" (click)="closeManageModal()">
-    <div class="modal-content large-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header header-light">
-        <h3>
-          <span class="material-icons header-icon">calendar_month</span>
-          Gestión de Horarios
-        </h3>
-        <button class="btn-icon close-btn" (click)="closeManageModal()" title="Cerrar">
-          <span class="material-icons">close</span>
-        </button>
-      </div>
-      <div class="management-body">
-        <!-- Form Section -->
-        <div class="management-form-card" [class.editing-mode]="editingSlot">
-          <div class="form-header-row">
-            <h4 class="section-title card-title">
-              <span class="material-icons indicator-icon">{{ editingSlot ? 'edit_calendar' : 'add_circle'
-              }}</span>
-              {{ editingSlot ? 'Editar Horario Existente' : 'Programar Nuevo Horario' }}
-            </h4>
-            @if (editingSlot) {
-              <span class="status-badge">Modo Edición</span>
-            }
-          </div>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Día de la semana</label>
-              <div class="select-wrapper">
-                <select [(ngModel)]="slotForm.day" class="modern-input">
-                  <option value="Lunes">Lunes</option>
-                  <option value="Martes">Martes</option>
-                  <option value="Miércoles">Miércoles</option>
-                  <option value="Jueves">Jueves</option>
-                  <option value="Viernes">Viernes</option>
-                  <option value="Sábado">Sábado</option>
-                  <option value="Domingo">Domingo</option>
-                </select>
-                <span class="material-icons select-icon">expand_more</span>
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Hora Inicio</label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">schedule</span>
-                <input type="time" [(ngModel)]="slotForm.startTime" class="modern-input with-icon">
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Hora Fin</label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">update</span>
-                <input type="time" [(ngModel)]="slotForm.endTime" class="modern-input with-icon">
-              </div>
-            </div>
-            <div class="form-group">
-              <label>Plazas Máx.</label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">group</span>
-                <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input with-icon"
-                  min="1">
-                </div>
-              </div>
-            </div>
-            <div class="form-actions-row">
-              @if (editingSlot) {
-                <button class="btn-text"
-                  (click)="editingSlot = null; slotForm = {day: 'Lunes', startTime:'10:00', endTime:'11:00', maxBookings:5}">
-                  <span class="material-icons btn-icon-small">cancel</span>
-                  Cancelar
-                </button>
-              }
-              <button class="btn-primary-action" [class.btn-edit]="editingSlot" (click)="saveSlot()">
-                <span class="material-icons btn-icon-small">{{ editingSlot ? 'save' : 'add' }}</span>
-                {{ editingSlot ? 'Guardar Cambios' : 'Añadir Horario' }}
-              </button>
-            </div>
-          </div>
-          <div class="divider"></div>
-          <!-- List Section -->
-          <div class="slots-list-section">
-            <div class="list-header">
-              <h4 class="section-title card-title">
-                <span class="material-icons indicator-icon">view_list</span>
-                Horarios Configurados
-              </h4>
-              <span class="count-badge">{{ timeSlots().length }} horarios</span>
-            </div>
-            <div class="slots-list-container">
-              @for (slot of timeSlots(); track slot) {
-                <div class="admin-slot-card"
-                  [class.highlighted]="editingSlot?.id === slot.id">
-                  <div class="slot-card-left">
-                    <div class="day-badge-container">
-                      <span class="day-badge">{{ slot.day.substring(0, 3) }}</span>
-                    </div>
-                    <div class="slot-info-main">
-                      <span class="time-range">{{ slot.start_time }} - {{ slot.end_time }}</span>
-                      <span class="capacity-badge">
-                        <span class="material-icons icon-tiny">person</span>
-                        {{ slot.max_bookings }} plazas max.
-                      </span>
-                    </div>
-                  </div>
-                  <div class="slot-actions">
-                    <button class="btn-icon-action edit" (click)="editSlot(slot)" title="Editar">
-                      <span class="material-icons">edit</span>
-                    </button>
-                    <button class="btn-icon-action delete" (click)="deleteSlot(slot.id)" title="Eliminar">
-                      <span class="material-icons">delete_outline</span>
-                    </button>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  }
+
 
   <!-- Image Modal -->
   @if (enlargedImageStr) {

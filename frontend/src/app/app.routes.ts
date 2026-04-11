@@ -63,6 +63,12 @@ export const routes: Routes = [
         title: 'Estadísticas de Vídeos | Agility Asturias'
     },
     {
+        path: 'gestionar-horarios',
+        loadComponent: () => import('./reservas/gestionar-horarios/gestionar-horarios.component').then(m => m.GestionarHorariosComponent),
+        canActivate: [staffGuard],
+        title: titleResolver, data: { pageTitle: 'Gestión de Horarios' }
+    },
+    {
         path: 'gestionar-competiciones',
         loadComponent: () => import('./components/crud-competicion/crud-competicion.component').then(m => m.CrudCompeticionComponent),
         canActivate: [staffGuard],

@@ -11,7 +11,7 @@
             <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenida</a></li>
           }
           @if (authService.isMember()) {
-            <li class="mobile-nav-divider">General</li>
+            <li class="mobile-nav-divider">Miembros</li>
             <li><a routerLink="/reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">event</span> Reservas</a></li>
             <li><a routerLink="/calendario" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">calendar_month</span> Calendario</a></li>
             <li><a routerLink="/ranking" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">emoji_events</span> Clasificación</a></li>
@@ -35,6 +35,7 @@
             <li><a routerLink="/admin/asistencia" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">fact_check</span> Verificar Asistencia</a></li>
             <li><a (click)="openExtraPointsDialog(); sidenav.close()" style="cursor: pointer;"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
             <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">people</span> Gestión Miembros</a></li>
+            <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">calendar_month</span> Gestión Horarios</a></li>
           }
 
           <!-- Administrar Section -->
@@ -53,7 +54,7 @@
               <li><a routerLink="/novedades" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">new_releases</span> Novedades</a></li>
             }
 
-            <li class="mobile-nav-divider">Pública</li>
+            <li class="mobile-nav-divider">Público</li>
             <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenida</a></li>
             <li><a routerLink="/galeria" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">photo_library</span> Galería</a></li>
             <li><a routerLink="/videos-publicos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">videocam</span> Videoteca</a></li>

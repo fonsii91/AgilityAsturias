@@ -11,10 +11,12 @@ import { TimeSlot } from '../../models/time-slot.model';
 
 import { ToastService } from '../../services/toast.service';
 
+import { RouterModule } from '@angular/router';
+
 @Component({
     selector: 'app-gestionar-reservas',
     standalone: true,
-    imports: [CommonModule, FormsModule, MatIconModule],
+    imports: [CommonModule, FormsModule, MatIconModule, RouterModule],
     templateUrl: './gestionar-reservas.component.html',
     styleUrl: './gestionar-reservas.component.css'
 })
@@ -84,15 +86,7 @@ export class GestionarReservasComponent {
     // Image Modal State
     enlargedImageStr: string | null = null;
 
-    // Management Modal State
-    isManageModalOpen = false;
-    editingSlot: TimeSlot | null = null; // null means creating new
-    slotForm = {
-        day: 'Lunes',
-        startTime: '10:00',
-        endTime: '11:00',
-        maxBookings: 5
-    };
+
 
     constructor() {
         effect(() => {
@@ -274,32 +268,7 @@ export class GestionarReservasComponent {
         }).filter(g => g !== null);
     });
 
-    openManageModal() {
-        this.isManageModalOpen = true;
-        this.editingSlot = null;
-        this.slotForm = {
-            day: 'Lunes',
-            startTime: '10:00',
-            endTime: '11:00',
-            maxBookings: 5
-        };
-    }
 
-    editSlot(slot: TimeSlot) {
-        this.isManageModalOpen = true;
-        this.editingSlot = slot;
-        this.slotForm = {
-            day: slot.day,
-            startTime: slot.start_time, // Backend uses snake_case
-            endTime: slot.end_time,
-            maxBookings: slot.max_bookings
-        };
-    }
-
-    closeManageModal() {
-        this.isManageModalOpen = false;
-        this.editingSlot = null;
-    }
 
     enlargeImage(imgUrl: string | undefined | null) {
         if (!imgUrl) return;
@@ -310,42 +279,7 @@ export class GestionarReservasComponent {
         this.enlargedImageStr = null;
     }
 
-    async deleteSlot(id: number) {
-        if (confirm('¿Estás seguro de eliminar este horario? Se perderán las reservas asociadas.')) {
-            try {
-                await this.timeSlotService.deleteTimeSlot(id);
-                this.timeSlotService.fetchTimeSlots(); // Refresh
-                this.toastService.success('Horario eliminado.');
-            } catch (error) {
-                console.error(error);
-                this.toastService.error('Error al eliminar.');
-            }
-        }
-    }
 
-    async saveSlot() {
-        try {
-            const slotData = {
-                day: this.slotForm.day,
-                start_time: this.slotForm.startTime,
-                end_time: this.slotForm.endTime,
-                max_bookings: this.slotForm.maxBookings
-            };
-
-            if (this.editingSlot) {
-                await this.timeSlotService.updateTimeSlot(this.editingSlot.id, slotData);
-                this.toastService.success('Horario actualizado.');
-            } else {
-                await this.timeSlotService.addTimeSlot(slotData as any);
-                this.toastService.success('Horario creado.');
-            }
-            this.timeSlotService.fetchTimeSlots(); // Refresh
-            this.closeManageModal();
-        } catch (error) {
-            console.error(error);
-            this.toastService.error('Error al guardar.');
-        }
-    }
 
     bookSlot(slot: TimeSlot & { date: string }) {
         const user = this.authService.currentUserSignal();

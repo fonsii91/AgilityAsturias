@@ -17,10 +17,10 @@
       @if (!authService.isMember()) {
         <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
       }
-<!-- General Dropdown for Logged In Members -->
+<!-- Miembros Dropdown for Logged In Members -->
 @if (authService.isMember()) {
   <li class="nav-dropdown">
-    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">apps</span> General <span class="material-icons arrow">expand_more</span></a>
+    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">apps</span> Miembros <span class="material-icons arrow">expand_more</span></a>
     <ul class="dropdown-menu-list">
       <li><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span> Reservas</a></li>
       <li><a routerLink="/calendario" routerLinkActive="active-route"><span class="material-icons">calendar_month</span> Calendario</a></li>
@@ -50,6 +50,7 @@ Contacto</a></li>
       <li><a routerLink="/admin/asistencia" routerLinkActive="active-route"><span class="material-icons">fact_check</span> Verificar Asistencia</a></li>
       <li><a (click)="openExtraPointsDialog()" style="cursor: pointer;"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
       <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route"><span class="material-icons">people</span> Gestión Miembros</a></li>
+      <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route"><span class="material-icons">calendar_month</span> Gestión Horarios</a></li>
     </ul>
   </li>
 }
@@ -79,10 +80,10 @@ Contacto</a></li>
   </li>
 }
 
-<!-- Pública Dropdown for Logged In Users -->
+<!-- Público Dropdown for Logged In Users -->
 @if (authService.isMember()) {
   <li class="nav-dropdown">
-    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Pública <span class="material-icons arrow">expand_more</span></a>
+    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Público <span class="material-icons arrow">expand_more</span></a>
     <ul class="dropdown-menu-list">
       <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
       <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>

@@ -1,0 +1,185 @@
+<div class="management-container"
+  [style.--club-primary]="clubConfig.colors.primary"
+  [style.--club-accent]="clubConfig.colors.accent"
+  [style.--club-warn]="clubConfig.colors.warn">
+  <div class="header-main" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2><span class="material-icons" style="vertical-align: middle; margin-right: 8px;">calendar_month</span> Gestión de Horarios Maestros</h2>
+      <p class="subtitle">Configura los horarios disponibles por defecto para las clases del club.</p>
+    </div>
+    <div>
+      <button class="btn-primary-action" (click)="openModal()">
+        <span class="material-icons btn-icon-small">add</span>
+        Añadir Horario
+      </button>
+    </div>
+  </div>
+
+  <div class="management-body">
+    <!-- List Section -->
+    <div class="slots-list-section">
+      <div class="list-header">
+        <h4 class="section-title card-title">
+          <span class="material-icons indicator-icon">view_list</span>
+          Horarios Configurados
+        </h4>
+        <span class="count-badge">{{ timeSlots().length }} horarios</span>
+      </div>
+      
+      <!-- Filtros Rápidos -->
+      <div class="filters-container" style="margin-top: 1rem; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="filter-pill" [class.active]="activeFilter() === 'Todos'" (click)="toggleFilter('Todos')">
+          Todos
+        </button>
+        @for (day of availableDays; track day) {
+          <button class="filter-pill" [class.active]="activeFilter() === day" (click)="toggleFilter(day)">
+            {{ day.substring(0, 3) }}
+          </button>
+        }
+      </div>
+      
+      <div class="slots-groups-container" style="display: flex; flex-direction: column; gap: 2rem; margin-top: 1.5rem;">
+        @for (group of filteredAndGroupedSlots(); track group.day) {
+          <div class="day-group">
+            <h3 class="day-group-header" style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+              <span class="material-icons" style="color: var(--club-primary, #0073cf)">today</span> 
+              {{ group.day }} <span style="font-size: 0.9rem; color: #64748b; font-weight: 500;">({{ group.slots.length }})</span>
+            </h3>
+            <div class="slots-list-container">
+              @for (slot of group.slots; track slot.id) {
+                <div class="admin-slot-card" [class.highlighted]="editingSlot?.id === slot.id">
+                  <div class="slot-card-left">
+                    <div class="day-badge-container" [style.opacity]="isAfternoonSlot(slot.start_time) ? '0.9' : '1'">
+                      <span class="day-badge" [class.afternoon-badge]="isAfternoonSlot(slot.start_time)">
+                        <span class="material-icons" style="font-size: 20px;">{{ isAfternoonSlot(slot.start_time) ? 'wb_cloudy' : 'wb_sunny' }}</span>
+                      </span>
+                    </div>
+                    <div class="slot-info-main">
+                      <span class="time-range">{{ slot.start_time }} - {{ slot.end_time }}</span>
+                      <span class="capacity-badge">
+                        <span class="material-icons icon-tiny">person</span>
+                        {{ slot.max_bookings }} plazas max.
+                      </span>
+                    </div>
+                  </div>
+                  <div class="slot-actions">
+                    <button class="btn-icon-action edit" (click)="editSlot(slot)" title="Editar">
+                      <span class="material-icons">edit</span>
+                    </button>
+                    <button class="btn-icon-action delete" (click)="deleteSlot(slot.id)" title="Eliminar">
+                      <span class="material-icons">delete_outline</span>
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        @if (timeSlots().length === 0) {
+          <div class="empty-schedule-state">
+            <div class="empty-icon-wrapper">
+              <span class="material-icons">event_busy</span>
+            </div>
+            <h3>Silencio en la pista...</h3>
+            <p>Todavía no hay ningún horario programado.</p>
+            <button class="btn-primary-action" style="margin-top: 1rem;" (click)="openModal()">
+              <span class="material-icons btn-icon-small">add</span> Añadir primer horario
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+@if (isModalOpen) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header header-light">
+        <h3>
+          <span class="material-icons header-icon">calendar_month</span>
+          Gestión de Horarios
+        </h3>
+        <button class="btn-icon close-btn" (click)="closeModal()" title="Cerrar">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="management-body" style="background: white; padding: 2rem;">
+        <div class="management-form-card" [class.editing-mode]="editingSlot" style="box-shadow: none; border: none; padding: 0;">
+          <div class="form-header-row">
+            <h4 class="section-title card-title">
+              <span class="material-icons indicator-icon">{{ editingSlot ? 'edit_calendar' : 'add_circle' }}</span>
+              {{ editingSlot ? 'Editar Horario Existente' : 'Programar Nuevo Horario' }}
+            </h4>
+            @if (editingSlot) {
+              <span class="status-badge">Modo Edición</span>
+            }
+          </div>
+          
+          <div class="form-grid">
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label>Día(s) de la semana</label>
+              @if (editingSlot) {
+                <div class="select-wrapper">
+                  <select [(ngModel)]="slotForm.days[0]" class="modern-input">
+                    @for (day of availableDays; track day) {
+                      <option [value]="day">{{ day }}</option>
+                    }
+                  </select>
+                  <span class="material-icons select-icon">expand_more</span>
+                </div>
+              } @else {
+                <div class="days-multi-selector">
+                  @for (day of availableDays; track day) {
+                    <button class="day-select-btn" 
+                      [class.selected]="slotForm.days.includes(day)"
+                      (click)="toggleDaySelection(day)">
+                      {{ day.substring(0, 3) }}
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+            
+            <div class="form-group">
+              <label>Hora Inicio</label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">schedule</span>
+                <input type="time" [(ngModel)]="slotForm.startTime" class="modern-input with-icon" />
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Hora Fin</label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">update</span>
+                <input type="time" [(ngModel)]="slotForm.endTime" class="modern-input with-icon" />
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Plazas Máx.</label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">group</span>
+                <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input with-icon" min="1" />
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-actions-row">
+            <button class="btn-text" (click)="cancelEdit()">
+              <span class="material-icons btn-icon-small">cancel</span>
+              Cancelar
+            </button>
+            <button class="btn-primary-action" [class.btn-edit]="editingSlot" (click)="saveSlot()">
+              <span class="material-icons btn-icon-small">{{ editingSlot ? 'save' : 'add' }}</span>
+              {{ editingSlot ? 'Guardar Cambios' : 'Añadir Horario' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
