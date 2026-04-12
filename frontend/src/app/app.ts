@@ -12,7 +12,7 @@ import { CompetitionService } from './services/competition.service';
 import { TimeSlotService } from './services/time-slot.service';
 import { ToastService } from './services/toast.service';
 import { SwUpdate } from '@angular/service-worker';
-
+import { NotificationService } from './services/notification.service';
 import { DogService } from './services/dog.service';
 import { environment } from '../environments/environment';
 
@@ -143,11 +143,16 @@ export class App implements OnInit, OnDestroy {
       const reservationService = this.injector.get(ReservationService);
       const competitionService = this.injector.get(CompetitionService);
       const timeSlotService = this.injector.get(TimeSlotService);
+      const dogService = this.injector.get(DogService);
+      const notificationService = this.injector.get(NotificationService);
 
       reservationService.fetchReservations();
       reservationService.fetchAvailability();
       competitionService.fetchCompetitions();
       timeSlotService.fetchTimeSlots();
+      dogService.loadUserDogs();
+      dogService.loadAllDogs();
+      notificationService.loadNotifications();
     }
   };
 }
