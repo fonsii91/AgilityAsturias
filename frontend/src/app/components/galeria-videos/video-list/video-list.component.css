@@ -1325,6 +1325,9 @@ select.form-input {
     padding-bottom: 1rem;
     margin-top: 1rem;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+    will-change: scroll-position;
 }
 
 .shorts-carousel::-webkit-scrollbar {
@@ -1348,7 +1351,12 @@ select.form-input {
 .shorts-carousel .video-card {
     flex: 0 0 300px;
     scroll-snap-align: start;
+    scroll-snap-stop: always;
     aspect-ratio: 9/16;
+    contain: layout style paint;
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
 }
 
 @media (max-width: 768px) {
