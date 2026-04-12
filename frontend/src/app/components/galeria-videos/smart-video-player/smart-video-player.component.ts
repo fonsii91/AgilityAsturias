@@ -9,7 +9,7 @@ import { environment } from '../../../../environments/environment';
   imports: [],
   styleUrl: './smart-video-player.component.css',
   template: `
-    <div class="video-wrapper" [class.is-youtube]="youtubeUrl" [class.is-active]="isVideoActive">
+    <div class="video-wrapper" [class.is-youtube]="youtubeUrl" [class.is-active]="isVideoActive" [class.is-horizontal-wrapper]="isHorizontal">
     
       <!-- Video Cover / Poster -->
       @if (!isVideoActive) {
@@ -28,11 +28,11 @@ import { environment } from '../../../../environments/environment';
       }
     
       @if (youtubeUrl && hasStarted) {
-        <iframe [src]="autoplayYoutubeUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="video-iframe"></iframe>
+        <iframe #youtubeIframe [src]="autoplayYoutubeUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="video-iframe"></iframe>
       }
     
       @if (!youtubeUrl && localUrl) {
-        <video #localVideo [src]="localUrl" class="video-local" playsinline webkit-playsinline loop preload="metadata"
+        <video #localVideo [src]="localUrl" class="video-local" playsinline webkit-playsinline loop preload="metadata" [muted]="isMuted"
         (playing)="isPlaying = true" (pause)="isPlaying = false" (timeupdate)="onTimeUpdate($event)" (click)="togglePlay()"></video>
         @if (!isPlaying && isVideoActive) {
           <div class="custom-play-overlay" (click)="togglePlay()">
@@ -47,6 +47,9 @@ import { environment } from '../../../../environments/environment';
           </div>
         }
         @if (isVideoActive) {
+          <button class="mute-btn" (click)="toggleMute($event)" title="Silenciar/Activar sonido">
+            <span class="material-icons">{{ isMuted ? 'volume_off' : 'volume_up' }}</span>
+          </button>
           <button class="fullscreen-btn" (click)="toggleFullscreen($event)">
             <span class="material-icons">fullscreen</span>
           </button>
@@ -58,6 +61,12 @@ import { environment } from '../../../../environments/environment';
           Vídeo no disponible
         </div>
       }
+    
+      @if (isVideoActive) {
+        <button class="return-cover-btn" (click)="returnToCover($event)" title="Volver a la portada">
+          <span class="material-icons">arrow_back</span>
+        </button>
+      }
     </div>
     `
 })
@@ -66,6 +75,7 @@ export class SmartVideoPlayerComponent implements OnInit {
   readonly youtubeId = input<string>();
   readonly localPath = input<string>();
   readonly localVideoRef = viewChild<ElementRef<HTMLVideoElement>>('localVideo');
+  readonly youtubeIframeLocal = viewChild<ElementRef<HTMLIFrameElement>>('youtubeIframe');
 
   private sanitizer = inject(DomSanitizer);
 
@@ -75,6 +85,9 @@ export class SmartVideoPlayerComponent implements OnInit {
   isPlaying = false;
   hasStarted = false; // Tracks if the video was ever started
   progress = 0;
+  isMuted = false;
+
+  @Input() isHorizontal = false;
 
   get isVideoActive(): boolean {
     return this.hasStarted;
@@ -84,21 +97,48 @@ export class SmartVideoPlayerComponent implements OnInit {
     const youtubeId = this.youtubeId();
     const localPath = this.localPath();
     if (youtubeId) {
-      this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${youtubeId}?playsinline=1&rel=0&modestbranding=1`);
-      this.autoplayYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${youtubeId}?playsinline=1&rel=0&modestbranding=1&autoplay=1`);
+      this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${youtubeId}?playsinline=1&rel=0&modestbranding=1&enablejsapi=1`);
+      this.autoplayYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${youtubeId}?playsinline=1&rel=0&modestbranding=1&autoplay=1&enablejsapi=1`);
     } else if (localPath) {
       this.localUrl = `${environment.apiUrl.replace('/api', '')}/storage/${localPath}`;
     }
   }
 
   startPlayback() {
+    const isFirstTime = !this.hasStarted;
     this.hasStarted = true;
-    const localVideoRef = this.localVideoRef();
+    this.isPlaying = true;
+
     if (this.youtubeId()) {
-      // YouTube iframe will start rendering and autoplay
-    } else if (localVideoRef) {
-      const video = localVideoRef.nativeElement;
-      video.play().catch(e => console.error('Play error:', e));
+      // If it was paused, resume it via YouTube API
+      if (!isFirstTime) {
+         this.youtubeIframeLocal()?.nativeElement.contentWindow?.postMessage(
+           '{"event":"command","func":"playVideo","args":""}', '*'
+         );
+      }
+    } else {
+      const localVideoRef = this.localVideoRef();
+      if (localVideoRef) {
+        const video = localVideoRef.nativeElement;
+        video.play().catch(e => console.error('Play error:', e));
+      }
+    }
+  }
+
+  returnToCover(event: Event) {
+    event.stopPropagation();
+    this.hasStarted = false;
+    this.isPlaying = false;
+    
+    if (this.youtubeUrl) {
+      this.youtubeIframeLocal()?.nativeElement.contentWindow?.postMessage(
+         '{"event":"command","func":"pauseVideo","args":""}', '*'
+      );
+    } else {
+      const localVideoRef = this.localVideoRef();
+      if (localVideoRef) {
+        localVideoRef.nativeElement.pause();
+      }
     }
   }
 
@@ -113,6 +153,15 @@ export class SmartVideoPlayerComponent implements OnInit {
       } else {
         video.pause();
       }
+    }
+  }
+
+  toggleMute(event: Event) {
+    event.stopPropagation();
+    this.isMuted = !this.isMuted;
+    const localVideoRef = this.localVideoRef();
+    if (localVideoRef) {
+      localVideoRef.nativeElement.muted = this.isMuted;
     }
   }
 

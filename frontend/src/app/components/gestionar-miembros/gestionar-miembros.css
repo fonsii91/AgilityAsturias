@@ -655,6 +655,10 @@ th {
 .icon-delete { color: #dc2626; background: #fee2e2; }
 .icon-zoom { color: #7c3aed; background: #ede9fe; }
 
+.icon-public { color: #10b981; background: #d1fae5; }
+.icon-explore { color: #8b5cf6; background: #ede9fe; }
+.icon-personal { color: #ec4899; background: #fce7f3; }
+
 .help-list-content strong {
     display: block;
     color: #0f172a;

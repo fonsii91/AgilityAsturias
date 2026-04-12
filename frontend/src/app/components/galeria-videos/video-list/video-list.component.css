@@ -216,6 +216,49 @@
     gap: 0.75rem;
 }
 
+/* =========================================================================
+   PESTAÑAS (TABS)
+   ========================================================================= */
+.video-tabs-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0 2rem 0;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0px;
+}
+
+.video-tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px; /* Pull down to overlap the container border */
+    transition: all 0.2s ease;
+}
+
+.video-tab-btn .material-icons {
+    font-size: 1.2rem;
+}
+
+.video-tab-btn:hover {
+    color: var(--primary-color, #1c62b9);
+    background: #f8fafc;
+    border-radius: 8px 8px 0 0;
+}
+
+.video-tab-btn.active {
+    color: var(--primary-color, #1c62b9);
+    border-bottom-color: var(--primary-color, #1c62b9);
+}
+
 .stylish-dog-select {
     height: 48px;
     border-radius: 24px;
@@ -499,60 +542,7 @@
     text-shadow: none;
 }
 
-.video-card.is-youtube .competition-badge,
-.video-card.is-youtube .date-badge {
-    background-color: #f1f5f9;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-}
-.video-card.is-youtube .date-icon {
-    color: #64748b;
-}
-
-.video-card.is-youtube .floating-actions-right {
-    flex-direction: row;
-    flex-wrap: wrap;
-    width: 100%;
-    justify-content: flex-start;
-    gap: 0.75rem;
-    padding-bottom: 0;
-}
-
-.video-card.is-youtube .action-bubble {
-    color: #475569;
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    padding: 0.4rem 0.6rem;
-    flex-direction: row;
-}
-
-.video-card.is-youtube .action-bubble:hover {
-    color: #1a202c;
-    background-color: #e2e8f0;
-}
-
-.video-card.is-youtube .action-bubble.liked {
-    color: #e53e3e;
-    background-color: #fff5f5;
-    border-color: #fed7d7;
-}
-
-.video-card.is-youtube .action-bubble .material-icons {
-    font-size: 20px;
-    filter: none;
-}
-
-.video-card.is-youtube .action-count {
-    text-shadow: none;
-}
-
-.video-card.is-youtube .dog-avatar-wrapper {
-    border-color: #e2e8f0;
-    box-shadow: none;
-}
-
-
+/* Legacy youtube classes removed */
 .video-info-overlay button,
 .video-info-overlay a,
 .video-info-overlay .dog-avatar-wrapper,
@@ -667,7 +657,7 @@
 
 .center-event-cover {
     position: absolute;
-    top: 15%;
+    top: 5%;
     left: 0;
     width: 100%;
     padding: 0 1rem;
@@ -682,57 +672,57 @@
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 1.5rem;
-    font-weight: 900;
+    font-size: 1rem;
+    font-weight: 800;
     color: #fff;
-    text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     text-transform: uppercase;
     letter-spacing: 1px;
     line-height: 1.2;
     text-align: center;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.05) 100%);
-    backdrop-filter: blur(8px);
-    padding: 0.6rem 1.2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.3);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
+    padding: 0.4rem 1rem;
+    border-radius: 9999px; /* Rounded pill */
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
 .event-name-huge.training-text {
-    opacity: 0.9;
-    font-size: 1.2rem;
+    opacity: 0.95;
+    font-size: 0.95rem;
     font-weight: 700;
 }
 
 .comp-icon-huge {
-    font-size: 32px !important;
+    font-size: 20px !important;
     color: #ffd700;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
 }
 
 .training-text .comp-icon-huge {
-    color: #a0aec0;
+    color: #cbd5e1;
 }
 
 .center-bottom-cover {
     position: absolute;
-    bottom: 8%;
+    bottom: 2.5rem;
     left: 0;
     width: 100%;
-    padding: 0 4.5rem 0 1rem;
-    text-align: center;
+    padding: 0 4rem 0 1rem; /* 4rem on right ensures it doesn't touch the buttons */
+    text-align: left; /* TikTok/Reels style left alignment */
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 0.6rem;
+    align-items: flex-start;
+    gap: 0.5rem;
     z-index: 25;
 }
 
 .video-title-cover-bottom {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.95);
-    text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -756,14 +746,14 @@
 .cover-badges-row {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Flow from the left */
     gap: 0.5rem;
     flex-wrap: wrap;
     width: 100%;
 }
 
 .dog-icon-huge {
-    font-size: 22px !important;
+    font-size: 20px !important;
     color: #4dabf7;
 }
 
@@ -771,21 +761,21 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    font-size: 1.3rem;
-    font-weight: 800;
+    font-size: 0.95rem;
+    font-weight: 700;
     letter-spacing: 0.5px;
-    background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.3) 100%);
-    backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(4px);
     color: #fff;
-    padding: 0.5rem 1.2rem;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    padding: 0.35rem 0.8rem;
+    border-radius: 8px; /* Slightly softer corners for dates */
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
 .date-icon-huge {
-    font-size: 22px !important;
+    font-size: 18px !important;
     color: #ffc107;
 }
 
@@ -804,21 +794,7 @@
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-/* YouTube tweaks for cover overlay */
-.video-card.is-youtube .event-name-huge,
-.video-card.is-youtube .date-badge-cover-huge {
-    background: #f8fafc;
-    color: #1e293b;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    text-shadow: none;
-}
-.video-card.is-youtube .video-title-cover-bottom {
-    color: #1a202c;
-    text-shadow: none;
-}
-
-
+/* YouTube logic is handled via cover posters now */
 /* Right Side Floating Actions */
 .floating-actions-right {
     display: flex;
@@ -1332,5 +1308,247 @@ select.form-input {
 .pagination-dots {
     color: #666;
     font-weight: bold;
-    padding: 0 0.25rem;
+}
+
+/* =========================================================================
+   AGILITY SHORTS CAROUSEL Y ESTILOS
+   ========================================================================= */
+.agility-shorts-section {
+    margin-bottom: 3rem;
+}
+
+.shorts-carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    margin-top: 1rem;
+    -webkit-overflow-scrolling: touch;
+}
+
+.shorts-carousel::-webkit-scrollbar {
+    height: 8px;
+}
+
+.shorts-carousel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.shorts-carousel::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.shorts-carousel::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.shorts-carousel .video-card {
+    flex: 0 0 300px;
+    scroll-snap-align: start;
+    aspect-ratio: 9/16;
+}
+
+@media (max-width: 768px) {
+    .shorts-carousel .video-card {
+        flex: 0 0 250px;
+    }
+}
+
+/* =========================================================================
+   TARJETAS HORIZONTALES CLÁSICAS
+   ========================================================================= */
+.video-card.is-horizontal {
+    display: flex !important;
+    flex-direction: column !important;
+    background: #fff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+    overflow: hidden !important;
+    aspect-ratio: auto !important; /* override 9/16 rigidly */
+    height: auto !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* Force horizontal video players to be 16:9 */
+.video-card.is-horizontal app-smart-video-player {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important; 
+    aspect-ratio: 16 / 9 !important;
+    position: relative !important;
+    flex: none !important; 
+    background: #000 !important;
+}
+
+/* =========================================================================
+   MODERN HORIZONTAL FOOTER YOUTUBE-STYLE
+   ========================================================================= */
+.modern-video-footer {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1.25rem;
+    background: var(--surface-color, #fff);
+    gap: 1rem;
+}
+
+.footer-main-row {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.footer-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    cursor: pointer;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.footer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.footer-avatar .placeholder-icon {
+    font-size: 24px;
+    color: #94a3b8;
+}
+
+.footer-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.footer-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--primary-text-color, #0f172a);
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.footer-subtitle {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.3;
+}
+
+.sub-dot {
+    font-size: 0.7rem;
+    opacity: 0.6;
+}
+
+.sub-dog, .sub-uploader {
+    font-weight: 500;
+}
+
+.footer-actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-left: 60px; /* Aligns with the title */
+}
+
+@media (max-width: 500px) {
+    .footer-actions-row {
+        margin-left: 0; 
+    }
+}
+
+.footer-event-badge {
+    display: flex;
+}
+
+.yt-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.yt-badge.comp {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+}
+.yt-badge.comp .material-icons { font-size: 14px; color: #f59e0b; }
+
+.yt-badge.train {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+.yt-badge.train .material-icons { font-size: 14px; color: #22c55e; }
+
+.modern-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.yt-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    background: #f1f5f9;
+    color: #475569;
+    border: none;
+    border-radius: 20px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.yt-action-btn .material-icons {
+    font-size: 18px;
+}
+
+.yt-action-btn:hover:not(.no-hover) {
+    background: #e2e8f0;
+    color: var(--primary-color, #0f172a);
+}
+
+.yt-action-btn.liked {
+    color: #ef4444;
+}
+
+.yt-action-btn.liked .material-icons {
+    color: #ef4444;
+}
+
+.yt-action-btn.delete-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
 }

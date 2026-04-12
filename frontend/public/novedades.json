@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.1.9",
+    "date": "2026-04-12",
+    "features": [
+      "¡Experiencia de cine premium! Hemos separado la visualización de los 'Agility Shorts' y la 'Colección Clásica' en dos pestañas diferentes, como en las mejoras aplicaciones. Disfruta de tus vídeos sin que el diseño se amontone.",
+      "Solucionado por fin el engañoso comportamiento de los botones '< 1 2 >' de los vídeos. Ya no volverás a ver vídeos repetidos ni saltos extraños en la pantalla al intentar pasar a la página siguiente."
+    ]
+  },
+  {
     "version": "1.1.8",
     "date": "2026-04-11",
     "features": [

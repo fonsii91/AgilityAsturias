@@ -63,6 +63,17 @@ class VideoController extends Controller
             }
         }
 
+        if ($request->has('orientation') && $request->orientation) {
+            if ($request->orientation === 'vertical') {
+                $query->where(function ($q) {
+                    $q->where('orientation', 'vertical')
+                      ->orWhereNull('orientation');
+                });
+            } else {
+                $query->where('orientation', $request->orientation);
+            }
+        }
+
         if ($request->has('dog_id') && $request->dog_id) {
             $query->where('dog_id', $request->dog_id);
         }
@@ -104,9 +115,9 @@ class VideoController extends Controller
         }
 
         if ($request->has('sort') && $request->sort === 'popular') {
-            $query->orderByDesc('likes_count')->latest();
+            $query->orderByDesc('likes_count')->latest()->orderBy('id', 'desc');
         } else {
-            $query->latest();
+            $query->latest()->orderBy('id', 'desc');
         }
 
         $videos = $query->paginate(10);

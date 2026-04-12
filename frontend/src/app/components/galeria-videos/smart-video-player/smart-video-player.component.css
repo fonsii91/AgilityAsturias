@@ -7,6 +7,11 @@
     border-radius: 12px;
 }
 
+.video-wrapper.is-horizontal-wrapper {
+    aspect-ratio: 16 / 9;
+    background-color: #0d1117; /* Slight dark tint for nice contrast */
+}
+
 .video-wrapper.is-youtube {
     border-radius: 12px 12px 0 0;
 }
@@ -124,6 +129,32 @@
     transform: scale(1.1);
 }
 
+/* Mute Button */
+.mute-btn {
+    position: absolute;
+    top: 12px;
+    right: 56px; /* Place it to the left of the fullscreen button */
+    background-color: rgba(0, 0, 0, 0.4);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    z-index: 30;
+    backdrop-filter: blur(2px);
+    transition: background-color 0.2s, transform 0.2s;
+    outline: none;
+}
+
+.mute-btn:hover {
+    background-color: rgba(0, 0, 0, 0.6);
+    transform: scale(1.1);
+}
+
 /* Poster Cover Styles */
 .poster-cover {
     position: absolute;
@@ -189,4 +220,35 @@
 .poster-cover:hover .play-icon-massive {
     transform: translate(-50%, -50%) scale(1.1);
     color: #fff;
+}
+
+/* Return to Cover Button */
+.return-cover-btn {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    z-index: 60; /* Above iframe */
+    backdrop-filter: blur(2px);
+    transition: background-color 0.2s, transform 0.2s;
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.return-cover-btn:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
+}
+
+.return-cover-btn .material-icons {
+    font-size: 28px;
 }

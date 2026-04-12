@@ -31,7 +31,7 @@
   @if (!isLoading && videos.length > 0) {
   <div class="video-grid">
     @for (video of videos; track video) {
-    <div class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id && player.isVideoActive}">
+    <div class="video-card" [ngClass]="{'is-horizontal': video.orientation !== 'vertical'}">
 
       @if (authService.isStaff() || authService.isAdmin()) {
       <div class="admin-quick-actions" style="position: absolute; top: 1rem; right: 1rem; z-index: 20;">
@@ -46,7 +46,7 @@
         [coverImageUrl]="video.dog?.photo_url">
       </app-smart-video-player>
 
-      <!-- LARGE COVER OVERLAY: Visible only when NOT playing -->
+      <!-- OVERLAY DE METADATOS: Visible solo cuando NO está reproduciendo -->
       @if (!player.isVideoActive) {
       <div class="video-cover-overlay">
         <div class="center-event-cover">
@@ -76,25 +76,6 @@
         </div>
         <div class="dog-name-cover-small" title="Ver perfil de {{video.dog?.name}}">
           {{ video.dog?.name }}
-        </div>
-      </div>
-      }
-
-      <!-- ORIGINAL PLAYER OVERLAY: Visible only when PLAYING -->
-      @if (player.isVideoActive) {
-      <div class="video-info-overlay">
-        <div class="bottom-info-left">
-          <p class="dog-name-row">
-            <span class="dog-name">@{{ video.dog?.name }}</span>
-            @if (video.competition) {
-            <span class="competition-badge" [title]="video.competition.nombre">
-              <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre }}</span>
-            </span>
-            }
-          </p>
-          <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
-          </h3>
         </div>
       </div>
       }

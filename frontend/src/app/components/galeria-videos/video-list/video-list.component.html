@@ -80,6 +80,16 @@
   </div>
   }
 
+  <!-- PESTAÑAS (TABS) -->
+  <div class="video-tabs-container">
+    <button class="video-tab-btn" [class.active]="activeTab === 'vertical'" (click)="goToTab('vertical')">
+      <span class="material-icons">phone_iphone</span> Agility Shorts
+    </button>
+    <button class="video-tab-btn" [class.active]="activeTab === 'horizontal'" (click)="goToTab('horizontal')">
+      <span class="material-icons">desktop_windows</span> Colección Clásica
+    </button>
+  </div>
+
   <!-- Skeleton Inicial -->
   @if (isLoading && videos.length === 0) {
   <div class="video-grid">
@@ -93,176 +103,189 @@
 
   @if (!isLoading && videos.length === 0) {
   <div class="empty-state">
-    <p>No hay vídeos disponibles.</p>
+    <p>No hay vídeos disponibles en esta sección.</p>
   </div>
   }
 
   @if (!isLoading && videos.length > 0) {
-  <div class="video-grid">
-    @for (video of videos; track video) {
-    <div class="video-card" [ngClass]="{'is-youtube': !!video.youtube_id && player.isVideoActive}">
-      <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path"
-        [coverImageUrl]="video.dog?.photo_url">
-      </app-smart-video-player>
-      <!-- LARGE COVER OVERLAY: Visible only when NOT playing -->
-      @if (!player.isVideoActive) {
-      <div class="video-cover-overlay">
-        <!-- Stacked Actions on the Right -->
-        <div class="floating-actions-right">
-          <div class="dog-avatar-wrapper" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
-            title="Ver perfil de {{video.dog?.name}}">
-            @if (video.dog?.photo_url) {
-            <img [src]="video.dog?.photo_url" alt="{{ video.dog?.name }}" class="dog-avatar-img">
-            } @else {
-            <div class="dog-avatar-placeholder">
-              <span class="material-icons">pets</span>
+    <!-- RENDER DEL GRID ÚNICO SEGÚN EL TAB ACTIVO -->
+    <div class="active-tab-grid" [ngClass]="{'shorts-carousel': activeTab === 'vertical', 'video-grid': activeTab === 'horizontal'}">
+      <ng-container *ngTemplateOutlet="videoListTpl; context: {$implicit: videos, type: activeTab}"></ng-container>
+    </div>
+
+    <ng-template #videoListTpl let-videoList let-type="type">
+      @for (video of videoList; track video) {
+      <div class="video-card" [ngClass]="{'is-horizontal': type === 'horizontal', 'is-vertical': type === 'vertical', 'is-youtube': !!video.youtube_id && player.isVideoActive}">
+        <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path"
+          [coverImageUrl]="video.dog?.photo_url" [isHorizontal]="type === 'horizontal'">
+        </app-smart-video-player>
+        <!-- HORIZONTAL YOUTUBE-STYLE FOOTER -->
+        @if (type === 'horizontal') {
+        <div class="modern-video-footer">
+          <div class="footer-main-row">
+            <div class="footer-avatar" (click)="openDogProfile($event, video.dog)" title="Ver perfil de {{video.dog?.name}}">
+              @if (video.dog?.photo_url) {
+                <img [src]="video.dog?.photo_url" alt="{{ video.dog?.name }}">
+              } @else {
+                <span class="material-icons placeholder-icon">pets</span>
+              }
             </div>
+            <div class="footer-meta">
+              <h3 class="footer-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+                {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+              </h3>
+              <div class="footer-subtitle">
+                <span class="sub-dog">{{ video.dog?.name }}</span>
+                <span class="sub-dot">•</span>
+                <span class="sub-uploader">{{ video.user?.name || 'Usuario' }}</span>
+                <span class="sub-dot">•</span>
+                <span class="sub-date">{{ video.date | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="footer-actions-row">
+            <div class="footer-event-badge">
+              @if (video.competition) {
+                <span class="yt-badge comp" [title]="video.competition.nombre">
+                  <span class="material-icons">emoji_events</span> {{ video.competition.nombre }}
+                </span>
+              } @else {
+                <span class="yt-badge train">
+                  <span class="material-icons">fitness_center</span> Entrenamiento
+                </span>
+              }
+            </div>
+
+            <div class="modern-actions">
+              <button class="yt-action-btn" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
+                <span class="material-icons">{{ video.is_liked_by_user ? 'favorite' : 'favorite_border' }}</span>
+                @if (video.likes_count) { <span class="action-text">{{ video.likes_count }}</span> }
+              </button>
+
+              @if (authService.isStaff() || authService.isAdmin()) {
+              <button (click)="togglePublicGallery($event, video)" class="yt-action-btn"
+                title="{{ video.in_public_gallery ? 'Quitar de pública' : 'Añadir a pública' }}"
+                [ngClass]="{'active-public': video.in_public_gallery}">
+                <span class="material-icons" [style.color]="video.in_public_gallery ? '#1abc9c' : 'inherit'">public</span>
+              </button>
+              }
+
+              @if (video.status === 'local') {
+              <button (click)="downloadVideo($event, video)" class="yt-action-btn" title="Descargar">
+                <span class="material-icons">download</span>
+              </button>
+              }
+
+              @if (canModifyVideo(video)) {
+              <button (click)="openEditModal($event, video)" class="yt-action-btn" title="Editar">
+                <span class="material-icons">edit</span>
+              </button>
+              <button (click)="openDeleteModal($event, video)" class="yt-action-btn delete-btn" title="Eliminar">
+                <span class="material-icons">delete</span>
+              </button>
+              }
+
+              @if (video.status === 'in_queue' || video.status === 'failed') {
+              <span class="yt-action-btn no-hover" [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
+                <span class="material-icons" [ngClass]="{'text-warning': video.status === 'in_queue', 'text-danger': video.status === 'failed'}">
+                  {{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline' }}
+                </span>
+              </span>
+              }
+            </div>
+          </div>
+        </div>
+        }
+
+        <!-- VERTICAL SHORTS ABSOLUTE OVERLAY -->
+        @if (type === 'vertical' && !player.isVideoActive) {
+        <div class="video-cover-overlay">
+          <!-- Stacked Actions on the Right -->
+          <div class="floating-actions-right">
+            <div class="dog-avatar-wrapper" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
+              title="Ver perfil de {{video.dog?.name}}">
+              @if (video.dog?.photo_url) {
+              <img [src]="video.dog?.photo_url" alt="{{ video.dog?.name }}" class="dog-avatar-img">
+              } @else {
+              <div class="dog-avatar-placeholder">
+                <span class="material-icons">pets</span>
+              </div>
+              }
+            </div>
+            <button class="action-bubble" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
+              <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
+                'favorite_border' }}</span>
+              <span class="action-count">{{ video.likes_count || 0 }}</span>
+            </button>
+            @if (authService.isStaff() || authService.isAdmin()) {
+            <button (click)="togglePublicGallery($event, video)" class="action-bubble"
+              title="{{ video.in_public_gallery ? 'Quitar de galería pública' : 'Mostrar en galería pública' }}"
+              [ngClass]="{'active-public': video.in_public_gallery}">
+              <span class="material-icons" [style.color]="video.in_public_gallery ? '#1abc9c' : 'inherit'">public</span>
+            </button>
             }
-          </div>
-          <button class="action-bubble" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
-            <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
-              'favorite_border' }}</span>
-            <span class="action-count">{{ video.likes_count || 0 }}</span>
-          </button>
-          @if (authService.isStaff() || authService.isAdmin()) {
-          <button (click)="togglePublicGallery($event, video)" class="action-bubble"
-            title="{{ video.in_public_gallery ? 'Quitar de galería pública' : 'Mostrar en galería pública' }}"
-            [ngClass]="{'active-public': video.in_public_gallery}">
-            <span class="material-icons" [style.color]="video.in_public_gallery ? '#1abc9c' : 'inherit'">public</span>
-          </button>
-          }
-          @if (video.status === 'local') {
-          <button (click)="downloadVideo($event, video)" class="action-bubble" title="Descargar">
-            <span class="material-icons">download</span>
-          </button>
-          }
-          @if (canModifyVideo(video)) {
-          <button (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
-            <span class="material-icons">edit</span>
-          </button>
-          }
-          @if (canModifyVideo(video)) {
-          <button (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
-            <span class="material-icons">delete</span>
-          </button>
-          }
-          @if (video.status === 'in_queue' || video.status === 'failed') {
-          <span class="status-indicator"
-            [ngClass]="{'status-local': video.status === 'in_queue', 'status-error': video.status === 'failed'}"
-            [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
-            <span class="material-icons">{{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline'
-              }}</span>
-          </span>
-          }
-        </div>
-        <div class="center-event-cover">
-          @if (video.competition) {
-          <span class="event-name-huge" [title]="video.competition.nombre">
-            <span class="material-icons comp-icon-huge">emoji_events</span>
-            <span>{{ video.competition.nombre }}</span>
-          </span>
-          }
-          @if (!video.competition) {
-          <span class="event-name-huge training-text">
-            <span class="material-icons comp-icon-huge">fitness_center</span>
-            <span>Entrenamiento</span>
-          </span>
-          }
-        </div>
-        <div class="center-bottom-cover">
-          <div class="cover-badges-row">
-            <span class="date-badge-cover-huge">
-              <span class="material-icons date-icon-huge">calendar_month</span>
-              {{ video.date | date:'dd/MM/yyyy' }}
-            </span>
-          </div>
-          <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
-          </div>
-        </div>
-        <div class="video-uploader-cover-small">
-          Subido por {{ video.user?.name || 'Usuario' }}
-        </div>
-        <div class="dog-name-cover-small" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
-          title="Ver perfil de {{video.dog?.name}}">
-          {{ video.dog?.name }}
-        </div>
-      </div>
-      }
-      <!-- ORIGINAL PLAYER OVERLAY: Visible only when PLAYING -->
-      @if (player.isVideoActive) {
-      <div class="video-info-overlay">
-        <!-- Bottom Left Info -->
-        <div class="bottom-info-left">
-          <p class="dog-name-row">
-            <span class="dog-name" (click)="openDogProfile($event, video.dog)" style="cursor: pointer">@{{
-              video.dog?.name }}</span>
-            @if (video.competition) {
-            <span class="competition-badge" [title]="video.competition.nombre">
-              <span class="material-icons comp-icon">emoji_events</span> <span>{{ video.competition.nombre
+            @if (video.status === 'local') {
+            <button (click)="downloadVideo($event, video)" class="action-bubble" title="Descargar">
+              <span class="material-icons">download</span>
+            </button>
+            }
+            @if (canModifyVideo(video)) {
+            <button (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
+              <span class="material-icons">edit</span>
+            </button>
+            }
+            @if (canModifyVideo(video)) {
+            <button (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
+              <span class="material-icons">delete</span>
+            </button>
+            }
+            @if (video.status === 'in_queue' || video.status === 'failed') {
+            <span class="status-indicator"
+              [ngClass]="{'status-local': video.status === 'in_queue', 'status-error': video.status === 'failed'}"
+              [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
+              <span class="material-icons">{{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline'
                 }}</span>
             </span>
             }
-          </p>
-          <h3 class="video-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
-          </h3>
-          <p class="video-description">Subido por {{ video.user?.name || 'Usuario' }} • {{ video.date |
-            date:'dd/MM/yy' }}</p>
-        </div>
-        <!-- Stacked Actions on the Right -->
-        <div class="floating-actions-right">
-          <div class="dog-avatar-wrapper" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
-            title="Ver perfil de {{video.dog?.name}}">
-            @if (video.dog?.photo_url) {
-            <img [src]="video.dog?.photo_url" alt="{{ video.dog?.name }}" class="dog-avatar-img">
-            } @else {
-            <div class="dog-avatar-placeholder">
-              <span class="material-icons">pets</span>
-            </div>
+          </div>
+          <div class="center-event-cover">
+            @if (video.competition) {
+            <span class="event-name-huge" [title]="video.competition.nombre">
+              <span class="material-icons comp-icon-huge">emoji_events</span>
+              <span>{{ video.competition.nombre }}</span>
+            </span>
+            }
+            @if (!video.competition) {
+            <span class="event-name-huge training-text">
+              <span class="material-icons comp-icon-huge">fitness_center</span>
+              <span>Entrenamiento</span>
+            </span>
             }
           </div>
-          <button class="action-bubble" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
-            <span class="material-icons like-icon">{{ video.is_liked_by_user ? 'favorite' :
-              'favorite_border' }}</span>
-            <span class="action-count">{{ video.likes_count || 0 }}</span>
-          </button>
-          @if (authService.isStaff() || authService.isAdmin()) {
-          <button (click)="togglePublicGallery($event, video)" class="action-bubble"
-            title="{{ video.in_public_gallery ? 'Quitar de galería pública' : 'Mostrar en galería pública' }}"
-            [ngClass]="{'active-public': video.in_public_gallery}">
-            <span class="material-icons" [style.color]="video.in_public_gallery ? '#1abc9c' : 'inherit'">public</span>
-          </button>
-          }
-          @if (video.status === 'local') {
-          <button (click)="downloadVideo($event, video)" class="action-bubble" title="Descargar">
-            <span class="material-icons">download</span>
-          </button>
-          }
-          @if (canModifyVideo(video)) {
-          <button (click)="openEditModal($event, video)" class="action-bubble" title="Editar">
-            <span class="material-icons">edit</span>
-          </button>
-          }
-          @if (canModifyVideo(video)) {
-          <button (click)="openDeleteModal($event, video)" class="action-bubble action-delete" title="Eliminar">
-            <span class="material-icons">delete</span>
-          </button>
-          }
-          @if (video.status === 'in_queue' || video.status === 'failed') {
-          <span class="status-indicator"
-            [ngClass]="{'status-local': video.status === 'in_queue', 'status-error': video.status === 'failed'}"
-            [title]="video.status === 'in_queue' ? 'Procesando' : 'Error'">
-            <span class="material-icons">{{ video.status === 'in_queue' ? 'hourglass_top' : 'error_outline'
-              }}</span>
-          </span>
-          }
+          <div class="center-bottom-cover">
+            <div class="cover-badges-row">
+              <span class="date-badge-cover-huge">
+                <span class="material-icons date-icon-huge">calendar_month</span>
+                {{ video.date | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
+            <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+              {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+            </div>
+          </div>
+          <div class="video-uploader-cover-small">
+            Subido por {{ video.user?.name || 'Usuario' }}
+          </div>
+          <div class="dog-name-cover-small" (click)="openDogProfile($event, video.dog)" style="cursor: pointer"
+            title="Ver perfil de {{video.dog?.name}}">
+            {{ video.dog?.name }}
+          </div>
         </div>
+        }
       </div>
       }
-    </div>
-    }
-  </div>
+    </ng-template>
   }
 
   <!-- Controles de Paginación Númerica -->

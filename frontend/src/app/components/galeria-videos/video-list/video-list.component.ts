@@ -39,6 +39,7 @@ export class VideoListComponent implements OnInit {
     isLoading = true;
     hasReachedEnd = false;
     isFiltersOpen = false;
+    activeTab: 'horizontal' | 'vertical' = 'vertical';
 
     selectedDogForProfile: Dog | null = null;
     isDogProfileOpen = false;
@@ -91,10 +92,18 @@ export class VideoListComponent implements OnInit {
         });
     }
 
+    goToTab(tab: 'horizontal' | 'vertical') {
+        if (this.activeTab !== tab) {
+            this.activeTab = tab;
+            this.loadVideos(1);
+        }
+    }
+
     loadVideos(page: number = 1) {
         this.isLoading = true;
         const filters: any = {
-            search: this.searchQuery
+            search: this.searchQuery,
+            orientation: this.activeTab
         };
 
         if (this.filterDateRange) filters.dateRange = this.filterDateRange;

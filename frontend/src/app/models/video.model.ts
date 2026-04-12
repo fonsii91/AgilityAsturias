@@ -12,6 +12,7 @@ export interface Video {
     local_path?: string;
     youtube_id?: string;
     status: 'local' | 'in_queue' | 'on_youtube' | 'failed';
+    orientation?: 'horizontal' | 'vertical';
     created_at?: string;
     updated_at?: string;
     likes_count?: number;
