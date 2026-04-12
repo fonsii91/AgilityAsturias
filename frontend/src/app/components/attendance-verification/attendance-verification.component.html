@@ -28,7 +28,7 @@
           <div class="session-header">
             <div class="date-info">
               <span class="date">{{ session.date | date:'EEEE, d MMMM' : '' : 'es-ES' }}</span>
-              <span class="time">{{ session.slot.start_time }} - {{ session.slot.end_time }}</span>
+              <span class="time">{{ session.slot?.start_time || 'Horario no disponible' }} {{ session.slot?.end_time ? '- ' + session.slot?.end_time : '' }}</span>
             </div>
             <div class="count-badge">
               {{ session.reservations.length }} reservas

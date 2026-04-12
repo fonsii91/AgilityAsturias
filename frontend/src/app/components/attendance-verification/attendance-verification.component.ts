@@ -122,7 +122,7 @@ export class AttendanceVerificationComponent {
     }
 
     getSessionKey(session: any): string {
-        return `${session.date}_${session.slot?.id}`;
+        return `${session.date}_${session.slot?.id || session.reservations[0]?.slot_id || 'orphan'}`;
     }
 
     isChecked(session: any, resId: number): boolean {
@@ -287,7 +287,7 @@ export class AttendanceVerificationComponent {
 
             this.reservationService.confirmAttendance({
                 date: session.date,
-                slot_id: session.slot.id,
+                slot_id: session.slot?.id || session.reservations[0]?.slot_id || 0,
                 attended_ids: attendedIds
             }).subscribe({
                 next: () => {

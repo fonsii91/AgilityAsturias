@@ -29,13 +29,20 @@ class AttendanceController extends Controller
             ->orderBy('date', 'desc')
             ->get();
 
-        // Filter out today's future sessions
+        // Filter out orphaned reservations and today's future sessions
         $filtered = $reservations->filter(function ($res) use ($todayStr, $currentTime) {
+            // Skip if the time slot was deleted (orphaned reservation)
+            if (!$res->timeSlot) {
+                return false;
+            }
+
             if ($res->date < $todayStr)
                 return true; // Past date
+                
             // If today, check time
-            if ($res->timeSlot && $res->timeSlot->end_time < $currentTime)
+            if ($res->timeSlot->end_time < $currentTime)
                 return true; // Session ended
+                
             return false;
         });
 
@@ -61,7 +68,7 @@ class AttendanceController extends Controller
         $validated = $request->validate([
             'date' => 'required|date',
             'slot_id' => 'required|integer',
-            'attended_ids' => 'array', // Array of Reservation IDs
+            'attended_ids' => 'present|array', // Array of Reservation IDs
             'attended_ids.*' => 'integer'
         ]);
 
@@ -132,10 +139,10 @@ class AttendanceController extends Controller
     {
         $validated = $request->validate([
             'competition_id' => 'required|integer|exists:competitions,id',
-            'attended_dogs' => 'array',
+            'attended_dogs' => 'present|array',
             'attended_dogs.*.id' => 'required|integer|exists:dogs,id',
             'attended_dogs.*.position' => 'nullable|string|in:1,2,3,4+',
-            'new_attendees' => 'array',
+            'new_attendees' => 'present|array',
             'new_attendees.*.user_id' => 'required|integer|exists:users,id',
             'new_attendees.*.dog_id' => 'required|integer|exists:dogs,id',
             'new_attendees.*.position' => 'nullable|string|in:1,2,3,4+',

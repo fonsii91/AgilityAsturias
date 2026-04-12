@@ -76,7 +76,13 @@ class TimeSlotController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        TimeSlot::destroy($id);
+        $timeSlot = TimeSlot::findOrFail($id);
+        
+        // Delete associated records to prevent orphaned data
+        $timeSlot->reservations()->delete();
+        $timeSlot->exceptions()->delete();
+        
+        $timeSlot->delete();
 
         return response()->noContent();
     }

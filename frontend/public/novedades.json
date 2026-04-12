@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.1.10",
+    "date": "2026-04-12",
+    "bugfixes": [
+      "¡Despídete de los entrenamientos fantasma! Hemos solucionado un comportamiento extraño que ocurría al intentar confirmar o desmarcar la asistencia a clases pasadas cuyo horario original había sido borrado por la administración."
+    ],
+    "features": [
+      "Mantenimiento automático e invisible: A partir de ahora, cuando el equipo del club elimine una franja horaria completa, el sistema se encargará él solo de limpiar y cancelar automáticamente todas las reservas asociadas a esa hora para que todo esté siempre impecable."
+    ]
+  },
+  {
     "version": "1.1.9",
     "date": "2026-04-12",
     "features": [
