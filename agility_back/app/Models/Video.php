@@ -21,7 +21,8 @@ class Video extends Model
         'title',
         'is_public',
         'in_public_gallery',
-        'youtube_error'
+        'youtube_error',
+        'orientation'
     ];
 
     protected $casts = [

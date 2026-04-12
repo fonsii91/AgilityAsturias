@@ -27,6 +27,8 @@ description: Datos para desplegar en producción el proyecto
 - **[Completado]** Fase 2 y 3: Base de datos configurada, repositorio clonado, dependencias instaladas y Angular compilado en producción en `/var/www/agilityasturias`.
 - **[Completado]** Fase 4: Configurado Nginx y Supervisor para mantener el backend y queues levantados.
 - **[Completado]** Fase 5: Verificada la disponibilidad del sitio web y configurado el certificado SSL (HTTPS) con Certbot.
+- **[Completado]** Fase 6: Instalado y configurado Netdata para monitorización del servidor. Se permite tráfico por el puerto 19999 mediante UFW. Accesible en: http://157.173.121.242:19999
+- **[Completado]** Fase 7: Instalado y configurado phpMyAdmin sobre Nginx. Se permite tráfico por el puerto 8080 mediante UFW. Accesible en: http://157.173.121.242:8080
 
 ---
 

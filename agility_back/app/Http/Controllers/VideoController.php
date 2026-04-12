@@ -121,7 +121,8 @@ class VideoController extends Controller
             'date' => 'required|date',
             'video' => 'required|file|mimes:mp4,mov,avi,wmv,webm|max:512000', // 500MB
             'title' => 'nullable|string|max:255',
-            'is_public' => 'nullable|boolean'
+            'is_public' => 'nullable|boolean',
+            'orientation' => 'nullable|in:horizontal,vertical'
         ]);
 
         $path = $request->file('video')->store('videos', 'public');
@@ -134,6 +135,7 @@ class VideoController extends Controller
             'title' => $request->title,
             'local_path' => $path,
             'status' => 'local',
+            'orientation' => $request->orientation ?? 'vertical',
             'is_public' => $request->has('is_public') ? filter_var($request->is_public, FILTER_VALIDATE_BOOLEAN) : true
         ]);
 

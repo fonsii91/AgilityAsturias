@@ -21,4 +21,10 @@ export class HomeComponent {
         const imagePath = (this.clubConfig as any).homeConfig?.heroImage || 'Images/Perros/Pumba.jpeg';
         return this.location.prepareExternalUrl(imagePath);
     }
+
+    get ctaImage() {
+        // Usa la foto de perro saltando en caso de no haber config
+        const imagePath = (this.clubConfig as any).homeConfig?.ctaImage || 'Images/Perros/perro_saltando.jpg';
+        return this.location.prepareExternalUrl(imagePath);
+    }
 }

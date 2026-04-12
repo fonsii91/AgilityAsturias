@@ -38,6 +38,8 @@ export class UploadVideoComponent implements OnInit {
     compressionMessage = '';
     compressionProgress = 0;
 
+    detectedOrientation: 'horizontal' | 'vertical' = 'vertical';
+
     constructor() {
         this.uploadForm = this.fb.group({
             dog_id: ['', Validators.required],
@@ -104,10 +106,11 @@ export class UploadVideoComponent implements OnInit {
         return dog.users.map((u: any) => u.name).join(', ');
     }
 
-    onFileSelected(event: any) {
+    async onFileSelected(event: any) {
         const file = event.target.files[0];
         if (file) {
             this.selectedFile = file;
+            this.detectedOrientation = await this.detectOrientation(file);
         }
     }
 
@@ -123,7 +126,7 @@ export class UploadVideoComponent implements OnInit {
         this.isDragging = false;
     }
 
-    onDrop(event: DragEvent) {
+    async onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
         this.isDragging = false;
@@ -134,10 +137,38 @@ export class UploadVideoComponent implements OnInit {
             // Validate it's a video
             if (file.type.startsWith('video/')) {
                 this.selectedFile = file;
+                this.detectedOrientation = await this.detectOrientation(file);
             } else {
                 this.toastService.error('Por favor, selecciona un archivo de vídeo válido.');
             }
         }
+    }
+
+    async detectOrientation(file: File): Promise<'horizontal' | 'vertical'> {
+        return new Promise((resolve) => {
+            try {
+                const video = document.createElement('video');
+                const url = URL.createObjectURL(file);
+                
+                video.onloadedmetadata = () => {
+                    URL.revokeObjectURL(url);
+                    if (video.videoWidth > video.videoHeight) {
+                        resolve('horizontal');
+                    } else {
+                        resolve('vertical');
+                    }
+                };
+                
+                video.onerror = () => {
+                    URL.revokeObjectURL(url);
+                    resolve('vertical');
+                };
+                
+                video.src = url;
+            } catch (error) {
+                resolve('vertical');
+            }
+        });
     }
 
     removeFile() {
@@ -299,6 +330,7 @@ export class UploadVideoComponent implements OnInit {
         formData.append('date', this.uploadForm.get('date')?.value);
         formData.append('title', this.uploadForm.get('title')?.value || '');
         formData.append('is_public', this.uploadForm.get('is_public')?.value ? '1' : '0');
+        formData.append('orientation', this.detectedOrientation);
         formData.append('video', finalFile);
 
         this.videoService.uploadVideo(formData).subscribe({
