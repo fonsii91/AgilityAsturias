@@ -120,7 +120,8 @@ class VideoController extends Controller
             $query->latest()->orderBy('id', 'desc');
         }
 
-        $videos = $query->paginate(10);
+        $perPage = $request->has('per_page') ? min((int) $request->per_page, 100) : 10;
+        $videos = $query->paginate($perPage);
         return response()->json($videos);
     }
 
@@ -133,7 +134,8 @@ class VideoController extends Controller
             'video' => 'required|file|mimes:mp4,mov,avi,wmv,webm|max:512000', // 500MB
             'title' => 'nullable|string|max:255',
             'is_public' => 'nullable|boolean',
-            'orientation' => 'nullable|in:horizontal,vertical'
+            'orientation' => 'nullable|in:horizontal,vertical',
+            'manga_type' => 'nullable|in:Agility,Jumping,Otra,Agility 1,Agility 2,Jumping 1,Jumping 2'
         ]);
 
         $path = $request->file('video')->store('videos', 'public');
@@ -147,6 +149,7 @@ class VideoController extends Controller
             'local_path' => $path,
             'status' => 'local',
             'orientation' => $request->orientation ?? 'vertical',
+            'manga_type' => $request->manga_type ?? 'Agility 1',
             'is_public' => $request->has('is_public') ? filter_var($request->is_public, FILTER_VALIDATE_BOOLEAN) : true
         ]);
 
@@ -169,7 +172,8 @@ class VideoController extends Controller
             'competition_id' => 'nullable|exists:competitions,id',
             'date' => 'required|date',
             'title' => 'nullable|string|max:255',
-            'is_public' => 'nullable|boolean'
+            'is_public' => 'nullable|boolean',
+            'manga_type' => 'nullable|in:Agility,Jumping,Otra,Agility 1,Agility 2,Jumping 1,Jumping 2'
         ]);
 
         $updateData = [
@@ -178,6 +182,10 @@ class VideoController extends Controller
             'date' => $request->date,
             'title' => $request->title,
         ];
+        
+        if ($request->has('manga_type')) {
+            $updateData['manga_type'] = $request->manga_type;
+        }
 
         if ($request->has('is_public')) {
             if ($isDogOwner || in_array($user->role, ['admin', 'staff'])) {

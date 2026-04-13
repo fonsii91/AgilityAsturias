@@ -53,6 +53,7 @@ class CompetitionController extends Controller
             'enlace' => 'nullable|string',
             'tipo' => 'required|in:competicion,otros',
             'nombre' => 'nullable|string',
+            'judge_name' => 'nullable|string',
         ]);
 
         $competition = Competition::create($validated);
@@ -91,6 +92,7 @@ class CompetitionController extends Controller
             'enlace' => 'nullable|string',
             'tipo' => 'required|in:competicion,otros',
             'nombre' => 'nullable|string',
+            'judge_name' => 'nullable|string',
         ]);
 
         $competition->update($validated);

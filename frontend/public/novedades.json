@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.1.11",
+    "date": "2026-04-13",
+    "features": [
+      "¡Despídete de llevar los papeles en la cartera! Hemos estrenado la Bitácora RSCE digitalizada para registrar todas las carreras y pruebas de tu perro: desde tus primeros pasos en Grado Iniciación hasta el Grado 3.",
+      "El nuevo sistema calcula de forma totalmente automática si cumples con los requisitos de ascenso para subir de nivel. Detectará por sí solo la velocidad, puntos y el número de jueces diferentes que has logrado para que no tengas decodificar ningún reglamento.",
+      "Siempre a mano. Hemos enlazado el Seguimiento RSCE al menú de tu teléfono móvil, y si necesitas presentárselo a algún juez de la federación, hemos incorporado un botón mágico para imprimir rápidamente todo tu historial en PDF limpio para llevar."
+    ]
+  },
+  {
     "version": "1.1.10",
     "date": "2026-04-12",
     "bugfixes": [

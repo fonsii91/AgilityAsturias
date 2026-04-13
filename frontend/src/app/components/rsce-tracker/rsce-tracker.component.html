@@ -1,0 +1,493 @@
+<div class="tracker-container">
+  <!-- Desktop Print Header (Hidden on screen) -->
+  <div class="print-header">
+    <h2>Bitácora RSCE</h2>
+    @if (selectedDog()) {
+    <div class="print-dog-info">
+      <p><strong>Perro:</strong> {{ selectedDog()?.name }} ({{ selectedDog()?.breed || 'Mestizo' }})</p>
+      <p><strong>Licencia RSCE:</strong> {{ selectedDog()?.rsce_license || 'No registrada' }}</p>
+      <p><strong>Microchip:</strong> {{ selectedDog()?.microchip || 'No registrado' }}</p>
+    </div>
+    }
+  </div>
+
+  <div class="tracker-header no-print">
+    <div class="header-titles" style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <h2><span class="material-icons-outlined" [style.color]="clubTheme.primary">analytics</span> Seguimiento RSCE
+        </h2>
+        <p>Registra tus mangas de Agility y Jumping, mantén el control de tus puntos y exporta el documento para la
+          Federación.</p>
+      </div>
+      <button class="help-btn" (click)="isHelpModalOpen.set(true)" title="Instrucciones"
+        style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+        <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
+      </button>
+    </div>
+  </div>
+
+  <div class="tracker-content">
+    <div class="dog-selector no-print">
+      <label>Selecciona tu perro:</label>
+      <div class="pill-group">
+        @for (dog of dogs(); track dog.id) {
+        <button class="pill-btn" [class.active]="selectedDogId() === dog.id" (click)="onDogSelectId(dog.id!)"
+          [style.background-color]="selectedDogId() === dog.id ? clubTheme.primary : ''">
+          <span class="material-icons-outlined">pets</span> {{ dog.name }}
+        </button>
+        }
+      </div>
+    </div>
+
+    @if (!selectedDogId()) {
+    <div class="empty-state no-print">
+      <span class="material-icons-outlined empty-icon">pets</span>
+      <p>Selecciona un perro de la lista superior para ver sus registros RSCE.</p>
+    </div>
+    } @else {
+
+    @if (!selectedDog()?.rsce_license) {
+    <div class="empty-state no-print" style="background-color: #fff1f2; border: 1px solid #fecdd3;">
+      <span class="material-icons-outlined empty-icon" style="color: #fda4af;">lock</span>
+      <p style="color: #9f1239; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">Función Bloqueada</p>
+      <p style="color: #be123c; margin: 0;">No disponible hasta introducir licencia RSCE en el <a
+          routerLink="/gestionar-perros" style="color: #be123c; text-decoration: underline;">perfil privado</a> del
+        perro.</p>
+    </div>
+    } @else {
+
+    <div class="progress-dashboard no-print">
+      <div class="dashboard-body">
+        
+        <div class="grade-progression-widget">
+          <div class="grade-card current" [style.border-color]="clubTheme.primary">
+            <div class="grade-icon" [style.background-color]="clubTheme.primary + '20'" [style.color]="clubTheme.primary">
+              <span class="material-icons">military_tech</span>
+            </div>
+            <div class="grade-text">
+              <span class="label">Grado Actual</span>
+              <span class="value">Grado {{ currentGrade() }}</span>
+            </div>
+          </div>
+
+          @if (currentGrade() === '0' || currentGrade() === '1' || currentGrade() === '2') {
+            <div class="progression-arrow">
+              <div class="line" [style.background-color]="clubTheme.primary"></div>
+              <div class="pulse-ring" [style.border-color]="clubTheme.primary"></div>
+              <span class="material-icons" [style.color]="clubTheme.primary">arrow_forward</span>
+            </div>
+
+            <div class="grade-card target">
+              <div class="grade-icon">
+                <span class="material-icons">emoji_events</span>
+              </div>
+              <div class="grade-text">
+                <span class="label">Próximo Objetivo</span>
+                <span class="value">Grado {{ currentGrade() === '0' ? '1' : (currentGrade() === '1' ? '2' : '3') }}</span>
+              </div>
+            </div>
+          } @else {
+            <div class="progression-arrow">
+              <span class="material-icons" style="color: #10b981; font-size: 2rem;">check_circle</span>
+            </div>
+            <div class="grade-card target achieved" style="border-color: #10b981; background-color: #f0fdf4;">
+              <div class="grade-icon" style="background-color: #dcfce7; color: #10b981;">
+                <span class="material-icons">workspace_premium</span>
+              </div>
+              <div class="grade-text">
+                <span class="label">Pico de Progreso</span>
+                <span class="value" style="color: #15803d;">Grado Máximo</span>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (currentGrade() === '0') {
+        <div class="grade-zero-checklist">
+          <div class="info-note" [style.border-left-color]="clubTheme.primary" style="margin-bottom: 1.5rem; background: #fff;">
+            <span class="material-icons" [style.color]="clubTheme.primary">info</span>
+            <p><strong>Los perros en Grado 0 o Iniciación no llevan un contador de pistas.</strong> <br>Para habilitar la bitácora RSCE, marca la siguiente casilla cuando tu perro haya cumplido los requisitos oficiales de iniciación.</p>
+          </div>
+          
+          <label class="checklist-item" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" [class.checked]="gradeZeroChecklist()">
+            <input type="checkbox" [ngModel]="gradeZeroChecklist()" (ngModelChange)="gradeZeroChecklist.set($event)" style="width: 24px; height: 24px; margin-top: 2px; accent-color: var(--primary-blue);">
+            <div style="flex: 1;">
+              <strong style="display: block; font-size: 1.1rem; color: #1e293b; margin-bottom: 4px;">Test de Sociabilidad Superado / Requisitos de Iniciación Cumplidos</strong>
+              <span style="color: #64748b; font-size: 0.9rem;">Certifico que este perro tiene aptitud para iniciar las competiciones oficiales de Grado 1.</span>
+            </div>
+          </label>
+
+          <div style="margin-top: 1.5rem; text-align: center;">
+            <button class="add-btn" 
+                    [style.background-color]="gradeZeroChecklist() ? clubTheme.primary : '#cbd5e1'" 
+                    [style.cursor]="gradeZeroChecklist() && !isUpgrading() ? 'pointer' : 'not-allowed'"
+                    [disabled]="!gradeZeroChecklist() || isUpgrading()" 
+                    (click)="upgradeToGrade1()" 
+                    style="padding: 1rem 2rem; font-size: 1.1rem;">
+              <span class="material-icons" [class.spinning]="isUpgrading()">{{ isUpgrading() ? 'sync' : 'upgrade' }}</span> 
+              {{ isUpgrading() ? 'Ascendiendo...' : '¡Ascender a Grado 1 y habilitar Bitácora!' }}
+            </button>
+          </div>
+        </div>
+        } @else if (currentGrade() === '1' || currentGrade() === '2') {
+        <div class="progress-item">
+          <div class="progress-label">
+            <div class="label-content">
+              <span class="label-title">{{ progressTitleA() }}</span>
+              <span class="label-subtitle">{{ progressSubtitleA() }}</span>
+            </div>
+            <span class="label-percent">{{ progressValueA() | number:'1.0-0' }}%</span>
+          </div>
+          <div class="slots-container">
+            @for (slot of slotArrayA; track $index) {
+            <div class="medal-slot" [class.filled]="$index < getFilledSlotsA()">
+              <span class="material-icons">{{ $index < getFilledSlotsA() ? 'workspace_premium' : 'workspace_premium'
+                  }}</span>
+            </div>
+            }
+          </div>
+        </div>
+
+        <div class="progress-item">
+          <div class="progress-label">
+            <div class="label-content">
+              <span class="label-title">{{ progressTitleB() }}</span>
+              <span class="label-subtitle">{{ progressSubtitleB() }}</span>
+            </div>
+            <span class="label-percent">{{ progressValueB() | number:'1.0-0' }}%</span>
+          </div>
+          <div class="slots-container">
+            @for (slot of slotArrayB; track $index) {
+            <div class="medal-slot" [class.filled]="$index < getFilledSlotsB()">
+              <span class="material-icons">{{ $index < getFilledSlotsB() ? 'workspace_premium' : 'workspace_premium'
+                  }}</span>
+            </div>
+            }
+          </div>
+        </div>
+
+        @if (progressMet()) {
+        <div class="success-alert" style="display: flex; flex-direction: column; gap: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons">emoji_events</span> <strong>¡Enhorabuena! Cumples los requisitos para ascender
+              al siguiente grado.</strong>
+          </div>
+          <p style="margin: 0; font-size: 0.9em; opacity: 0.9;">Recuerda que puedes actualizar el Grado RSCE manualmente
+            en el perfil privado de tu perro desde <a routerLink="/gestionar-perros"
+              style="color: inherit; text-decoration: underline; font-weight: bold;">Gestionar Perros</a>.</p>
+        </div>
+        }
+        } @else {
+        <div class="success-alert top-grade">
+          <span class="material-icons">military_tech</span> 
+          <div>
+            <strong>{{ progressTitleA() }}</strong>
+            <p style="margin: 0; font-size: 0.85em; opacity: 0.9;">{{ progressSubtitleA() }}</p>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    @if (currentGrade() !== '0') {
+    <div class="tracks-list">
+      <div class="list-header no-print">
+        <h3>Historial de Mangas</h3>
+        <button class="add-btn" (click)="openAddForm()" [style.background-color]="clubTheme.primary">
+          <span class="material-icons">add</span> Registrar Manga
+        </button>
+      </div>
+
+      @if (filteredTracks().length === 0) {
+      <div class="empty-state no-print">
+        <span class="material-icons-outlined empty-icon">description</span>
+        <p>Todavía no hay pistas registradas para {{ selectedDog()?.name }}.</p>
+      </div>
+      } @else {
+      <div class="table-responsive">
+        <table class="tracks-table">
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Manga</th>
+              <th>Calificación</th>
+              <th>Velocidad (m/s)</th>
+              <th>Juez</th>
+              <th>Competición</th>
+              <th class="no-print">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (track of filteredTracks(); track track.id) {
+            <tr>
+              <td>{{ track.date | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="badge" [class.agility]="track.manga_type.startsWith('Agility')"
+                  [class.jumping]="track.manga_type.startsWith('Jumping')">
+                  {{ track.manga_type }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getQualificationClass(track.qualification)">
+                  {{ track.qualification }}
+                </span>
+              </td>
+              <td>{{ track.speed ? track.speed : '-' }}</td>
+              <td>{{ track.judge_name || '-' }}</td>
+              <td>{{ track.location || '-' }}</td>
+              <td class="no-print">
+                <div class="action-buttons" style="display:flex; gap: 8px;">
+                  @if (getMatchingVideo(track); as video) {
+                  <button class="btn-icon" (click)="playVideo(video)" title="Ver Vídeo"
+                    [style.color]="clubTheme.primary">
+                    <span class="material-icons">play_circle</span>
+                  </button>
+                  }
+                  <button class="btn-icon edit" (click)="openEditForm(track)" title="Editar">
+                    <span class="material-icons">edit</span>
+                  </button>
+                  <button class="btn-icon delete" (click)="deleteTrack(track.id!)" title="Eliminar">
+                    <span class="material-icons">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+
+      @if (filteredTracks().length > 0) {
+      <div class="export-actions no-print" style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+        <button class="btn-print" (click)="printPassport()" [style.background-color]="clubTheme.primary">
+          <span class="material-icons">print</span> Imprimir / Exportar PDF
+        </button>
+      </div>
+      }
+    </div>
+    }
+    }
+    }
+  </div>
+</div>
+
+<!-- Reproductor de Vídeo (Modal Overlay) -->
+@if (videoToPlay()) {
+<div class="modal-overlay" style="z-index: 1000;" (click)="closeVideo()">
+  <div class="video-player-container" [style.width]="videoToPlay()!.orientation === 'horizontal' ? '800px' : '400px'"
+    style="position: relative; max-width: 90vw; max-height: 90vh;" (click)="$event.stopPropagation()">
+    <button class="close-btn" (click)="closeVideo()"
+      style="position: absolute; top: -10px; right: -10px; background: white; border-radius: 50%; z-index: 1001; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; border: none; display: flex;">
+      <span class="material-icons" style="font-size: 24px; color: #334155;">close</span>
+    </button>
+    <app-smart-video-player [youtubeId]="videoToPlay()!.youtube_id" [localPath]="videoToPlay()!.local_path"
+      [coverImageUrl]="videoToPlay()!.dog?.photo_url" [isHorizontal]="videoToPlay()!.orientation === 'horizontal'"
+      style="display: block; width: 100%;">
+    </app-smart-video-player>
+  </div>
+</div>
+}
+
+
+<!-- Add/Edit Modal (No print) -->
+@if (isFormOpen()) {
+<div class="modal-overlay no-print" (click)="closeForm()">
+  <div class="modal-content slide-in" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ isEditing() ? 'Editar Registro' : 'Nueva Manga' }}</h3>
+      <button class="btn-close" (click)="closeForm()"><span class="material-icons">close</span></button>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="form-section">
+        <h4 class="section-title"><mat-icon>event_note</mat-icon> Datos Básicos</h4>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Fecha *</label>
+            <input type="date" [(ngModel)]="formData().date" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label>Tipo de Manga *</label>
+            <select [(ngModel)]="formData().manga_type" class="form-control" required>
+              <option value="Agility 1">Agility 1</option>
+              <option value="Agility 2">Agility 2</option>
+              <option value="Jumping 1">Jumping 1</option>
+              <option value="Jumping 2">Jumping 2</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4 class="section-title"><mat-icon>emoji_events</mat-icon> Resultados</h4>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Calificación *</label>
+            <select [(ngModel)]="formData().qualification" class="form-control" required>
+              <option value="Excelente a 0">EXCELENTE a 0</option>
+              <option value="EXCELENTE">EXCELENTE (hasta 5.99 ptos)</option>
+              <option value="MUY BUENO">MUY BUENO (hasta 15.99 ptos)</option>
+              <option value="BUENO">BUENO (hasta 25.99 ptos)</option>
+              <option value="NO CLASIFICADO">NO CLASIFICADO (+26 ptos)</option>
+              <option value="Eliminado">Eliminado</option>
+              <option value="No Presentado">No Presentado</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Velocidad (m/s)</label>
+            <div style="position: relative;">
+              <input type="number" step="0.1" [(ngModel)]="formData().speed" class="form-control" placeholder="Ej. 4.56"
+                style="padding-right: 3rem;">
+              <span
+                style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9em; pointer-events: none;">m/s</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4 class="section-title"><mat-icon>place</mat-icon> Evento</h4>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label>Competición Organizadora</label>
+            <select [ngModel]="locationSelectMode()" (ngModelChange)="onCompetitionChange($event)" class="form-control"
+              style="background: white; margin-bottom: 0.5rem;">
+              <option value="">-- Seleccionar --</option>
+              @for (comp of competitions(); track comp.id) {
+              <option [value]="comp.nombre + ' - ' + comp.lugar">{{ comp.nombre }} - {{ comp.lugar }}</option>
+              }
+              <option value="otro">Otra (escribir manualmente)...</option>
+            </select>
+
+            @if (locationSelectMode() === 'otro') {
+            <input type="text" [(ngModel)]="formData().location" class="form-control"
+              placeholder="Ej. Club Agility Asturias">
+            }
+          </div>
+
+          <div class="form-group full-width">
+            <label style="display: flex; align-items: center; gap: 4px;">Juez <mat-icon
+                style="font-size: 16px; width: 16px; height: 16px; color: #3b82f6;"
+                title="Autocompletado automático si la competición lo tiene">auto_awesome</mat-icon></label>
+            <input type="text" [(ngModel)]="formData().judge_name" class="form-control"
+              placeholder="Nombre completo del juez">
+          </div>
+
+          <div class="form-group full-width">
+            <label>Notas (son únicamente para ti)</label>
+            <textarea [(ngModel)]="formData().notes" class="form-control" rows="2"
+              placeholder="Sensaciones, faltas, rehuses..."></textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeForm()">Cancelar</button>
+      <button class="btn-submit" (click)="saveTrack()" [style.background-color]="clubTheme.primary">Guardar</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Modal de Instrucciones -->
+@if (isHelpModalOpen()) {
+<div class="modal-overlay" style="z-index: 2000;" (click)="isHelpModalOpen.set(false)">
+  <div class="modal-content slide-in" style="max-width: 600px; padding: 24px;" (click)="$event.stopPropagation()">
+    <div class="modal-header" style="border-bottom: 1px solid #e2e8f0; padding-bottom: 16px; margin-bottom: 20px;">
+      <h3 style="margin: 0; display: flex; align-items: center; gap: 8px;">
+        <span class="material-icons" style="color: var(--primary-color);">help_outline</span> Instrucciones del
+        Seguimiento
+      </h3>
+      <button class="btn-close" (click)="isHelpModalOpen.set(false)"
+        style="background: none; border: none; cursor: pointer; font-size: 24px; color: #64748b;">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+
+    <div class="modal-body"
+      style="text-align: left; overflow-y: auto; max-height: 70vh; display: flex; flex-direction: column; gap: 16px; font-size: 14px; line-height: 1.6; color: #334155;">
+      <p>El panel superior rastrea automáticamente tu progreso para subir de Grado basándose en la normativa oficial de
+        la RSCE. Para que una pista sume puntos, debe ser calificada siempre como <strong>Excelente a 0</strong>.</p>
+
+      <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+        <h4 style="margin: 0 0 12px 0; font-size: 15px; color: #1e293b;">🐕 Si estás en Grado 0 (Iniciación):</h4>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons"
+              style="font-size: 18px; color: var(--primary-color); flex-shrink: 0; margin-top: 2px;">pets</span>
+            <span><strong>Requisitos oficiales:</strong> Para poder acceder al Grado 1 y comenzar a acumular puntos, tu perro debe tener la <strong>edad mínima reglamentaria</strong> y haber superado con éxito el <strong>Test de Sociabilidad de la RSCE</strong>.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+        <h4 style="margin: 0 0 12px 0; font-size: 15px; color: #1e293b;">🐕 Si estás en Grado 1 (Para pasar a Grado 2):
+        </h4>
+        <p style="margin: 0 0 8px 0;">Puedes lograr el ascenso completando cualquiera de estas dos vías:</p>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons"
+              style="font-size: 18px; color: #fbbf24; flex-shrink: 0; margin-top: 2px;">workspace_premium</span>
+            <span><strong>Opción A (Solo Agility):</strong> Conseguir 3 pistas de Agility a 0, evaluadas por al menos 2
+              jueces diferentes.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons"
+              style="font-size: 18px; color: #10b981; flex-shrink: 0; margin-top: 2px;">workspace_premium</span>
+            <span><strong>Opción B (Mixta):</strong> Conseguir 2 pistas de Agility a 0 y 2 pistas de Jumping a 0,
+              evaluadas por al menos 2 jueces diferentes.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+        <h4 style="margin: 0 0 12px 0; font-size: 15px; color: #1e293b;">🐕 Si estás en Grado 2 (Para pasar a Grado 3):
+        </h4>
+        <p style="margin: 0 0 8px 0;">Las reglas se endurecen y ya no hay vías opcionales; debes completar
+          <strong>ambos</strong> retos bajo la mirada de <strong>3 jueces diferentes</strong> en cada disciplina:
+        </p>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons"
+              style="font-size: 18px; color: #fbbf24; flex-shrink: 0; margin-top: 2px;">military_tech</span>
+            <span><strong>Agility:</strong> 3 pistas a 0 cumpliendo una velocidad mínima (4.50 m/s para S/M y 4.70 m/s
+              para L/X).</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons"
+              style="font-size: 18px; color: #10b981; flex-shrink: 0; margin-top: 2px;">military_tech</span>
+            <span><strong>Jumping:</strong> 3 pistas a 0 cumpliendo una velocidad mínima (4.70 m/s para S/M y 4.90 m/s
+              para L/X).</span>
+          </li>
+        </ul>
+      </div>
+
+      <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <h4 style="margin: 0 0 8px 0; font-size: 14px; color: #1e293b;">Reglas Adicionales:</h4>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons"
+              style="font-size: 18px; color: #0ea5e9; flex-shrink: 0; margin-top: 2px;">play_circle</span>
+            <span><strong>Vídeo Bridge:</strong> Si subes un vídeo a tu galería que coincida en Perro, Fecha y Tipo de
+              manga con una carrera registrada aquí, aparecerá un botón azul para reproducirlo instantáneamente sin
+              salir del historial. ¡Ideal para repasar tus carreras a cero!</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="modal-actions"
+      style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end;">
+      <button class="btn-submit" (click)="isHelpModalOpen.set(false)"
+        [style.background-color]="clubTheme.primary">Entendido</button>
+    </div>
+  </div>
+</div>
+}

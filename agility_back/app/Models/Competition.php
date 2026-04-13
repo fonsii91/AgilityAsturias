@@ -19,6 +19,7 @@ class Competition extends Model
         'enlace',
         'tipo',
         'nombre',
+        'judge_name',
     ];
 
     public function attendees()

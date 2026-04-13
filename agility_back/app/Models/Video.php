@@ -22,7 +22,8 @@ class Video extends Model
         'is_public',
         'in_public_gallery',
         'youtube_error',
-        'orientation'
+        'orientation',
+        'manga_type'
     ];
 
     protected $casts = [

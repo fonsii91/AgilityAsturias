@@ -97,15 +97,15 @@ export class App implements OnInit, OnDestroy {
       const warningDays = 15;
 
       return dogs.some(dog => {
-          if (!dog.license_expiration_date) return false;
-          
-          const expirationDate = new Date(dog.license_expiration_date);
-          expirationDate.setHours(0,0,0,0);
-          
-          const diffTime = expirationDate.getTime() - today.getTime();
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          const checkWarning = (dateStr?: string) => {
+              if (!dateStr) return false;
+              const expirationDate = new Date(dateStr);
+              expirationDate.setHours(0,0,0,0);
+              const diffDays = Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+              return diffDays <= warningDays;
+          };
 
-          return diffDays <= warningDays;
+          return checkWarning(dog.rsce_expiration_date) || checkWarning(dog.rfec_expiration_date);
       });
   }
 

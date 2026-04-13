@@ -102,6 +102,11 @@
 
       <div class="form-scrollable-body">
         @if (activeTab() === 'publico') {
+        <div class="info-note" [style.border-left-color]="clubTheme.primary" style="margin-bottom: 1.5rem;">
+          <span class="material-icons-outlined" [style.color]="clubTheme.primary">info</span>
+          <p>El <strong>Nombre</strong> del perro es el único dato obligatorio para que la app funcione. El resto de campos son opcionales y sirven para darte funcionalidades extra.</p>
+        </div>
+
         <div class="photo-section">
           <div class="photo-preview-wrapper" [class.no-photo]="!previewUrl()">
             @if (isUploadingPhoto()) {
@@ -161,41 +166,80 @@
                 placeholder="Código de 15 dígitos u otros (max 30 caract.)" maxlength="30">
             </div>
 
-            <h4 class="section-divider">Datos Federativos y Competición</h4>
-
+            <h4 class="section-divider" style="grid-column: 1 / -1; margin-top: 1rem;">Licencia RSCE</h4>
             <div class="form-group">
-              <label>Vencimiento de Licencia</label>
-              <input type="date" [(ngModel)]="formData().license_expiration_date" class="date-input">
+              <label>Nº Licencia</label>
+              <input type="text" [(ngModel)]="formData().rsce_license" placeholder="Opcional">
+            </div>
+            <div class="form-group">
+              <label>Caducidad de Licencia</label>
+              <input type="date" [(ngModel)]="formData().rsce_expiration_date" class="date-input">
+            </div>
+            
+            <div class="form-group">
+              <label>Grado RSCE Actual</label>
+              <select [(ngModel)]="formData().rsce_grade">
+                <option value="">-- No definido --</option>
+                <option value="0">Grado 0 / Iniciación</option>
+                <option value="1">Grado I</option>
+                <option value="2">Grado II</option>
+                <option value="3">Grado III</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Categoría de Tamaño</label>
+              <select [(ngModel)]="formData().rsce_category">
+                <option value="">-- No definido --</option>
+                <option value="S">Small (S)</option>
+                <option value="M">Medium (M)</option>
+                <option value="I">Intermediate (I)</option>
+                <option value="L">Large (L)</option>
+              </select>
             </div>
 
+            <h4 class="section-divider" style="grid-column: 1 / -1; margin-top: 1rem;">Licencia RFEC</h4>
             <div class="form-group">
+              <label>Nº Licencia</label>
+              <input type="text" [(ngModel)]="formData().rfec_license" placeholder="Opcional">
+            </div>
+            <div class="form-group">
+              <label>Caducidad de Licencia</label>
+              <input type="date" [(ngModel)]="formData().rfec_expiration_date" class="date-input">
+            </div>
+
+            <h4 class="section-divider" style="grid-column: 1 / -1; margin-top: 1rem;">Otros Documentos</h4>
+            <div class="form-group" style="grid-column: 1 / -1;">
               <label>Número de Pedigree / LOE</label>
               <input type="text" [(ngModel)]="formData().pedigree" placeholder="LOE-0000000">
             </div>
           </div>
 
           @if (selectedDog()) {
-          <div
-            style="margin-top: 3rem; padding: 1.5rem; border-radius: 12px; background: #fef2f2; border: 1px solid #fecaca;">
-            <h4 style="color: #b91c1c; margin: 0 0 0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
-              <span class="material-icons-outlined">warning</span> {{ isPrimaryOwner() ? 'Zona de Peligro' : 'Renunciar
-              al acceso' }}
-            </h4>
-            <p style="font-size: 0.85rem; color: #991b1b; margin: 0 0 1rem 0;">
-              @if (isPrimaryOwner()) {
-              Eliminar el perfil es una acción destructiva e irremediable. Borrará todo el historial, participaciones y
-              reservas vinculadas a este perro en el sistema.
-              } @else {
-              Al desvincularte, dejarás de tener acceso al perfil de este perro. El animal seguirá existiendo en el
-              sistema para el dueño original.
-              }
-            </p>
-            <button class="btn-danger-outline" (click)="promptDelete($event)"
-              style="background: white; width: 100%; justify-content: center;">
-              <span class="material-icons-outlined">{{ isPrimaryOwner() ? 'delete_forever' : 'person_remove' }}</span>
-              {{ isPrimaryOwner() ? 'Eliminar a ' : 'Desvincularme de ' }} {{ selectedDog()?.name }}
-            </button>
-          </div>
+          <details class="danger-zone-details"
+            style="margin-top: 3rem; padding: 1.5rem; border-radius: 12px; background: #fef2f2; border: 1px solid #fecaca; cursor: pointer;">
+            <summary style="color: #b91c1c; font-weight: bold; margin: 0; display:flex; align-items:center; gap:0.5rem; outline: none; user-select: none; justify-content: space-between; list-style: none;">
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <span class="material-icons-outlined">warning</span> {{ isPrimaryOwner() ? 'Zona de Peligro' : 'Renunciar al acceso' }}
+              </div>
+              <span class="material-icons-outlined expand-icon" style="transition: transform 0.3s;">expand_more</span>
+            </summary>
+            <div style="margin-top: 1rem; cursor: default;">
+              <p style="font-size: 0.85rem; color: #991b1b; margin: 0 0 1rem 0;">
+                @if (isPrimaryOwner()) {
+                Eliminar el perfil es una acción destructiva e irremediable. Borrará todo el historial, participaciones y
+                reservas vinculadas a este perro en el sistema.
+                } @else {
+                Al desvincularte, dejarás de tener acceso al perfil de este perro. El animal seguirá existiendo en el
+                sistema para el dueño original.
+                }
+              </p>
+              <button class="btn-danger-outline" (click)="promptDelete($event)"
+                style="background: white; width: 100%; justify-content: center;">
+                <span class="material-icons-outlined">{{ isPrimaryOwner() ? 'delete_forever' : 'person_remove' }}</span>
+                {{ isPrimaryOwner() ? 'Eliminar a ' : 'Desvincularme de ' }} {{ selectedDog()?.name }}
+              </button>
+            </div>
+          </details>
           }
         </div>
         }
@@ -354,14 +398,14 @@
             <div style="flex: 1;">
               <strong style="color: #1e293b; display: block; margin-bottom: 4px;">Datos Privados</strong>
               <span style="color: #475569; font-size: 0.9rem; line-height: 1.6;">
-                Tus números de <span class="chipi">Microchip</span> y <span class="chipi">LOE</span> jamás se utilizan
+                Tus números de <span class="chipi">Microchip</span>, <span class="chipi">LOE</span> y tus <span class="chipi">Licencias (RSCE/RFEC)</span> jamás se utilizan
                 funcionalmente dentro de la
                 aplicación. Están ahí únicamente para ti, listos y accesibles para cuando necesites consultarlos. Toda
-                esta información la guardamos <strong>protegida</strong> en nuestra base de datos y es
-                <b>confidencial</b>.<br><br>
-                Además, si introduces una <span class="chipi">Fecha de Licencia</span>, el sistema activará una alarma
+                esta información la guardamos <strong>encriptada</strong> en nuestra base de datos y es
+                <b>estrictamente confidencial</b>.<br><br>
+                Además, si introduces una <span class="chipi">Fecha de Caducidad</span> en tus licencias, el sistema activará una alarma
                 automática para
-                avisarte antes de que caduque para que recuerdes renovarla a tiempo.
+                avisarte antes de que caduquen para que recuerdes renovarlas a tiempo.
               </span>
             </div>
           </li>

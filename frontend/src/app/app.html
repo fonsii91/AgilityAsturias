@@ -50,6 +50,7 @@
           @if (authService.isMember()) {
             <li class="mobile-nav-divider">Explorar</li>
             <li><a routerLink="/recursos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">folder_shared</span> Recursos</a></li>
+            <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">analytics</span> Seguimiento RSCE</a></li>
             @if (authService.isMember()) {
               <li><a routerLink="/novedades" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">new_releases</span> Novedades</a></li>
             }

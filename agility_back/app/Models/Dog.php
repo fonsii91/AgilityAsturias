@@ -15,11 +15,25 @@ class Dog extends Model
         'name',
         'breed',
         'birth_date',
-        'license_expiration_date',
+        'rsce_license',
+        'rsce_expiration_date',
+        'rsce_grade',
+        'rsce_category',
+        'rfec_license',
+        'rfec_expiration_date',
         'microchip',
         'pedigree',
         'photo_url',
         'points',
+    ];
+
+    protected $casts = [
+        'rsce_license' => 'encrypted',
+        'rsce_expiration_date' => 'encrypted',
+        'rfec_license' => 'encrypted',
+        'rfec_expiration_date' => 'encrypted',
+        'microchip' => 'encrypted',
+        'pedigree' => 'encrypted',
     ];
 
     public function users()
@@ -47,6 +61,11 @@ class Dog extends Model
         return $this->hasMany(PointHistory::class);
     }
 
+    public function rsceTracks()
+    {
+        return $this->hasMany(RsceTrack::class);
+    }
+
     /**
      * Override toArray to ensure private data is only exposed to the owners.
      */
@@ -71,7 +90,10 @@ class Dog extends Model
         if (!$isOwner) {
             unset($array['microchip']);
             unset($array['pedigree']);
-            unset($array['license_expiration_date']);
+            unset($array['rsce_license']);
+            unset($array['rsce_expiration_date']);
+            unset($array['rfec_license']);
+            unset($array['rfec_expiration_date']);
         }
 
         return $array;

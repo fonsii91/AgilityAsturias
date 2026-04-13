@@ -12,6 +12,7 @@ export interface Video {
     local_path?: string;
     youtube_id?: string;
     status: 'local' | 'in_queue' | 'on_youtube' | 'failed';
+    manga_type?: 'Agility 1' | 'Agility 2' | 'Jumping 1' | 'Jumping 2' | 'Otra' | string;
     orientation?: 'horizontal' | 'vertical';
     created_at?: string;
     updated_at?: string;

@@ -47,12 +47,13 @@ export class CrudCompeticionComponent {
             nombre: ['', Validators.required],
             lugar: [''],
             fechaEvento: ['', Validators.required],
-            fechaFinEvento: [''], // Optional end date
+            fechaFinEvento: [''],
             fechaLimite: [''],
             formaPago: [''],
             enlace: ['', [Validators.pattern('https?://.+')]],
-            tipo: ['competicion', Validators.required], // Default to 'competicion'
-            cartel: [null] // Validation handled manually if needed, or required only on creation
+            tipo: ['competicion', Validators.required],
+            cartel: [null],
+            judge_name: [''] // Optional judge name
         });
     }
 
@@ -76,10 +77,10 @@ export class CrudCompeticionComponent {
 
     editCompetition(comp: Competition) {
         this.currentCompetitionId = comp.id;
-        this.existingCartel = comp.cartel;
+        this.existingCartel = comp.cartel || null;
 
         this.competitionForm.patchValue({
-            nombre: comp.nombre || '', // Handle missing name in old records
+            nombre: comp.nombre || '', 
             lugar: comp.lugar,
             fechaEvento: comp.fechaEvento,
             fechaFinEvento: comp.fechaFinEvento || '',
@@ -87,6 +88,7 @@ export class CrudCompeticionComponent {
             formaPago: comp.formaPago,
             enlace: comp.enlace,
             tipo: comp.tipo || 'competicion',
+            judge_name: comp.judge_name || ''
             // Don't patch cartel with the file object/string directly as file input is read-only
             // We handle preservation via existingCartel
         });

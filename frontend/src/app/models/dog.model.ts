@@ -3,7 +3,12 @@ export interface Dog {
     name: string;
     breed?: string; // Raza opcional
     birth_date?: string;
-    license_expiration_date?: string;
+    rsce_license?: string;
+    rsce_expiration_date?: string;
+    rsce_grade?: string;
+    rsce_category?: string;
+    rfec_license?: string;
+    rfec_expiration_date?: string;
     microchip?: string;
     pedigree?: string;
     photo_url?: string;

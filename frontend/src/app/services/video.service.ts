@@ -12,8 +12,11 @@ export class VideoService {
 
     constructor(private http: HttpClient) { }
 
-    getVideos(page: number = 1, filters?: { search?: string, date?: string, category?: string, sort?: string, dateRange?: string, dog_id?: string, competition_id?: string, orientation?: string }): Observable<any> {
+    getVideos(page: number = 1, filters?: { search?: string, date?: string, category?: string, sort?: string, dateRange?: string, dog_id?: string, competition_id?: string, orientation?: string, per_page?: number }): Observable<any> {
         let params = new HttpParams().set('page', page.toString());
+        if (filters?.per_page) {
+            params = params.set('per_page', filters.per_page.toString());
+        }
         if (filters?.search) {
             params = params.set('search', filters.search);
         }

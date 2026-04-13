@@ -12,6 +12,7 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SuggestionController;
+use App\Http\Controllers\RsceTrackController;
 use Illuminate\Http\Request; // Added for the closure route
 
 /*
@@ -137,6 +138,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/dogs/{id}', [DogController::class, 'update']);
         Route::post('/dogs/{id}/delete', [DogController::class, 'destroy']);
         Route::post('/dogs/{id}/photo', [DogController::class, 'uploadPhoto']);
+
+        // RSCE Tracks
+        Route::get('/rsce-tracks', [RsceTrackController::class, 'index']);
+        Route::post('/rsce-tracks', [RsceTrackController::class, 'store']);
+        Route::post('/rsce-tracks/{rsceTrack}', [RsceTrackController::class, 'update']);
+        Route::post('/rsce-tracks/{rsceTrack}/delete', [RsceTrackController::class, 'destroy']);
 
         Route::get('/availability', [ReservationController::class, 'availability']); // ???
         Route::get('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'index']);

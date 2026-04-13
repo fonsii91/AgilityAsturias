@@ -166,5 +166,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/novedades/novedades.component').then(m => m.NovedadesComponent),
         canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: '' }
+    },
+    {
+        path: 'bitacora-rsce',
+        loadComponent: () => import('./components/rsce-tracker/rsce-tracker.component').then(m => m.RsceTrackerComponent),
+        canActivate: [memberGuard],
+        title: titleResolver, data: { pageTitle: 'Seguimiento RSCE' }
     }
 ];

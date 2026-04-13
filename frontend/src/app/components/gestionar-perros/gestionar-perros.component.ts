@@ -55,7 +55,7 @@ export class GestionarPerrosComponent implements OnInit {
     this.selectedDog.set(null);
     this.isAddingNew.set(true);
     this.activeTab.set('publico');
-    this.formData.set({ name: '', breed: '', birth_date: '', license_expiration_date: '', microchip: '', pedigree: '' });
+    this.formData.set({ name: '', breed: '', birth_date: '', rsce_license: '', rsce_expiration_date: '', rfec_license: '', rfec_expiration_date: '', microchip: '', pedigree: '' });
     this.selectedFile = null;
     this.previewUrl.set(null);
   }
@@ -68,7 +68,10 @@ export class GestionarPerrosComponent implements OnInit {
       name: dog.name, 
       breed: dog.breed || '', 
       birth_date: dog.birth_date ? dog.birth_date.split('T')[0] : '', // Extract YYYY-MM-DD
-      license_expiration_date: dog.license_expiration_date ? dog.license_expiration_date.split('T')[0] : '',
+      rsce_license: dog.rsce_license || '',
+      rsce_expiration_date: dog.rsce_expiration_date ? dog.rsce_expiration_date.split('T')[0] : '',
+      rfec_license: dog.rfec_license || '',
+      rfec_expiration_date: dog.rfec_expiration_date ? dog.rfec_expiration_date.split('T')[0] : '',
       microchip: dog.microchip || '',
       pedigree: dog.pedigree || ''
     });
@@ -130,7 +133,10 @@ export class GestionarPerrosComponent implements OnInit {
       name: data.name!,
       breed: data.breed?.trim() || null,
       birth_date: data.birth_date || null,
-      license_expiration_date: data.license_expiration_date || null,
+      rsce_license: data.rsce_license?.trim() || null,
+      rsce_expiration_date: data.rsce_expiration_date || null,
+      rfec_license: data.rfec_license?.trim() || null,
+      rfec_expiration_date: data.rfec_expiration_date || null,
       microchip: data.microchip?.trim() || null,
       pedigree: data.pedigree?.trim() || null
     };
@@ -221,7 +227,7 @@ export class GestionarPerrosComponent implements OnInit {
 
   calculateProgress(dog: Dog): number {
     let completed = 0;
-    const fields = ['name', 'photo_url', 'breed', 'birth_date', 'microchip', 'pedigree', 'license_expiration_date'];
+    const fields = ['name', 'photo_url', 'breed', 'birth_date', 'microchip', 'pedigree', 'rsce_license', 'rsce_expiration_date', 'rfec_license', 'rfec_expiration_date'];
     fields.forEach(field => {
       if ((dog as any)[field]) completed++;
     });

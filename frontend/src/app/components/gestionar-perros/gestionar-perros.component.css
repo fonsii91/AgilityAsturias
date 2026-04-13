@@ -439,7 +439,7 @@
   padding-left: 42px;
 }
 
-input {
+input, select {
   width: 100%;
   padding: 12px 15px;
   border: 2px solid transparent;
@@ -449,9 +449,10 @@ input {
   font-size: 0.95rem;
   font-weight: 500;
   transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
-input:focus {
+input:focus, select:focus {
   outline: none;
   border-color: var(--primary-blue, #0073CF);
   background: white;
@@ -773,4 +774,13 @@ input::placeholder {
   .hidden-mobile {
     display: none !important;
   }
+}
+
+/* Danger Zone Expander */
+.danger-zone-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.danger-zone-details[open] .expand-icon {
+  transform: rotate(180deg);
 }
