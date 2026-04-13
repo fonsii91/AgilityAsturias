@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.12",
+    "date": "2026-04-13",
+    "bugfixes": [
+      "Solucionado un percance técnico en la pantalla de Ranking que a veces se quedaba congelada y mostraba un error al intentar cargar la clasificación de los perros y analizar sus licencias federativas."
+    ]
+  },
+  {
     "version": "1.1.11",
     "date": "2026-04-13",
     "features": [
