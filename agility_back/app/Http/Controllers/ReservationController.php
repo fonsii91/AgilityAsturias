@@ -94,13 +94,14 @@ class ReservationController extends Controller
                     'user_name' => $userName,
                     'user_image' => $userImage,
                     'dogs' => [
-                        ['name' => $dogName, 'image' => $dogPhoto]
+                        ['name' => $dogName, 'image' => $dogPhoto, 'reservation_id' => $reservation->id]
                     ]
                 ];
             } else {
                 $availability[$key]['attendees'][$foundUserIdx]['dogs'][] = [
                     'name' => $dogName,
-                    'image' => $dogPhoto
+                    'image' => $dogPhoto,
+                    'reservation_id' => $reservation->id
                 ];
             }
         }

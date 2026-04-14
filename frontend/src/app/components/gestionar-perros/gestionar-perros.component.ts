@@ -55,7 +55,7 @@ export class GestionarPerrosComponent implements OnInit {
     this.selectedDog.set(null);
     this.isAddingNew.set(true);
     this.activeTab.set('publico');
-    this.formData.set({ name: '', breed: '', birth_date: '', rsce_license: '', rsce_expiration_date: '', rfec_license: '', rfec_expiration_date: '', microchip: '', pedigree: '' });
+    this.formData.set({ name: '', breed: '', birth_date: '', rsce_license: '', rsce_expiration_date: '', rsce_grade: '', rsce_category: '', rfec_license: '', rfec_expiration_date: '', microchip: '', pedigree: '' });
     this.selectedFile = null;
     this.previewUrl.set(null);
   }
@@ -70,6 +70,8 @@ export class GestionarPerrosComponent implements OnInit {
       birth_date: dog.birth_date ? dog.birth_date.split('T')[0] : '', // Extract YYYY-MM-DD
       rsce_license: dog.rsce_license || '',
       rsce_expiration_date: dog.rsce_expiration_date ? dog.rsce_expiration_date.split('T')[0] : '',
+      rsce_grade: dog.rsce_grade || '',
+      rsce_category: dog.rsce_category || '',
       rfec_license: dog.rfec_license || '',
       rfec_expiration_date: dog.rfec_expiration_date ? dog.rfec_expiration_date.split('T')[0] : '',
       microchip: dog.microchip || '',
@@ -135,6 +137,8 @@ export class GestionarPerrosComponent implements OnInit {
       birth_date: data.birth_date || null,
       rsce_license: data.rsce_license?.trim() || null,
       rsce_expiration_date: data.rsce_expiration_date || null,
+      rsce_grade: data.rsce_grade || null,
+      rsce_category: data.rsce_category || null,
       rfec_license: data.rfec_license?.trim() || null,
       rfec_expiration_date: data.rfec_expiration_date || null,
       microchip: data.microchip?.trim() || null,

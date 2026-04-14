@@ -124,7 +124,7 @@
                           </div>
                           <div class="attendee-dogs">
                             @for (dog of res.selectedDogs; track dog) {
-                              <span class="dog-tag">
+                              <span class="dog-tag" style="display: inline-flex; align-items: center; position: relative;" [style.paddingRight]="['admin', 'staff'].includes(authService.currentUserSignal()?.role || '') && res.selectedDogs.length > 1 ? '24px' : '8px'">
                                 <span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">pets</span>
                                 @if (dog.image) {
                                   <span class="dog-name-link"
@@ -132,6 +132,13 @@
                                 }
                                 @if (!dog.image) {
                                   <span>{{ dog.name || dog }}</span>
+                                }
+                                @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '') && res.selectedDogs.length > 1) {
+                                  <button class="btn-icon-action delete-dog" style="position: absolute; right: 4px; padding: 0; display: flex; align-items: center; justify-content: center; height: 16px; width: 16px; color: #f44336; border: none; background: rgba(244, 67, 54, 0.1); border-radius: 50%; cursor: pointer; transition: background 0.2s;"
+                                    onmouseover="this.style.background='rgba(244, 67, 54, 0.2)'" onmouseout="this.style.background='rgba(244, 67, 54, 0.1)'"
+                                    (click)="openStaffDeleteDogModal(dog.reservation_id, dog.name, res.userName)" title="Eliminar reserva solo de este perro">
+                                    <span class="material-icons" style="font-size: 12px;">close</span>
+                                  </button>
                                 }
                               </span>
                             }
@@ -313,6 +320,25 @@
           <button class="btn-secondary" (click)="closeStaffDeleteUserModal()">Cancelar</button>
           <button class="btn-confirm btn-delete-action" (click)="confirmStaffDeleteUser()" [disabled]="isSubmitting()">
             {{ isSubmitting() ? 'Eliminando...' : 'Sí, eliminar reservas' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Admin Dog Delete Modal -->
+  @if (isDogDeleteModalOpen) {
+    <div class="modal-backdrop" (click)="closeStaffDeleteDogModal()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h3><span class="material-icons" style="vertical-align: text-bottom; color: #f44336; margin-right: 8px;">pets</span> Eliminar Perro de la Reserva</h3>
+        <div class="modal-body">
+          <p class="confirm-message">¿Estás seguro de que quieres eliminar a <strong>{{ dogToDelete?.dogName }}</strong> de la reserva de <strong>{{ dogToDelete?.userName }}</strong>?</p>
+          <p class="note">El usuario seguirá apuntado a la clase con sus otros perros.</p>
+        </div>
+        <div class="modal-actions" style="margin-top: 1.5rem;">
+          <button class="btn-secondary" (click)="closeStaffDeleteDogModal()">Cancelar</button>
+          <button class="btn-confirm btn-delete-action" (click)="confirmStaffDeleteDog()" [disabled]="isSubmitting()">
+            {{ isSubmitting() ? 'Eliminando...' : 'Sí, eliminar perro' }}
           </button>
         </div>
       </div>

@@ -203,7 +203,8 @@ export class GestionarReservasComponent {
                     }
                     myGroups.get(uName).selectedDogs.push({
                         name: r.dog?.name || 'Perro Desconocido',
-                        image: r.dog?.photo_url || null
+                        image: r.dog?.photo_url || null,
+                        reservation_id: r.id
                     });
                 }
                 allAttendees = Array.from(myGroups.values());
@@ -539,6 +540,34 @@ export class GestionarReservasComponent {
         } catch (error) {
             console.error(error);
             this.toastService.error('Error al liberar plazas del usuario.');
+        } finally {
+            this.isSubmitting.set(false);
+        }
+    }
+    // Admin Dog Deletion Modal
+    dogToDelete: { reservationId: number, dogName: string, userName: string } | null = null;
+    isDogDeleteModalOpen = false;
+
+    openStaffDeleteDogModal(reservationId: number, dogName: string, userName: string) {
+        this.dogToDelete = { reservationId, dogName, userName };
+        this.isDogDeleteModalOpen = true;
+    }
+
+    closeStaffDeleteDogModal() {
+        this.isDogDeleteModalOpen = false;
+        this.dogToDelete = null;
+    }
+
+    async confirmStaffDeleteDog() {
+        if (!this.dogToDelete) return;
+        this.isSubmitting.set(true);
+        try {
+            await this.reservationService.deleteReservation(this.dogToDelete.reservationId);
+            this.toastService.success(`Reserva de ${this.dogToDelete.dogName} cancelada.`);
+            this.closeStaffDeleteDogModal();
+        } catch (error) {
+            console.error(error);
+            this.toastService.error('Error al cancelar la reserva del perro.');
         } finally {
             this.isSubmitting.set(false);
         }
