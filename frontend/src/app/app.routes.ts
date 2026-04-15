@@ -75,6 +75,18 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'tablon-anuncios',
+        loadComponent: () => import('./components/tablon-anuncios/tablon-anuncios.component').then(m => m.TablonAnunciosComponent),
+        canActivate: [memberGuard],
+        title: titleResolver, data: { pageTitle: 'Tablón de Anuncios' }
+    },
+    {
+        path: 'tablon-anuncios/redactar',
+        loadComponent: () => import('./components/tablon-anuncios/crear-anuncio/crear-anuncio.component').then(m => m.CrearAnuncioComponent),
+        canActivate: [staffGuard],
+        title: titleResolver, data: { pageTitle: 'Redactar Anuncio' }
+    },
+    {
         path: 'gestionar-miembros',
         loadComponent: () => import('./components/gestionar-miembros/gestionar-miembros').then(m => m.GestionarMiembrosComponent),
         canActivate: [staffGuard],

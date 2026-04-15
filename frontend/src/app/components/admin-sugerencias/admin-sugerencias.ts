@@ -75,4 +75,29 @@ export class AdminSugerencias implements OnInit {
       }
     });
   }
+
+  markAsUnresolved(id: number) {
+    if(!confirm('¿Estás seguro de marcar este reporte como NO resuelto?')) {
+      return;
+    }
+
+    this.suggestionService.unresolveSuggestion(id).subscribe({
+      next: () => {
+        this.toastService.success('Reporte revertido a pendiente');
+        this.suggestions.update(sugs => {
+            const ix = sugs.findIndex(s => s.id === id);
+            if (ix !== -1) {
+                const updated = [...sugs];
+                updated[ix] = { ...updated[ix], status: 'pending' };
+                return updated;
+            }
+            return sugs;
+        });
+      },
+      error: (err) => {
+        console.error('Error unresolving suggestion', err);
+        this.toastService.error('Error al actualizar el reporte');
+      }
+    });
+  }
 }

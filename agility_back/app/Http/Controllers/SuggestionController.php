@@ -66,10 +66,34 @@ class SuggestionController extends Controller
             $suggestion->status = 'resolved';
             $suggestion->save();
 
+            // Notify the user who created it
+            if ($suggestion->user) {
+                $suggestion->user->notify(new \App\Notifications\SuggestionResolvedNotification($suggestion));
+            }
+
             return response()->json(['message' => 'Marcado como resuelto', 'data' => $suggestion], 200);
         } catch (\Exception $e) {
             Log::error('Error resolving suggestion: ' . $e->getMessage());
             return response()->json(['message' => 'Error al actualizar el estado'], 500);
+        }
+    }
+
+    /**
+     * Mark a suggestion as unresolved (pending) (Only for Admin)
+     */
+    public function unresolve($id)
+    {
+        try {
+            $suggestion = Suggestion::findOrFail($id);
+            $suggestion->status = 'pending';
+            $suggestion->save();
+
+            // Do not send notification here
+
+            return response()->json(['message' => 'Marcado como no resuelto', 'data' => $suggestion], 200);
+        } catch (\Exception $e) {
+            Log::error('Error unresolving suggestion: ' . $e->getMessage());
+            return response()->json(['message' => 'Error al revertir el estado'], 500);
         }
     }
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SuggestionController;
+use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RsceTrackController;
 use Illuminate\Http\Request; // Added for the closure route
 
@@ -102,6 +103,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Suggestions (Admin)
         Route::get('/admin/suggestions', [SuggestionController::class, 'index']);
         Route::post('/admin/suggestions/{id}/resolve', [SuggestionController::class, 'resolve']);
+        Route::post('/admin/suggestions/{id}/unresolve', [SuggestionController::class, 'unresolve']);
+
+        // Announcements (Admin/Staff)
+        Route::post('/announcements', [AnnouncementController::class, 'store']);
+        Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
 
         // Videos (Admin)
         Route::get('/admin/videos/stats', [VideoController::class, 'stats']);
@@ -138,6 +144,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/dogs/{id}', [DogController::class, 'update']);
         Route::post('/dogs/{id}/delete', [DogController::class, 'destroy']);
         Route::post('/dogs/{id}/photo', [DogController::class, 'uploadPhoto']);
+
+        // Announcements
+        Route::get('/announcements', [AnnouncementController::class, 'index']);
 
         // RSCE Tracks
         Route::get('/rsce-tracks', [RsceTrackController::class, 'index']);

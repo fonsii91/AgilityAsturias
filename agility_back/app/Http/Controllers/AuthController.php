@@ -210,7 +210,7 @@ class AuthController extends Controller
 
             \Illuminate\Support\Facades\DB::transaction(function () use ($targetUser) {
                 // Delete user's dogs but preserve shared ones
-                $targetUser->loadCount('dogs.users');
+                $targetUser->load('dogs');
                 foreach ($targetUser->dogs as $dog) {
                     // Si el perro lo tiene alguien más (co-propiedad), solo lo desvinculamos
                     $usersCount = $dog->users()->count();

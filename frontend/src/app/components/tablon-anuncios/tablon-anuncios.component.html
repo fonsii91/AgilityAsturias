@@ -1,0 +1,95 @@
+<div class="crud-container">
+  <div class="header">
+    <h2>Tablón de Anuncios</h2>
+    
+    @if (canManage) {
+      <button class="btn btn-primary" routerLink="/tablon-anuncios/redactar">
+        <span>+</span> Redactar Anuncio
+      </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+    <div class="skeleton-list">
+      <div class="skeleton-card">
+        <div class="skeleton-header">
+          <div class="skeleton-avatar"></div>
+          <div class="skeleton-title-group">
+            <div class="skeleton-title"></div>
+            <div class="skeleton-meta"></div>
+          </div>
+        </div>
+        <div class="skeleton-body">
+          <div class="skeleton-text full"></div>
+          <div class="skeleton-text full"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-header">
+          <div class="skeleton-avatar"></div>
+          <div class="skeleton-title-group">
+            <div class="skeleton-title"></div>
+            <div class="skeleton-meta"></div>
+          </div>
+        </div>
+        <div class="skeleton-body">
+          <div class="skeleton-text full"></div>
+          <div class="skeleton-text medium"></div>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (!isLoading() && announcements().length === 0) {
+    <div class="empty-state">
+      <span class="material-icons">campaign</span>
+      <p>No hay anuncios en el tablón en este momento.</p>
+    </div>
+  }
+
+  <div class="announcements-list">
+    @for (announcement of announcements(); track announcement.id) {
+      <div class="announcement-card">
+        <div class="announcement-header">
+          <div class="title-group">
+            <h2 class="title">{{ announcement.title }}</h2>
+            @if (isRecent(announcement.created_at)) {
+              <span class="badge-new">Reciente</span>
+            }
+          </div>
+          @if (canManage) {
+            <button class="btn-delete" (click)="deleteAnnouncement(announcement.id)" title="Borrar anuncio">
+              <span class="material-icons">delete</span>
+            </button>
+          }
+        </div>
+        
+        <div class="announcement-meta">
+          <div class="author-avatar" title="{{ announcement.user?.name || 'Administración' }}">
+            {{ (announcement.user?.name || 'A').charAt(0).toUpperCase() }}
+          </div>
+          <span>
+            <strong>{{ announcement.user?.name || 'Administración' }}</strong>
+            <span class="role-badge">{{ announcement.user?.role === 'admin' ? 'Coordinación' : 'Staff' }}</span>
+          </span>
+          <span><span class="material-icons">event</span> {{ announcement.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
+        </div>
+
+        <div class="announcement-body">
+          <div 
+            class="content-wrapper" 
+            [class.text-collapsed]="!isExpanded(announcement.id) && needsCollapse(announcement.content)"
+            [innerHTML]="formatContent(announcement.content)">
+          </div>
+          
+          @if (needsCollapse(announcement.content)) {
+            <button class="btn-expand" (click)="toggleExpand(announcement.id)">
+              {{ isExpanded(announcement.id) ? 'Desplegar menos ▲' : 'Leer más ▼' }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>

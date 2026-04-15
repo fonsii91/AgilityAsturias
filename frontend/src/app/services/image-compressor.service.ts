@@ -43,7 +43,8 @@ export class ImageCompressorService {
 
                     canvas.toBlob((blob) => {
                         if (!blob) return reject('Compression failed');
-                        const compressedFile = new File([blob], file.name, {
+                        const newFilename = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+                        const compressedFile = new File([blob], newFilename, {
                             type: 'image/jpeg',
                             lastModified: Date.now(),
                         });

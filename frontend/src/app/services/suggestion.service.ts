@@ -35,4 +35,11 @@ export class SuggestionService {
   resolveSuggestion(id: number): Observable<any> {
     return this.http.post(`${this.apiUrl}/admin/suggestions/${id}/resolve`, {});
   }
+
+  /**
+   * Marcar reporte como no resuelto (Admin)
+   */
+  unresolveSuggestion(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/admin/suggestions/${id}/unresolve`, {});
+  }
 }

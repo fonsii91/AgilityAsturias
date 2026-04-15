@@ -1,0 +1,34 @@
+<div class="crud-container">
+  <div class="header">
+    <h2>Nuevo Anuncio</h2>
+    <button class="btn btn-secondary" routerLink="/tablon-anuncios">
+      ← Volver al Tablón
+    </button>
+  </div>
+
+  <div class="form-view">
+    <h3 class="form-header">Redactar Comunicado</h3>
+    <form [formGroup]="announcementForm" (ngSubmit)="onSubmit()">
+      
+      <div class="form-group">
+        <label for="title">Asunto del anuncio</label>
+        <input type="text" id="title" formControlName="title" placeholder="Ej: Clases suspendidas mañana" class="form-control">
+      </div>
+      
+      <div class="form-group">
+        <label for="content">Cuerpo del mensaje</label>
+        <textarea id="content" formControlName="content" placeholder="Escribe el aviso detallado aquí..." rows="8" class="form-control"></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-success" [disabled]="announcementForm.invalid || isSubmitting()" style="margin-left: 0;">
+          Publicar Anuncio
+        </button>
+        <button type="button" class="btn btn-cancel" routerLink="/tablon-anuncios">
+          Cancelar
+        </button>
+      </div>
+      
+    </form>
+  </div>
+</div>
