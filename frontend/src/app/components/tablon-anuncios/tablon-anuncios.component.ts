@@ -1,6 +1,7 @@
-import { Component, OnInit, signal, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { AnnouncementService, Announcement } from '../../services/announcement.service';
 import { AuthService } from '../../services/auth.service';
@@ -10,13 +11,23 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-tablon-anuncios',
   standalone: true,
-  imports: [CommonModule, DatePipe, MatIconModule, RouterModule],
+  imports: [CommonModule, DatePipe, MatIconModule, RouterModule, FormsModule],
   templateUrl: './tablon-anuncios.component.html',
   styleUrls: ['./tablon-anuncios.component.css']
 })
 export class TablonAnunciosComponent implements OnInit {
   announcements = signal<Announcement[]>([]);
   isLoading = signal(true);
+  searchQuery = signal('');
+
+  displayedAnnouncements = computed(() => {
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return this.announcements();
+    return this.announcements().filter(a => 
+      a.title.toLowerCase().includes(query) || 
+      a.content.toLowerCase().includes(query)
+    );
+  });
   
   // UX logic
   expandedAnnouncements = new Set<number>();

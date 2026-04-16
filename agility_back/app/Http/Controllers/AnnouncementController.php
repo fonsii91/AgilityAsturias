@@ -9,7 +9,7 @@ class AnnouncementController extends Controller
 {
     public function index()
     {
-        $announcements = Announcement::with('user:id,name')->orderBy('created_at', 'desc')->get();
+        $announcements = Announcement::with('user:id,name,role')->orderBy('is_pinned', 'desc')->orderBy('created_at', 'desc')->get();
         return response()->json($announcements, 200);
     }
 
@@ -18,12 +18,14 @@ class AnnouncementController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string|max:10000',
+            'is_pinned' => 'boolean',
         ]);
 
         $announcement = Announcement::create([
             'user_id' => $request->user()->id,
             'title' => $validated['title'],
             'content' => $validated['content'],
+            'is_pinned' => $validated['is_pinned'] ?? false,
         ]);
 
         return response()->json($announcement->load('user:id,name'), 201);

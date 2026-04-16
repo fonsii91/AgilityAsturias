@@ -13,6 +13,7 @@ class Announcement extends Model
         'user_id',
         'title',
         'content',
+        'is_pinned',
     ];
 
     public function user()

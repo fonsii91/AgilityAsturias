@@ -8,6 +8,7 @@ export interface Announcement {
   user_id: number;
   title: string;
   content: string;
+  is_pinned?: boolean;
   created_at: string;
   updated_at: string;
   user?: {
@@ -29,7 +30,7 @@ export class AnnouncementService {
     return this.http.get<Announcement[]>(`${this.apiUrl}/announcements`);
   }
 
-  createAnnouncement(data: { title: string, content: string }): Observable<Announcement> {
+  createAnnouncement(data: { title: string, content: string, is_pinned?: boolean }): Observable<Announcement> {
     return this.http.post<Announcement>(`${this.apiUrl}/announcements`, data);
   }
 

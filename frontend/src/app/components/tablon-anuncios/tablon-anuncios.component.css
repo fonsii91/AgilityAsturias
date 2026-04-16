@@ -23,13 +23,53 @@
     margin-bottom: 2.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid #f0f2f5;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.header h2 {
+.header-content h2 {
     margin: 0;
     font-size: 1.8rem;
     color: var(--primary-blue, #003366);
     font-weight: 700;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 30px;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.search-container:focus-within {
+    background: #ffffff;
+    border-color: #4da3ff;
+    box-shadow: 0 0 0 3px rgba(77, 163, 255, 0.2);
+}
+
+.search-icon {
+    color: #6c757d;
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+.search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 0.95rem;
+    color: #495057;
+    width: 200px;
 }
 
 .btn {
@@ -125,24 +165,51 @@
 
 .announcement-card {
     background: #ffffff;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    border: 1px solid #e9ecef;
-    border-left: 5px solid var(--primary-blue, #003366);
+    border: 1px solid #f0f2f5;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     position: relative;
-    transition: box-shadow 0.2s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes slideUpFade {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.announcements-list .announcement-card:nth-child(1) { animation-delay: 0.1s; }
+.announcements-list .announcement-card:nth-child(2) { animation-delay: 0.2s; }
+.announcements-list .announcement-card:nth-child(3) { animation-delay: 0.3s; }
+.announcements-list .announcement-card:nth-child(4) { animation-delay: 0.4s; }
+.announcements-list .announcement-card:nth-child(n+5) { animation-delay: 0.5s; }
+
+.announcement-card.pinned {
+    border: 1px solid #ffd54f;
+    background: #fffdf5;
+}
+
+.pin-icon {
+    color: #ffb300;
+    font-size: 1.4rem;
+    transform: rotate(45deg);
 }
 
 .announcement-card:hover {
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
 }
 
 .announcement-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .title-group {
@@ -178,14 +245,15 @@
 }
 
 .badge-new {
-    background-color: #ffc107;
-    color: #000;
-    font-size: 0.75rem;
+    background: linear-gradient(135deg, #4dd0e1, #00acc1);
+    color: #ffffff;
+    font-size: 0.7rem;
     font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 12px;
+    padding: 4px 10px;
+    border-radius: 20px;
     text-transform: uppercase;
-    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 6px rgba(0, 172, 193, 0.3);
     animation: pulseBadge 2s infinite;
 }
 
@@ -208,24 +276,47 @@
 
 .announcement-meta {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 1.5rem;
     font-size: 0.85rem;
     color: #6c757d;
     margin-bottom: 1rem;
-    padding-bottom: 0.75rem;
+    padding-bottom: 1rem;
     border-bottom: 1px solid #f0f2f5;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.announcement-meta > span {
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.author-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-name {
+    font-weight: 600;
+    color: #343a40;
+    font-size: 0.95rem;
+}
+
+.date-info {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    background: #f8f9fa;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 500;
 }
 
-.announcement-meta .material-icons {
+.date-info .material-icons {
     font-size: 1rem;
-    color: #495057;
+    color: #6c757d;
 }
 
 .author-avatar {
