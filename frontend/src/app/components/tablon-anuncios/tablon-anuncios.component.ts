@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, AfterViewInit, ElementRef, ViewChildren, QueryList, OnDestroy } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -19,14 +19,26 @@ export class TablonAnunciosComponent implements OnInit {
   announcements = signal<Announcement[]>([]);
   isLoading = signal(true);
   searchQuery = signal('');
+  selectedCategory = signal('Todos');
+  categories = ['Todos', 'Importante', 'Competición', 'Entrenamientos', 'Organización', 'Social'];
 
   displayedAnnouncements = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return this.announcements();
-    return this.announcements().filter(a => 
-      a.title.toLowerCase().includes(query) || 
-      a.content.toLowerCase().includes(query)
-    );
+    const currentCategory = this.selectedCategory();
+    
+    let filtered = this.announcements();
+
+    if (currentCategory !== 'Todos') {
+      filtered = filtered.filter(a => a.category === currentCategory);
+    }
+
+    if (query) {
+      filtered = filtered.filter(a => 
+        a.title.toLowerCase().includes(query) || 
+        a.content.toLowerCase().includes(query)
+      );
+    }
+    return filtered;
   });
   
   // UX logic
@@ -105,6 +117,18 @@ export class TablonAnunciosComponent implements OnInit {
     return content.length > 300 || (content.match(/\n/g) || []).length > 3;
   }
 
+  getCategoryIcon(cat: string | undefined): string {
+    if (!cat) return 'campaign';
+    switch (cat) {
+      case 'Importante': return 'warning';
+      case 'Competición': return 'emoji_events';
+      case 'Entrenamientos': return 'sports_tennis';
+      case 'Organización': return 'build';
+      case 'Social': return 'groups';
+      default: return 'campaign';
+    }
+  }
+
   formatContent(content: string): SafeHtml {
     // Linkify URLs
     const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -114,5 +138,72 @@ export class TablonAnunciosComponent implements OnInit {
     });
     
     return this.sanitizer.bypassSecurityTrustHtml(formatted);
+  }
+
+  setCategory(cat: string) {
+    this.selectedCategory.set(cat);
+  }
+
+  // INTERSECTION OBSERVER LOGIC - "Invisible Read Tracking"
+  @ViewChildren('announcementCard') cardElements!: QueryList<ElementRef>;
+  private observer: IntersectionObserver | null = null;
+  private readTimers = new Map<number, any>();
+  private alreadyRead = new Set<number>();
+
+  ngAfterViewInit() {
+    this.setupObserver();
+    this.cardElements.changes.subscribe(() => {
+      this.setupObserver();
+    });
+  }
+
+  setupObserver() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    
+    // Configurar el vigía: la tarjeta debe estar 60% visible
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const id = Number(entry.target.getAttribute('data-id'));
+        if (this.alreadyRead.has(id)) return;
+
+        if (entry.isIntersecting) {
+          // Si está en pantalla, iniciar cuenta atrás de 2.5s
+          const timer = setTimeout(() => {
+             this.alreadyRead.add(id);
+             this.triggerMarkAsRead(id);
+          }, 2500);
+          this.readTimers.set(id, timer);
+        } else {
+          // Si hace scroll y se esconde, cancelar la lectura
+          if (this.readTimers.has(id)) {
+            clearTimeout(this.readTimers.get(id));
+            this.readTimers.delete(id);
+          }
+        }
+      });
+    }, { threshold: 0.6 });
+
+    this.cardElements.forEach(el => {
+      const id = Number(el.nativeElement.getAttribute('data-id'));
+      if (!this.alreadyRead.has(id)) {
+        this.observer?.observe(el.nativeElement);
+      }
+    });
+  }
+
+  triggerMarkAsRead(id: number) {
+    this.announcementService.markAsRead(id).subscribe({
+      next: () => { /* Logged read successfully */ },
+      error: () => { /* Silently fail to not interrupt UX */ }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+    this.readTimers.forEach(timer => clearTimeout(timer));
   }
 }

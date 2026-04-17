@@ -14,14 +14,55 @@
         <label for="title">Asunto del anuncio</label>
         <input type="text" id="title" formControlName="title" placeholder="Ej: Clases suspendidas mañana" class="form-control">
       </div>
+
+      <div class="form-group">
+        <label for="category">Categoría</label>
+        <select id="category" formControlName="category" class="form-control">
+          <option value="General">General (Sin categoría específica)</option>
+          <option value="Importante">Importante</option>
+          <option value="Competición">Competición</option>
+          <option value="Entrenamientos">Entrenamientos</option>
+          <option value="Organización">Organización</option>
+          <option value="Social">Social</option>
+        </select>
+      </div>
       
       <div class="form-group">
         <label for="content">Cuerpo del mensaje</label>
         <textarea id="content" formControlName="content" placeholder="Escribe el aviso detallado aquí..." rows="8" class="form-control"></textarea>
       </div>
 
+      <div class="notification-section">
+        <label>Alertar a los Socios</label>
+
+        <div class="segmented-control">
+          <button type="button" class="segment-btn" [class.active]="notifyType() === 'none'" (click)="setNotifyType('none')" title="Silencio">
+            <span class="material-icons">notifications_off</span>
+          </button>
+          <button type="button" class="segment-btn" [class.active]="notifyType() === 'all'" (click)="setNotifyType('all')">
+            <span class="material-icons" style="font-size: 1rem;">campaign</span> A Todos
+          </button>
+          <button type="button" class="segment-btn" [class.active]="notifyType() === 'specific'" (click)="setNotifyType('specific')">
+            Seleccionar...
+          </button>
+        </div>
+
+        @if (notifyType() === 'specific') {
+        <div class="specific-users-list">
+          <div class="users-grid">
+            @for (u of usersList(); track u.id) {
+            <label class="user-checkbox" [class.selected]="selectedUsers().has(u.id)">
+              <input type="checkbox" [checked]="selectedUsers().has(u.id)" (change)="toggleUser(u.id)">
+              <span>{{ u.name }}</span>
+            </label>
+            }
+          </div>
+        </div>
+        }
+      </div>
+
       <div class="form-actions">
-        <button type="submit" class="btn btn-success" [disabled]="announcementForm.invalid || isSubmitting()" style="margin-left: 0;">
+        <button type="submit" class="btn btn-primary" [disabled]="announcementForm.invalid || isSubmitting()" style="margin-left: 0;">
           Publicar Anuncio
         </button>
         <button type="button" class="btn btn-cancel" routerLink="/tablon-anuncios">

@@ -18,6 +18,18 @@
     </div>
   </div>
 
+  <div class="category-tabs">
+    @for (cat of categories; track cat) {
+      <button class="tab-btn" [class.active]="selectedCategory() === cat" (click)="setCategory(cat)">
+        @if (cat !== 'Todos' && cat !== 'General') {
+          <span class="material-icons tab-icon">{{ getCategoryIcon(cat) }}</span>
+        }
+        {{ cat }}
+      </button>
+    }
+  </div>
+
+
   @if (isLoading()) {
   <div class="skeleton-list">
     <div class="skeleton-card">
@@ -59,36 +71,24 @@
 
   <div class="announcements-list">
     @for (announcement of displayedAnnouncements(); track announcement.id) {
-    <div class="announcement-card" [class.pinned]="announcement.is_pinned">
+    <div #announcementCard class="announcement-card" [class.pinned]="announcement.is_pinned" [attr.data-id]="announcement.id">
       <div class="announcement-header">
         <div class="title-group">
+          <span class="material-icons category-label-icon" [title]="'Categoría: ' + announcement.category">
+            {{ getCategoryIcon(announcement.category) }}
+          </span>
           @if (announcement.is_pinned) {
           <span class="material-icons pin-icon" title="Anuncio fijado">push_pin</span>
           }
           <h2 class="title">{{ announcement.title }}</h2>
-          @if (isRecent(announcement.created_at)) {
-          <span class="badge-new">Nuevo</span>
+        </div>
+        <div class="header-actions-card">
+          <span class="date-compact">{{ announcement.created_at | date:'dd/MM' }}</span>
+          @if (canManage) {
+          <button class="btn-delete" (click)="deleteAnnouncement(announcement.id)" title="Borrar anuncio">
+            <span class="material-icons">delete</span>
+          </button>
           }
-        </div>
-        @if (canManage) {
-        <button class="btn-delete" (click)="deleteAnnouncement(announcement.id)" title="Borrar anuncio">
-          <span class="material-icons">delete</span>
-        </button>
-        }
-      </div>
-
-      <div class="announcement-meta">
-        <div class="author-info">
-          <div class="author-avatar" title="{{ announcement.user?.name || 'Administración' }}">
-            {{ (announcement.user?.name || 'A').charAt(0).toUpperCase() }}
-          </div>
-          <div class="author-details">
-            <span class="author-name">{{ announcement.user?.name || 'Administración' }}</span>
-            <span class="role-badge">{{ announcement.user?.role === 'admin' ? 'Coordinación' : 'Staff' }}</span>
-          </div>
-        </div>
-        <div class="date-info">
-          <span class="material-icons">event</span> {{ announcement.created_at | date:'dd MMM yyyy, HH:mm' }}
         </div>
       </div>
 
@@ -98,10 +98,31 @@
           [innerHTML]="formatContent(announcement.content)">
         </div>
 
-        @if (needsCollapse(announcement.content)) {
-        <button class="btn-expand" (click)="toggleExpand(announcement.id)">
-          {{ isExpanded(announcement.id) ? 'Desplegar menos ▲' : 'Leer más ▼' }}
-        </button>
+        <div class="expand-action-container" (click)="toggleExpand(announcement.id)" title="Desplegar anuncio">
+          <button class="btn-icon-expand" tabindex="-1">
+            <span class="material-icons">{{ isExpanded(announcement.id) ? 'expand_less' : 'expand_more' }}</span>
+          </button>
+        </div>
+
+        @if (isExpanded(announcement.id)) {
+        <div class="announcement-footer">
+          <div class="author-info">
+            <div class="author-avatar-small">
+              <span class="material-icons" style="font-size: 16px;">person</span>
+            </div>
+            <div class="author-details-small">
+              <span class="author-name">{{ announcement.user?.name || 'Administración' }}</span>
+              <span class="role-badge">{{ announcement.user?.role || 'Staff' }}</span>
+            </div>
+          </div>
+
+          @if (announcement.reads_count !== undefined) {
+          <div class="read-stats" title="Leído por {{ announcement.reads_count }} socios">
+            <span class="material-icons">visibility</span>
+            <span class="read-count">{{ announcement.reads_count }}</span>
+          </div>
+          }
+        </div>
         }
       </div>
     </div>

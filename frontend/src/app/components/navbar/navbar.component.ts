@@ -78,6 +78,8 @@ export class NavbarComponent {
                 this.router.navigate([notif.data.action_url]);
             } else if (notif.data.competition_id) {
                 this.router.navigate(['/calendario']);
+            } else if (notif.type.includes('NewAnnouncementNotification') || notif.data.type === 'announcement') {
+                this.router.navigate(['/tablon-anuncios']);
             }
         });
     }

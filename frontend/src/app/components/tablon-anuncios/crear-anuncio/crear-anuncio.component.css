@@ -80,6 +80,116 @@ textarea.form-control {
     min-height: 100px;
 }
 
+.notification-section {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    padding: 1.25rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+.notification-section label {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: #343a40;
+}
+
+.segmented-control {
+    display: flex;
+    background: #e9ecef;
+    padding: 4px;
+    border-radius: 8px;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.segmented-control::-webkit-scrollbar {
+    display: none;
+}
+
+.segment-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #495057;
+    padding: 0.6rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.segment-btn .material-icons {
+    font-size: 1.2rem;
+}
+
+.segment-btn:hover:not(.active) {
+    color: #212529;
+}
+
+.segment-btn.active {
+    background: #ffffff;
+    color: var(--primary-blue, #003366);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.specific-users-list {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #dee2e6;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.users-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.user-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.user-checkbox:hover {
+    border-color: #ced4da;
+    background: #e9ecef;
+}
+
+.user-checkbox.selected {
+    background: #e6f2ff;
+    border-color: #80bdff;
+    color: #004080;
+    font-weight: 500;
+}
+
+.user-checkbox input {
+    cursor: pointer;
+}
+
 .form-actions {
     margin-top: 2rem;
     display: flex;
@@ -115,19 +225,20 @@ textarea.form-control {
     color: #212529;
 }
 
-.btn-success {
-    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-blue, #0073CF) 0%, var(--primary-blue-dark, #005bb5) 100%);
     color: white;
-    box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 115, 207, 0.2);
 }
 
-.btn-success:hover:not(:disabled) {
-    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
-    box-shadow: 0 6px 8px rgba(40, 167, 69, 0.25);
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--primary-blue-dark, #005bb5) 0%, #004a94 100%);
+    box-shadow: 0 6px 8px rgba(0, 115, 207, 0.3);
 }
 
-.btn-success:disabled {
-    background: #94d3a2;
+.btn-primary:disabled {
+    background: #a3ccf5;
+    color: var(--text-secondary);
     cursor: not-allowed;
     box-shadow: none;
 }

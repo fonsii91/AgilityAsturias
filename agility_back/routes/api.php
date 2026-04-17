@@ -147,6 +147,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Announcements
         Route::get('/announcements', [AnnouncementController::class, 'index']);
+        Route::post('/announcements/{id}/read', [AnnouncementController::class, 'markAsRead']);
 
         // RSCE Tracks
         Route::get('/rsce-tracks', [RsceTrackController::class, 'index']);

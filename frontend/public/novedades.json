@@ -1,5 +1,21 @@
 [
   {
+    "version": "1.1.13",
+    "date": "2026-04-17",
+    "features": [
+      "¡El Tablón de Anuncios ha recibido un lavado de cara espectacular! Lo hemos rediseñado al completo para que leer los comunicados del club en el móvil sea muchísimo más limpio, reduciendo el desorden de botones y textos repetitivos.",
+      "Ahora los avisos llevan la fecha en un formato supercompacto y cuentan con un pequeño icono al lado de su título para que sepas de un solo vistazo de qué trata sin empachar la pantalla.",
+      "Hemos estrenado tecnología invisible en el Tablón: el sistema ahora contabiliza sutilmente a cuántos socios se ha notificado o han visto un anuncio. ¡Podrás consultar este contador en la esquina de cada tarjeta ampliada!",
+      "La campanita de notificaciones ahora es mucho más lista y ágil: si la abres y pinchas en un aviso del Tablón, te redirigirá instantáneamente hacia él en vez de quedarse pasmado."
+    ],
+    "bugfixes": [
+      "Hemos erradicado por completo el 'error de servidor interno' que bloqueaba de forma persistente la pantalla de Clasificación (Ranking) bajo algunas circunstancias.",
+      "Se ha pulido y reforzado visualmente hasta el último milímetro la interfaz del Seguimiento de carrera en la RSCE.",
+      "Puestos cinturones de seguridad internos: las clases o asistencias que queden 'huérfanas' al eliminar franjas horarias grandes ahora se eliminarán de forma segura en cascada.",
+      "Inyectamos vitaminas a la plataforma en móviles: los teléfonos que bloquaban la pantalla sin cerrar la aplicación volverán ahora a conectarse en una fracción de segundo, refrescando al instante la campanita y vuestro panel de perros."
+    ]
+  },
+  {
     "version": "1.1.12",
     "date": "2026-04-13",
     "bugfixes": [

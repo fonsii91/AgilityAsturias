@@ -9,6 +9,7 @@ export interface Announcement {
   title: string;
   content: string;
   is_pinned?: boolean;
+  category?: string;
   created_at: string;
   updated_at: string;
   user?: {
@@ -16,6 +17,7 @@ export interface Announcement {
     name: string;
     role?: string;
   };
+  reads_count?: number;
 }
 
 @Injectable({
@@ -30,8 +32,12 @@ export class AnnouncementService {
     return this.http.get<Announcement[]>(`${this.apiUrl}/announcements`);
   }
 
-  createAnnouncement(data: { title: string, content: string, is_pinned?: boolean }): Observable<Announcement> {
+  createAnnouncement(data: { title: string, content: string, is_pinned?: boolean, category: string, notify_all?: boolean, notify_users?: number[] }): Observable<Announcement> {
     return this.http.post<Announcement>(`${this.apiUrl}/announcements`, data);
+  }
+
+  markAsRead(id: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/announcements/${id}/read`, {});
   }
 
   deleteAnnouncement(id: number): Observable<any> {
