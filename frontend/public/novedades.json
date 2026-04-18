@@ -2,6 +2,9 @@
   {
     "version": "1.1.14",
     "date": "2026-04-18",
+    "features": [
+      "Para ahorraros algo de tiempo, a partir de ahora, cuando el equipo vaya a redactar un aviso nuevo en el Tablón de Anuncios, la opción de enviárselo a todo el mundo vendrá seleccionada por defecto."
+    ],
     "bugfixes": [
       "¡Pequeño despiste solucionado! Ahora también tienes el acceso directo al nuevo Tablón de Anuncios desde el menú lateral de tu teléfono móvil, para que estés siempre al corriente de los comunicados estés donde estés."
     ]

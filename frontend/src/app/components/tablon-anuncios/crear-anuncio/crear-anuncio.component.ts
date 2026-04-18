@@ -20,7 +20,7 @@ export class CrearAnuncioComponent implements OnInit {
 
   // Notification Options
   usersList = signal<{id: number, name: string}[]>([]);
-  notifyType = signal<'none' | 'all' | 'specific'>('none');
+  notifyType = signal<'none' | 'all' | 'specific'>('all');
   selectedUsers = signal<Set<number>>(new Set<number>());
 
   constructor(
