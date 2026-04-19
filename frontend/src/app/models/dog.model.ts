@@ -12,6 +12,11 @@ export interface Dog {
     microchip?: string;
     pedigree?: string;
     photo_url?: string;
+    has_previous_injuries?: boolean;
+    sterilized_at?: string;
+    weight_kg?: number;
+    height_cm?: number;
+    acwr_color?: 'none' | 'gray' | 'blue' | 'green' | 'yellow' | 'red';
     users?: Array<{ id: number; name: string; email?: string; pivot?: { is_primary_owner: boolean } }>;
     points?: number;
     pointHistories?: Array<{

@@ -146,6 +146,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/dogs/{id}/delete', [DogController::class, 'destroy']);
         Route::post('/dogs/{id}/photo', [DogController::class, 'uploadPhoto']);
 
+        // Workloads (Salud Deportiva ACWR)
+        Route::get('/dogs/{dog}/workload', [\App\Http\Controllers\DogWorkloadController::class, 'getAcwrData']);
+        Route::get('/dogs/{dog}/pending-reviews', [\App\Http\Controllers\DogWorkloadController::class, 'getPendingReviews']);
+        Route::post('/dogs/{dog}/workloads', [\App\Http\Controllers\DogWorkloadController::class, 'store']);
+        Route::post('/workloads/{workload}/confirm', [\App\Http\Controllers\DogWorkloadController::class, 'confirmWorkload']);
+        Route::put('/workloads/{workload}', [\App\Http\Controllers\DogWorkloadController::class, 'update']);
+        Route::delete('/workloads/{workload}', [\App\Http\Controllers\DogWorkloadController::class, 'destroy']);
+
         // Announcements
         Route::get('/announcements', [AnnouncementController::class, 'index']);
         Route::post('/announcements/{id}/read', [AnnouncementController::class, 'markAsRead']);

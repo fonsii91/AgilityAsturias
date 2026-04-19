@@ -11,18 +11,18 @@ import { environment } from '../../../../../environments/environment';
     <div class="health-container">
       <div class="coming-soon glass-effect" [style.border-top]="'4px solid ' + clubTheme.primary">
         <span class="material-icons-outlined huge-icon" [style.color]="clubTheme.primary">medical_services</span>
-        <h3>Portal Veterinario</h3>
-        <p>Próximamente podrás llevar un registro completo de la salud de {{ dog()?.name || 'tu perro' }}:</p>
+        <h3>Cartilla Sanitaria Digital</h3>
+        <p>Pronto podrás gestionar el historial veterinario de {{ dog()?.name || 'tu perro' }}:</p>
         <ul class="feature-list">
-          <li><span class="material-icons-outlined">vaccines</span> Vacunas y Desparasitaciones</li>
-          <li><span class="material-icons-outlined">monitor_weight</span> Gráfica de control de peso</li>
-          <li><span class="material-icons-outlined">event_note</span> Historial médico y lesiones</li>
+          <li><span class="material-icons-outlined">vaccines</span> Control de Vacunas y Desparasitaciones</li>
+          <li><span class="material-icons-outlined">fingerprint</span> Número de Microchip</li>
+          <li><span class="material-icons-outlined">medical_information</span> Diagnósticos Crotales</li>
         </ul>
       </div>
     </div>
   `,
   styles: [`
-    .health-container { animation: fadeIn 0.4s ease; }
+    .health-container { animation: fadeIn 0.4s ease; padding: 1rem 0; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
     .coming-soon { background: white; padding: 3rem; border-radius: 16px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }

@@ -81,7 +81,7 @@ class AttendanceController extends Controller
             $reservations = Reservation::where('date', $date)
                 ->where('slot_id', $slotId)
                 ->where('attendance_verified', false)
-                ->with('dog.users')
+                ->with(['dog.users', 'timeSlot'])
                 ->get();
 
             foreach ($reservations as $res) {
@@ -103,6 +103,22 @@ class AttendanceController extends Controller
                                 Notification::send($owner, new DogPointNotification($res->dog));
                             }
                         }
+
+                        // Auto-create pending workload
+                        $duration = 60;
+                        if ($res->timeSlot && $res->timeSlot->start_time && $res->timeSlot->end_time) {
+                            $duration = \Carbon\Carbon::parse($res->timeSlot->end_time)->diffInMinutes(\Carbon\Carbon::parse($res->timeSlot->start_time));
+                        }
+                        
+                        \App\Models\DogWorkload::create([
+                            'dog_id' => $res->dog->id,
+                            'source_type' => 'auto_attendance',
+                            'source_id' => $res->id,
+                            'date' => $date,
+                            'duration_min' => 15, // Tiempo activo por defecto
+                            'intensity_rpe' => 5, // Medio
+                            'status' => 'pending_review'
+                        ]);
                     }
                 } else {
                     // Did not attend (No Show)
@@ -237,6 +253,18 @@ class AttendanceController extends Controller
                                 \Illuminate\Support\Facades\Notification::send($owner, new \App\Notifications\DogPointNotification($dog));
                             }
                         }
+
+                        // Auto-create pending workload for competition
+                        \App\Models\DogWorkload::create([
+                            'dog_id' => $dog->id,
+                            'source_type' => 'auto_competition',
+                            'source_id' => $competitionId,
+                            'date' => $competition->fecha_evento,
+                            // Competitions are short bursts of maximum intensity
+                            'duration_min' => 15,
+                            'intensity_rpe' => 9, 
+                            'status' => 'pending_review'
+                        ]);
                     }
                 }
             }

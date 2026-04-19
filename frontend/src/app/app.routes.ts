@@ -210,6 +210,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'explorar/salud-deportiva',
+        loadComponent: () => import('./components/explorar/salud-deportiva/salud-deportiva').then(m => m.SaludDeportivaComponent),
+        canActivate: [authGuard],
+        title: titleResolver, data: { pageTitle: 'Salud Deportiva' }
+    },
+    {
         path: 'bitacora-rsce',
         loadComponent: () => import('./components/rsce-tracker/rsce-tracker.component').then(m => m.RsceTrackerComponent),
         canActivate: [memberGuard],

@@ -1,0 +1,21 @@
+<div class="gauge-card">
+  <div class="gauge-card-body">
+    <div class="acwr-gauge-card text-center p-2">
+      <!-- ECharts Gauge -->
+      <div style="height: 250px; width: 100%;">
+        <div echarts [options]="chartOptions()" class="demo-chart" style="height: 100%;"></div>
+      </div>
+      
+      <div class="status-info mt-2">
+        <h4 class="mb-2" [ngClass]="statusClass">{{ statusText }}</h4>
+        <p class="text-small text-muted">{{ statusDescription }}</p>
+        
+        @if (confidenceText) {
+          <div class="mt-3 p-2 rounded {{ confidenceClass }}" style="font-size: 0.8rem;">
+            <strong>{{ confidenceText }}</strong>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

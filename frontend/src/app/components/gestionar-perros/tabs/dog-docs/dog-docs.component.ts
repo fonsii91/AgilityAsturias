@@ -64,13 +64,8 @@ import { environment } from '../../../../../environments/environment';
             </div>
             <div class="form-group">
               <label>Categoría</label>
-              <select [(ngModel)]="formData.rsce_category">
-                <option value="">-- No definido --</option>
-                <option value="S">Small (S)</option>
-                <option value="M">Medium (M)</option>
-                <option value="I">Intermediate (I)</option>
-                <option value="L">Large (L)</option>
-              </select>
+              <input type="text" [value]="calculatedCategory" disabled style="background-color: #e2e8f0; color: #64748b; font-weight: 600; border: 1px solid #cbd5e1;">
+              <small class="help-text" style="color: #64748b;">Métrica autocálculada por la FCI en base a la altura introducida en la pestaña de Entrenamiento.</small>
             </div>
           </div>
 
@@ -141,12 +136,20 @@ export class DogDocsComponent {
     rsce_license: this.dog()?.rsce_license || '',
     rsce_expiration_date: this.dog()?.rsce_expiration_date ? this.dog()!.rsce_expiration_date!.split('T')[0] : '',
     rsce_grade: this.dog()?.rsce_grade || '',
-    rsce_category: this.dog()?.rsce_category || '',
     rfec_license: this.dog()?.rfec_license || '',
     rfec_expiration_date: this.dog()?.rfec_expiration_date ? this.dog()!.rfec_expiration_date!.split('T')[0] : ''
   };
   
   isSaving = false;
+
+  get calculatedCategory(): string {
+    const dog = this.dog();
+    if (!dog?.height_cm) return 'Falta altura (Ir a Entrenamiento)';
+    if (dog.height_cm < 35) return 'Mini / Small (S) - ' + dog.height_cm + 'cm';
+    if (dog.height_cm < 43) return 'Midi / Medium (M) - ' + dog.height_cm + 'cm';
+    if (dog.height_cm < 48) return 'Intermediate (I) - ' + dog.height_cm + 'cm';
+    return 'Standard / Large (L) - ' + dog.height_cm + 'cm';
+  }
 
   async saveChanges() {
     const currentDog = this.dog();
@@ -161,7 +164,6 @@ export class DogDocsComponent {
         rsce_license: this.formData.rsce_license || null,
         rsce_expiration_date: this.formData.rsce_expiration_date || null,
         rsce_grade: this.formData.rsce_grade || null,
-        rsce_category: this.formData.rsce_category || null,
         rfec_license: this.formData.rfec_license || null,
         rfec_expiration_date: this.formData.rfec_expiration_date || null
       };

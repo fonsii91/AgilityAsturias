@@ -16,9 +16,25 @@ class ReservationController extends Controller
         // Admin/Staff sees all
         $user = $request->user();
         if ($user->role === 'admin' || $user->role === 'staff') {
-            return Reservation::with(['user', 'timeSlot', 'dog.users:id'])
-                ->where('status', 'active')
-                ->get();
+            $reservations = Reservation::with([
+                'user', 
+                'timeSlot', 
+                'dog.users:id',
+                'dog.workloads' => function($q) {
+                    $q->where('date', '>=', now()->subDays(28))->where('status', 'confirmed');
+                }
+            ])
+            ->where('status', 'active')
+            ->get();
+
+            // Computar color de semáforo para la UI (Info Reservas)
+            $reservations->each(function($res) {
+                if ($res->dog) {
+                    $res->dog->setAttribute('acwr_color', $res->dog->calculateAcwrData()['status_color']);
+                }
+            });
+
+            return $reservations;
         }
 
         // Standard user only sees their own (fallback for index)
@@ -94,14 +110,20 @@ class ReservationController extends Controller
                     'user_name' => $userName,
                     'user_image' => $userImage,
                     'dogs' => [
-                        ['name' => $dogName, 'image' => $dogPhoto, 'reservation_id' => $reservation->id]
+                        [
+                            'name' => $dogName, 
+                            'image' => $dogPhoto, 
+                            'reservation_id' => $reservation->id,
+                            'acwr_color' => $reservation->dog ? $reservation->dog->calculateAcwrData()['status_color'] : 'none'
+                        ]
                     ]
                 ];
             } else {
                 $availability[$key]['attendees'][$foundUserIdx]['dogs'][] = [
                     'name' => $dogName,
                     'image' => $dogPhoto,
-                    'reservation_id' => $reservation->id
+                    'reservation_id' => $reservation->id,
+                    'acwr_color' => $reservation->dog ? $reservation->dog->calculateAcwrData()['status_color'] : 'none'
                 ];
             }
         }

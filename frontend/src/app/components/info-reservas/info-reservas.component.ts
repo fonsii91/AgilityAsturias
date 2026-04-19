@@ -44,11 +44,16 @@ export class InfoReservasComponent {
         return Array.from(map.entries())
             .sort((a, b) => timeToMins(a[0]) - timeToMins(b[0]))
             .map(([time, reservations]) => {
-                const userMap = new Map<string, string[]>();
+                const userMap = new Map<string, any[]>();
                 reservations.forEach(r => {
                     const uName = r.userName || 'Usuario';
                     if (!userMap.has(uName)) userMap.set(uName, []);
-                    if (r.dog?.name) userMap.get(uName)!.push(r.dog.name);
+                    if (r.dog?.name) {
+                        userMap.get(uName)!.push({
+                            name: r.dog.name,
+                            acwr_color: r.dog.acwr_color || 'none'
+                        });
+                    }
                 });
                 const groupedUsers = Array.from(userMap.entries()).map(([userName, dogs]) => ({ userName, selectedDogs: dogs }));
                 return { time, reservations: groupedUsers, rawCount: reservations.length };
@@ -90,11 +95,16 @@ export class InfoReservasComponent {
                 const timeSlots = Array.from(timeMap.entries())
                     .sort((a, b) => timeToMins(a[0]) - timeToMins(b[0]))
                     .map(([time, reservations]) => {
-                        const userMap = new Map<string, string[]>();
+                        const userMap = new Map<string, any[]>();
                         reservations.forEach(r => {
                             const uName = r.userName || 'Usuario';
                             if (!userMap.has(uName)) userMap.set(uName, []);
-                            if (r.dog?.name) userMap.get(uName)!.push(r.dog.name);
+                            if (r.dog?.name) {
+                                userMap.get(uName)!.push({
+                                    name: r.dog.name,
+                                    acwr_color: r.dog.acwr_color || 'none'
+                                });
+                            }
                         });
                         const groupedUsers = Array.from(userMap.entries()).map(([userName, dogs]) => ({ userName, selectedDogs: dogs }));
                         return { time, reservations: groupedUsers };

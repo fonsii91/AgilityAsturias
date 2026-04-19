@@ -44,8 +44,8 @@
                 <div class="user-row">
                   <span class="user-name">{{ res.userName }}</span>
                   <div class="dogs-chips">
-                    @for (dog of res.selectedDogs; track dog) {
-                      <span class="dog-chip">🐕 {{ dog }}</span>
+                    @for (dog of res.selectedDogs; track dog.name) {
+                      <span class="dog-chip"><span class="semaforo-dot {{ dog.acwr_color }}"></span> 🐕 {{ dog.name }}</span>
                     }
                     @if (!res.selectedDogs.length) {
                       <span class="no-dogs">Sin perros</span>
@@ -91,7 +91,12 @@
                   <div class="user-row-small">
                     <span class="user-name-small">{{ res.userName }}</span>
                     <span class="dogs-text-small">
-                      {{ res.selectedDogs.join(', ') || 'Sin perros' }}
+                      @for (dog of res.selectedDogs; track dog.name; let isLast = $last) {
+                        <span class="semaforo-dot mini {{ dog.acwr_color }}"></span> {{ dog.name }}{{ !isLast ? ', ' : '' }}
+                      }
+                      @if (!res.selectedDogs.length) {
+                        Sin perros
+                      }
                     </span>
                   </div>
                 }

@@ -1,0 +1,438 @@
+<div class="acwr-container">
+  <div class="acwr-header">
+    <h2><span class="material-icons title-icon">favorite</span> Salud Deportiva (ACWR)</h2>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div class="d-flex align-items-center gap-2">
+        @if (dogs().length > 0) {
+        <select class="custom-select" [ngModel]="selectedDogId()" (change)="onDogChange($event)">
+          @for (dog of dogs(); track dog.id) {
+          <option [value]="dog.id">{{dog.name}}</option>
+          }
+        </select>
+        }
+      </div>
+      <button class="help-btn" (click)="openHelpModal()" title="Instrucciones"
+        style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s;">
+        <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Analizando cargas de trabajo...</p>
+  </div>
+  }
+
+  @if (!isLoading() && acwrData()) {
+  <div class="acwr-dashboard">
+
+    <!-- Left Column: Gauge -->
+    <div class="dashboard-left">
+      <app-workload-gauge [acwrData]="acwrData()!" [dogName]="selectedDogName()"></app-workload-gauge>
+
+      <div class="manual-button-wrapper">
+        <button class="btn-action" [ngClass]="{'btn-cancel': isManualFormOpen()}" (click)="toggleManualForm()">
+          <span class="material-icons">{{ isManualFormOpen() ? 'close' : 'add' }}</span>
+          {{ isManualFormOpen() ? 'Cancelar inserción' : 'Añadir registro' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Column: Pending Workloads -->
+    <div class="dashboard-right">
+
+      @if (pendingReviews().length > 0) {
+      <div class="pending-reviews-section">
+        <div class="alert-box warning-alert">
+          <span class="material-icons alert-icon">warning</span>
+          <div class="alert-content">
+            <h4>Tienes {{pendingReviews().length}} sesión(es) de entrenamiento pendiente(s)</h4>
+            <p>El Staff ha validado la asistencia. Ajusta la intensidad real de la sesión para mantener precisa tu
+              gráfica.</p>
+          </div>
+        </div>
+
+        @for (pending of pendingReviews(); track pending.id) {
+        <div class="form-card success-border">
+          <div class="form-card-body">
+            <div class="pending-header mb-3">
+              <div class="date"><span class="material-icons text-success">event_available</span> {{ pending.date |
+                date:'dd MMM yyyy' }}</div>
+              <div class="source-badge">
+                <span class="material-icons">sell</span>
+                {{ pending.source_type === 'auto_attendance' ? 'Entrenamiento' : 'Competición' }}
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label>
+                  Minutos Activos
+                  <span class="trust-marker"
+                    title="Introduce únicamente el tiempo real de movimiento o pista. Por ejemplo, en una clase de 60 minutos, el tiempo activo de cada perro suele ser de 10-15 min. Las paradas o descansos no afectan a la fatiga mecánica.">
+                    <span class="material-icons-outlined">info</span>
+                  </span>
+                </label>
+                <div class="input-with-icon">
+                  <span class="material-icons icon-prefix">schedule</span>
+                  <input type="number" class="custom-input with-prefix with-suffix" [(ngModel)]="pending.duration_min"
+                    min="1" step="5">
+                  <span class="input-suffix">min</span>
+                </div>
+              </div>
+
+              <div class="form-group flex-2">
+                <div class="intensity-header">
+                  <label>Esfuerzo Percibido</label>
+                  <div class="intensity-badge">
+                    <span class="material-icons emoji-indicator">{{ getIconForIntensity(pending.intensity_rpe) }}</span>
+                    {{ pending.intensity_rpe }} <small>/ 10</small>
+                  </div>
+                </div>
+                <div class="intensity-slider-wrap">
+                  <span class="slider-label"><span class="material-icons align-middle text-small mr-1">pets</span>
+                    Fácil</span>
+                  <input type="range" class="custom-range" [(ngModel)]="pending.intensity_rpe" min="1" max="10"
+                    step="1">
+                  <span class="slider-label danger"><span
+                      class="material-icons align-middle text-small mr-1">local_fire_department</span> Exhausto</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Modifiers Pending Reviews -->
+            <div class="pending-modifiers mt-2 d-flex gap-15">
+              <div class="form-group flex-2">
+                <label>¿Saltó a su máxima altura?</label>
+                <div class="toggle-switch-wrapper mini">
+                  <label class="switch mini-switch">
+                    <input type="checkbox" [(ngModel)]="pending.jumped_max_height">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
+              </div>
+              <div class="form-group flex-1">
+                <label title="Número de pistas completas o mangas">Salidas a pista</label>
+                <div class="run-selector d-flex gap-2 mt-1">
+                  <button class="run-chip" [class.active]="pending.number_of_runs === 2"
+                    (click)="pending.number_of_runs = (pending.number_of_runs === 2 ? undefined : 2)">1-2</button>
+                  <button class="run-chip" [class.active]="pending.number_of_runs === 4"
+                    (click)="pending.number_of_runs = (pending.number_of_runs === 4 ? undefined : 4)">3-5</button>
+                  <button class="run-chip" [class.active]="pending.number_of_runs === 6"
+                    (click)="pending.number_of_runs = (pending.number_of_runs === 6 ? undefined : 6)">+5</button>
+                </div>
+              </div>
+            </div>
+
+            <button class="btn-success btn-small mt-2 full-width" (click)="confirmPending(pending)"
+              [disabled]="confirmingIds().includes(pending.id)">
+              @if(confirmingIds().includes(pending.id)) {
+              <span class="spinner-small"></span> Guardando
+              } @else {
+              <span class="material-icons">check_circle</span> Confirmar Sesión
+              }
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      }
+
+      @if (pendingReviews().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons success-icon">task_alt</span>
+        <h3>Todo al día</h3>
+        <p>No tienes registros físicos pendientes de evaluar para este perro.</p>
+      </div>
+      }
+
+    </div>
+  </div>
+
+  <!-- Recent History Section -->
+  <div class="recent-history-section fade-in mt-4">
+    <div class="section-title-wrap mb-3">
+      <h3><span class="material-icons title-icon align-middle">history</span> Historial de Esfuerzos (28 días)</h3>
+    </div>
+    @if (acwrData()!.recent_history && acwrData()!.recent_history.length > 0) {
+    <div class="history-grid">
+      @for (history of acwrData()!.recent_history; track history.id) {
+      <div class="history-item-card glass-effect">
+        <div class="hi-header d-flex justify-content-between align-items-center">
+          <div>
+            <span class="hi-date text-muted"><span class="material-icons-outlined text-small align-middle">event</span>
+              {{ history.date | date:'dd MMM' }}</span>
+            <span class="hi-type badge-light ml-2">
+              {{ translateSourceType(history.source_type) }}
+            </span>
+          </div>
+          <div>
+            <button class="btn-icon-primary btn-small" (click)="startEditWorkload(history)" title="Modificar registro"
+              style="background: none; border: none; color: #3b82f6; cursor: pointer; margin-right: 5px;">
+              <span class="material-icons text-small">edit</span>
+            </button>
+            <button class="btn-icon-danger btn-small" (click)="promptDeleteWorkload(history.id)"
+              title="Eliminar registro" style="background: none; border: none; color: #ef4444; cursor: pointer;">
+              <span class="material-icons text-small">delete</span>
+            </button>
+          </div>
+        </div>
+        <div class="hi-body d-flex justify-content-between mt-2">
+          <div class="hi-dur"><span class="material-icons-outlined text-small align-middle text-muted">timer</span>
+            <strong>{{ history.duration_min }} m</strong>
+          </div>
+          <div class="hi-rpe" title="Esfuerzo sRPE">
+            <span class="material-icons text-small align-middle emoji-indicator">{{
+              getIconForIntensity(history.intensity_rpe) }}</span>
+            <strong>{{ history.intensity_rpe }}</strong>/10
+          </div>
+        </div>
+        @if(history.jumped_max_height || history.number_of_runs! >= 3) {
+        <div class="hi-footer mt-2 border-top pt-2 d-flex gap-2">
+          @if(history.jumped_max_height) { <span class="badge badge-warning text-xsmall"><span
+              class="material-icons align-middle d-inline-block text-xsmall">keyboard_double_arrow_up</span> Salto
+            Max</span> }
+          @if(history.number_of_runs! >= 3) { <span class="badge badge-warning text-xsmall"><span
+              class="material-icons align-middle d-inline-block text-xsmall">repeat</span> {{history.number_of_runs}}
+            runs</span> }
+        </div>
+        }
+      </div>
+      }
+    </div>
+    } @else {
+    <div class="empty-state-mini text-muted text-center py-4">
+      <span class="material-icons-outlined text-large mb-2 opacity-50">hourglass_empty</span>
+      <p class="m-0">No hay entrenamientos registrados en las últimas 4 semanas.</p>
+    </div>
+    }
+  </div>
+
+  }
+  @if (isManualFormOpen()) {
+  <div class="modal-overlay slide-fade-in" (click)="toggleManualForm()">
+    <div class="form-card accent-border modal-card" (click)="$event.stopPropagation()">
+      <div class="form-card-header d-flex justify-content-between align-items-center">
+        <div><span class="material-icons">{{ editingWorkloadId() ? 'edit' : 'add_circle' }}</span> {{
+          editingWorkloadId() ? 'Modificar Registro' : 'Nuevo Esfuerzo Externo' }}</div>
+        <button class="btn-icon-close" (click)="toggleManualForm()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="form-card-body">
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>Fecha</label>
+            <input type="date" class="custom-input" [ngModel]="manualDate()" (ngModelChange)="manualDate.set($event)">
+          </div>
+
+          <div class="form-group flex-2">
+            <label>
+              Minutos Activos
+              <span class="trust-marker"
+                title="Introduce únicamente el tiempo real de movimiento o pista. Por ejemplo, en una clase de 60 minutos, el tiempo activo de cada perro suele ser de 10-15 min. Las paradas o descansos no afectan a la fatiga mecánica.">
+                <span class="material-icons-outlined">info</span>
+              </span>
+            </label>
+            <div class="input-with-icon">
+              <span class="material-icons icon-prefix">schedule</span>
+              <input type="number" class="custom-input with-prefix with-suffix" [ngModel]="manualDuration()"
+                (ngModelChange)="manualDuration.set($event)" min="1">
+              <span class="input-suffix">min</span>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="form-row mt-3">
+          <div class="form-group full-width">
+            <div class="intensity-header">
+              <label>Esfuerzo Percibido (sRPE)</label>
+              <div class="intensity-badge">
+                <span class="material-icons emoji-indicator">{{ getIconForIntensity(manualIntensity()) }}</span>
+                {{ manualIntensity() }} <small>/ 10</small>
+              </div>
+            </div>
+            <div class="intensity-slider-wrap">
+              <span class="slider-label"><span class="material-icons align-middle text-small mr-1">pets</span>
+                Fácil</span>
+              <input type="range" class="custom-range" [ngModel]="manualIntensity()"
+                (ngModelChange)="manualIntensity.set($event)" min="1" max="10" step="1">
+              <span class="slider-label danger"><span
+                  class="material-icons align-middle text-small mr-1">local_fire_department</span> Exhausto</span>
+            </div>
+          </div>
+        </div>
+        <div class="form-row mt-3 form-modifiers">
+          <div class="form-group flex-1">
+            <label>
+              ¿Saltó a su altura máxima hoy?
+              <span class="trust-marker"
+                title="Cruzar el umbral de altura a la cruz aumenta el impacto articular exponencialmente.">
+                <span class="material-icons-outlined">info</span>
+              </span>
+            </label>
+            <div class="toggle-switch-wrapper">
+              <label class="switch">
+                <input type="checkbox" [ngModel]="manualJumpedMaxHeight()"
+                  (ngModelChange)="manualJumpedMaxHeight.set($event)">
+                <span class="slider round"></span>
+              </label>
+              <span class="toggle-label">{{ manualJumpedMaxHeight() ? 'Sí' : 'No' }}</span>
+            </div>
+          </div>
+
+          <div class="form-group flex-1">
+            <label>Múltiples Salidas a pista</label>
+            <div class="run-selector d-flex gap-2 mt-1">
+              <button class="run-chip" [class.active]="manualNumberOfRuns() === 2"
+                (click)="manualNumberOfRuns() === 2 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(2)">1-2</button>
+              <button class="run-chip" [class.active]="manualNumberOfRuns() === 4"
+                (click)="manualNumberOfRuns() === 4 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(4)">3-5</button>
+              <button class="run-chip" [class.active]="manualNumberOfRuns() === 6"
+                (click)="manualNumberOfRuns() === 6 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(6)">+5</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-card-footer right-align d-flex justify-content-end gap-2">
+        <button class="btn-text" (click)="toggleManualForm()" [disabled]="isSubmitting()">Cancelar</button>
+        <button class="btn-success" (click)="submitManualWorkload()" [disabled]="isSubmitting()">
+          @if(isSubmitting()) {
+          <span class="spinner-small"></span> {{ editingWorkloadId() ? 'Actualizando...' : 'Guardando...' }}
+          } @else {
+          <span class="material-icons">{{ editingWorkloadId() ? 'update' : 'save' }}</span> {{ editingWorkloadId() ?
+          'Actualizar Sesión' : 'Guardar Sesión' }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  @if (workloadToDelete() !== null) {
+  <div class="modal-overlay" (click)="cancelDeleteWorkload()">
+    <div class="modal-card danger-border fade-scale-in" (click)="$event.stopPropagation()">
+      <div class="modal-header d-flex align-items-center mb-3">
+        <span class="material-icons danger-text mr-2" style="font-size: 2rem;">warning</span>
+        <h3 class="m-0">Eliminar Esfuerzo</h3>
+      </div>
+      <div class="modal-body mb-4">
+        <p>Estás a punto de eliminar un registro del historial de este perro.</p>
+        <p class="text-muted text-small text-balance">Esta acción destruirá permanentemente los datos mecánicos
+          asociados e impactará inmediatamente en su gráfica general de Preparación. ¿Estás absolutamente seguro?</p>
+      </div>
+      <div class="modal-footer d-flex gap-2 justify-content-end">
+        <button class="btn-cancel" (click)="cancelDeleteWorkload()">Mantener Registro</button>
+        <button class="btn-danger" (click)="confirmDeleteWorkload()">
+          <span class="material-icons text-small mr-1">delete_forever</span> Sí, Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  @if (isHelpModalOpen()) {
+  <div class="modal-overlay" (click)="closeHelpModal()">
+    <div class="form-card accent-border modal-card help-modal-card fade-scale-in" (click)="$event.stopPropagation()"
+      style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+      <div class="form-card-header d-flex justify-content-between align-items-center"
+        style="position: sticky; top: 0; background: var(--surface-card, #fff); z-index: 10; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color, #e2e8f0);">
+        <div><span class="material-icons" style="color: #3b82f6;">help_outline</span> Instrucciones del Medidor</div>
+        <button class="btn-icon-close" (click)="closeHelpModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="form-card-body mt-3" style="text-align: left; line-height: 1.6; color: var(--text-main, #334155);">
+
+        <p>Esta sección actúa como un tablero de control para monitorizar la exigencia física y deportiva del perro.
+          Utiliza toda la información de pista recopilada para calcular y advertirte sobre la curva de adaptación
+          atlética.</p>
+
+        <h4 style="margin-top: 1.5rem; color: #0f172a;"><span class="material-icons align-middle text-small"
+            style="color: #f59e0b;">emoji_events</span> Registro y Uso Diario</h4>
+        <ul
+          style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #3b82f6;">speed</span>
+            <span><strong>Zonas de Esfuerzo (La Brújula):</strong> El medidor se divide en 4 grandes zonas estadísticas.
+              Azul (desentrenamiento), Verde (estado ideal), Naranja (acumulación de carga rápida) y Roja (riesgo
+              estadístico agudo).</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #ec4899;">hourglass_empty</span>
+            <span><strong>Fases de Calibración:</strong> Los algoritmos requieren un mínimo de <strong>28 días</strong>
+              de datos constantes para alcanzar su máxima precisión. Las 2 primeras semanas el velocímetro será gris,
+              advirtiendo que aún no se ha establecido el perfil base de carga del perro.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #10b981;">post_add</span>
+            <span><strong>Entrenos Manuales vs Clases:</strong> Las clases rutinarias y las competiciones (donde pases
+              lista) aparecerán arriba automáticamente y pedirán que le confirmes la <em>intensidad</em>. Para todos los
+              demás picos de esfuerzo por tu cuenta, deberás hacer clic en <em>"+ Añadir registro"</em>.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #8b5cf6;">history</span>
+            <span><strong>Correcciones:</strong> En el listado inferior puedes alterar registros pasados haciendo clic
+              en <span class="material-icons text-small align-middle" style="color:#3b82f6">edit</span> o destruirlos
+              con <span class="material-icons text-small align-middle" style="color:#ef4444">delete</span>. Los cálculos
+              estadísticos mundiales se regenerarán automáticamente en todo el sistema al efectuar un cambio.</span>
+          </li>
+        </ul>
+
+        <div
+          style="margin-top: 2rem; padding: 1rem; background-color: #f8fafc; border-left: 4px solid #64748b; border-radius: 4px;">
+          <h4 style="margin-top: 0; color: #475569; font-size: 1rem;"><span
+              class="material-icons align-middle text-small" style="color: #64748b;">science</span> Fundamentos Técnicos
+            del Ratio ACWR</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 8px;">El medidor emplea el protocolo estadístico de <strong>Carga
+              Aguda frente a Carga Crónica (ACWR)</strong>, popularizado por Tim Gabbett (2016) en un estudio publicado
+            en el <em>British Journal of Sports Medicine</em> ("The training—injury prevention paradox: should athletes
+            be training smarter and harder?").</p>
+          <ul style="font-size: 0.9rem; margin-bottom: 1rem; padding-left: 20px;">
+            <li><strong>Carga Aguda (7 días):</strong> Representa el grado de fatiga que experimenta el atleta por todo
+              el ejercicio sumado de la última semana.</li>
+            <li><strong>Carga Crónica (28 días):</strong> Representa la base física (fitness) calculada sobre la media
+              de intensidad y duración de las últimas 4 semanas. Equivaldría a su nivel actual de tolerancia sin sufrir
+              estrés.</li>
+            <li>El sistema divide el valor agudo entre el valor crónico. El rango de seguridad histórico (Sweet Spot) se
+              sitúa mayoritariamente entre <strong>0.8 y 1.3</strong>. Valores superiores rompen el estándar estadístico
+              de tolerancia estructural.</li>
+          </ul>
+
+          <h4 style="margin-top: 1.5rem; color: #475569; font-size: 1rem;"><span
+              class="material-icons align-middle text-small" style="color: #64748b;">calculate</span> Variables y
+            Modificadores del Algoritmo</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 8px;">El sistema no se limita a sumar minutos, sino que ajusta
+            matemáticamente el desgaste (Unidades Arbitrarias de Carga) ponderando mútliples factores:</p>
+          <ul style="font-size: 0.9rem; margin-bottom: 0; padding-left: 20px;">
+            <li><strong>Esfuerzo Base:</strong> Se calcula multiplicando <code>Minutos Activos × sRPE (1-10)</code>.
+            </li>
+            <li><strong>Tipo de Actividad:</strong> El <em>Agility</em> aporta el 100% de la carga (Baseline x1.0) por
+              el impacto de giros y saltos. </li>
+            <li><strong>Penalización por Estructura:</strong> "Saltar a Máxima Altura" aplica un multiplicador de castigo del <strong>+20% (x1.2)</strong> sobre la carga registrada. "Múltiples Salidas" aplica un castigo progresivo: hacer de 3 a 5 pistas suma un <strong>+30% (x1.3)</strong>, y correr más de 5 mangas estresa críticamente el sistema con un <strong>+60% (x1.6)</strong>.</li>
+            <li><strong>Tolerancia Dinámica Acumulada:</strong> La barrera de riesgo máximo (Roja) es normalmente 1.50 de
+              ACWR.
+              <ul>
+                <li>Si el perro tiene el flag de <strong>Lesión Previa</strong>, su barrera baja de 1.50 a
+                  <strong>1.35</strong> (mucho menor margen de aguante para re-lesionarse).
+                </li>
+                <li>Si el sistema detecta un bajo ratio biomecánico cruzando Altura y Peso (tejido adiposo que
+                  sobrecarga los tendones corporales), la barrera de riesgo baja otro <strong>-0.10 extra</strong>.</li>
+              </ul>
+            </li>
+            <li><strong>Cold Start (Prevención de picos falsos):</strong> Si registras entrenos con la app recién
+              instalada, el sistema divide temporalmente tu récord crónico entre bloques de "semanas activas" en lugar
+              de 4 semanas muertas. Esto evita que los primeros entrenos generen un ACWR irreal de 4.0 marcando peligro
+              rojo falso.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>

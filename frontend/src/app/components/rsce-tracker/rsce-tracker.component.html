@@ -51,7 +51,7 @@
       <span class="material-icons-outlined empty-icon" style="color: #fda4af;">lock</span>
       <p style="color: #9f1239; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">Función Bloqueada</p>
       <p style="color: #be123c; margin: 0;">No disponible hasta introducir licencia RSCE en el <a
-          routerLink="/gestionar-perros" style="color: #be123c; text-decoration: underline;">perfil privado</a> del
+          [routerLink]="['/gestionar-perros/perro', selectedDogId(), 'documentacion']" style="color: #be123c; text-decoration: underline;">perfil privado</a> del
         perro.</p>
     </div>
     } @else {
@@ -167,16 +167,31 @@
         </div>
 
         @if (progressMet()) {
-        <div class="success-alert" style="display: flex; flex-direction: column; gap: 4px;">
+        <div class="success-alert" style="display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; padding: 1.5rem;">
           <div style="display: flex; align-items: center; gap: 8px;">
-            <span class="material-icons">emoji_events</span> <strong>¡Enhorabuena! Cumples los requisitos para ascender
-              al siguiente grado.</strong>
+            <span class="material-icons" style="font-size: 28px; color: #15803d;">emoji_events</span> 
+            <strong style="font-size: 1.1em; color: #15803d;">¡Enhorabuena! Cumples todos los requisitos.</strong>
           </div>
-          <p style="margin: 0; font-size: 0.9em; opacity: 0.9;">Recuerda que puedes actualizar el Grado RSCE manualmente
-            en el perfil privado de tu perro desde <a routerLink="/gestionar-perros"
-              style="color: inherit; text-decoration: underline; font-weight: bold;">Gestionar Perros</a>.</p>
+          
+          <button class="add-btn" 
+                  [disabled]="isUpgrading()" 
+                  (click)="upgradeNextGrade()" 
+                  style="background-color: white; color: #15803d; border: 2px solid #16a34a; font-weight: bold; padding: 0.8rem 1.5rem; display: inline-flex; align-items: center; gap: 6px; border-radius: 30px; font-size: 1.05rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.1);">
+            <span class="material-icons" [class.spinning]="isUpgrading()">{{ isUpgrading() ? 'sync' : 'upgrade' }}</span> 
+            {{ isUpgrading() ? 'Ascendiendo...' : 'Ascender a Grado ' + nextGrade() }}
+          </button>
         </div>
         }
+        @if (!progressMet() && (progressValueA() >= 100 || progressValueB() >= 100)) {
+        <div class="warning-alert" style="background-color: #fffbeb; border: 1px solid #fde68a; padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem; display: flex; gap: 12px; align-items: flex-start;">
+          <span class="material-icons" style="color: #d97706; font-size: 28px;">gavel</span>
+          <div>
+            <strong style="color: #92400e; font-size: 1.05em; display: block; margin-bottom: 4px;">Faltan Jueces Diferentes</strong>
+            <p style="margin: 0; font-size: 0.95em; color: #b45309; line-height: 1.5;">Tienes las pistas necesarias a cero, pero la normativa de la RSCE exige que hayan sido evaluadas por distintos jueces. Fíjate en los paréntesis grises de las barras superiores. Sigue compitiendo bajo otros jueces para desbloquear el ascenso.</p>
+          </div>
+        </div>
+        }
+
         } @else {
         <div class="success-alert top-grade">
           <span class="material-icons">military_tech</span> 

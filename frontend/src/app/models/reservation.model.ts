@@ -11,6 +11,7 @@ export interface Reservation {
     dog?: {
         name: string;
         photo_url?: string;
+        acwr_color?: string;
     };
 
     // Relationships
@@ -30,5 +31,5 @@ export interface Reservation {
     userImage?: string;
     day?: string;
     startTime?: string;
-    selectedDogs?: { name: string, image?: string }[];
+    selectedDogs?: { name: string, image?: string, acwr_color?: string }[];
 }

@@ -47,6 +47,10 @@ class DogController extends Controller
             'rfec_expiration_date' => 'nullable|date',
             'microchip' => 'nullable|string|max:30',
             'pedigree' => 'nullable|string',
+            'has_previous_injuries' => 'boolean',
+            'sterilized_at' => 'nullable|date',
+            'weight_kg' => 'nullable|numeric|min:1',
+            'height_cm' => 'nullable|numeric|min:10',
         ]);
 
         $dog = $request->user()->dogs()->create($validated, ['is_primary_owner' => true]);
@@ -84,6 +88,10 @@ class DogController extends Controller
             'rfec_expiration_date' => 'nullable|date',
             'microchip' => 'nullable|string|max:30',
             'pedigree' => 'nullable|string',
+            'has_previous_injuries' => 'boolean',
+            'sterilized_at' => 'nullable|date',
+            'weight_kg' => 'nullable|numeric|min:1',
+            'height_cm' => 'nullable|numeric|min:10',
         ]);
 
         $dog->update($validated);

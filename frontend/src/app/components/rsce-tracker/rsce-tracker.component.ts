@@ -1,5 +1,6 @@
 import { Component, effect, inject, signal, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../services/toast.service';
 import { DogService } from '../../services/dog.service';
@@ -18,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-rsce-tracker',
   standalone: true,
-  imports: [CommonModule, FormsModule, SmartVideoPlayerComponent, MatIconModule],
+  imports: [CommonModule, RouterModule, FormsModule, SmartVideoPlayerComponent, MatIconModule],
   templateUrl: './rsce-tracker.component.html',
   styleUrls: ['./rsce-tracker.component.css'],
   providers: [DatePipe]
@@ -153,12 +154,59 @@ export class RsceTrackerComponent implements OnInit {
         name: dog.name, 
         rsce_grade: '1' 
       });
+      
+      confetti({
+          particleCount: 200,
+          spread: 120,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#fbbf24', '#3b82f6', '#ef4444']
+      });
+      
       this.selectedDog.set(updated);
       this.toastService.success('¡Perro ascendido a Grado 1!');
       this.gradeZeroChecklist.set(false);
       this.calculateProgress();
     } catch (err) {
       console.error('Error al ascender a Grado 1', err);
+      this.toastService.error('Hubo un error al ascender de grado');
+    } finally {
+      this.isUpgrading.set(false);
+    }
+  }
+
+  nextGrade(): string {
+    const current = this.currentGrade();
+    if (current === '1') return '2';
+    if (current === '2') return '3';
+    return '';
+  }
+
+  async upgradeNextGrade() {
+    const dog = this.selectedDog();
+    if (!dog || !dog.id) return;
+    
+    const next = this.nextGrade();
+    if (!next) return;
+
+    this.isUpgrading.set(true);
+    try {
+      const updated = await this.dogService.updateDog(dog.id, { 
+        name: dog.name, 
+        rsce_grade: next 
+      });
+      
+      confetti({
+          particleCount: 200,
+          spread: 120,
+          origin: { y: 0.6 },
+          colors: ['#10b981', '#fbbf24', '#3b82f6', '#ef4444']
+      });
+      
+      this.selectedDog.set(updated);
+      this.toastService.success(`¡Enhorabuena! Ascenso a Grado ${next} registrado.`);
+      this.calculateProgress();
+    } catch (err) {
+      console.error('Error al ascender de grado', err);
       this.toastService.error('Hubo un error al ascender de grado');
     } finally {
       this.isUpgrading.set(false);
@@ -195,7 +243,8 @@ export class RsceTrackerComponent implements OnInit {
         let aJudges = new Set(agilityPaths.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
 
         let optionAMet = aCount >= 3 && aJudges >= 2;
-        this.progressValueA.set(Math.min((aCount / 3) * 100, 100));
+        let aScore = 3 - Math.max(Math.max(0, 3 - aCount), Math.max(0, 2 - aJudges));
+        this.progressValueA.set((aScore / 3) * 100);
         this.progressTitleA.set('Opción A: Sólo Agility');
         this.progressSubtitleA.set(`${aCount}/3 puntos` + (aCount > 0 && aJudges < 2 ? ' (Falta 1 juez distinto)' : ''));
 
@@ -206,11 +255,14 @@ export class RsceTrackerComponent implements OnInit {
         let bJudges = new Set(combinedTracks.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
 
         let optionBMet = bAgilityCount >= 2 && bJumpingCount >= 2 && bJudges >= 2;
-        let bProgress = ((Math.min(bAgilityCount, 2) + Math.min(bJumpingCount, 2)) / 4) * 100;
-        this.progressValueB.set(bProgress);
+        let missingAgility = Math.max(0, 2 - bAgilityCount);
+        let missingJumping = Math.max(0, 2 - bJumpingCount);
+        let missingJudges = Math.max(0, 2 - bJudges);
+        let bScore = 4 - Math.max(missingAgility + missingJumping, missingJudges);
+        this.progressValueB.set((bScore / 4) * 100);
         
         this.progressTitleB.set('Opción B: Mix de Mangas');
-        this.progressSubtitleB.set(`Agility ${Math.min(bAgilityCount, 2)}/2 | Jumping ${Math.min(bJumpingCount, 2)}/2` + (bProgress > 0 && bJudges < 2 ? ' (Falta 1 juez distinto)' : ''));
+        this.progressSubtitleB.set(`Agility ${Math.min(bAgilityCount, 2)}/2 | Jumping ${Math.min(bJumpingCount, 2)}/2` + (bScore > 0 && bJudges < 2 ? ' (Falta 1 juez)' : ''));
 
         this.progressMet.set(optionAMet || optionBMet);
 
@@ -232,8 +284,11 @@ export class RsceTrackerComponent implements OnInit {
         let aMet = aCount >= 3 && aJudges >= 3;
         let jMet = jCount >= 3 && jJudges >= 3;
 
-        this.progressValueA.set(Math.min((aCount / 3) * 100, 100));
-        this.progressValueB.set(Math.min((jCount / 3) * 100, 100));
+        let aScore = 3 - Math.max(Math.max(0, 3 - aCount), Math.max(0, 3 - aJudges));
+        let jScore = 3 - Math.max(Math.max(0, 3 - jCount), Math.max(0, 3 - jJudges));
+
+        this.progressValueA.set((aScore / 3) * 100);
+        this.progressValueB.set((jScore / 3) * 100);
 
         this.progressTitleA.set('Agility');
         this.progressSubtitleA.set(`Vel ≥ ${requiredAgilitySpeed} m/s • ${aCount}/3 puntos` + (aCount > 0 && aJudges < 3 ? ` (${aJudges}/3 jueces)` : ''));
