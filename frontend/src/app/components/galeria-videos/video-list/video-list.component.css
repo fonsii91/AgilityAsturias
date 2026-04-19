@@ -259,6 +259,22 @@
     border-bottom-color: var(--primary-color, #1c62b9);
 }
 
+.tab-badge {
+    background: #e2e8f0;
+    color: #475569;
+    border-radius: 12px;
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-left: 4px;
+    transition: all 0.2s ease;
+}
+
+.video-tab-btn.active .tab-badge {
+    background: var(--primary-color, #1c62b9);
+    color: white;
+}
+
 .stylish-dog-select {
     height: 48px;
     border-radius: 24px;

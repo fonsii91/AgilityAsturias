@@ -46,8 +46,7 @@ export class UploadVideoComponent implements OnInit {
             competition_id: [''],
             date: ['', Validators.required],
             manga_type: ['Agility 1'],
-            title: [''],
-            is_public: [true]
+            title: ['']
         });
 
         effect(() => {
@@ -331,7 +330,6 @@ export class UploadVideoComponent implements OnInit {
         formData.append('date', this.uploadForm.get('date')?.value);
         formData.append('title', this.uploadForm.get('title')?.value || '');
         formData.append('manga_type', this.uploadForm.get('manga_type')?.value || 'Agility 1');
-        formData.append('is_public', this.uploadForm.get('is_public')?.value ? '1' : '0');
         formData.append('orientation', this.detectedOrientation);
         formData.append('video', finalFile);
 

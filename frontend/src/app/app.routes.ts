@@ -63,6 +63,12 @@ export const routes: Routes = [
         title: 'Estadísticas de Vídeos | Agility Asturias'
     },
     {
+        path: 'admin/videos-borrados',
+        loadComponent: () => import('./components/admin-deleted-videos/admin-deleted-videos.component').then(m => m.AdminDeletedVideosComponent),
+        canActivate: [adminGuard],
+        title: 'Historial Vídeos Borrados | Agility Asturias'
+    },
+    {
         path: 'gestionar-horarios',
         loadComponent: () => import('./reservas/gestionar-horarios/gestionar-horarios.component').then(m => m.GestionarHorariosComponent),
         canActivate: [staffGuard],
@@ -106,9 +112,33 @@ export const routes: Routes = [
     },
     {
         path: 'gestionar-perros',
-        loadComponent: () => import('./components/gestionar-perros/gestionar-perros.component').then(m => m.GestionarPerrosComponent),
         canActivate: [authGuard],
-        title: titleResolver, data: { pageTitle: 'Mis Perros' }
+        children: [
+            {
+                path: '',
+                loadComponent: () => import('./components/gestionar-perros').then(m => m.DogListComponent),
+                title: titleResolver, data: { pageTitle: 'Mi Manada' }
+            },
+            {
+                path: 'nuevo',
+                loadComponent: () => import('./components/gestionar-perros').then(m => m.DogFormComponent),
+                title: titleResolver, data: { pageTitle: 'Nuevo Perro' }
+            },
+            {
+                path: ':id',
+                loadComponent: () => import('./components/gestionar-perros').then(m => m.DogDashboardComponent),
+                title: titleResolver, data: { pageTitle: 'Perfil del Perro' },
+                children: [
+                    { path: '', redirectTo: 'resumen', pathMatch: 'full' },
+                    { path: 'resumen', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogSummaryComponent) },
+                    { path: 'entrenamiento', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogTrainingComponent) },
+                    { path: 'salud', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogHealthComponent) },
+                    { path: 'documentacion', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogDocsComponent) },
+                    { path: 'familia', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogFamilyComponent) },
+                    { path: 'ajustes', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogSettingsComponent) }
+                ]
+            }
+        ]
     },
     {
         path: 'admin/usuarios',

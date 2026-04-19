@@ -12,20 +12,8 @@ class VideoController extends Controller
     {
         $query = Video::query()->with(['dog.users:id,name', 'user', 'competition']);
 
-        // Filtro de privacidad
-        if (auth()->check()) {
-            $userId = auth()->id();
-            $userRole = auth()->user()->role;
-            
-            if (!in_array($userRole, ['admin', 'staff'])) {
-                $query->where(function ($q) use ($userId) {
-                    $q->where('is_public', true)
-                      ->orWhereHas('dog.users', function ($qDogUser) use ($userId) {
-                          $qDogUser->where('users.id', $userId);
-                      });
-                });
-            }
-        } else {
+        // Ya no hay filtros de privacidad para miembros, todos ven todos los vídeos
+        if (!auth()->check()) {
             $query->where('is_public', true);
         }
 
@@ -63,16 +51,7 @@ class VideoController extends Controller
             }
         }
 
-        if ($request->has('orientation') && $request->orientation) {
-            if ($request->orientation === 'vertical') {
-                $query->where(function ($q) {
-                    $q->where('orientation', 'vertical')
-                      ->orWhereNull('orientation');
-                });
-            } else {
-                $query->where('orientation', $request->orientation);
-            }
-        }
+
 
         if ($request->has('dog_id') && $request->dog_id) {
             $query->where('dog_id', $request->dog_id);
@@ -104,6 +83,23 @@ class VideoController extends Controller
             }
         }
 
+        $baseQueryForCounts = clone $query;
+        $verticalCount = (clone $baseQueryForCounts)->where(function ($q) {
+            $q->where('orientation', 'vertical')->orWhereNull('orientation');
+        })->count();
+        $horizontalCount = (clone $baseQueryForCounts)->where('orientation', 'horizontal')->count();
+
+        if ($request->has('orientation') && $request->orientation) {
+            if ($request->orientation === 'vertical') {
+                $query->where(function ($q) {
+                    $q->where('orientation', 'vertical')
+                      ->orWhereNull('orientation');
+                });
+            } else {
+                $query->where('orientation', $request->orientation);
+            }
+        }
+
         $query->withCount('likes');
 
         if (auth()->check()) {
@@ -122,7 +118,14 @@ class VideoController extends Controller
 
         $perPage = $request->has('per_page') ? min((int) $request->per_page, 100) : 10;
         $videos = $query->paginate($perPage);
-        return response()->json($videos);
+        
+        $responseArray = $videos->toArray();
+        $responseArray['counts'] = [
+            'vertical' => $verticalCount,
+            'horizontal' => $horizontalCount
+        ];
+
+        return response()->json($responseArray);
     }
 
     public function store(Request $request)
@@ -133,7 +136,6 @@ class VideoController extends Controller
             'date' => 'required|date',
             'video' => 'required|file|mimes:mp4,mov,avi,wmv,webm|max:512000', // 500MB
             'title' => 'nullable|string|max:255',
-            'is_public' => 'nullable|boolean',
             'orientation' => 'nullable|in:horizontal,vertical',
             'manga_type' => 'nullable|in:Agility,Jumping,Otra,Agility 1,Agility 2,Jumping 1,Jumping 2'
         ]);
@@ -150,7 +152,7 @@ class VideoController extends Controller
             'status' => 'local',
             'orientation' => $request->orientation ?? 'vertical',
             'manga_type' => $request->manga_type ?? 'Agility 1',
-            'is_public' => $request->has('is_public') ? filter_var($request->is_public, FILTER_VALIDATE_BOOLEAN) : true
+            'is_public' => true
         ]);
 
         return response()->json($video->load(['dog.users:id,name', 'user', 'competition']), 201);
@@ -172,7 +174,6 @@ class VideoController extends Controller
             'competition_id' => 'nullable|exists:competitions,id',
             'date' => 'required|date',
             'title' => 'nullable|string|max:255',
-            'is_public' => 'nullable|boolean',
             'manga_type' => 'nullable|in:Agility,Jumping,Otra,Agility 1,Agility 2,Jumping 1,Jumping 2'
         ]);
 
@@ -185,12 +186,6 @@ class VideoController extends Controller
         
         if ($request->has('manga_type')) {
             $updateData['manga_type'] = $request->manga_type;
-        }
-
-        if ($request->has('is_public')) {
-            if ($isDogOwner || in_array($user->role, ['admin', 'staff'])) {
-                $updateData['is_public'] = filter_var($request->is_public, FILTER_VALIDATE_BOOLEAN);
-            }
         }
 
         $video->update($updateData);
@@ -209,6 +204,22 @@ class VideoController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
+        \App\Models\DeletedVideoHistory::create([
+            'original_video_id' => $video->id,
+            'dog_name' => $video->dog ? $video->dog->name : 'Unknown',
+            'dog_id' => $video->dog_id,
+            'uploader_name' => $video->user ? $video->user->name : 'Unknown',
+            'uploader_id' => $video->user_id,
+            'deleted_by_name' => $user->name,
+            'deleted_by_id' => $user->id,
+            'video_title' => $video->title,
+            'competition_name' => $video->competition ? $video->competition->name : null,
+            'competition_id' => $video->competition_id,
+            'video_date' => $video->date,
+            'manga_type' => $video->manga_type,
+            'status_before_deletion' => $video->status,
+        ]);
+
         if ($video->local_path && Storage::disk('public')->exists($video->local_path)) {
             Storage::disk('public')->delete($video->local_path);
         }
@@ -216,6 +227,12 @@ class VideoController extends Controller
         $video->delete();
 
         return response()->json(['message' => 'Video deleted successfully']);
+    }
+
+    public function deletedHistory()
+    {
+        $history = \App\Models\DeletedVideoHistory::latest()->paginate(20);
+        return response()->json($history);
     }
 
     public function toggleLike($id)

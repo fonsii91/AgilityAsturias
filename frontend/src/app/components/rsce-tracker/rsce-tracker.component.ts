@@ -220,8 +220,8 @@ export class RsceTrackerComponent implements OnInit {
 
         const exc0 = tracks.filter(t => t.qualification === 'Excelente a 0' || t.qualification === 'EXCELENTE' || t.qualification === 'Excelente');
         
-        const validAgility = exc0.filter(t => t.manga_type.startsWith('Agility') && t.speed && t.speed <= requiredAgilitySpeed);
-        const validJumping = exc0.filter(t => t.manga_type.startsWith('Jumping') && t.speed && t.speed <= requiredJumpingSpeed);
+        const validAgility = exc0.filter(t => t.manga_type.startsWith('Agility') && t.speed && t.speed >= requiredAgilitySpeed);
+        const validJumping = exc0.filter(t => t.manga_type.startsWith('Jumping') && t.speed && t.speed >= requiredJumpingSpeed);
 
         let aJudges = new Set(validAgility.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
         let jJudges = new Set(validJumping.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
@@ -236,10 +236,10 @@ export class RsceTrackerComponent implements OnInit {
         this.progressValueB.set(Math.min((jCount / 3) * 100, 100));
 
         this.progressTitleA.set('Agility');
-        this.progressSubtitleA.set(`Vel ≤ ${requiredAgilitySpeed} m/s • ${aCount}/3 puntos` + (aCount > 0 && aJudges < 3 ? ` (${aJudges}/3 jueces)` : ''));
+        this.progressSubtitleA.set(`Vel ≥ ${requiredAgilitySpeed} m/s • ${aCount}/3 puntos` + (aCount > 0 && aJudges < 3 ? ` (${aJudges}/3 jueces)` : ''));
         
         this.progressTitleB.set('Jumping');
-        this.progressSubtitleB.set(`Vel ≤ ${requiredJumpingSpeed} m/s • ${jCount}/3 puntos` + (jCount > 0 && jJudges < 3 ? ` (${jJudges}/3 jueces)` : ''));
+        this.progressSubtitleB.set(`Vel ≥ ${requiredJumpingSpeed} m/s • ${jCount}/3 puntos` + (jCount > 0 && jJudges < 3 ? ` (${jJudges}/3 jueces)` : ''));
 
         this.progressMet.set(aMet && jMet);
 

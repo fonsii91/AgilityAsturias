@@ -17,17 +17,21 @@ export class DogService {
         // Let's expose a method to load.
     }
 
-    loadUserDogs() {
-        this.http.get<any[]>(this.apiUrl).subscribe({
-            next: (data) => {
-                const dogs = data.map(d => this.mapDog(d));
-                this.dogsSignal.set(dogs);
-            },
-            error: (err) => {
-                if (err.status !== 403) {
-                    console.error('Error loading dogs:', err);
+    loadUserDogs(): Promise<Dog[]> {
+        return new Promise((resolve, reject) => {
+            this.http.get<any[]>(this.apiUrl).subscribe({
+                next: (data) => {
+                    const dogs = data.map(d => this.mapDog(d));
+                    this.dogsSignal.set(dogs);
+                    resolve(dogs);
+                },
+                error: (err) => {
+                    if (err.status !== 403) {
+                        console.error('Error loading dogs:', err);
+                    }
+                    resolve([]); // Don't reject to avoid breaking app startup, just resolve empty
                 }
-            }
+            });
         });
     }
 

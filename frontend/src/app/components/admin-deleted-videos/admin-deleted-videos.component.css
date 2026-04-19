@@ -1,0 +1,151 @@
+.admin-container {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header-section {
+    margin-bottom: 24px;
+}
+
+.title-with-icon {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.title-icon {
+    font-size: 32px;
+    color: var(--primary-color);
+}
+
+h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.subtitle {
+    margin: 4px 0 0 44px;
+    color: var(--text-color-secondary);
+    font-size: 14px;
+}
+
+.data-card {
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+}
+
+.loading-state, .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    color: var(--text-color-secondary);
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--surface-hover);
+    font-weight: 600;
+    color: var(--text-color);
+    white-space: nowrap;
+    padding: 16px;
+}
+
+td {
+    padding: 16px;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: middle;
+}
+
+.date-cell, .user-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.micro-icon {
+    font-size: 16px;
+    color: var(--text-color-secondary);
+}
+
+.error-text {
+    color: var(--error-color, #f44336);
+    font-weight: 500;
+}
+.error-text .micro-icon {
+    color: var(--error-color, #f44336);
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.info-badge {
+    background: rgba(33, 150, 243, 0.1);
+    color: #2196f3;
+}
+
+.status-indicator {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-indicator.local {
+    background: rgba(156, 39, 176, 0.1);
+    color: #9c27b0;
+}
+
+.status-indicator.on_youtube {
+    background: rgba(244, 67, 54, 0.1);
+    color: #f44336;
+}
+
+.status-indicator.in_queue {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .data-card {
+    background: var(--surface-color);
+}

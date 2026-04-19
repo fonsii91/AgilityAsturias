@@ -40,6 +40,7 @@ export class VideoListComponent implements OnInit {
     hasReachedEnd = false;
     isFiltersOpen = false;
     activeTab: 'horizontal' | 'vertical' = 'vertical';
+    tabCounts = { vertical: 0, horizontal: 0 };
 
     selectedDogForProfile: Dog | null = null;
     isDogProfileOpen = false;
@@ -121,6 +122,10 @@ export class VideoListComponent implements OnInit {
                 this.currentPage = res.current_page;
                 this.totalPages = res.last_page;
                 this.hasReachedEnd = this.currentPage >= this.totalPages;
+                
+                if (res.counts) {
+                    this.tabCounts = res.counts;
+                }
                 
                 this.isLoading = false;
                 this.cdr.detectChanges();
@@ -274,19 +279,6 @@ export class VideoListComponent implements OnInit {
         return false;
     }
 
-    canEditPrivacy(video: Video | null): boolean {
-        if (!video) return false;
-        const userId = this.currentUserId;
-        if (!userId) return false;
-
-        const role = this.authService.currentUserSignal()?.role;
-        if (role === 'admin' || role === 'staff') return true;
-
-        if (video.dog?.users && video.dog.users.some(u => u.id == userId)) return true;
-
-        return false;
-    }
-
     hasDogUser(dog: Dog | undefined, userId: number | undefined | null): boolean {
         if (!dog?.users || !userId) return false;
         return dog.users.some(u => u.id === userId);
@@ -347,8 +339,7 @@ export class VideoListComponent implements OnInit {
             title: video.title || '',
             date: video.date || '',
             dog_id: video.dog_id || (video.dog ? video.dog.id : ''),
-            competition_id: video.competition_id || (video.competition ? video.competition.id : ''),
-            is_public: video.is_public !== undefined ? video.is_public : true
+            competition_id: video.competition_id || (video.competition ? video.competition.id : '')
         };
         this.cdr.detectChanges();
     }

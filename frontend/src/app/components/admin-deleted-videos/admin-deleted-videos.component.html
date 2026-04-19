@@ -1,0 +1,129 @@
+<div class="admin-container fade-in">
+  <div class="header-section">
+    <div class="title-with-icon">
+      <span class="material-icons-outlined title-icon">auto_delete</span>
+      <h1>Historial de Vídeos Borrados</h1>
+    </div>
+    <p class="subtitle">Registro histórico de todas las eliminaciones de videos del sistema.</p>
+  </div>
+
+  <mat-card class="data-card">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando historial...</p>
+      </div>
+    } @else {
+      @if (historyList().length === 0) {
+        <div class="empty-state">
+          <span class="material-icons-outlined empty-icon">history</span>
+          <h3>Sin registros</h3>
+          <p>No se ha eliminado ningún video todavía.</p>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table mat-table [dataSource]="historyList()" class="mat-elevation-z0 hover-table">
+            
+            <!-- Fecha Column -->
+            <ng-container matColumnDef="date">
+              <th mat-header-cell *matHeaderCellDef> Fecha Eliminación </th>
+              <td mat-cell *matCellDef="let element"> 
+                <div class="date-cell">
+                  <span class="material-icons-outlined micro-icon">event</span>
+                  {{element.created_at | date:'dd/MM/yyyy HH:mm'}}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Video Date Column -->
+            <ng-container matColumnDef="video_date">
+              <th mat-header-cell *matHeaderCellDef> Rec. fecha </th>
+              <td mat-cell *matCellDef="let element"> 
+                <div class="user-cell">
+                  <span class="material-icons-outlined micro-icon">videocam</span>
+                  {{element.video_date ? (element.video_date | date:'dd/MM/yyyy') : 'N/A'}}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Título Column -->
+            <ng-container matColumnDef="title">
+              <th mat-header-cell *matHeaderCellDef> Título </th>
+              <td mat-cell *matCellDef="let element"> 
+                <strong>{{element.video_title || 'Sin título'}}</strong>
+              </td>
+            </ng-container>
+
+            <!-- Competicion Column -->
+            <ng-container matColumnDef="competition">
+              <th mat-header-cell *matHeaderCellDef> Evento </th>
+              <td mat-cell *matCellDef="let element"> 
+                {{element.competition_name || 'Entrenamiento'}} 
+              </td>
+            </ng-container>
+
+            <!-- Manga Column -->
+            <ng-container matColumnDef="manga">
+              <th mat-header-cell *matHeaderCellDef> Manga </th>
+              <td mat-cell *matCellDef="let element"> 
+                {{element.manga_type || '-'}} 
+              </td>
+            </ng-container>
+
+            <!-- Dog Column -->
+            <ng-container matColumnDef="dog">
+              <th mat-header-cell *matHeaderCellDef> Perro </th>
+              <td mat-cell *matCellDef="let element"> 
+                <span class="badge info-badge">{{element.dog_name}}</span> 
+              </td>
+            </ng-container>
+
+            <!-- Uploader Column -->
+            <ng-container matColumnDef="uploader">
+              <th mat-header-cell *matHeaderCellDef> Subido por </th>
+              <td mat-cell *matCellDef="let element"> 
+                <div class="user-cell">
+                  <span class="material-icons-outlined micro-icon">upload</span>
+                  {{element.uploader_name}}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Deleted By Column -->
+            <ng-container matColumnDef="deleted_by">
+              <th mat-header-cell *matHeaderCellDef> Borrado por </th>
+              <td mat-cell *matCellDef="let element"> 
+                <div class="user-cell error-text">
+                  <span class="material-icons-outlined micro-icon">person_remove</span>
+                  {{element.deleted_by_name}}
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef> Previo </th>
+              <td mat-cell *matCellDef="let element"> 
+                <span class="status-indicator" [class]="element.status_before_deletion">
+                  {{element.status_before_deletion}}
+                </span>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+
+        <mat-paginator
+          [length]="totalItems()"
+          [pageSize]="pageSize()"
+          [pageSizeOptions]="[20]"
+          (page)="onPageChange($event)"
+          aria-label="Selecciona página de historial"
+          showFirstLastButtons>
+        </mat-paginator>
+      }
+    }
+  </mat-card>
+</div>
