@@ -7,6 +7,9 @@
       "Para ayudarte a llevar el registro deportivo impecable, ahora puedes editar y sobreescribir entrenamientos pasados desde el propio Historial de Esfuerzos con total normalidad y sin romper las estadísticas.",
       "Hemos blindado las instrucciones de la plataforma con la información científica que hace latir vuestra aplicación en base a las cargas de Agility para que podáis exprimir la temporada sin lesiones.",
       "¡Control de pista para entrenadores a otro nivel! El Staff técnico ahora verá un indicador vital en formato de semáforo luminoso directamente al lado de cada perro apuntado en los listados de reservas, informándoles al instante de su estado de descanso o riesgo de agotamiento."
+    ],
+    "bugfixes": [
+      "Corregido un pequeño despiste visual: el acceso a la sección de 'Salud Deportiva' ya aparece correctamente listado dentro del menú lateral al acceder desde teléfonos móviles."
     ]
   },
   {
