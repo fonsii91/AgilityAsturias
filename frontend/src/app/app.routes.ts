@@ -69,6 +69,18 @@ export const routes: Routes = [
         title: 'Historial Vídeos Borrados | Agility Asturias'
     },
     {
+        path: 'admin/salud-monitor',
+        loadComponent: () => import('./components/admin-salud-monitor/admin-salud-monitor').then(m => m.AdminSaludMonitorComponent),
+        canActivate: [adminGuard],
+        title: 'Monitor ACWR | Agility Asturias'
+    },
+    {
+        path: 'admin/rsce-monitor',
+        loadComponent: () => import('./components/admin-rsce-monitor/admin-rsce-monitor').then(m => m.AdminRsceMonitorComponent),
+        canActivate: [adminGuard],
+        title: 'Monitor RSCE | Agility Asturias'
+    },
+    {
         path: 'gestionar-horarios',
         loadComponent: () => import('./reservas/gestionar-horarios/gestionar-horarios.component').then(m => m.GestionarHorariosComponent),
         canActivate: [staffGuard],

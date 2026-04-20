@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { RsceTrack } from '../models/rsce-track.model';
+import { RsceTrack, AdminRsceStats } from '../models/rsce-track.model';
 
 @Injectable({
   providedIn: 'root'
@@ -25,5 +25,9 @@ export class RsceTrackService {
 
   deleteTrack(id: number): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/${id}/delete`, {});
+  }
+
+  getAdminMonitorData(): Observable<AdminRsceStats[]> {
+    return this.http.get<AdminRsceStats[]>(`${environment.apiUrl}/admin/rsce/monitor`);
   }
 }

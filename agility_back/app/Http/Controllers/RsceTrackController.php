@@ -79,4 +79,57 @@ class RsceTrackController extends Controller
         $rsceTrack->delete();
         return response()->noContent();
     }
+
+    public function adminMonitorData()
+    {
+        // Solo admin
+        if (auth()->user()->role !== 'admin') {
+            return response()->json(['error' => 'No autorizado'], 403);
+        }
+
+        $tracks = \App\Models\RsceTrack::with('dog.users')->get();
+
+        $statsByUser = [];
+
+        foreach ($tracks as $t) {
+            $user = null;
+            if ($t->dog && $t->dog->users->count() > 0) {
+                // Atribuir al dueño primario
+                $user = $t->dog->users->first();
+            }
+
+            if ($user) {
+                $id = $user->id;
+                if (!isset($statsByUser[$id])) {
+                    $statsByUser[$id] = [
+                        'user_id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'total_tracks' => 0,
+                        'dogs' => []
+                    ];
+                }
+
+                $statsByUser[$id]['total_tracks']++;
+
+                if ($t->dog) {
+                    $statsByUser[$id]['dogs'][$t->dog->id] = $t->dog->name;
+                }
+            }
+        }
+
+        // Format dogs map into string lists and sort
+        $result = array_values($statsByUser);
+        foreach ($result as &$stat) {
+            $stat['dogs_list'] = array_values($stat['dogs']);
+            unset($stat['dogs']);
+        }
+
+        // Sort by total tracks descending
+        usort($result, function($a, $b) {
+            return $b['total_tracks'] <=> $a['total_tracks'];
+        });
+
+        return response()->json($result);
+    }
 }

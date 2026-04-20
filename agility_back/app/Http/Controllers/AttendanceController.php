@@ -104,27 +104,25 @@ class AttendanceController extends Controller
                             }
                         }
 
-                        // Auto-create pending workload
-                        $duration = 60;
-                        if ($res->timeSlot && $res->timeSlot->start_time && $res->timeSlot->end_time) {
-                            $duration = \Carbon\Carbon::parse($res->timeSlot->end_time)->diffInMinutes(\Carbon\Carbon::parse($res->timeSlot->start_time));
-                        }
-                        
-                        \App\Models\DogWorkload::create([
-                            'dog_id' => $res->dog->id,
-                            'source_type' => 'auto_attendance',
-                            'source_id' => $res->id,
-                            'date' => $date,
-                            'duration_min' => 15, // Tiempo activo por defecto
-                            'intensity_rpe' => 5, // Medio
-                            'status' => 'pending_review'
-                        ]);
+                        // Auto-create or confirm premature workload
+                        $workload = \App\Models\DogWorkload::firstOrCreate(
+                            ['dog_id' => $res->dog->id, 'source_type' => 'auto_attendance', 'source_id' => $res->id],
+                            ['date' => $date, 'duration_min' => 10, 'intensity_rpe' => 5, 'status' => 'pending_review']
+                        );
+                        $workload->is_staff_verified = true;
+                        $workload->save();
                     }
                 } else {
                     // Did not attend (No Show)
                     // We mark as cancelled so it shows as such in history, or we could have a 'no_show' status
                     // For now, 'cancelled' is safest to clear it from "Active"
                     $res->status = 'cancelled';
+                    
+                    // Cleanup any prematurely generated workload since the dog didn't attend
+                    \App\Models\DogWorkload::where('dog_id', ($res->dog ? $res->dog->id : null))
+                        ->where('source_type', 'auto_attendance')
+                        ->where('source_id', $res->id)
+                        ->delete();
                 }
 
                 $res->attendance_verified = true;
@@ -254,17 +252,13 @@ class AttendanceController extends Controller
                             }
                         }
 
-                        // Auto-create pending workload for competition
-                        \App\Models\DogWorkload::create([
-                            'dog_id' => $dog->id,
-                            'source_type' => 'auto_competition',
-                            'source_id' => $competitionId,
-                            'date' => $competition->fecha_evento,
-                            // Competitions are short bursts of maximum intensity
-                            'duration_min' => 15,
-                            'intensity_rpe' => 9, 
-                            'status' => 'pending_review'
-                        ]);
+                        // Auto-create or confirm premature workload for competition
+                        $compWorkload = \App\Models\DogWorkload::firstOrCreate(
+                            ['dog_id' => $dog->id, 'source_type' => 'auto_competition', 'source_id' => $competitionId],
+                            ['date' => $competition->fecha_evento, 'duration_min' => 10, 'intensity_rpe' => 9, 'status' => 'pending_review']
+                        );
+                        $compWorkload->is_staff_verified = true;
+                        $compWorkload->save();
                     }
                 }
             }

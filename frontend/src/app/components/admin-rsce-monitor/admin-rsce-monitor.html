@@ -1,0 +1,70 @@
+<div class="admin-container">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+      <h1 style="margin: 0; color: var(--primary-color);">Monitor de Seguimiento RSCE</h1>
+      <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">
+        Monitorización Read-Only de historiales de competición deportiva RSCE.
+      </p>
+    </div>
+    <div class="stats" style="background: var(--surface-card); padding: 10px 20px; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600; color: var(--text-main);">
+      <span>Usuarios Activos: {{ stats().length }}</span>
+    </div>
+  </div>
+
+  @if (!isLoading()) {
+    <div class="table-container glass-effect" style="border-radius: 12px; overflow: hidden; background: var(--surface-card); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);">
+      <table style="width: 100%; border-collapse: collapse;">
+        <thead style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
+          <tr>
+            <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Dueño Responsable</th>
+            <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Email</th>
+            <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600; text-align: center;">Mangas Registradas</th>
+            <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Perros Asignados</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (stat of stats(); track stat.user_id) {
+            <tr style="border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s;">
+              <td style="padding: 15px 20px; font-weight: 600; color: var(--text-main);">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <span class="material-icons" style="color: #64748b; font-size: 20px;">account_circle</span>
+                  {{ stat.name }}
+                </div>
+              </td>
+              <td style="padding: 15px 20px; color: var(--text-secondary);">{{ stat.email }}</td>
+              <td style="padding: 15px 20px; text-align: center;">
+                <span style="background: #fce7f3; color: #be185d; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">
+                  {{ stat.total_tracks }}
+                </span>
+              </td>
+              <td style="padding: 15px 20px; color: var(--text-secondary);">
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  @for (dog of stat.dogs_list; track dog) {
+                    <span style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 3px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
+                      <span class="material-icons" style="font-size: 12px; vertical-align: text-top; margin-right: 2px;">pets</span>
+                      {{ dog }}
+                    </span>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+          
+          @if (stats().length === 0) {
+            <tr>
+              <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-light);">
+                <span class="material-icons" style="font-size: 48px; color: #cbd5e1; margin-bottom: 10px;">inbox</span>
+                <p style="margin: 0;">Todavía ningún usuario ha registrado mangas de seguimiento RSCE.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 0;">
+      <span class="spinner-small" style="width: 30px; height: 30px; border-width: 4px; border-top-color: var(--primary-color); margin-bottom: 15px;"></span>
+      <p style="color: var(--text-secondary); font-weight: 500;">Computando matríz de uso de RSCE...</p>
+    </div>
+  }
+</div>

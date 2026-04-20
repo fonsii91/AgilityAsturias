@@ -70,17 +70,21 @@
             <div class="form-row">
               <div class="form-group flex-1">
                 <label>
-                  Minutos Activos
-                  <span class="trust-marker"
-                    title="Introduce únicamente el tiempo real de movimiento o pista. Por ejemplo, en una clase de 60 minutos, el tiempo activo de cada perro suele ser de 10-15 min. Las paradas o descansos no afectan a la fatiga mecánica.">
+                  Minutos Activos (En Pista)
+                  <span class="trust-marker" (click)="showInfo('time')"
+                    title="Se cuenta ÚNICAMENTE el tiempo real de esfuerzo máximo donde el perro está haciendo pista. Un entrenamiento de 1 hora y media de entrenamiento suele suponer apenas 10 minutos reales de tiempo bajo tensión física máxima.">
                     <span class="material-icons-outlined">info</span>
                   </span>
                 </label>
-                <div class="input-with-icon">
-                  <span class="material-icons icon-prefix">schedule</span>
-                  <input type="number" class="custom-input with-prefix with-suffix" [(ngModel)]="pending.duration_min"
-                    min="1" step="5">
-                  <span class="input-suffix">min</span>
+                <div class="time-stepper">
+                  <button class="stepper-btn" (click)="decreasePendingDuration(pending)">
+                    <span class="material-icons">remove</span>
+                  </button>
+                  <input type="number" class="stepper-input" [(ngModel)]="pending.duration_min" min="1">
+                  <div class="stepper-label">min</div>
+                  <button class="stepper-btn" (click)="increasePendingDuration(pending)">
+                    <span class="material-icons">add</span>
+                  </button>
                 </div>
               </div>
 
@@ -104,9 +108,15 @@
             </div>
 
             <!-- Modifiers Pending Reviews -->
-            <div class="pending-modifiers mt-2 d-flex gap-15">
-              <div class="form-group flex-2">
-                <label>¿Saltó a su máxima altura?</label>
+            <div class="pending-modifiers mt-4 d-flex gap-15">
+              <div class="form-group flex-2 d-flex justify-content-between align-items-center mb-0" style="flex-direction: row; padding: 10px 0; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">
+                <label class="mb-0" style="margin-bottom: 0;">
+                  ¿Saltó a su máxima altura?
+                  <span class="trust-marker" (click)="showInfo('jump')"
+                    title="Cruzar el umbral de altura a la cruz aumenta el impacto articular exponencialmente.">
+                    <span class="material-icons-outlined">info</span>
+                  </span>
+                </label>
                 <div class="toggle-switch-wrapper mini">
                   <label class="switch mini-switch">
                     <input type="checkbox" [(ngModel)]="pending.jumped_max_height">
@@ -117,12 +127,12 @@
               <div class="form-group flex-1">
                 <label title="Número de pistas completas o mangas">Salidas a pista</label>
                 <div class="run-selector d-flex gap-2 mt-1">
-                  <button class="run-chip" [class.active]="pending.number_of_runs === 2"
-                    (click)="pending.number_of_runs = (pending.number_of_runs === 2 ? undefined : 2)">1-2</button>
-                  <button class="run-chip" [class.active]="pending.number_of_runs === 4"
-                    (click)="pending.number_of_runs = (pending.number_of_runs === 4 ? undefined : 4)">3-5</button>
-                  <button class="run-chip" [class.active]="pending.number_of_runs === 6"
-                    (click)="pending.number_of_runs = (pending.number_of_runs === 6 ? undefined : 6)">+5</button>
+                  <button class="run-chip" [class.active]="pending.number_of_runs == 2"
+                    (click)="pending.number_of_runs = (pending.number_of_runs == 2 ? undefined : 2)">1-2</button>
+                  <button class="run-chip" [class.active]="pending.number_of_runs == 4"
+                    (click)="pending.number_of_runs = (pending.number_of_runs == 4 ? undefined : 4)">3-5</button>
+                  <button class="run-chip" [class.active]="pending.number_of_runs == 6"
+                    (click)="pending.number_of_runs = (pending.number_of_runs == 6 ? undefined : 6)">+5</button>
                 </div>
               </div>
             </div>
@@ -190,14 +200,17 @@
             <strong>{{ history.intensity_rpe }}</strong>/10
           </div>
         </div>
-        @if(history.jumped_max_height || history.number_of_runs! >= 3) {
-        <div class="hi-footer mt-2 border-top pt-2 d-flex gap-2">
+        @if(history.jumped_max_height || history.number_of_runs! >= 3 || history.is_staff_verified) {
+        <div class="hi-footer mt-2 border-top pt-2 d-flex gap-2" style="flex-wrap: wrap;">
           @if(history.jumped_max_height) { <span class="badge badge-warning text-xsmall"><span
               class="material-icons align-middle d-inline-block text-xsmall">keyboard_double_arrow_up</span> Salto
             Max</span> }
           @if(history.number_of_runs! >= 3) { <span class="badge badge-warning text-xsmall"><span
               class="material-icons align-middle d-inline-block text-xsmall">repeat</span> {{history.number_of_runs}}
             runs</span> }
+          @if(history.is_staff_verified) { <span class="badge badge-success text-xsmall"
+            style="background:#dcfce7; color:#166534;"><span
+              class="material-icons align-middle d-inline-block text-xsmall">verified</span> Validado</span> }
         </div>
         }
       </div>
@@ -231,17 +244,22 @@
 
           <div class="form-group flex-2">
             <label>
-              Minutos Activos
-              <span class="trust-marker"
-                title="Introduce únicamente el tiempo real de movimiento o pista. Por ejemplo, en una clase de 60 minutos, el tiempo activo de cada perro suele ser de 10-15 min. Las paradas o descansos no afectan a la fatiga mecánica.">
+              Minutos Activos (En Pista)
+              <span class="trust-marker" (click)="showInfo('time')"
+                title="Se cuenta ÚNICAMENTE el tiempo real de esfuerzo máximo donde el perro está haciendo pista. Un entrenamiento de 1 hora suele suponer apenas 10 minutos reales de tiempo bajo tensión física máxima.">
                 <span class="material-icons-outlined">info</span>
               </span>
             </label>
-            <div class="input-with-icon">
-              <span class="material-icons icon-prefix">schedule</span>
-              <input type="number" class="custom-input with-prefix with-suffix" [ngModel]="manualDuration()"
+            <div class="time-stepper">
+              <button class="stepper-btn" (click)="decreaseManualDuration()">
+                <span class="material-icons">remove</span>
+              </button>
+              <input type="number" class="stepper-input" [ngModel]="manualDuration()"
                 (ngModelChange)="manualDuration.set($event)" min="1">
-              <span class="input-suffix">min</span>
+              <div class="stepper-label">min</div>
+              <button class="stepper-btn" (click)="increaseManualDuration()">
+                <span class="material-icons">add</span>
+              </button>
             </div>
           </div>
         </div>
@@ -266,11 +284,11 @@
             </div>
           </div>
         </div>
-        <div class="form-row mt-3 form-modifiers">
-          <div class="form-group flex-1">
-            <label>
+        <div class="form-row mt-4">
+          <div class="form-group flex-1 d-flex justify-content-between align-items-center mb-0" style="flex-direction: row; padding: 10px 0; border-bottom: 1px solid #e2e8f0; border-top: 1px solid #e2e8f0;">
+            <label class="mb-0" style="margin-bottom: 0;">
               ¿Saltó a su altura máxima hoy?
-              <span class="trust-marker"
+              <span class="trust-marker" (click)="showInfo('jump')"
                 title="Cruzar el umbral de altura a la cruz aumenta el impacto articular exponencialmente.">
                 <span class="material-icons-outlined">info</span>
               </span>
@@ -288,12 +306,12 @@
           <div class="form-group flex-1">
             <label>Múltiples Salidas a pista</label>
             <div class="run-selector d-flex gap-2 mt-1">
-              <button class="run-chip" [class.active]="manualNumberOfRuns() === 2"
-                (click)="manualNumberOfRuns() === 2 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(2)">1-2</button>
-              <button class="run-chip" [class.active]="manualNumberOfRuns() === 4"
-                (click)="manualNumberOfRuns() === 4 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(4)">3-5</button>
-              <button class="run-chip" [class.active]="manualNumberOfRuns() === 6"
-                (click)="manualNumberOfRuns() === 6 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(6)">+5</button>
+              <button class="run-chip" [class.active]="manualNumberOfRuns() == 2"
+                (click)="manualNumberOfRuns() == 2 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(2)">1-2</button>
+              <button class="run-chip" [class.active]="manualNumberOfRuns() == 4"
+                (click)="manualNumberOfRuns() == 4 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(4)">3-5</button>
+              <button class="run-chip" [class.active]="manualNumberOfRuns() == 6"
+                (click)="manualNumberOfRuns() == 6 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(6)">+5</button>
             </div>
           </div>
         </div>
@@ -414,8 +432,11 @@
             </li>
             <li><strong>Tipo de Actividad:</strong> El <em>Agility</em> aporta el 100% de la carga (Baseline x1.0) por
               el impacto de giros y saltos. </li>
-            <li><strong>Penalización por Estructura:</strong> "Saltar a Máxima Altura" aplica un multiplicador de castigo del <strong>+20% (x1.2)</strong> sobre la carga registrada. "Múltiples Salidas" aplica un castigo progresivo: hacer de 3 a 5 pistas suma un <strong>+30% (x1.3)</strong>, y correr más de 5 mangas estresa críticamente el sistema con un <strong>+60% (x1.6)</strong>.</li>
-            <li><strong>Tolerancia Dinámica Acumulada:</strong> La barrera de riesgo máximo (Roja) es normalmente 1.50 de
+            <li><strong>Penalización por Estructura:</strong> "Saltar a Máxima Altura" aplica un multiplicador de
+              castigo del <strong>+20% (x1.2)</strong> sobre la carga registrada. "Múltiples Salidas" aplica un castigo
+              progresivo que <strong>varía según el contexto</strong>: hacer de 3 a 5 pistas en una clase suma un <strong>+15% (x1.15)</strong>, pero en alta excitación de competición escalará al <strong>+30% (x1.30)</strong>. Maratonianas salidas de más de 5 mangas estresan críticamente el sistema con un <strong>+40% / +60%</strong> extra.</li>
+            <li><strong>Tolerancia Dinámica Acumulada:</strong> La barrera de riesgo máximo (Roja) es normalmente 1.50
+              de
               ACWR.
               <ul>
                 <li>Si el perro tiene el flag de <strong>Lesión Previa</strong>, su barrera baja de 1.50 a

@@ -10,6 +10,7 @@ export interface DogWorkload {
     jumped_max_height?: boolean;
     number_of_runs?: number;
     status: 'confirmed' | 'pending_review';
+    is_staff_verified?: boolean;
     created_at?: string;
     updated_at?: string;
 }
@@ -24,3 +25,12 @@ export interface AcwrData {
     is_calibrating: boolean;
     recent_history: DogWorkload[];
 }
+
+export interface AdminWorkloadStats {
+    user_id: number;
+    name: string;
+    email: string;
+    total_workloads: number;
+    dogs_list: string[];
+}
+

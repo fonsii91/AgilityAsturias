@@ -11,3 +11,11 @@ export interface RsceTrack {
     created_at?: Date | string;
     updated_at?: Date | string;
 }
+
+export interface AdminRsceStats {
+    user_id: number;
+    name: string;
+    email: string;
+    total_tracks: number;
+    dogs_list: string[];
+}

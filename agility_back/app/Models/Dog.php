@@ -138,12 +138,16 @@ class Dog extends Model
                 $load *= 1.2;
             }
             
-            // Multiplicador de riesgo: Altas mangas en competición o entrenamiento
+            // Multiplicador de riesgo: Número de mangas cruzado con contexto competitivo
             if ($workload->number_of_runs) {
+                $isCompetition = ($workload->source_type === 'auto_competition');
+
                 if ($workload->number_of_runs >= 6) {
-                    $load *= 1.6; // +60% de fatiga para maratones de pistas (+5)
+                    // Maratón extrema (+5 pistas)
+                    $load *= $isCompetition ? 1.6 : 1.4; // 60% castigo en compe, 40% en entreno largo
                 } else if ($workload->number_of_runs >= 3) {
-                    $load *= 1.3; // +30% de fatiga estructural para 3-5 mangas
+                    // Rutina media-alta (3-5 pistas)
+                    $load *= $isCompetition ? 1.3 : 1.15; // 30% castigo en compe por estrés, 15% en clase normal
                 }
             }
 

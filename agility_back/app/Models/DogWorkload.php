@@ -17,6 +17,7 @@ class DogWorkload extends Model
         'status',
         'jumped_max_height',
         'number_of_runs',
+        'is_staff_verified',
     ];
 
     protected $casts = [
@@ -25,6 +26,7 @@ class DogWorkload extends Model
         'intensity_rpe' => 'integer',
         'jumped_max_height' => 'boolean',
         'number_of_runs' => 'integer',
+        'is_staff_verified' => 'boolean',
     ];
 
     public function dog()

@@ -116,6 +116,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     });
 
+    // Rutas protegidas EXCLUSIVAMENTE por rol admin
+    Route::middleware(['role:admin'])->group(function () {
+        // Dog Workloads Monitor
+        Route::get('/admin/salud/monitor', [\App\Http\Controllers\DogWorkloadController::class, 'adminMonitorData']);
+        // RSCE Monitor
+        Route::get('/admin/rsce/monitor', [RsceTrackController::class, 'adminMonitorData']);
+    });
+
 
     Route::middleware(['role:admin,staff,member'])->group(function () {
         // Ranking

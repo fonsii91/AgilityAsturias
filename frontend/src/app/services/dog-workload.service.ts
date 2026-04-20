@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DogWorkload, AcwrData } from '../models/dog-workload.model';
+import { DogWorkload, AcwrData, AdminWorkloadStats } from '../models/dog-workload.model';
 
 @Injectable({
   providedIn: 'root'
@@ -39,5 +39,9 @@ export class DogWorkloadService {
 
   deleteWorkload(workloadId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/workloads/${workloadId}`);
+  }
+
+  getAdminMonitorData(): Observable<AdminWorkloadStats[]> {
+    return this.http.get<AdminWorkloadStats[]>(`${this.apiUrl}/admin/salud/monitor`);
   }
 }

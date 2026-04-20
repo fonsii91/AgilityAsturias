@@ -34,10 +34,10 @@ export class SaludDeportivaComponent implements OnInit {
   isHelpModalOpen = signal<boolean>(false);
   editingWorkloadId = signal<number | null>(null);
   manualDate = signal<string>(new Date().toISOString().split('T')[0]);
-  manualDuration = signal<number>(15);
+  manualDuration = signal<number>(8);
   manualIntensity = signal<number>(8); // Agility default RPE
   manualJumpedMaxHeight = signal<boolean>(false);
-  manualNumberOfRuns = signal<number | null>(null);
+  manualNumberOfRuns = signal<number | null>(2); // Preselected 1-2
   isSubmitting = signal<boolean>(false);
   workloadToDelete = signal<number | null>(null);
   
@@ -78,8 +78,9 @@ export class SaludDeportivaComponent implements OnInit {
     this.workloadService.getPendingReviews(dogId).subscribe(pending => {
       this.pendingReviews.set(pending.map(p => ({
         ...p,
-        duration_min: 15, // Ignora el 60min antiguo de DB
-        intensity_rpe: p.intensity_rpe || 5
+        duration_min: p.duration_min || 8, // Respeta el valor dinámico calculado en backend
+        intensity_rpe: p.intensity_rpe || 5,
+        number_of_runs: p.number_of_runs || 2 // Preselect 1-2
       })));
     });
   }
@@ -128,10 +129,10 @@ export class SaludDeportivaComponent implements OnInit {
   resetManualForm() {
     this.editingWorkloadId.set(null);
     this.manualDate.set(new Date().toISOString().split('T')[0]);
-    this.manualDuration.set(15);
+    this.manualDuration.set(8);
     this.manualIntensity.set(8);
     this.manualJumpedMaxHeight.set(false);
-    this.manualNumberOfRuns.set(null);
+    this.manualNumberOfRuns.set(2);
   }
 
   startEditWorkload(w: DogWorkload) {
@@ -146,8 +147,37 @@ export class SaludDeportivaComponent implements OnInit {
     window.scrollTo({ top: 300, behavior: 'smooth' });
   }
 
+  decreasePendingDuration(pending: DogWorkload) {
+    if (pending.duration_min > 1) {
+      pending.duration_min -= 1;
+    }
+  }
+
+  increasePendingDuration(pending: DogWorkload) {
+    pending.duration_min += 1;
+  }
+
+  decreaseManualDuration() {
+    let val = this.manualDuration();
+    if (val > 1) {
+      this.manualDuration.set(val - 1);
+    }
+  }
+
+  increaseManualDuration() {
+    this.manualDuration.set(this.manualDuration() + 1);
+  }
+
   openHelpModal() {
     this.isHelpModalOpen.set(true);
+  }
+
+  showInfo(type: 'time' | 'jump') {
+    if (type === 'time') {
+      this.toast.info('Se cuenta ÚNICAMENTE el tiempo de máxima intensidad. 1 h de clase suele suponer entre 6 y 8 min reales en pista.', 8000);
+    } else {
+      this.toast.info('Cruzar el umbral de altura a la cruz aumenta el impacto articular exponencialmente.', 5000);
+    }
   }
 
   closeHelpModal() {
