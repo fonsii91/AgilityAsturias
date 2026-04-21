@@ -15,6 +15,7 @@ import { AcwrData } from '../../../../models/dog-workload.model';
 export class WorkloadGaugeComponent {
   acwrData = input.required<AcwrData>();
   dogName = input<string>('Tu compañero');
+  transparentMode = input<boolean>(false);
   chartOptions = signal<EChartsOption>({});
   
   rotation: number = 0;

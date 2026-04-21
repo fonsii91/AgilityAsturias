@@ -30,30 +30,22 @@
 
     <!-- HERO PROTAGONIST COLUMN (LEFT) -->
     <div class="bento-hero-column">
-      <div class="hero-image-card shadow-premium" [ngStyle]="{'background-image': 'url(' + (selectedDog()?.photo_url || '/placeholder-dog.jpg') + ')'}">
-        
-        <div class="hero-overlay" [ngClass]="'overlay-' + acwrData()!.status_color"></div>
-        
-        <div class="hero-content d-flex flex-column justify-content-between">
-          <div class="hero-top-bar d-flex justify-content-end">
-            <div class="status-badge glass-badge" [ngClass]="'badge-' + acwrData()!.status_color">
-              <span class="material-icons text-small align-middle mr-1">monitor_heart</span> 
-              {{ getStatusText(acwrData()!.status_color) }}
-            </div>
-          </div>
-          
-          <div class="hero-bottom-area">
-            <div class="hero-text-info">
-              <h1 class="hero-dog-name">{{ selectedDogName() }}</h1>
-              <span class="hero-subtitle">Perfil Atlético</span>
-            </div>
-          </div>
+      <!-- Dog Profile Card -->
+      <div class="hero-profile-bento shadow-premium" [ngStyle]="{'background-image': 'url(' + (selectedDog()?.photo_url || '/placeholder-dog.jpg') + ')'}">
+        <div class="profile-gradient-overlay"></div>
+        <div class="profile-content">
+          <h1 class="hero-dog-name m-0">{{ selectedDogName() }}</h1>
+          <span class="hero-subtitle">PERFIL ATLÉTICO</span>
         </div>
       </div>
 
-      <!-- THE GAUGE FLOATING BELOW/OVERLAPPING -->
-      <div class="hero-gauge-container glass-panel shadow-premium">
-        <app-workload-gauge [acwrData]="acwrData()!" [dogName]="selectedDogName()"></app-workload-gauge>
+      <!-- Gauge Data Card -->
+      <div class="gauge-bento-card bento-card shadow-premium mt-1" [ngClass]="'border-top-' + acwrData()!.status_color">
+        <app-workload-gauge 
+          [acwrData]="acwrData()!" 
+          [dogName]="selectedDogName()" 
+          [transparentMode]="false">
+        </app-workload-gauge>
       </div>
 
       <div class="manual-button-wrapper mt-4">
