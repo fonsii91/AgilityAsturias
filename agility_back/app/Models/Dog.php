@@ -36,7 +36,7 @@ class Dog extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot('is_primary_owner', 'rsce_license', 'rsce_expiration_date', 'rsce_grade', 'sociability_test_passed');
+        return $this->belongsToMany(User::class)->using(DogUser::class)->withPivot('is_primary_owner', 'rsce_license', 'rsce_expiration_date', 'rsce_grade', 'sociability_test_passed');
     }
 
     public function reservations()

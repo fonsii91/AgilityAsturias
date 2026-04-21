@@ -61,7 +61,7 @@ class User extends Authenticatable
      */
     public function dogs()
     {
-        return $this->belongsToMany(Dog::class)->withPivot('is_primary_owner', 'rsce_license', 'rsce_expiration_date', 'rsce_grade', 'sociability_test_passed');
+        return $this->belongsToMany(Dog::class)->using(DogUser::class)->withPivot('is_primary_owner', 'rsce_license', 'rsce_expiration_date', 'rsce_grade', 'sociability_test_passed');
     }
 
     /**
