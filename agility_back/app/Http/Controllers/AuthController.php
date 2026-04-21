@@ -252,6 +252,8 @@ class AuthController extends Controller
             $request->validate([
                 'name' => 'nullable|string|max:255',
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'rfec_license' => 'nullable|string|max:255',
+                'rfec_expiration_date' => 'nullable|date',
             ], [
                 'name.max' => 'El nombre no puede tener más de 255 caracteres.',
                 'photo.image' => 'El archivo debe ser una imagen.',
@@ -263,6 +265,13 @@ class AuthController extends Controller
 
             if ($request->has('name') && $request->name) {
                 $user->name = $request->name;
+            }
+
+            if ($request->has('rfec_license')) {
+                $user->rfec_license = $request->rfec_license;
+            }
+            if ($request->has('rfec_expiration_date')) {
+                $user->rfec_expiration_date = $request->rfec_expiration_date;
             }
 
             if ($request->hasFile('photo')) {

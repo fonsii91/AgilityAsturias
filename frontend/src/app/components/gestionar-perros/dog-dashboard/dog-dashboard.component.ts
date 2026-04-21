@@ -47,7 +47,7 @@ import { ImageCompressorService } from '../../../services/image-compressor.servi
             <div class="dog-main-info">
               <div class="title-row">
                 <h2>{{ dog()!.name }}</h2>
-                @if (dog()!.rsce_grade) { <span class="badge grade">Grado {{ dog()!.rsce_grade }}</span> }
+                @if (dog()!.pivot?.rsce_grade) { <span class="badge grade">Grado {{ dog()!.pivot?.rsce_grade }}</span> }
               </div>
               <p class="subtitle">
                 {{ dog()!.breed || 'Mestizo' }} &bull; {{ calculateAge(dog()!.birth_date) }}

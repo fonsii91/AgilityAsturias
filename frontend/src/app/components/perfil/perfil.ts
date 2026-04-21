@@ -36,6 +36,10 @@ export class Perfil {
   // Name editing state
   isEditingName = signal(false);
   editedName = signal('');
+  
+  // RFEC editing state
+  isEditingRfec = signal(false);
+  rfecData = { license: '', expiration: '' };
 
   // Branding theme
   clubTheme = environment.clubConfig.colors;
@@ -46,6 +50,10 @@ export class Perfil {
       if (user) {
         this.dogService.loadUserDogs();
         this.editedName.set(user.name);
+        this.rfecData = { 
+            license: user.rfec_license || '', 
+            expiration: user.rfec_expiration_date ? user.rfec_expiration_date.split('T')[0] : '' 
+        };
       }
     });
   }
@@ -55,6 +63,19 @@ export class Perfil {
     if (this.isEditingName()) {
       const user = this.authService.currentUserSignal();
       if (user) this.editedName.set(user.name);
+    }
+  }
+
+  toggleEditRfec() {
+    this.isEditingRfec.set(!this.isEditingRfec());
+    if (this.isEditingRfec()) {
+      const user = this.authService.currentUserSignal();
+      if (user) {
+        this.rfecData = { 
+            license: user.rfec_license || '', 
+            expiration: user.rfec_expiration_date ? user.rfec_expiration_date.split('T')[0] : '' 
+        };
+      }
     }
   }
 
@@ -122,6 +143,24 @@ export class Perfil {
         errorMsg = error.error.message;
       }
       this.toastService.error(errorMsg);
+    }
+  }
+
+  async saveRfec() {
+    try {
+      const user = this.authService.currentUserSignal();
+      if(!user) return;
+      await this.authService.updateProfile(
+          user.name, 
+          undefined, 
+          this.rfecData.license || '', 
+          this.rfecData.expiration || ''
+      );
+      this.isEditingRfec.set(false);
+      this.toastService.success('Licencia RFEC actualizada');
+    } catch (error) {
+      console.error('Error updating RFEC:', error);
+      this.toastService.error('Error al actualizar licencia RFEC');
     }
   }
 

@@ -43,8 +43,6 @@ class DogController extends Controller
             'rsce_expiration_date' => 'nullable|date',
             'rsce_grade' => 'nullable|string|max:10',
             'rsce_category' => 'nullable|string|max:10',
-            'rfec_license' => 'nullable|string',
-            'rfec_expiration_date' => 'nullable|date',
             'microchip' => 'nullable|string|max:30',
             'pedigree' => 'nullable|string',
             'has_previous_injuries' => 'boolean',
@@ -53,7 +51,15 @@ class DogController extends Controller
             'height_cm' => 'nullable|numeric|min:10',
         ]);
 
-        $dog = $request->user()->dogs()->create($validated, ['is_primary_owner' => true]);
+        $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade'])->toArray();
+        $pivotData = [
+            'is_primary_owner' => true,
+            'rsce_license' => collect($validated)->get('rsce_license'),
+            'rsce_expiration_date' => collect($validated)->get('rsce_expiration_date'),
+            'rsce_grade' => collect($validated)->get('rsce_grade'),
+        ];
+
+        $dog = $request->user()->dogs()->create($dogData, $pivotData);
         $dog->load('users:id,name,email');
 
         return response()->json($dog, 201);
@@ -84,8 +90,6 @@ class DogController extends Controller
             'rsce_expiration_date' => 'nullable|date',
             'rsce_grade' => 'nullable|string|max:10',
             'rsce_category' => 'nullable|string|max:10',
-            'rfec_license' => 'nullable|string',
-            'rfec_expiration_date' => 'nullable|date',
             'microchip' => 'nullable|string|max:30',
             'pedigree' => 'nullable|string',
             'has_previous_injuries' => 'boolean',
@@ -94,7 +98,27 @@ class DogController extends Controller
             'height_cm' => 'nullable|numeric|min:10',
         ]);
 
-        $dog->update($validated);
+        $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade'])->toArray();
+        $dog->update($dogData);
+
+        // Update pivot for current user only for fields present in request
+        $pivotUpdates = [];
+        if (array_key_exists('rsce_license', $validated)) {
+            $pivotUpdates['rsce_license'] = $validated['rsce_license'];
+        }
+        if (array_key_exists('rsce_expiration_date', $validated)) {
+            $pivotUpdates['rsce_expiration_date'] = $validated['rsce_expiration_date'];
+        }
+        if (array_key_exists('rsce_grade', $validated)) {
+            $pivotUpdates['rsce_grade'] = $validated['rsce_grade'];
+        }
+
+        if (!empty($pivotUpdates)) {
+            $dog->users()->updateExistingPivot(Auth::id(), $pivotUpdates);
+        }
+
+        // Reload the dog from the relationship to get the fresh pivot object
+        $dog = Auth::user()->dogs()->findOrFail($id);
 
         $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');

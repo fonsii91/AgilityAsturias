@@ -68,22 +68,6 @@ import { environment } from '../../../../../environments/environment';
               <small class="help-text" style="color: #64748b;">Métrica autocálculada por la FCI en base a la altura introducida en la pestaña de Entrenamiento.</small>
             </div>
           </div>
-
-          <!-- Licencia RFEC -->
-          <div class="doc-card rfec-card">
-            <div class="doc-header">
-              <span class="material-icons-outlined">card_membership</span>
-              <h3>Licencia RFEC</h3>
-            </div>
-            <div class="form-group">
-              <label>Nº Licencia</label>
-              <input type="text" [(ngModel)]="formData.rfec_license">
-            </div>
-            <div class="form-group">
-              <label>Caducidad</label>
-              <input type="date" [(ngModel)]="formData.rfec_expiration_date" class="date-input">
-            </div>
-          </div>
         </div>
         
         <div class="form-actions" style="margin-top: 1.5rem; text-align: right;">
@@ -133,11 +117,9 @@ export class DogDocsComponent {
   formData = {
     microchip: this.dog()?.microchip || '',
     pedigree: this.dog()?.pedigree || '',
-    rsce_license: this.dog()?.rsce_license || '',
-    rsce_expiration_date: this.dog()?.rsce_expiration_date ? this.dog()!.rsce_expiration_date!.split('T')[0] : '',
-    rsce_grade: this.dog()?.rsce_grade || '',
-    rfec_license: this.dog()?.rfec_license || '',
-    rfec_expiration_date: this.dog()?.rfec_expiration_date ? this.dog()!.rfec_expiration_date!.split('T')[0] : ''
+    rsce_license: this.dog()?.pivot?.rsce_license || '',
+    rsce_expiration_date: this.dog()?.pivot?.rsce_expiration_date ? this.dog()!.pivot!.rsce_expiration_date!.split('T')[0] : '',
+    rsce_grade: this.dog()?.pivot?.rsce_grade || ''
   };
   
   isSaving = false;
@@ -163,9 +145,7 @@ export class DogDocsComponent {
         pedigree: this.formData.pedigree || null,
         rsce_license: this.formData.rsce_license || null,
         rsce_expiration_date: this.formData.rsce_expiration_date || null,
-        rsce_grade: this.formData.rsce_grade || null,
-        rfec_license: this.formData.rfec_license || null,
-        rfec_expiration_date: this.formData.rfec_expiration_date || null
+        rsce_grade: this.formData.rsce_grade || null
       };
 
       const updated = await this.dogService.updateDog(currentDog.id, payload as any);

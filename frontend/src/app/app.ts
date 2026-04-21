@@ -1,4 +1,4 @@
-import { Component, signal, inject, OnInit, OnDestroy, Injector, effect } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy, Injector, effect, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 
@@ -16,9 +16,11 @@ import { NotificationService } from './services/notification.service';
 import { DogService } from './services/dog.service';
 import { environment } from '../environments/environment';
 
+import { CommonModule, DatePipe } from '@angular/common';
+
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -84,34 +86,60 @@ export class App implements OnInit, OnDestroy {
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
 
-  showLicenseWarning() {
-      if (this.isProfileRoute()) return false;
-      if (!this.authService.isLoggedIn()) return false;
-
-      const dogs = this.dogService.getDogs()();
-      if (!dogs || dogs.length === 0) return false;
+  licenseWarningsList = computed(() => {
+      const warnings: { type: string, name: string, dateStr: string, isExpired: boolean, daysLeft: number }[] = [];
+      
+      const user = this.authService.currentUserSignal();
+      // Only proceed if user is logged in
+      if (!user) return warnings;
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
       const warningDays = 15;
 
-      return dogs.some(dog => {
-          const checkWarning = (dateStr?: string) => {
-              if (!dateStr) return false;
-              const expirationDate = new Date(dateStr);
-              expirationDate.setHours(0,0,0,0);
-              const diffDays = Math.ceil((expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-              return diffDays <= warningDays;
-          };
+      const getWarningInfo = (dateStr: string | null | undefined, type: 'rfec'|'rsce', name: string) => {
+          if (!dateStr) return null;
+          const expirationDate = new Date(dateStr);
+          expirationDate.setHours(0,0,0,0);
+          const diffDiff = expirationDate.getTime() - today.getTime();
+          const diffDays = Math.ceil(diffDiff / (1000 * 60 * 60 * 24));
+          
+          if (diffDays <= warningDays) {
+              return { type, name, dateStr, isExpired: diffDays < 0, daysLeft: diffDays };
+          }
+          return null;
+      };
 
-          return checkWarning(dog.rsce_expiration_date) || checkWarning(dog.rfec_expiration_date);
-      });
+      const rfecWarn = getWarningInfo(user.rfec_expiration_date, 'rfec', 'Tu Licencia RFEC personal');
+      if (rfecWarn) warnings.push(rfecWarn);
+
+      const dogs = this.dogService.getDogs()();
+      if (dogs && dogs.length > 0) {
+          for (const dog of dogs) {
+             const rsceWarn = getWarningInfo(dog.pivot?.rsce_expiration_date, 'rsce', `Licencia RSCE de ${dog.name}`);
+             if (rsceWarn) warnings.push(rsceWarn);
+          }
+      }
+
+      return warnings;
+  });
+
+  showLicenseWarning() {
+      if (this.isProfileRoute()) return false;
+      return this.licenseWarningsList().length > 0;
   }
+
+  hasRfecWarning = computed(() => this.licenseWarningsList().some(w => w.type === 'rfec'));
+  hasRsceWarning = computed(() => this.licenseWarningsList().some(w => w.type === 'rsce'));
 
   goToProfile() {
       this.router.navigate(['/perfil']);
-      this.isWarningMinimized.set(false); // reset state when going to profile
+      this.isWarningMinimized.set(false);
+  }
+
+  goToDogsManagement() {
+      this.router.navigate(['/gestionar-perros']);
+      this.isWarningMinimized.set(false);
   }
 
   minimizeWarning() {

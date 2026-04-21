@@ -27,6 +27,8 @@ class User extends Authenticatable
         'google_id',
         'points',
         'reset_token',
+        'rfec_license',
+        'rfec_expiration_date',
     ];
 
     /**
@@ -50,6 +52,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'rfec_license' => 'encrypted',
+            'rfec_expiration_date' => 'encrypted',
         ];
     }
     /**
@@ -57,7 +61,7 @@ class User extends Authenticatable
      */
     public function dogs()
     {
-        return $this->belongsToMany(Dog::class)->withPivot('is_primary_owner');
+        return $this->belongsToMany(Dog::class)->withPivot('is_primary_owner', 'rsce_license', 'rsce_expiration_date', 'rsce_grade', 'sociability_test_passed');
     }
 
     /**

@@ -10,7 +10,7 @@
 
 .profile-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 30px;
     padding: 3rem 2rem;
     background: linear-gradient(180deg, rgba(240,244,248,1) 0%, rgba(255,255,255,1) 100%);
@@ -79,6 +79,11 @@
 
 .camera-icon {
     font-size: 18px;
+}
+
+.profile-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .profile-info h2 {
@@ -194,6 +199,149 @@
 .role-badge.member {
     background-color: #e8f5e9;
     color: #2e7d32;
+}
+
+/* RFEC License Styling */
+.rfec-card {
+    margin-top: 1.5rem;
+    display: inline-block;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-left: 4px solid var(--primary-color, #10b981);
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+    min-width: 320px;
+    max-width: 100%;
+}
+
+.rfec-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+    font-size: 1rem;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.rfec-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.rfec-data {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rfec-data-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rfec-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    min-width: 80px;
+}
+
+.rfec-badge {
+    background: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    color: #334155;
+    border: 1px solid #e2e8f0;
+    min-width: 130px;
+    display: inline-block;
+}
+
+.rfec-edit-btn {
+    align-self: flex-end;
+    margin-bottom: 4px;
+}
+
+.rfec-edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rfec-input-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.rfec-input-row .input-icon {
+    position: absolute;
+    left: 12px;
+    color: #94a3b8;
+    font-size: 1.1rem;
+}
+
+.rfec-input {
+    width: 100%;
+    padding: 10px 10px 10px 40px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    color: #334155;
+    background: white;
+    transition: all 0.2s;
+}
+
+.rfec-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.rfec-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.rfec-btn-save {
+    flex: 1;
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.rfec-btn-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.rfec-btn-cancel {
+    flex: 1;
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #64748b;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.rfec-btn-cancel:hover {
+    background: #f1f5f9;
+}
+
+.rfec-section {
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .dogs-section {
@@ -577,9 +725,14 @@
 
     .profile-header {
         flex-direction: column;
+        align-items: center;
         text-align: center;
         gap: 15px;
         padding: 2rem 1.5rem;
+    }
+
+    .name-display {
+        justify-content: center;
     }
 
     .profile-avatar {
@@ -589,6 +742,24 @@
 
     .profile-info h2 {
         font-size: 1.4rem;
+    }
+
+    .rfec-card {
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+        text-align: left;
+    }
+
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .section-header .btn-primary {
+        width: 100%;
+        text-align: center;
     }
 
     .add-dog-form {

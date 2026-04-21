@@ -14,6 +14,8 @@ export interface User {
     email_verified_at?: string;
     created_at?: string;
     updated_at?: string;
+    rfec_license?: string;
+    rfec_expiration_date?: string;
     // Compatibility fields
     uid?: number; // alias for id
     displayName?: string; // alias for name
@@ -166,11 +168,17 @@ export class AuthService {
         return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/delete`, {}));
     }
 
-    async updateProfile(name: string, photo?: File): Promise<void> {
+    async updateProfile(name: string, photo?: File, rfec_license?: string, rfec_expiration_date?: string): Promise<void> {
         const formData = new FormData();
         formData.append('name', name);
         if (photo) {
             formData.append('photo', photo);
+        }
+        if (rfec_license !== undefined) {
+            formData.append('rfec_license', rfec_license);
+        }
+        if (rfec_expiration_date !== undefined) {
+            formData.append('rfec_expiration_date', rfec_expiration_date);
         }
 
         // The server was occasionally blocking PUT/DELETE, so the backend was updated to explicitly expect POST.

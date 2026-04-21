@@ -15,12 +15,7 @@ class Dog extends Model
         'name',
         'breed',
         'birth_date',
-        'rsce_license',
-        'rsce_expiration_date',
-        'rsce_grade',
         'rsce_category',
-        'rfec_license',
-        'rfec_expiration_date',
         'microchip',
         'pedigree',
         'photo_url',
@@ -32,10 +27,6 @@ class Dog extends Model
     ];
 
     protected $casts = [
-        'rsce_license' => 'encrypted',
-        'rsce_expiration_date' => 'encrypted',
-        'rfec_license' => 'encrypted',
-        'rfec_expiration_date' => 'encrypted',
         'microchip' => 'encrypted',
         'pedigree' => 'encrypted',
         'has_previous_injuries' => 'boolean',
@@ -45,7 +36,7 @@ class Dog extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class)->withPivot('is_primary_owner');
+        return $this->belongsToMany(User::class)->withPivot('is_primary_owner', 'rsce_license', 'rsce_expiration_date', 'rsce_grade', 'sociability_test_passed');
     }
 
     public function reservations()
@@ -102,10 +93,6 @@ class Dog extends Model
         if (!$isOwner) {
             unset($array['microchip']);
             unset($array['pedigree']);
-            unset($array['rsce_license']);
-            unset($array['rsce_expiration_date']);
-            unset($array['rfec_license']);
-            unset($array['rfec_expiration_date']);
         }
 
         return $array;

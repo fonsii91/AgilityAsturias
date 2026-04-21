@@ -1,109 +1,158 @@
 @if (authService.userProfileSignal(); as user) {
-  <div class="perfil-container">
-    <div class="profile-header fade-in">
-      <div class="avatar-container">
-        @if (isUploadingPhoto()) {
-          <div class="upload-overlay">
-            <span class="material-icons-outlined spin-icon">sync</span>
-          </div>
-        }
-        <img [src]="previewUrl || user.photoURL || 'assets/default-user.png'" alt="Avatar"
-          class="profile-avatar clickable-image" referrerpolicy="no-referrer"
-          [style.border-color]="clubTheme.accent"
-          (click)="openImageModal(previewUrl || user.photoURL || 'assets/default-user.png')">
-          <label class="camera-btn" title="Cambiar foto" [style.background-color]="clubTheme.primary">
-            <span class="material-icons-outlined camera-icon">photo_camera</span>
-            <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
-          </label>
-        </div>
-        <div class="profile-info">
-          <div class="name-edit-container">
-            @if (!isEditingName()) {
-              <div class="name-display">
-                <h2 [style.color]="clubTheme.primary">{{ user.displayName }}</h2>
-                <button class="btn-icon-edit" (click)="toggleEditName()" title="Editar nombre">
-                  <span class="material-icons-outlined">edit</span>
-                </button>
-              </div>
-            }
-            @if (isEditingName()) {
-              <div class="name-input-group">
-                <input type="text" [(ngModel)]="editedName" (keyup.enter)="saveName()" class="edit-name-input" [style.border-color]="clubTheme.primary">
-                <div class="edit-actions">
-                  <button class="btn-check" (click)="saveName()" [style.color]="'#22c55e'">
-                    <span class="material-icons">check_circle</span>
-                  </button>
-                  <button class="btn-cancel-edit" (click)="toggleEditName()" [style.color]="clubTheme.warn">
-                    <span class="material-icons">cancel</span>
-                  </button>
-                </div>
-              </div>
-            }
-          </div>
-          <p>{{ user.email }}</p>
-          <span class="role-badge" [ngClass]="user.role">{{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase) }}</span>
-        </div>
+<div class="perfil-container">
+  <div class="profile-header fade-in">
+    <div class="avatar-container">
+      @if (isUploadingPhoto()) {
+      <div class="upload-overlay">
+        <span class="material-icons-outlined spin-icon">sync</span>
       </div>
-      <div class="dogs-section slide-up">
-        <div class="section-header">
-          <h3 class="section-title"><span class="material-icons-outlined">pets</span> Mi Familia Canina</h3>
-          <button class="btn-primary" [routerLink]="['/gestionar-perros']" [style.background-color]="clubTheme.primary">
-            Gestionar Perros
+      }
+      <img [src]="previewUrl || user.photoURL || 'assets/default-user.png'" alt="Avatar"
+        class="profile-avatar clickable-image" referrerpolicy="no-referrer" [style.border-color]="clubTheme.accent"
+        (click)="openImageModal(previewUrl || user.photoURL || 'assets/default-user.png')">
+      <label class="camera-btn" title="Cambiar foto" [style.background-color]="clubTheme.primary">
+        <span class="material-icons-outlined camera-icon">photo_camera</span>
+        <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+      </label>
+    </div>
+    <div class="profile-info">
+      <div class="name-edit-container">
+        @if (!isEditingName()) {
+        <div class="name-display">
+          <h2 [style.color]="clubTheme.primary">{{ user.displayName }}</h2>
+          <button class="btn-icon-edit" (click)="toggleEditName()" title="Editar nombre">
+            <span class="material-icons-outlined">edit</span>
           </button>
         </div>
-        <p class="section-desc">Tus compañeros peludos vinculados a esta cuenta.</p>
-        <div class="dogs-grid">
-          @if (dogs().length === 0) {
-            <div class="empty-state">
-              <span class="material-icons-outlined empty-icon">sentiment_dissatisfied</span>
-              <p>Aún no has añadido ningún perro.</p>
-            </div>
-          }
-          @for (dog of dogs(); track dog) {
-            <div class="glass-card dog-card" (click)="openFicha(dog)" title="Ver Ficha de {{dog.name}}">
-              <div class="dog-card-content">
-                <div class="dog-icon-container">
-                  @if (dog.photo_url) {
-                    <img [src]="dog.photo_url" alt="{{ dog.name }}"
-                      class="dog-avatar clickable-image" referrerpolicy="no-referrer"
-                      [style.border-color]="clubTheme.accent"
-                      (click)="openImageModal(dog.photo_url); $event.stopPropagation()">
-                  }
-                  @if (!dog.photo_url) {
-                    <div class="dog-icon-placeholder" [style.color]="clubTheme.primary">
-                      <span class="material-icons">pets</span>
-                    </div>
-                  }
-                </div>
-                <div class="dog-info">
-                  <span class="dog-name">{{ dog.name }}</span>
-                  @if (dog.breed) {
-                    <span class="dog-breed">{{ dog.breed }}</span>
-                  }
-                </div>
-                <div class="dog-action-icon">
-                  <span class="material-icons-outlined" [style.color]="clubTheme.primary">arrow_forward</span>
-                </div>
-              </div>
-            </div>
-          }
+        }
+        @if (isEditingName()) {
+        <div class="name-input-group">
+          <input type="text" [(ngModel)]="editedName" (keyup.enter)="saveName()" class="edit-name-input"
+            [style.border-color]="clubTheme.primary">
+          <div class="edit-actions">
+            <button class="btn-check" (click)="saveName()" [style.color]="'#22c55e'">
+              <span class="material-icons">check_circle</span>
+            </button>
+            <button class="btn-cancel-edit" (click)="toggleEditName()" [style.color]="clubTheme.warn">
+              <span class="material-icons">cancel</span>
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+      <p>{{ user.email }}</p>
+      <span class="role-badge" [ngClass]="user.role">{{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase)
+        }}</span>
+
+    </div>
+  </div>
+
+  <div class="rfec-section slide-up">
+    <div class="section-header" style="margin-bottom: 1rem;">
+      <h3 class="section-title"><span class="material-icons-outlined">card_membership</span> Licencias Federativas</h3>
+    </div>
+    <div class="rfec-card" [style.border-left-color]="clubTheme.primary">
+      <div class="rfec-header">
+        <span class="material-icons-outlined" [style.color]="clubTheme.primary">badge</span>
+        Licencia RFEC (Caza)
+      </div>
+
+      @if (!isEditingRfec()) {
+      <div class="rfec-content">
+        <div class="rfec-data">
+          <div class="rfec-data-row">
+            <span class="rfec-label">Nº Licencia:</span>
+            <span class="rfec-badge">{{ user.rfec_license || 'No vinculada' }}</span>
+          </div>
+          <div class="rfec-data-row">
+            <span class="rfec-label">Caducidad:</span>
+            <span class="rfec-badge">{{ user.rfec_expiration_date ? (user.rfec_expiration_date | date:'dd/MM/yyyy') :
+              '-' }}</span>
+          </div>
+        </div>
+        <button class="btn-icon-edit rfec-edit-btn" (click)="toggleEditRfec()" title="Editar RFEC">
+          <span class="material-icons-outlined">edit</span>
+        </button>
+      </div>
+      } @else {
+      <div class="rfec-edit-form">
+        <div class="rfec-input-row">
+          <span class="material-icons-outlined input-icon">badge</span>
+          <input type="text" [(ngModel)]="rfecData.license" placeholder="Obligatorio si compites" class="rfec-input"
+            [style.border-color]="clubTheme.primary">
+        </div>
+        <div class="rfec-input-row">
+          <span class="material-icons-outlined input-icon">event</span>
+          <input type="date" [(ngModel)]="rfecData.expiration" class="rfec-input"
+            [style.border-color]="clubTheme.primary">
+        </div>
+        <div class="rfec-actions">
+          <button class="rfec-btn-save" (click)="saveRfec()" [style.background-color]="clubTheme.primary">Guardar
+            Cambios</button>
+          <button class="rfec-btn-cancel" (click)="toggleEditRfec()">Cancelar</button>
         </div>
       </div>
-      <!-- Image Modal -->
-      @if (imageModalOpen()) {
-        <div class="modal-overlay image-modal-overlay" (click)="closeImageModal()">
-          <button class="close-image-btn" (click)="closeImageModal()">&times;</button>
-          @if (selectedImage()) {
-            <img [src]="selectedImage()" class="full-size-image" (click)="$event.stopPropagation()">
-          }
-        </div>
       }
     </div>
-  }
-
-    <!-- Ficha Perro Modal -->
-    @if (selectedDogFicha()) {
-      <app-ficha-perro [dog]="selectedDogFicha()!" [isOpen]="fichaModalOpen()"
-        (close)="closeFicha()">
-      </app-ficha-perro>
+  </div>
+  <div class="dogs-section slide-up">
+    <div class="section-header">
+      <h3 class="section-title"><span class="material-icons-outlined">pets</span> Mi Familia Canina</h3>
+      <button class="btn-primary" [routerLink]="['/gestionar-perros']" [style.background-color]="clubTheme.primary">
+        Gestionar Perros
+      </button>
+    </div>
+    <p class="section-desc">Tus compañeros peludos vinculados a esta cuenta.</p>
+    <div class="dogs-grid">
+      @if (dogs().length === 0) {
+      <div class="empty-state">
+        <span class="material-icons-outlined empty-icon">sentiment_dissatisfied</span>
+        <p>Aún no has añadido ningún perro.</p>
+      </div>
+      }
+      @for (dog of dogs(); track dog) {
+      <div class="glass-card dog-card" (click)="openFicha(dog)" title="Ver Ficha de {{dog.name}}">
+        <div class="dog-card-content">
+          <div class="dog-icon-container">
+            @if (dog.photo_url) {
+            <img [src]="dog.photo_url" alt="{{ dog.name }}" class="dog-avatar clickable-image"
+              referrerpolicy="no-referrer" [style.border-color]="clubTheme.accent"
+              (click)="openImageModal(dog.photo_url); $event.stopPropagation()">
+            }
+            @if (!dog.photo_url) {
+            <div class="dog-icon-placeholder" [style.color]="clubTheme.primary">
+              <span class="material-icons">pets</span>
+            </div>
+            }
+          </div>
+          <div class="dog-info">
+            <span class="dog-name">{{ dog.name }}</span>
+            @if (dog.breed) {
+            <span class="dog-breed">{{ dog.breed }}</span>
+            }
+          </div>
+          <div class="dog-action-icon">
+            <span class="material-icons-outlined" [style.color]="clubTheme.primary">arrow_forward</span>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  <!-- Image Modal -->
+  @if (imageModalOpen()) {
+  <div class="modal-overlay image-modal-overlay" (click)="closeImageModal()">
+    <button class="close-image-btn" (click)="closeImageModal()">&times;</button>
+    @if (selectedImage()) {
+    <img [src]="selectedImage()" class="full-size-image" (click)="$event.stopPropagation()">
     }
+  </div>
+  }
+</div>
+}
+
+<!-- Ficha Perro Modal -->
+@if (selectedDogFicha()) {
+<app-ficha-perro [dog]="selectedDogFicha()!" [isOpen]="fichaModalOpen()" (close)="closeFicha()">
+</app-ficha-perro>
+}

@@ -95,18 +95,46 @@
       </div>
       <div class="warning-body">
         <h3>Atención Requerida</h3>
-        <p>
-          Uno o más de tus perros tienen la <strong>licencia de agility caducada o a punto de caducar</strong> (menos de 15 días).
-        </p>
-        <p class="warning-subtitle">
-          Actualiza la fecha de caducidad en el perfil correspondiente para mantenerte al día y continuar usando la aplicación de forma normal.
-        </p>
+        <p style="margin-bottom: 0.5rem">Se han detectado expiraciones en tu equipo:</p>
+        
+        <ul style="list-style: none; padding: 0; margin-bottom: 1rem; border-radius: 8px; border: 1px solid #fee2e2; background: #fef2f2; overflow: hidden;">
+          @for (warn of licenseWarningsList(); track warn.name) {
+            <li style="padding: 10px; border-bottom: 1px solid #fee2e2; font-size: 0.9rem;">
+              <div style="font-weight: bold; color: #b91c1c; display: flex; align-items: center; gap: 6px;">
+                @if (warn.type === 'rfec') {
+                  <span class="material-icons-outlined" style="font-size: 1.1rem">card_membership</span>
+                } @else {
+                  <span class="material-icons-outlined" style="font-size: 1.1rem">pets</span>
+                }
+                {{ warn.name }}
+              </div>
+              <div style="color: #7f1d1d; display: flex; justify-content: space-between; margin-top: 4px; padding-left: 24px;">
+                <span>Válida hasta: {{ warn.dateStr | date:'dd/MM/yyyy' }}</span>
+                <span>
+                  @if (warn.isExpired) {
+                    <strong style="color: #dc2626; background: #fee2e2; padding: 2px 6px; border-radius: 4px;">¡CADUCADA!</strong>
+                  } @else {
+                    <span style="color: #ea580c; font-weight: 600;">En {{ warn.daysLeft }} días</span>
+                  }
+                </span>
+              </div>
+            </li>
+          }
+        </ul>
       </div>
-      <div class="warning-actions">
-        <button class="btn-warning-action" (click)="goToProfile()">
-          <span>Actualizar ahora</span>
-          <span class="material-icons">arrow_forward</span>
-        </button>
+      <div class="warning-actions" style="display: flex; flex-direction: column; gap: 8px;">
+        @if (hasRfecWarning()) {
+          <button class="btn-warning-action" (click)="goToProfile()" style="width: 100%; justify-content: center; background: #dc2626;">
+            <span>Renovar Licencia (Mi Perfil)</span>
+            <span class="material-icons">person</span>
+          </button>
+        }
+        @if (hasRsceWarning()) {
+          <button class="btn-warning-action" (click)="goToDogsManagement()" style="width: 100%; justify-content: center; background: #ea580c;">
+            <span>Renovar RSCE (Mis Perros)</span>
+            <span class="material-icons">pets</span>
+          </button>
+        }
       </div>
     </div>
   </div>

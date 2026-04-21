@@ -5,7 +5,7 @@
     @if (selectedDog()) {
     <div class="print-dog-info">
       <p><strong>Perro:</strong> {{ selectedDog()?.name }} ({{ selectedDog()?.breed || 'Mestizo' }})</p>
-      <p><strong>Licencia RSCE:</strong> {{ selectedDog()?.rsce_license || 'No registrada' }}</p>
+      <p><strong>Licencia RSCE:</strong> {{ selectedDog()?.pivot?.rsce_license || 'No registrada' }}</p>
       <p><strong>Microchip:</strong> {{ selectedDog()?.microchip || 'No registrado' }}</p>
     </div>
     }
@@ -46,7 +46,7 @@
     </div>
     } @else {
 
-    @if (!selectedDog()?.rsce_license) {
+    @if (!selectedDog()?.pivot?.rsce_license) {
     <div class="empty-state no-print" style="background-color: #fff1f2; border: 1px solid #fecdd3;">
       <span class="material-icons-outlined empty-icon" style="color: #fda4af;">lock</span>
       <p style="color: #9f1239; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">Función Bloqueada</p>

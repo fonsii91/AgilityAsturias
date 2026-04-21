@@ -141,7 +141,7 @@ export class RsceTrackerComponent implements OnInit {
   }
 
   currentGrade(): string {
-    return this.selectedDog()?.rsce_grade || '0';
+    return this.selectedDog()?.pivot?.rsce_grade || '0';
   }
 
   async upgradeToGrade1() {
@@ -153,7 +153,7 @@ export class RsceTrackerComponent implements OnInit {
       const updated = await this.dogService.updateDog(dog.id, { 
         name: dog.name, 
         rsce_grade: '1' 
-      });
+      } as any);
       
       confetti({
           particleCount: 200,
@@ -193,7 +193,7 @@ export class RsceTrackerComponent implements OnInit {
       const updated = await this.dogService.updateDog(dog.id, { 
         name: dog.name, 
         rsce_grade: next 
-      });
+      } as any);
       
       confetti({
           particleCount: 200,
@@ -231,7 +231,7 @@ export class RsceTrackerComponent implements OnInit {
     
     if (!dog || tracks.length === 0) return;
 
-    const grade = dog.rsce_grade || '0'; // Default to 0 if not set
+    const grade = dog.pivot?.rsce_grade || '0'; // Default to 0 if not set
     const category = dog.rsce_category || 'M';
 
     if (grade === '1') {

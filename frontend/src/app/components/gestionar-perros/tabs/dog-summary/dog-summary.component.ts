@@ -102,11 +102,19 @@ export class DogSummaryComponent {
     const currentDog = this.dog();
     if (!currentDog) return 0;
     let completed = 0;
-    const fields = ['name', 'photo_url', 'breed', 'birth_date', 'microchip', 'pedigree', 'rsce_license', 'rsce_expiration_date', 'rfec_license', 'rfec_expiration_date'];
-    fields.forEach(field => {
+    const directFields = ['name', 'photo_url', 'breed', 'birth_date', 'microchip', 'pedigree'];
+    const pivotFields = ['rsce_license', 'rsce_expiration_date'];
+    
+    directFields.forEach(field => {
       if ((currentDog as any)[field]) completed++;
     });
-    return Math.round((completed / fields.length) * 100);
+    
+    pivotFields.forEach(field => {
+      if ((currentDog.pivot as any)?.[field]) completed++;
+    });
+
+    const totalFields = directFields.length + pivotFields.length;
+    return Math.round((completed / totalFields) * 100);
   }
 
   async saveChanges() {

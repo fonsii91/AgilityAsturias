@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.1.18",
+    "date": "2026-04-21",
+    "features": [
+      "¡Información mucho más clara! Hemos rediseñado tu perfil de usuario separando elegantemente el apartado de tus Licencias Federativas para que tengas un control impecable de tu documentación.",
+      "A partir de ahora, si detectamos que alguna licencia va a caducar pronto, el sistema te avisará con un mensaje sumamente inteligente: te indicará exactamente de qué perro se trata (o si es tu propia licencia) acompañándolo de botones directos para que renueves tu papeleo en un solo clic."
+    ],
+    "bugfixes": [
+      "Hemos fortalecido el cerebro matemático del Seguimiento RSCE: ahora, aunque compartas el perfil de tu perro con otros miembros de tu familia, el sistema jamás se liará al calcular los puntos o ascensos si varios de vosotros intentáis gestionar su historial a la vez."
+    ]
+  },
+  {
     "version": "1.1.17",
     "date": "2026-04-21",
     "features": [
