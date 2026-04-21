@@ -9,7 +9,7 @@ export interface DogWorkload {
     intensity_rpe: number;
     jumped_max_height?: boolean;
     number_of_runs?: number;
-    status: 'confirmed' | 'pending_review';
+    status: 'confirmed' | 'pending_review' | 'auto_confirmed';
     is_staff_verified?: boolean;
     created_at?: string;
     updated_at?: string;
@@ -31,6 +31,8 @@ export interface AdminWorkloadStats {
     name: string;
     email: string;
     total_workloads: number;
+    manual_workloads: number;
+    auto_workloads: number;
     dogs_list: string[];
 }
 

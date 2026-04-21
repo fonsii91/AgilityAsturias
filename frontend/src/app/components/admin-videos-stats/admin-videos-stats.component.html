@@ -93,4 +93,32 @@
       }
     }
   }
+
+  @if (dailyHistory() && dailyHistory()!.length > 0) {
+    <div class="history-section" style="margin-top: 40px;">
+      <h3 style="color: var(--text-main); font-weight: 600; margin-bottom: 20px;">Historial Diario (03:00 AM)</h3>
+      <div class="table-overlay glass-effect" style="border-radius: 12px; overflow: hidden; background: var(--surface-card); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left;">
+          <thead style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+            <tr>
+              <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Fecha</th>
+              <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Local</th>
+              <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">En YouTube</th>
+              <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (day of dailyHistory(); track day.id) {
+              <tr style="border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s;">
+                <td style="padding: 15px 20px; font-weight: 500; color: var(--text-main);">{{ day.date | date:'dd/MM/yyyy' }}</td>
+                <td style="padding: 15px 20px; color: #0284c7; font-weight: 600;">{{ day.local_count }}</td>
+                <td style="padding: 15px 20px; color: #dc2626; font-weight: 600;">{{ day.youtube_count }}</td>
+                <td style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">{{ day.total_count }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
 </div>

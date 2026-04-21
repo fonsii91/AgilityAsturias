@@ -18,7 +18,9 @@
           <tr>
             <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Dueño Responsable</th>
             <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Email</th>
-            <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600; text-align: center;">Sesiones Confirmadas</th>
+            <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600; text-align: center;">Total Confirmadas</th>
+            <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600; text-align: center;">Manuales</th>
+            <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600; text-align: center;">Automáticas</th>
             <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Perros Asignados</th>
           </tr>
         </thead>
@@ -37,6 +39,16 @@
                   {{ stat.total_workloads }}
                 </span>
               </td>
+              <td style="padding: 15px 20px; text-align: center;">
+                <span style="background: #dcfce7; color: #15803d; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">
+                  {{ stat.manual_workloads }}
+                </span>
+              </td>
+              <td style="padding: 15px 20px; text-align: center;">
+                <span style="background: #f1f5f9; color: #475569; padding: 4px 12px; border-radius: 20px; font-weight: 700; font-size: 0.9rem;">
+                  {{ stat.auto_workloads }}
+                </span>
+              </td>
               <td style="padding: 15px 20px; color: var(--text-secondary);">
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                   @for (dog of stat.dogs_list; track dog) {
@@ -52,7 +64,7 @@
           
           @if (stats().length === 0) {
             <tr>
-              <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-light);">
+              <td colspan="6" style="padding: 40px; text-align: center; color: var(--text-light);">
                 <span class="material-icons" style="font-size: 48px; color: #cbd5e1; margin-bottom: 10px;">inbox</span>
                 <p style="margin: 0;">Todavía ningún usuario ha registrado sesiones reales de salud.</p>
               </td>

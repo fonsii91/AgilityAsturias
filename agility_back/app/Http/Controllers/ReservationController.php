@@ -19,9 +19,10 @@ class ReservationController extends Controller
             $reservations = Reservation::with([
                 'user', 
                 'timeSlot', 
-                'dog.users:id',
-                'dog.workloads' => function($q) {
-                    $q->where('date', '>=', now()->subDays(28))->where('status', 'confirmed');
+                'dog' => function($query) {
+                    $query->with(['workloads' => function($q) {
+                        $q->where('date', '>=', now()->subDays(28))->whereIn('status', ['confirmed', 'auto_confirmed']);
+                    }]);
                 }
             ])
             ->where('status', 'active')

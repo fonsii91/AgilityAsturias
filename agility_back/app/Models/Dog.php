@@ -123,7 +123,7 @@ class Dog extends Model
         // Fetch workloads for the last 28 days that are confirmed
         // Se eager load si no están previamente cargadas para evitar N+1 si procesamos multiples perros
         $workloads = $this->workloads()
-            ->where('status', 'confirmed')
+            ->whereIn('status', ['confirmed', 'auto_confirmed'])
             ->where('date', '>=', $twentyEightDaysAgo)
             ->get();
 
@@ -159,7 +159,7 @@ class Dog extends Model
         }
 
         // --- CORRECCIÓN DE ONBOARDING (COLD START) ---
-        $firstWorkloadDate = $this->workloads()->where('status', 'confirmed')->orderBy('date', 'asc')->value('date');
+        $firstWorkloadDate = $this->workloads()->whereIn('status', ['confirmed', 'auto_confirmed'])->orderBy('date', 'asc')->value('date');
         $activeWeeks = 4;
         
         if ($firstWorkloadDate) {

@@ -26,6 +26,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 })
 export class AdminVideosStatsComponent implements OnInit {
   stats = signal<any>(null);
+  dailyHistory = signal<any[] | null>(null);
   loading = signal<boolean>(true);
   displayedColumns: string[] = ['title', 'dog_name', 'date', 'youtube_error', 'actions'];
 
@@ -40,15 +41,37 @@ export class AdminVideosStatsComponent implements OnInit {
 
   loadStats() {
     this.loading.set(true);
+    
+    // Load current stats
     this.videoService.getAdminVideoStats().subscribe({
       next: (data) => {
         this.stats.set(data);
-        this.loading.set(false);
+        if (this.dailyHistory() !== null) {
+          this.loading.set(false);
+        }
       },
       error: (err) => {
         console.error('Error loading video stats', err);
         this.toastService.error('Error al cargar las estadísticas de los vídeos.');
         this.loading.set(false);
+      }
+    });
+
+    // Load daily history
+    this.videoService.getAdminDailyVideoStats().subscribe({
+      next: (data) => {
+        this.dailyHistory.set(data);
+        if (this.stats() !== null) {
+          this.loading.set(false);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading daily history', err);
+        // Silently fail history so it doesn't block main stats
+        this.dailyHistory.set([]);
+        if (this.stats() !== null) {
+          this.loading.set(false);
+        }
       }
     });
   }

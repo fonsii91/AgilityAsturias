@@ -111,6 +111,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Videos (Admin)
         Route::get('/admin/videos/stats', [VideoController::class, 'stats']);
+        Route::get('/admin/videos/daily-history', [VideoController::class, 'dailyHistory']);
         Route::get('/admin/deleted-videos', [VideoController::class, 'deletedHistory']);
         Route::post('/admin/videos/{id}/retry', [VideoController::class, 'retryUpload']);
 

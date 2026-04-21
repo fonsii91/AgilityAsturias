@@ -293,6 +293,12 @@ class VideoController extends Controller
         ]);
     }
 
+    public function dailyHistory()
+    {
+        $history = \App\Models\DailyVideoStat::orderBy('date', 'desc')->take(30)->get();
+        return response()->json($history);
+    }
+
     public function retryUpload($id)
     {
         $video = Video::findOrFail($id);

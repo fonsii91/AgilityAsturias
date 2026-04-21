@@ -52,6 +52,7 @@ class DogWorkloadController extends Controller
         
         // Auto-generate pending workloads for unverified competitions
         $unverifiedCompetitions = \App\Models\Competition::where('attendance_verified', false)
+            ->where('tipo', 'competicion')
             ->where('fecha_evento', '<=', $today)
             ->whereHas('attendingDogs', function($q) use ($dog) {
                 $q->where('dogs.id', $dog->id);
@@ -206,7 +207,7 @@ class DogWorkloadController extends Controller
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
-        $workloads = \App\Models\DogWorkload::where('status', 'confirmed')
+        $workloads = \App\Models\DogWorkload::whereIn('status', ['confirmed', 'auto_confirmed'])
             ->where('date', '>=', \Carbon\Carbon::now()->subDays(28))
             ->with(['dog.users', 'user']) // eager load dog owners and workload user
             ->get();
@@ -228,11 +229,18 @@ class DogWorkloadController extends Controller
                         'name' => $user->name,
                         'email' => $user->email,
                         'total_workloads' => 0,
+                        'manual_workloads' => 0,
+                        'auto_workloads' => 0,
                         'dogs' => []
                     ];
                 }
 
                 $statsByUser[$id]['total_workloads']++;
+                if ($w->status === 'auto_confirmed') {
+                    $statsByUser[$id]['auto_workloads']++;
+                } else {
+                    $statsByUser[$id]['manual_workloads']++;
+                }
 
                 if ($w->dog) {
                     $statsByUser[$id]['dogs'][$w->dog->id] = $w->dog->name;

@@ -64,6 +64,10 @@ export class VideoService {
         return this.http.get<any>(`${environment.apiUrl}/admin/videos/stats`);
     }
 
+    getAdminDailyVideoStats(): Observable<any[]> {
+        return this.http.get<any[]>(`${environment.apiUrl}/admin/videos/daily-history`);
+    }
+
     getDeletedVideosHistory(page: number = 1): Observable<any> {
         return this.http.get<any>(`${environment.apiUrl}/admin/deleted-videos?page=${page}`);
     }

@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.1.17",
+    "date": "2026-04-21",
+    "features": [
+      "¡Nuevos perfiles caninos! Hemos remodelado por completo la pantalla de gestión de tus peludos para que sea muchísimo más rápida y fácil de usar, organizando toda su información mediante cómodas pestañas.",
+      "Mejorada la videoteca: ahora incluimos prácticos contadores numéricos en las pestañas que te chivarán cuántos vídeos hay grabados en formato vertical y horizontal antes de que entres a buscarlos.",
+      "Te quitamos trabajo de encima: ahora si te olvidas de indicar el cansancio de un entrenamiento al que has asistido, el sistema lo rellenará automáticamente por ti tras 7 días para mantener al día la salud deportiva del perro sin que tengas que molestarte."
+    ]
+  },
+  {
     "version": "1.1.16",
     "date": "2026-04-21",
     "features": [
