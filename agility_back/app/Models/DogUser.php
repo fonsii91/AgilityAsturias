@@ -10,8 +10,8 @@ class DogUser extends Pivot
 
     protected $casts = [
         'is_primary_owner' => 'boolean',
-        'rsce_license' => 'encrypted',
-        'rsce_expiration_date' => 'encrypted',
+        'rsce_license' => \App\Casts\GracefulEncryption::class,
+        'rsce_expiration_date' => \App\Casts\GracefulEncryption::class,
         'sociability_test_passed' => 'boolean',
     ];
 }

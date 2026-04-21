@@ -52,8 +52,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'rfec_license' => 'encrypted',
-            'rfec_expiration_date' => 'encrypted',
+            'rfec_license' => \App\Casts\GracefulEncryption::class,
+            'rfec_expiration_date' => \App\Casts\GracefulEncryption::class,
         ];
     }
     /**

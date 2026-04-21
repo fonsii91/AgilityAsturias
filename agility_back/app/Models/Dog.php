@@ -27,8 +27,8 @@ class Dog extends Model
     ];
 
     protected $casts = [
-        'microchip' => 'encrypted',
-        'pedigree' => 'encrypted',
+        'microchip' => \App\Casts\GracefulEncryption::class,
+        'pedigree' => \App\Casts\GracefulEncryption::class,
         'has_previous_injuries' => 'boolean',
         'weight_kg' => 'decimal:2',
         'height_cm' => 'decimal:2',
