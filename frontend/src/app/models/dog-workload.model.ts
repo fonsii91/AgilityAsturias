@@ -24,6 +24,7 @@ export interface AcwrData {
     calibration_days: number;
     is_calibrating: boolean;
     recent_history: DogWorkload[];
+    status_color: string;
 }
 
 export interface AdminWorkloadStats {

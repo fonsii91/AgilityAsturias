@@ -18,6 +18,7 @@ import { ToastService } from '../../../services/toast.service';
 export class SaludDeportivaComponent implements OnInit {
   dogs = signal<Dog[]>([]);
   selectedDogId = signal<number | null>(null);
+  // Force recompile to pick up AcwrData status_color interface change
   acwrData = signal<AcwrData | null>(null);
   pendingReviews = signal<DogWorkload[]>([]);
   isLoading = signal<boolean>(false);
@@ -27,6 +28,12 @@ export class SaludDeportivaComponent implements OnInit {
     if (!id) return 'Tu perro';
     const dog = this.dogs().find(d => d.id === id);
     return dog ? dog.name : 'Tu perro';
+  });
+
+  selectedDog = computed(() => {
+    const id = this.selectedDogId();
+    if (!id) return null;
+    return this.dogs().find(d => d.id === id) || null;
   });
 
   // Formularios manuales
@@ -188,6 +195,18 @@ export class SaludDeportivaComponent implements OnInit {
     if (level <= 3) return 'pets'; 
     if (level <= 7) return 'directions_run'; 
     return 'local_fire_department'; 
+  }
+
+  getStatusText(color: string | undefined): string {
+    if (!color) return 'Analizando...';
+    switch(color) {
+      case 'blue': return 'Desentrenamiento';
+      case 'green': return 'Estado Óptimo';
+      case 'yellow': return 'Sobrecarga Ligera';
+      case 'red': return 'Riesgo de Lesión';
+      case 'gray': return 'Calibrando (Faltan datos)';
+      default: return 'Desconocido';
+    }
   }
 
   translateSourceType(type: string): string {
