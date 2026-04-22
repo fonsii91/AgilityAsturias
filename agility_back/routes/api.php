@@ -14,6 +14,7 @@ use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RsceTrackController;
+use App\Http\Controllers\PersonalEventController;
 use Illuminate\Http\Request; // Added for the closure route
 
 /*
@@ -196,6 +197,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/competitions/{id}/attend', [CompetitionController::class, 'attend']);
         Route::post('/competitions/{id}/unattend', [CompetitionController::class, 'unattend']);
         Route::get('/competitions/{id}/attendees', [CompetitionController::class, 'getAttendees']);
+
+        // Personal Events
+        Route::get('/personal-events', [PersonalEventController::class, 'index']);
+        Route::post('/personal-events', [PersonalEventController::class, 'store']);
+        Route::put('/personal-events/{id}', [PersonalEventController::class, 'update']);
+        Route::delete('/personal-events/{id}', [PersonalEventController::class, 'destroy']);
 
     });
 

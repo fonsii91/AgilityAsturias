@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { CompetitionService } from '../../services/competition.service';
 import { AuthService } from '../../services/auth.service';
 import { DogService } from '../../services/dog.service';
+import { PersonalEventService } from '../../services/personal-event.service';
+import { PersonalEvent } from '../../models/personal-event.model';
+import { FormsModule } from '@angular/forms';
 
 interface CalendarDay {
     date: Date;
@@ -15,12 +18,13 @@ interface CalendarDay {
     deadlines: any[];
     competitions: any[]; // List of all competitions on this day
     competitionDetails?: any; // Primary/First competition for backward compat
+    personalEvents: PersonalEvent[]; // Lista de eventos personales
 }
 
 @Component({
     selector: 'app-calendario',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, FormsModule],
     templateUrl: './calendario.component.html',
     styleUrls: ['./calendario.component.css']
 })
@@ -32,18 +36,21 @@ export class CalendarioComponent implements AfterViewInit {
     ];
 
     private competitions: Signal<any[]>;
+    private personalEventsSignal: Signal<PersonalEvent[]>;
+    personalEventService = inject(PersonalEventService);
 
     // Computed signal for calendar data
     months = computed(() => {
         const monthsData = [];
-        // Tracks competitions signal
+        // Tracks signals
         const comps = this.competitions();
+        const persEvents = this.personalEventsSignal();
         const year = this.currentYear();
 
         for (let i = 0; i < 12; i++) {
             monthsData.push({
                 name: this.monthNames[i],
-                days: this.getDaysInMonth(i, year, comps)
+                days: this.getDaysInMonth(i, year, comps, persEvents)
             });
         }
         return monthsData;
@@ -57,6 +64,7 @@ export class CalendarioComponent implements AfterViewInit {
     selectedCompetition: any = null;
     selectedCompetitions: any[] = []; // List to show in modal if multiple
     selectedDeadlines: any[] = [];
+    selectedPersonalEvents: PersonalEvent[] = []; // Personal events for the selected day
     isModalOpen = false;
     isHelpModalOpen = false;
     activeModalTab: 'info' | 'asistencia' = 'info'; // Tab state
@@ -76,6 +84,13 @@ export class CalendarioComponent implements AfterViewInit {
 
     constructor(private competitionService: CompetitionService) {
         this.competitions = this.competitionService.getCompetitions();
+        this.personalEventsSignal = this.personalEventService.getEvents();
+        
+        // Load personal events and dogs if user is logged in
+        if (this.authService.currentUserSignal()) {
+            this.personalEventService.loadEvents();
+            this.dogService.loadUserDogs();
+        }
     }
 
     ngAfterViewInit() {
@@ -95,21 +110,26 @@ export class CalendarioComponent implements AfterViewInit {
     openModal(day: CalendarDay) {
         this.selectedCompetitions = day.competitions || [];
         this.selectedDeadlines = day.deadlines || [];
+        this.selectedPersonalEvents = day.personalEvents || [];
 
-        const totalItems = this.selectedCompetitions.length + this.selectedDeadlines.length;
+        const totalItems = this.selectedCompetitions.length + this.selectedDeadlines.length + this.selectedPersonalEvents.length;
 
-        if (totalItems === 1) {
+        if (totalItems === 1 && this.selectedPersonalEvents.length === 0) {
             this.selectedCompetition = this.selectedCompetitions.length === 1
                 ? this.selectedCompetitions[0]
                 : this.selectedDeadlines[0];
             this.activeModalTab = 'info';
             this.resetAttendanceState();
+        } else if (totalItems === 1 && this.selectedPersonalEvents.length === 1) {
+            // Si solo hay 1 evento personal, abrimos directamente el modal de evento personal y no el modal general
+            this.openPersonalEventModal(undefined, this.selectedPersonalEvents[0]);
+            return;
         } else {
             this.selectedCompetition = null; // Show list if multiple items
         }
 
-        // Only open if there is something to show
-        if (totalItems > 0) {
+        // Only open general modal if there is something to show and it wasn't already handled (like a single personal event)
+        if (totalItems > 0 && !(totalItems === 1 && this.selectedPersonalEvents.length === 1)) {
             this.isModalOpen = true;
             document.body.style.overflow = 'hidden';
             if (this.authService.currentUserSignal()) {
@@ -146,7 +166,7 @@ export class CalendarioComponent implements AfterViewInit {
         this.selectedCompetition = null;
     }
 
-    getDaysInMonth(monthIndex: number, year: number, competitions: any[]): CalendarDay[] {
+    getDaysInMonth(monthIndex: number, year: number, competitions: any[], personalEvents: PersonalEvent[]): CalendarDay[] {
         const days: CalendarDay[] = [];
         const date = new Date(year, monthIndex, 1);
         const firstDayIndex = (date.getDay() + 6) % 7; // 0 = Mon, 6 = Sun
@@ -163,7 +183,8 @@ export class CalendarioComponent implements AfterViewInit {
                 isToday: false,
                 isAttending: false,
                 deadlines: [],
-                competitions: []
+                competitions: [],
+                personalEvents: []
             });
         }
 
@@ -197,6 +218,9 @@ export class CalendarioComponent implements AfterViewInit {
             // Check if this day is a registration deadline for any event(s)
             const deadlines = competitions.filter((c: any) => c.fechaLimite === dateString);
 
+            // Find ALL personal events for this day
+            const dailyPersonalEvents = personalEvents.filter(pe => pe.start_date && pe.start_date.startsWith(dateString));
+
             days.push({
                 date: new Date(date),
                 isCompetition: isCompetition,
@@ -207,7 +231,8 @@ export class CalendarioComponent implements AfterViewInit {
                 isAttending: isAttending,
                 deadlines: deadlines,
                 competitions: dailyCompetitions,
-                competitionDetails: dailyCompetitions[0] // Fallback
+                competitionDetails: dailyCompetitions[0], // Fallback
+                personalEvents: dailyPersonalEvents
             });
             date.setDate(date.getDate() + 1);
         }
@@ -392,5 +417,92 @@ export class CalendarioComponent implements AfterViewInit {
 
     closeImage() {
         this.isImageExpanded = false;
+    }
+
+    // --- Personal Events Logic ---
+    isPersonalEventModalOpen = false;
+    personalEventForm: Partial<PersonalEvent> = {
+        title: '',
+        type: 'veterinario',
+        start_date: '',
+        notes: ''
+    };
+    isEditingPersonalEvent = false;
+    isViewingPersonalEvent = false;
+
+    openPersonalEventModal(day?: CalendarDay, eventToEdit?: PersonalEvent) {
+        this.isPersonalEventModalOpen = true;
+        document.body.style.overflow = 'hidden';
+        
+        if (eventToEdit) {
+            this.isViewingPersonalEvent = true;
+            this.isEditingPersonalEvent = false;
+            this.personalEventForm = { ...eventToEdit };
+        } else {
+            this.isViewingPersonalEvent = false;
+            this.isEditingPersonalEvent = false;
+            this.personalEventForm = {
+                title: '',
+                type: 'veterinario',
+                start_date: day ? this.formatDateToIso(day.date) : this.formatDateToIso(new Date()),
+                notes: '',
+                dog_id: this.userDogs()?.length > 0 ? this.userDogs()[0].id : undefined
+            };
+        }
+    }
+
+    editPersonalEvent() {
+        this.isViewingPersonalEvent = false;
+        this.isEditingPersonalEvent = true;
+    }
+
+    closePersonalEventModal() {
+        this.isPersonalEventModalOpen = false;
+        this.isEditingPersonalEvent = false;
+        this.isViewingPersonalEvent = false;
+        document.body.style.overflow = 'auto';
+    }
+
+    async savePersonalEvent() {
+        if (!this.personalEventForm.dog_id || !this.personalEventForm.title || !this.personalEventForm.start_date || !this.personalEventForm.type) {
+            alert('Por favor, rellena todos los campos obligatorios.');
+            return;
+        }
+
+        try {
+            if (this.isEditingPersonalEvent && this.personalEventForm.id) {
+                await this.personalEventService.updateEvent(this.personalEventForm.id, this.personalEventForm);
+            } else {
+                await this.personalEventService.createEvent(this.personalEventForm as PersonalEvent);
+            }
+            this.closePersonalEventModal();
+        } catch (e) {
+            console.error('Error saving personal event:', e);
+            alert('Hubo un error al guardar el evento personal.');
+        }
+    }
+
+    async deletePersonalEvent(id?: number) {
+        if (!id) return;
+        if (!confirm('¿Estás seguro de que deseas eliminar este evento personal?')) return;
+        
+        try {
+            await this.personalEventService.deleteEvent(id);
+            this.closePersonalEventModal();
+            // Cierra también el modal general si estuviese abierto con este evento (aunque los mostraremos distinto)
+            this.isModalOpen = false; 
+            document.body.style.overflow = 'auto';
+        } catch (e) {
+            console.error('Error deleting personal event:', e);
+            alert('Hubo un error al eliminar el evento.');
+        }
+    }
+
+    getDogName(dogId?: number): string {
+        if (!dogId) return 'Desconocido';
+        const dogs = this.userDogs();
+        if (!dogs) return dogId.toString();
+        const dog = dogs.find(d => d.id === dogId);
+        return dog ? dog.name : dogId.toString();
     }
 }

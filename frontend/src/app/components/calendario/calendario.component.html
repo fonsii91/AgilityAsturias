@@ -1,7 +1,8 @@
 <div class="calendar-container">
   <div class="calendar-header">
     <div class="calendar-header-actions"
-      style="display: flex; gap: 1rem; align-items: center; width: 100%; justify-content: space-between;">
+      style="display: flex; gap: 1rem; align-items: center; width: 100%; justify-content: space-between; flex-wrap: wrap;">
+      
       <div class="year-navigation">
         <button class="nav-btn" (click)="changeYear(-1)">
           <span class="material-icons-outlined">&lt;</span>
@@ -12,10 +13,20 @@
         </button>
       </div>
 
-      <button class="help-btn" (click)="openHelpModal()" title="Instrucciones sobre Calendario"
-        style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s; background-color: white;">
-        <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
-      </button>
+      <div class="header-right-actions" style="display: flex; align-items: center; gap: 1rem;">
+        @if (authService.currentUserSignal()) {
+        <button class="add-btn" (click)="openPersonalEventModal()" title="Añadir Evento Personal"
+          style="display: inline-flex; align-items: center; gap: 0.5rem; background: linear-gradient(135deg, var(--primary-blue, #0073CF) 0%, var(--primary-blue-dark, #005bb5) 100%); color: white; padding: 0.75rem 1.5rem; border-radius: 9999px; font-weight: 600; font-size: 0.95rem; border: none; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0, 115, 207, 0.2);">
+          <span class="material-icons" style="font-size: 20px;">add_circle_outline</span>
+          <span>Evento Personal</span>
+        </button>
+        }
+
+        <button class="help-btn" (click)="openHelpModal()" title="Instrucciones sobre Calendario"
+          style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s; background-color: white;">
+          <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
+        </button>
+      </div>
     </div>
 
     <div class="calendar-legend">
@@ -28,6 +39,10 @@
         <span>Otros Eventos</span>
       </div>
       @if (authService.currentUserSignal()) {
+      <div class="legend-item">
+        <span class="dot personal-dot" style="background-color: #10b981;"></span>
+        <span>Mis Eventos</span>
+      </div>
       <div class="legend-item">
         <span class="dot attending-dot"></span>
         <span>Asistiré</span>
@@ -51,8 +66,8 @@
         @for (day of month.days; track day) {
         <div class="day" [class.other-month]="day.isOtherMonth" [class.weekend]="day.isWeekend"
           [class.competition]="day.isCompetition" [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
-          [class.attending]="day.isAttending"
-          (click)="(day.competitions.length > 0 || day.deadlines.length > 0) && openModal(day)">
+          [class.attending]="day.isAttending" [class.personal-event]="day.personalEvents.length > 0"
+          (click)="(day.competitions.length > 0 || day.deadlines.length > 0 || day.personalEvents.length > 0) && openModal(day)">
           @if (!day.isOtherMonth) {
           <span>{{ day.date | date:'d' }}</span>
           }
@@ -109,6 +124,21 @@
               </div>
             </div>
             <div class="event-preview-location">📍 {{ comp.lugar }}</div>
+          </div>
+          }
+          <!-- Personal Events integrated as list items -->
+          @for (pe of selectedPersonalEvents; track pe) {
+          <div class="event-card-preview" (click)="openPersonalEventModal(undefined, pe)"
+            style="border-left: 4px solid #10b981;">
+            <div class="event-preview-header">
+              <span class="event-name">{{ pe.title }}</span>
+              <div style="display: flex; gap: 0.5rem;">
+                <span class="event-type-badge" style="background: #10b981; color: white;">
+                  {{ pe.type | titlecase }}
+                </span>
+              </div>
+            </div>
+            <div class="event-preview-location"><i class="fas fa-paw" style="margin-right: 4px;"></i> Perro: {{ getDogName(pe.dog_id) }}</div>
           </div>
           }
           <!-- Deadlines integrated as list items -->
@@ -412,7 +442,7 @@
                       <img [src]="dog.photo_url" referrerpolicy="no-referrer">
                       }
                       @if (!dog.photo_url) {
-                      <div class="chip-default-icon">🐕</div>
+                      <div class="chip-default-icon"><i class="fas fa-paw"></i></div>
                       }
                       <span>{{ dog.name }}</span>
                     </div>
@@ -428,6 +458,114 @@
           </div>
         </div>
       </div>
+      }
+    </div>
+  </div>
+  }
+
+  <!-- Modal Eventos Personales -->
+  @if (isPersonalEventModalOpen) {
+  <div class="modal-overlay" (click)="closePersonalEventModal()">
+    <div class="dialog-container" (click)="$event.stopPropagation()">
+      @if (isViewingPersonalEvent) {
+        <div class="dialog-header" style="margin-bottom: 16px;">
+          <h2 class="dialog-title">
+            <i class="fas fa-calendar-check" style="margin-right: 8px;"></i>
+            Detalles del Evento
+          </h2>
+        </div>
+
+        <div class="dialog-content" style="align-items: center; text-align: center; padding-bottom: 10px;">
+          <div style="font-size: 3rem; margin-bottom: 10px; color: var(--color-primary, #1976d2);">
+            <i class="fas" [ngClass]="{'fa-stethoscope': personalEventForm.type === 'veterinario', 'fa-bone': personalEventForm.type === 'fisioterapia', 'fa-file-alt': personalEventForm.type === 'otro'}"></i>
+          </div>
+          <h3 style="margin: 0; font-size: 1.3rem; color: var(--color-text);">{{ personalEventForm.title }}</h3>
+          
+          <div style="display: flex; gap: 8px; justify-content: center; margin-top: 12px; margin-bottom: 12px;">
+            <span style="background: var(--color-background-alt, #f0f0f0); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 500;">
+              <i class="fas fa-paw" style="margin-right: 6px;"></i>{{ getDogName(personalEventForm.dog_id) }}
+            </span>
+            <span style="background: var(--color-background-alt, #f0f0f0); padding: 4px 10px; border-radius: 12px; font-size: 0.85rem; font-weight: 500;">
+              <i class="fas fa-calendar-day" style="margin-right: 6px;"></i>{{ personalEventForm.start_date | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+
+          @if (personalEventForm.notes) {
+            <div style="margin-top: 10px; padding: 12px; background: var(--color-background-alt, #f0f0f0); border-radius: 8px; text-align: left; font-size: 0.95rem; width: 100%;">
+              <strong><i class="fas fa-sticky-note" style="margin-right: 6px;"></i>Notas:</strong><br>
+              <div style="margin-top: 6px; white-space: pre-wrap; line-height: 1.4;">{{ personalEventForm.notes }}</div>
+            </div>
+          }
+        </div>
+
+        <div class="dialog-actions" style="justify-content: space-between; margin-top: 24px;">
+          <button class="submit-btn remove-btn" (click)="deletePersonalEvent(personalEventForm.id)">
+            <i class="fas fa-trash"></i> Eliminar
+          </button>
+          <button class="submit-btn" style="background-color: var(--color-primary, #1976d2);" (click)="editPersonalEvent()">
+            <i class="fas fa-pencil-alt" style="margin-right: 8px;"></i> Editar
+          </button>
+        </div>
+      } @else {
+        <div class="dialog-header">
+          <h2 class="dialog-title">
+            <i class="fas fa-calendar-alt" style="margin-right: 8px;"></i>
+            {{ isEditingPersonalEvent ? 'Editar Evento' : 'Nuevo Evento Personal' }}
+          </h2>
+          <p class="dialog-subtitle">Gestiona tus eventos personales</p>
+        </div>
+
+        <div class="dialog-content">
+          <div class="form-group">
+            <label for="dogSelectPE">Perro *</label>
+            <select id="dogSelectPE" [(ngModel)]="personalEventForm.dog_id">
+              <option [ngValue]="undefined" disabled selected>-- Elige un perro --</option>
+              @for (dog of userDogs(); track dog) {
+                <option [value]="dog.id">{{ dog.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Título *</label>
+            <input type="text" [(ngModel)]="personalEventForm.title" placeholder="Ej. Visita veterinario vacunas">
+          </div>
+
+          <div class="form-group">
+            <label>Tipo *</label>
+            <select [(ngModel)]="personalEventForm.type">
+              <option value="veterinario">Veterinario</option>
+              <option value="fisioterapia">Fisioterapia</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Fecha *</label>
+            <input type="date" [(ngModel)]="personalEventForm.start_date">
+          </div>
+
+          <div class="form-group">
+            <label>Notas (Opcional)</label>
+            <input type="text" [(ngModel)]="personalEventForm.notes" placeholder="Añade detalles si lo necesitas...">
+          </div>
+        </div>
+
+        <div class="dialog-actions" style="justify-content: space-between;">
+          @if (isEditingPersonalEvent) {
+            <button class="submit-btn remove-btn" (click)="deletePersonalEvent(personalEventForm.id)">
+              <i class="fas fa-trash" style="margin-right: 8px;"></i> Eliminar
+            </button>
+          } @else {
+            <div></div> <!-- Spacer -->
+          }
+          <div style="display: flex; gap: 12px;">
+            <button class="cancel-btn" (click)="closePersonalEventModal()">Cancelar</button>
+            <button class="submit-btn" (click)="savePersonalEvent()">
+              <i class="fas fa-check" style="margin-right: 8px;"></i> Guardar
+            </button>
+          </div>
+        </div>
       }
     </div>
   </div>
@@ -468,6 +606,7 @@
             <li><strong style="color: #00509e;">Azul oscuro:</strong> Designa una <i>Competición</i> oficial.</li>
             <li><strong style="color: #2e7d32;">Verde oscuro:</strong> Designa <i>Otros tipos de evento</i> (cenas,
               seminarios, reuniones).</li>
+            <li><strong style="color: #10b981;">Verde esmeralda:</strong> Son tus <i>Eventos Personales</i> privados (veterinario, fisio).</li>
             <li><strong style="color: #e65100;">Naranja o dorado:</strong> Eventos a los que tú has confirmado tu
               asistencia.</li>
             <li><strong style="color: #d32f2f;">Alerta Roja y !:</strong> Indica el límite (cierre) de inscripciones

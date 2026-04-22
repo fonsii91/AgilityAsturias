@@ -235,6 +235,20 @@
     box-shadow: 0 6px 12px rgba(46, 125, 50, 0.4);
 }
 
+.personal-event {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    cursor: pointer;
+    font-weight: 700;
+    box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+}
+
+.personal-event:hover {
+    transform: scale(1.15);
+    z-index: 2;
+    box-shadow: 0 6px 12px rgba(16, 185, 129, 0.4);
+}
+
 .other-dot {
     background: var(--other-bg);
 }
@@ -1256,4 +1270,138 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+/* Modal Eventos Personales (Estilo Dar Puntos Extra) */
+.dialog-container {
+    padding: 24px;
+    background-color: var(--color-background-paper, #ffffff);
+    color: var(--color-text, #333333);
+    border-radius: 12px;
+    min-width: 350px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 1001;
+}
+
+.dialog-header {
+    margin-bottom: 24px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.dialog-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    color: var(--color-primary, #1976d2);
+}
+
+.dialog-subtitle {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: var(--color-text-light, #666666);
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    max-height: 60vh;
+    padding-right: 4px;
+}
+
+.dialog-content::-webkit-scrollbar {
+    width: 6px;
+}
+.dialog-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+.dialog-content::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.dialog-content select, .dialog-content input {
+    padding: 12px 14px;
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 8px;
+    font-size: 1rem;
+    background-color: var(--color-background, #fafafa);
+    color: var(--color-text, #333);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dialog-content select:focus, .dialog-content input:focus {
+    outline: none;
+    border-color: var(--color-primary, #1976d2);
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
+}
+
+.dialog-actions {
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.cancel-btn, .submit-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+.cancel-btn {
+    background-color: transparent;
+    color: var(--color-text-light, #666);
+}
+
+.cancel-btn:hover {
+    background-color: var(--color-background-alt, #f0f0f0);
+}
+
+.submit-btn {
+    background-color: var(--color-primary, #1976d2);
+    color: white;
+    box-shadow: 0 4px 6px rgba(25, 118, 210, 0.2);
+}
+
+.submit-btn:hover {
+    background-color: var(--color-primary-dark, #115293);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 10px rgba(25, 118, 210, 0.3);
+}
+
+.submit-btn.remove-btn {
+    background-color: #f44336; 
+    box-shadow: 0 4px 6px rgba(244, 67, 54, 0.2);
+}
+
+.submit-btn.remove-btn:hover {
+    background-color: #d32f2f;
+    box-shadow: 0 6px 10px rgba(244, 67, 54, 0.3);
 }
