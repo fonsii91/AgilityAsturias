@@ -85,3 +85,7 @@ Schedule::call(function () {
         \Illuminate\Support\Facades\Log::info("Auto-calibrated {$count} pending dog workloads.");
     }
 })->dailyAt('04:00')->timezone('Europe/Madrid');
+
+// Database Backups (Local via Spatie)
+Schedule::command('backup:clean')->dailyAt('04:30')->timezone('Europe/Madrid');
+Schedule::command('backup:run --only-db')->dailyAt('05:00')->timezone('Europe/Madrid');

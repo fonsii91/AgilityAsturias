@@ -29,6 +29,7 @@ description: Datos para desplegar en producción el proyecto
 - **[Completado]** Fase 5: Verificada la disponibilidad del sitio web y configurado el certificado SSL (HTTPS) con Certbot.
 - **[Completado]** Fase 6: Instalado y configurado Netdata para monitorización del servidor. Se permite tráfico por el puerto 19999 mediante UFW. Accesible en: http://157.173.121.242:19999
 - **[Completado]** Fase 7: Instalado y configurado phpMyAdmin sobre Nginx. Se permite tráfico por el puerto 8080 mediante UFW. Accesible en: http://157.173.121.242:8080
+- **[Completado]** Fase 8: Configurado sistema de backups locales automáticos diarios de la base de datos con rotación.
 
 
 ---
