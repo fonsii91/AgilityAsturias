@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.20",
+    "date": "2026-04-22",
+    "features": [
+      "¡Tu calendario ahora es más tuyo que nunca! Hemos estrenado una nueva funcionalidad que te permite crear y gestionar tus propios eventos personales directamente en el calendario. Úsalo para anotar recordatorios importantes como la cita del veterinario, la próxima vacuna de tu perro o planes de entrenamiento por tu cuenta. Todo de forma completamente confidencial, solo tú podrás verlos."
+    ]
+  },
+  {
     "version": "1.1.19",
     "date": "2026-04-21",
     "features": [
