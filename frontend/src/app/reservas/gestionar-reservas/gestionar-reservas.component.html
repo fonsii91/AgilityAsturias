@@ -43,7 +43,7 @@
             <div class="card-header">
               <div class="time-badge">
                 <span class="material-icons time-icon">schedule</span>
-                {{ slot.start_time }} - {{ slot.end_time }}
+                <span class="time-range">{{ slot.start_time | slice:0:5 }} - {{ slot.end_time | slice:0:5 }}</span>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 @if (!slot.isCancelled) {
@@ -181,8 +181,7 @@
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <h3><span class="material-icons" style="vertical-align: text-bottom; margin-right: 8px;">event_available</span> Confirmar Reserva</h3>
-      <p>¿Quieres reservar plaza para el <strong>{{ selectedSlotForBooking()?.day }}</strong> a las <strong>{{
-    selectedSlotForBooking()?.start_time }}</strong>?</p>
+      <p>¿Estás seguro de que quieres reservar plaza el <strong>{{ selectedSlotForBooking()?.day }} {{ selectedSlotForBooking()?.date | date:'dd/MM' }}</strong> a las <strong>{{ selectedSlotForBooking()?.start_time | slice:0:5 }}</strong>?</p>
     <div class="dog-selection">
       @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
         <div class="admin-user-selector" style="margin-bottom: 1.5rem; padding: 1rem; background: #f0f4f8; border-radius: 8px; border-left: 4px solid #1976d2;">
@@ -236,9 +235,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <h3><span class="material-icons" style="vertical-align: text-bottom; color: #f44336; margin-right: 8px;">sentiment_dissatisfied</span> Cancelar Reserva</h3>
       <div class="modal-body">
-        <p class="confirm-message">¿Estás seguro de que quieres cancelar tu reserva para el <strong>{{
-        selectedSlotForCancellation?.day }}</strong> a las <strong>{{
-      selectedSlotForCancellation?.start_time }}</strong>?</p>
+        <p class="confirm-message">¿Estás seguro de que quieres cancelar tu reserva del <strong>{{ selectedSlotForCancellation?.day }} {{ selectedSlotForCancellation?.date | date:'dd/MM' }}</strong> a las <strong>{{ selectedSlotForCancellation?.start_time | slice:0:5 }}</strong>?</p>
       <p class="note warning">Esta acción liberará tu plaza inmediatamente.</p>
     </div>
     <div class="modal-actions">
@@ -275,7 +272,7 @@
         </h3>
         <div class="modal-body" style="margin-top: 1rem;">
           <p class="confirm-message" style="margin-bottom: 1.5rem;">
-            ¿Estás seguro de que quieres <strong>{{ slotToToggle?.isCancelled ? 'restaurar' : 'anular' }}</strong> la clase del <strong>{{ slotToToggle?.day }} {{ slotToToggle?.date | date:'dd/MM' }}</strong> a las <strong>{{ slotToToggle?.start_time }}</strong>?
+            ¿Estás seguro de que quieres <strong>{{ slotToToggle?.isCancelled ? 'restaurar' : 'anular' }}</strong> la clase del <strong>{{ slotToToggle?.day }} {{ slotToToggle?.date | date:'dd/MM' }}</strong> a las <strong>{{ slotToToggle?.start_time | slice:0:5 }}</strong>?
           </p>
           @if (!slotToToggle?.isCancelled) {
             <div class="note warning" style="display: flex; gap: 0.8rem; align-items: center;">

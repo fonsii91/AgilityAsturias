@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Traits\HasClub;
+
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 
@@ -9,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Dog extends Model
 {
+    use HasClub;
     use HasFactory;
 
     protected $fillable = [

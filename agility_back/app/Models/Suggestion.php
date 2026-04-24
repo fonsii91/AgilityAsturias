@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasClub;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Suggestion extends Model
 {
+    use HasClub;
     use HasFactory;
 
     protected $fillable = [

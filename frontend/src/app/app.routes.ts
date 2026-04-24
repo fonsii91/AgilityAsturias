@@ -13,6 +13,12 @@ import { memberGuard } from './guards/member.guard';
 
 export const routes: Routes = [
     {
+        path: 'admin/clubs',
+        loadComponent: () => import('./components/admin/clubs-list.component').then(m => m.ClubsListComponent),
+        canActivate: [adminGuard],
+        title: titleResolver, data: { pageTitle: 'Gestión de Clubes' }
+    },
+    {
         path: '',
         component: HomeComponent,
         title: titleResolver, data: { pageTitle: '' }

@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.21",
+    "date": "2026-04-24",
+    "features": [
+      "Hemos realizado importantes mejoras invisibles en la arquitectura de la plataforma para permitir una conexión mucho más estable y segura en la infraestructura del servidor."
+    ]
+  },
+  {
     "version": "1.1.20",
     "date": "2026-04-22",
     "features": [

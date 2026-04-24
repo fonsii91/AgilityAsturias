@@ -15,6 +15,7 @@ import { SwUpdate } from '@angular/service-worker';
 import { NotificationService } from './services/notification.service';
 import { DogService } from './services/dog.service';
 import { environment } from '../environments/environment';
+import { TenantService } from './services/tenant.service';
 
 import { CommonModule, DatePipe } from '@angular/common';
 
@@ -27,6 +28,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 export class App implements OnInit, OnDestroy {
   protected readonly title = signal(environment.clubConfig?.name || 'Agility Asturias');
   authService = inject(AuthService);
+  tenantService = inject(TenantService);
   private toastService = inject(ToastService);
   private swUpdate = inject(SwUpdate);
   private injector = inject(Injector);

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasClub;
+
 use Illuminate\Database\Eloquent\Model;
 
 class PersonalEvent extends Model
 {
+    use HasClub;
     protected $fillable = [
         'user_id',
         'dog_id',

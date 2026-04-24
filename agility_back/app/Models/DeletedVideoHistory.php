@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasClub;
+
 use Illuminate\Database\Eloquent\Model;
 
 class DeletedVideoHistory extends Model
 {
+    use HasClub;
     protected $table = 'deleted_videos_history';
 
     protected $fillable = [

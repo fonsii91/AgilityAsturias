@@ -28,6 +28,8 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset-password', [AuthController::class, 'resetPasswordWithToken']);
 
+Route::get('/tenant/info', [\App\Http\Controllers\ClubController::class, 'current']);
+
 Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
 
@@ -124,8 +126,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/salud/monitor', [\App\Http\Controllers\DogWorkloadController::class, 'adminMonitorData']);
         // RSCE Monitor
         Route::get('/admin/rsce/monitor', [RsceTrackController::class, 'adminMonitorData']);
+        
+        // Gestión de Clubes
+        Route::get('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'index']);
+        Route::post('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'store']);
+        Route::put('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']);
+        Route::delete('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'destroy']);
     });
-
 
     Route::middleware(['role:admin,staff,member'])->group(function () {
         // Ranking

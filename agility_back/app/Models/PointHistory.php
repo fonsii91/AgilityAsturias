@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasClub;
+
 use Illuminate\Database\Eloquent\Model;
 
 class PointHistory extends Model
 {
+    use HasClub;
     protected $fillable = [
         'dog_id',
         'points',

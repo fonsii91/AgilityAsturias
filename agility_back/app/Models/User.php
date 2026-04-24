@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Traits\HasClub;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasClub;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +30,7 @@ class User extends Authenticatable
         'reset_token',
         'rfec_license',
         'rfec_expiration_date',
+        'club_id',
     ];
 
     /**
@@ -78,5 +80,13 @@ class User extends Authenticatable
     public function competitions()
     {
         return $this->belongsToMany(Competition::class);
+    }
+
+    /**
+     * Get the club the user belongs to.
+     */
+    public function club()
+    {
+        return $this->belongsTo(Club::class);
     }
 }

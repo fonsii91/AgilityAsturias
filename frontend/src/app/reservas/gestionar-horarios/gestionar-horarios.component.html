@@ -55,7 +55,7 @@
                       </span>
                     </div>
                     <div class="slot-info-main">
-                      <span class="time-range">{{ slot.start_time }} - {{ slot.end_time }}</span>
+                      <span class="time-range">{{ slot.start_time | slice:0:5 }} - {{ slot.end_time | slice:0:5 }}</span>
                       <span class="capacity-badge">
                         <span class="material-icons icon-tiny">person</span>
                         {{ slot.max_bookings }} plazas max.
