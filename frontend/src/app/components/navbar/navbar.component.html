@@ -7,6 +7,28 @@
     </button>
     <img [src]="clubLogo()" [alt]="clubName() + ' Logo'" class="nav-logo" routerLink="/">
     <h1 class="nav-title" routerLink="/">{{ clubName() }}</h1>
+
+    <nav class="desktop-nav" style="margin-left: 2rem;">
+      <ul>
+        @if (!authService.isMember()) {
+          <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
+          <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
+          <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
+          <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
+        }
+        @if (authService.isMember()) {
+          <li class="nav-dropdown">
+            <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Público <span class="material-icons arrow">expand_more</span></a>
+            <ul class="dropdown-menu-list">
+              <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
+              <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
+              <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
+              <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
+            </ul>
+          </li>
+        }
+      </ul>
+    </nav>
   </div>
 
   <!-- Spacer to push items to the right -->
@@ -14,9 +36,6 @@
 
   <nav class="desktop-nav">
     <ul>
-      @if (!authService.isMember()) {
-        <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
-      }
 <!-- Miembros Dropdown for Logged In Members -->
 @if (authService.isMember()) {
   <li class="nav-dropdown">
@@ -28,16 +47,6 @@
       <li><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span> Vídeos</a></li>
     </ul>
   </li>
-}
-
-@if (!authService.isMember()) {
-  <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
-  <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
-}
-
-@if (!authService.isMember()) {
-  <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span>
-Contacto</a></li>
 }
 
 <!-- Staff Dropdown for Staff Users -->
@@ -82,19 +91,6 @@ Contacto</a></li>
       <li><a routerLink="/tablon-anuncios" routerLinkActive="active-route"><span class="material-icons">campaign</span> Tablón de Anuncios</a></li>
       <li><a routerLink="/recursos" routerLinkActive="active-route"><span class="material-icons">folder_shared</span> Recursos</a></li>
       <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route"><span class="material-icons">analytics</span> Seguimiento RSCE</a></li>
-    </ul>
-  </li>
-}
-
-<!-- Público Dropdown for Logged In Users -->
-@if (authService.isMember()) {
-  <li class="nav-dropdown">
-    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Público <span class="material-icons arrow">expand_more</span></a>
-    <ul class="dropdown-menu-list">
-      <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
-      <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
-      <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
-      <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
     </ul>
   </li>
 }

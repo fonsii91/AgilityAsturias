@@ -29,7 +29,7 @@ return new class extends Migration
 
     public function up(): void
     {
-        $defaultClubId = 1;
+        $defaultClubId = DB::table('clubs')->where('slug', 'agility-asturias')->first()->id ?? 1;
 
         foreach ($this->tables as $tableName) {
             Schema::table($tableName, function (Blueprint $table) {

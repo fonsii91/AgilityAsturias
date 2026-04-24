@@ -24,6 +24,18 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Gestión de Clubes' }
     },
     {
+        path: 'admin/clubs/new',
+        loadComponent: () => import('./components/admin/club-form/club-form.component').then(m => m.ClubFormComponent),
+        canActivate: [adminGuard],
+        title: titleResolver, data: { pageTitle: 'Nuevo Club' }
+    },
+    {
+        path: 'admin/clubs/edit/:id',
+        loadComponent: () => import('./components/admin/club-form/club-form.component').then(m => m.ClubFormComponent),
+        canActivate: [adminGuard],
+        title: titleResolver, data: { pageTitle: 'Editar Club' }
+    },
+    {
         path: '',
         component: HomeComponent,
         title: titleResolver, data: { pageTitle: '' }

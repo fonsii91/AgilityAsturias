@@ -64,15 +64,20 @@ class ClubController extends Controller
 
     public function update(Request $request, Club $club)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:clubs,slug,' . $club->id,
-            'domain' => 'nullable|string|max:255|unique:clubs,domain,' . $club->id,
-            'logo_url' => 'nullable|string|max:255',
-            'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
-            'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-            'cta_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'slug' => 'required|string|max:255|unique:clubs,slug,' . $club->id,
+                'domain' => 'nullable|string|max:255|unique:clubs,domain,' . $club->id,
+                'logo_url' => 'nullable|string|max:255',
+                'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+                'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'cta_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('Validation failed: ' . json_encode($e->errors()));
+            throw $e;
+        }
 
         $settings = $request->input('settings');
         if (is_string($settings)) {

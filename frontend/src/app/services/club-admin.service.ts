@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 export interface Club {
     id: number;
@@ -21,6 +21,12 @@ export class ClubAdminService {
 
     getClubs(): Observable<Club[]> {
         return this.http.get<Club[]>(`${this.apiUrl}/admin/clubs`);
+    }
+
+    getClub(id: number): Observable<Club | undefined> {
+        return this.getClubs().pipe(
+            map(clubs => clubs.find(c => c.id === id))
+        );
     }
 
     createClub(club: Partial<Club>): Observable<Club> {

@@ -4,19 +4,18 @@ import { ClubAdminService, Club } from '../../services/club-admin.service';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ClubFormDialogComponent } from './club-form-dialog/club-form-dialog.component';
+import { RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-clubs-list',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, RouterModule],
   template: `
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
         <h1 class="text-2xl font-bold">Gestión de Clubes</h1>
-        <button mat-raised-button color="primary" (click)="openClubDialog()">
+        <button mat-raised-button color="primary" routerLink="/admin/clubs/new">
           <mat-icon>add</mat-icon> Nuevo Club
         </button>
       </div>
@@ -59,7 +58,7 @@ import { ToastService } from '../../services/toast.service';
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef> Acciones </th>
           <td mat-cell *matCellDef="let club">
-            <button mat-icon-button color="primary" (click)="openClubDialog(club)">
+            <button mat-icon-button color="primary" [routerLink]="['/admin/clubs/edit', club.id]">
               <mat-icon>edit</mat-icon>
             </button>
             <button mat-icon-button color="warn" (click)="deleteClub(club)" [disabled]="club.id === 1">
@@ -88,7 +87,6 @@ import { ToastService } from '../../services/toast.service';
 })
 export class ClubsListComponent implements OnInit {
   private clubService = inject(ClubAdminService);
-  private dialog = inject(MatDialog);
   private toast = inject(ToastService);
 
   clubs = signal<Club[]>([]);
@@ -119,19 +117,6 @@ export class ClubsListComponent implements OnInit {
     this.clubService.getClubs().subscribe({
       next: (data) => this.clubs.set(data),
       error: (err) => this.toast.error('Error al cargar clubes')
-    });
-  }
-
-  openClubDialog(club?: Club) {
-    const dialogRef = this.dialog.open(ClubFormDialogComponent, {
-      width: '500px',
-      data: { club }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loadClubs();
-      }
     });
   }
 
