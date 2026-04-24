@@ -56,13 +56,13 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #003366 0%, #004080 100%);
+    background: var(--primary-color, #003366);
     color: white;
     box-shadow: 0 4px 6px rgba(0, 51, 102, 0.2);
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #004080 0%, #00509e 100%);
+    filter: brightness(0.9);
     box-shadow: 0 6px 8px rgba(0, 51, 102, 0.25);
 }
 
@@ -78,13 +78,13 @@
 }
 
 .btn-success {
-    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    background: var(--primary-color, #28a745);
     color: white;
     box-shadow: 0 4px 6px rgba(40, 167, 69, 0.2);
 }
 
 .btn-success:hover {
-    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+    filter: brightness(0.9);
     box-shadow: 0 6px 8px rgba(40, 167, 69, 0.25);
 }
 
@@ -177,12 +177,12 @@
 }
 
 .btn-icon.edit {
-    color: #003366;
+    color: var(--primary-blue, #003366);
     background-color: #e3f2fd;
 }
 
 .btn-icon.edit:hover {
-    background-color: #003366;
+    background-color: var(--primary-blue, #003366);
     color: white;
 }
 
@@ -464,7 +464,7 @@ textarea.form-control {
 
 /* Event Type Indicators in Table */
 .border-comp {
-    border-left: 5px solid #003366 !important;
+    border-left: 5px solid var(--primary-blue, #003366) !important;
     padding-left: 15px !important;
 }
 

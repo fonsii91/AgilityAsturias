@@ -77,7 +77,7 @@ a:hover {
     min-height: 100vh;
     padding: var(--spacing-unit);
     /* Rich, deep gradient background */
-    background: linear-gradient(135deg, #0073CF 0%, #002d52 100%);
+    background: var(--primary-color, #0073CF);
     background-size: 400% 400%;
     animation: gradientBG 15s ease infinite;
     position: relative;
@@ -149,7 +149,7 @@ a:hover {
 .logo-circle {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    background: var(--primary-color, #0073CF);
     border-radius: 50%;
     margin: 0 auto 1.5rem;
     display: flex;
@@ -245,7 +245,7 @@ a:hover {
 .auth-card .btn-primary {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    background: var(--primary-color, #0073CF);
     color: var(--white);
     border: none;
     border-radius: 12px;
@@ -435,7 +435,7 @@ a:hover {
 }
 
 .user-details .role {
-    background: linear-gradient(135deg, #F6D312 0%, #e0be00 100%);
+    background: var(--accent-orange, #F6D312);
     color: #1a1a1a;
     padding: 6px 16px;
     border-radius: 20px;

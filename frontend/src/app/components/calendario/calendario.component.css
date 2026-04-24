@@ -9,8 +9,8 @@
     --bg-light: #f4f7f9;
     --card-bg: #ffffff;
     --weekend-bg: #f8f9fa;
-    --competition-bg: linear-gradient(135deg, #003366 0%, #00509e 100%);
-    --other-bg: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+    --competition-bg: var(--primary-color, #003366);
+    --other-bg: #2e7d32;
     --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.2);
@@ -236,7 +236,7 @@
 }
 
 .personal-event {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: #10b981;
     color: white;
     cursor: pointer;
     font-weight: 700;
@@ -257,7 +257,7 @@
     position: absolute;
     bottom: -4px;
     right: -4px;
-    background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);
+    background: var(--accent-orange, #ff9800);
     color: white;
     width: 18px;
     height: 18px;
@@ -271,7 +271,7 @@
 }
 
 .attending-dot {
-    background: linear-gradient(135deg, #e65100 0%, #ff9800 100%);
+    background: var(--accent-orange, #ff9800);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1299,7 +1299,7 @@
     font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
-    color: var(--color-primary, #1976d2);
+    color: var(--primary-color, #1976d2);
 }
 
 .dialog-subtitle {
@@ -1353,7 +1353,7 @@
 
 .dialog-content select:focus, .dialog-content input:focus {
     outline: none;
-    border-color: var(--color-primary, #1976d2);
+    border-color: var(--primary-color, #1976d2);
     box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
 }
 
@@ -1385,13 +1385,13 @@
 }
 
 .submit-btn {
-    background-color: var(--color-primary, #1976d2);
+    background-color: var(--primary-color, #1976d2);
     color: white;
     box-shadow: 0 4px 6px rgba(25, 118, 210, 0.2);
 }
 
 .submit-btn:hover {
-    background-color: var(--color-primary-dark, #115293);
+    filter: brightness(0.9);
     transform: translateY(-2px);
     box-shadow: 0 6px 10px rgba(25, 118, 210, 0.3);
 }

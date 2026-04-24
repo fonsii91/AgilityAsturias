@@ -17,7 +17,7 @@ import { environment } from '../../../../environments/environment';
         </h2>
         <p>Selecciona un perro para gestionar su perfil, entrenamientos y salud.</p>
       </div>
-      <button class="btn-primary add-btn" routerLink="nuevo" [style.background-color]="clubTheme.primary">
+      <button class="btn-primary add-btn" routerLink="nuevo">
         <span class="material-icons">add</span> Añadir Perro
       </button>
     </div>
@@ -26,7 +26,7 @@ import { environment } from '../../../../environments/environment';
       <div class="empty-state">
         <span class="material-icons-outlined empty-icon">sentiment_dissatisfied</span>
         <p>Todavía no has registrado ningún perro.</p>
-        <button class="btn-primary" routerLink="nuevo" [style.background-color]="clubTheme.primary" style="margin-top: 1rem;">
+        <button class="btn-primary" routerLink="nuevo" style="margin-top: 1rem;">
           Añadir tu primer perro
         </button>
       </div>
@@ -53,7 +53,7 @@ import { environment } from '../../../../environments/environment';
                 <span class="stat-value">{{ calculateAge(dog.birth_date) }}</span>
                 <span class="stat-label">Edad</span>
               </div>
-              <div class="stat-item points" [style.color]="clubTheme.accent">
+              <div class="stat-item points" style="color: var(--accent-orange)">
                 <span class="stat-value">{{ dog.points || 0 }}</span>
                 <span class="stat-label">Puntos</span>
               </div>
@@ -89,8 +89,8 @@ import { environment } from '../../../../environments/environment';
     .header-titles h2 { margin: 0; color: #1e293b; font-size: 1.8rem; }
     .header-titles p { margin: 0.5rem 0 0 0; color: #64748b; }
     
-    .btn-primary { border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .btn-primary { background: var(--primary-color); border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; color: white; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: filter 0.2s, transform 0.2s, box-shadow 0.2s; }
+    .btn-primary:hover { transform: translateY(-2px); filter: brightness(0.9); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     
     .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 4rem; background: white; border-radius: 12px; text-align: center; border: 1px dashed #cbd5e1; }
     .empty-icon { font-size: 4rem; color: #94a3b8; margin-bottom: 1rem; }
@@ -127,7 +127,6 @@ import { environment } from '../../../../environments/environment';
 export class DogListComponent implements OnInit {
   dogService = inject(DogService);
   dogs = this.dogService.getDogs();
-  clubTheme = environment.clubConfig.colors;
 
   ngOnInit() {
     this.dogService.loadUserDogs();

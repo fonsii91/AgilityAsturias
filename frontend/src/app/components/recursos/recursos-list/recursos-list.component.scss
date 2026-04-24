@@ -59,7 +59,7 @@
             align-items: center;
             gap: 0.5rem;
             padding: 0.6rem 1.2rem;
-            background: #2ecc71;
+            background: var(--primary-color, #2ecc71);
             color: white;
             border: none;
             border-radius: 8px;
@@ -69,7 +69,7 @@
             text-decoration: none;
 
             &:hover {
-                background: #27ae60;
+                filter: brightness(0.9);
                 transform: translateY(-2px);
             }
         }

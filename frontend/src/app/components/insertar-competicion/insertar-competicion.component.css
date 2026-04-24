@@ -87,7 +87,7 @@ label {
 }
 
 .submit-btn:hover {
-    background-color: var(--secondary-yellow, #ffcc00);
+    background-color: var(--accent-orange, #ffcc00);
     color: var(--primary-blue, #003366);
 }
 

@@ -57,15 +57,6 @@ export class App implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-      // Inject CSS properties from club config
-      if (environment.clubConfig?.colors) {
-        document.documentElement.style.setProperty('--primary-blue', environment.clubConfig.colors.primary);
-        document.documentElement.style.setProperty('--accent-orange', environment.clubConfig.colors.accent);
-        if (environment.clubConfig.colors.warn) {
-            document.documentElement.style.setProperty('--error-color', environment.clubConfig.colors.warn);
-            document.documentElement.style.setProperty('--danger', environment.clubConfig.colors.warn);
-        }
-      }
 
       if (this.authService.isLoggedIn()) {
           this.dogService.loadUserDogs();

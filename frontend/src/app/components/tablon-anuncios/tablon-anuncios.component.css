@@ -89,22 +89,12 @@
     transform: translateY(1px);
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--primary-blue, #003366) 0%, #004080 100%);
-    color: white;
-    box-shadow: 0 4px 6px rgba(0, 51, 102, 0.2);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #004080 0%, #00509e 100%);
-    box-shadow: 0 6px 8px rgba(0, 51, 102, 0.25);
-}
 
 .btn-primary {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-blue-dark));
+    background: var(--primary-color, #003366);
     color: white;
     padding: 0.85rem 2rem;
     border: none;
@@ -118,6 +108,7 @@
 
 .btn-primary:hover:not(:disabled) {
     transform: translateY(-2px);
+    filter: brightness(0.9);
     box-shadow: 0 6px 20px rgba(0, 115, 207, 0.4);
 }
 
@@ -459,7 +450,7 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #003366, #005bb5);
+    background: var(--primary-color, #003366);
     color: white;
     font-size: 0.75rem;
     font-weight: 600;

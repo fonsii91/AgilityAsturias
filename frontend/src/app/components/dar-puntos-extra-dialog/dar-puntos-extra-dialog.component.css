@@ -22,7 +22,7 @@
     font-size: 1.5rem;
     font-weight: bold;
     margin: 0;
-    color: var(--color-primary, #1976d2);
+    color: var(--primary-color, #1976d2);
 }
 
 .dialog-subtitle {
@@ -77,7 +77,7 @@ select, input {
 
 select:focus, input:focus {
     outline: none;
-    border-color: var(--color-primary, #1976d2);
+    border-color: var(--primary-color, #1976d2);
     box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.15);
 }
 
@@ -111,7 +111,7 @@ select:focus, input:focus {
 }
 
 .radio-group label:has(input[value="add"]:checked) {
-    background-color: var(--color-primary, #1976d2);
+    background-color: var(--primary-color, #1976d2);
     color: white;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
@@ -154,13 +154,13 @@ select:focus, input:focus {
 }
 
 .submit-btn {
-    background-color: var(--color-primary, #1976d2);
+    background-color: var(--primary-color, #1976d2);
     color: white;
     box-shadow: 0 4px 6px rgba(25, 118, 210, 0.2);
 }
 
 .submit-btn:hover:not(:disabled) {
-    background-color: var(--color-primary-dark, #115293);
+    background-color: var(--primary-color, #115293);
     transform: translateY(-2px);
     box-shadow: 0 6px 10px rgba(25, 118, 210, 0.3);
 }

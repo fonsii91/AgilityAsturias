@@ -21,10 +21,10 @@ import { environment } from '../../../../environments/environment';
         <p>Añade a tu compañero canino para gestionar sus entrenamientos y documentos.</p>
       </div>
 
-      <div class="form-card glass-effect" [style.border-top]="'4px solid ' + clubTheme.primary">
+      <div class="form-card glass-effect">
         
-        <div class="info-note" [style.border-left-color]="clubTheme.primary">
-          <span class="material-icons-outlined" [style.color]="clubTheme.primary">info</span>
+        <div class="info-note">
+          <span class="material-icons-outlined info-icon">info</span>
           <p>El <strong>Nombre</strong> es el único dato obligatorio para crear el perfil. Podrás añadir el resto de información (microchip, vacunas) más adelante.</p>
         </div>
 
@@ -40,7 +40,7 @@ import { environment } from '../../../../environments/environment';
             } @else {
               <span class="material-icons-outlined placeholder-icon">add_a_photo</span>
             }
-            <label class="camera-floating-btn" title="Subir foto" [style.background]="clubTheme.primary">
+            <label class="camera-floating-btn" title="Subir foto">
               <span class="material-icons">camera_alt</span>
               <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
             </label>
@@ -72,7 +72,7 @@ import { environment } from '../../../../environments/environment';
         </div>
         
         <div class="form-actions">
-          <button class="btn-save" [style.background]="clubTheme.primary" (click)="saveDog()" [disabled]="!formData.name.trim() || isSaving()">
+          <button class="btn-save" (click)="saveDog()" [disabled]="!formData.name.trim() || isSaving()">
             <span class="material-icons">pets</span> {{ isSaving() ? 'Registrando...' : 'Registrar Perro' }}
           </button>
         </div>
@@ -93,9 +93,10 @@ import { environment } from '../../../../environments/environment';
     .back-btn { background: transparent; border: none; color: #64748b; font-weight: 600; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: color 0.2s; }
     .back-btn:hover { color: #0f172a; }
     
-    .form-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .form-card { background: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-top: 4px solid var(--primary-color); }
     
     .info-note { background: #f8fafc; color: #334155; padding: 1rem; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: flex-start; gap: 0.8rem; border-left: 4px solid var(--primary-color); margin-bottom: 2rem; }
+    .info-note .info-icon { color: var(--primary-color); }
     .info-note p { margin: 0; line-height: 1.5; }
     
     .photo-section { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; margin-bottom: 2.5rem; }
@@ -108,8 +109,8 @@ import { environment } from '../../../../environments/environment';
     .upload-overlay { position: absolute; inset: 0; background: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center; border-radius: 50%; z-index: 2; }
     .spinner { animation: spin 1s linear infinite; color: var(--primary-color, #0f172a); }
     
-    .camera-floating-btn { position: absolute; bottom: 0; right: 0; color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid white; transition: transform 0.2s; }
-    .camera-floating-btn:hover { transform: scale(1.1); }
+    .camera-floating-btn { position: absolute; bottom: 0; right: 0; background: var(--primary-color); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid white; transition: filter 0.2s, transform 0.2s; }
+    .camera-floating-btn:hover { transform: scale(1.1); filter: brightness(0.9); }
     .camera-floating-btn .material-icons { font-size: 18px; }
     .photo-help-text { font-size: 0.85rem; color: #64748b; margin: 0.5rem 0 0 0; }
     
@@ -129,9 +130,9 @@ import { environment } from '../../../../environments/environment';
     input:focus { outline: none; border-color: var(--primary-color, #0f172a); background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     
     .form-actions { margin-top: 2rem; display: flex; justify-content: center; }
-    .btn-save { color: white; border: none; padding: 1rem 2.5rem; border-radius: 30px; font-weight: 600; font-size: 1.1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-save { background: var(--primary-color); color: white; border: none; padding: 1rem 2.5rem; border-radius: 30px; font-weight: 600; font-size: 1.1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: filter 0.2s, transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .btn-save:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(0.9); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; filter: none; }
   `]
 })
 export class DogFormComponent {
@@ -140,8 +141,6 @@ export class DogFormComponent {
   router = inject(Router);
   imageCompressor = inject(ImageCompressorService);
   
-  clubTheme = environment.clubConfig.colors;
-
   formData = {
     name: '',
     breed: '',

@@ -346,7 +346,6 @@
 .cta-section {
     padding: 6rem 5%;
     background-color: var(--primary-blue);
-    background-image: linear-gradient(135deg, var(--primary-blue) 0%, #002a60 100%);
     color: white;
     display: flex;
     align-items: center;

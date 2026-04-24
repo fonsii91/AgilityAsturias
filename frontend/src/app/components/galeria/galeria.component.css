@@ -208,7 +208,7 @@ h2 {
 }
 
 .btn-upload {
-    background-color: #007bff; /* primary-blue fallback */
+    background-color: var(--primary-color, #007bff);
     color: white;
     border: none;
     padding: 0.8rem 1.5rem;
@@ -216,13 +216,13 @@ h2 {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: filter 0.3s, transform 0.2s;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-upload:hover:not([disabled]) {
     transform: translateY(-2px);
-    opacity: 0.9;
+    filter: brightness(0.9);
 }
 
 .btn-upload[disabled] {
