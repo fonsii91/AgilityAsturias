@@ -65,6 +65,9 @@ export class TenantService {
       if (response.ok) {
         const info: TenantInfo = await response.json();
         this.tenantInfo.set(info);
+        if (!this.tenantSlug()) {
+          this.tenantSlug.set(info.slug);
+        }
         this.applyTheming(info);
       } else {
         this.redirectToMainDomain();
