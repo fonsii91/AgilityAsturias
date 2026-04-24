@@ -31,6 +31,15 @@ export class ClubAdminService {
         return this.http.put<Club>(`${this.apiUrl}/admin/clubs/${id}`, club);
     }
 
+    updateClubWithFormData(id: number, formData: FormData): Observable<Club> {
+        formData.append('_method', 'PUT');
+        return this.http.post<Club>(`${this.apiUrl}/admin/clubs/${id}`, formData);
+    }
+
+    createClubWithFormData(formData: FormData): Observable<Club> {
+        return this.http.post<Club>(`${this.apiUrl}/admin/clubs`, formData);
+    }
+
     deleteClub(id: number): Observable<any> {
         return this.http.delete(`${this.apiUrl}/admin/clubs/${id}`);
     }

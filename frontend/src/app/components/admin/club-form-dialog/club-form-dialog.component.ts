@@ -63,11 +63,18 @@ import { ToastService } from '../../../services/toast.service';
               <input matInput formControlName="slogan" placeholder="Ej: Pasión por el agility">
             </mat-form-field>
             
-            <mat-form-field appearance="outline" class="w-full md:col-span-2">
-              <mat-label>URL del Logo</mat-label>
-              <mat-icon matPrefix class="mr-2 text-slate-400">image</mat-icon>
-              <input matInput formControlName="logo_url" placeholder="Ej: https://midominio.com/logo.png">
-            </mat-form-field>
+            <div class="w-full md:col-span-2 flex gap-2 items-start">
+              <mat-form-field appearance="outline" class="flex-1">
+                <mat-label>URL del Logo</mat-label>
+                <mat-icon matPrefix class="mr-2 text-slate-400">image</mat-icon>
+                <input matInput formControlName="logo_url" placeholder="Ej: https://midominio.com/logo.png">
+              </mat-form-field>
+              <button type="button" mat-stroked-button color="primary" class="mt-1 h-[56px] px-4" (click)="logoInput.click()">
+                <mat-icon>upload_file</mat-icon>
+                {{ logoFile ? 'Sustituir Logo' : 'Subir Logo' }}
+              </button>
+              <input #logoInput type="file" accept="image/*" class="hidden" (change)="onFileSelected('logo', $event)">
+            </div>
           </div>
         </div>
 
@@ -111,17 +118,31 @@ import { ToastService } from '../../../services/toast.service';
               </div>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="w-full md:col-span-2">
-              <mat-label>URL Imagen Cabecera (Hero)</mat-label>
-              <mat-icon matPrefix class="mr-2 text-slate-400">wallpaper</mat-icon>
-              <input matInput formControlName="heroImage" placeholder="Ej: Images/Perros/Pumba.jpeg">
-            </mat-form-field>
+            <div class="w-full md:col-span-2 flex gap-2 items-start">
+              <mat-form-field appearance="outline" class="flex-1">
+                <mat-label>URL Imagen Cabecera (Hero)</mat-label>
+                <mat-icon matPrefix class="mr-2 text-slate-400">wallpaper</mat-icon>
+                <input matInput formControlName="heroImage" placeholder="Ej: Images/Perros/Pumba.jpeg">
+              </mat-form-field>
+              <button type="button" mat-stroked-button color="primary" class="mt-1 h-[56px] px-4" (click)="heroInput.click()">
+                <mat-icon>upload_file</mat-icon>
+                {{ heroFile ? 'Sustituir Hero' : 'Subir Hero' }}
+              </button>
+              <input #heroInput type="file" accept="image/*" class="hidden" (change)="onFileSelected('hero', $event)">
+            </div>
 
-            <mat-form-field appearance="outline" class="w-full md:col-span-2">
-              <mat-label>URL Imagen Salto (Call to Action)</mat-label>
-              <mat-icon matPrefix class="mr-2 text-slate-400">pets</mat-icon>
-              <input matInput formControlName="jumpImage" placeholder="Ej: Images/Perros/perro_saltando.jpg">
-            </mat-form-field>
+            <div class="w-full md:col-span-2 flex gap-2 items-start">
+              <mat-form-field appearance="outline" class="flex-1">
+                <mat-label>URL Imagen Salto (Call to Action)</mat-label>
+                <mat-icon matPrefix class="mr-2 text-slate-400">pets</mat-icon>
+                <input matInput formControlName="jumpImage" placeholder="Ej: Images/Perros/perro_saltando.jpg">
+              </mat-form-field>
+              <button type="button" mat-stroked-button color="primary" class="mt-1 h-[56px] px-4" (click)="ctaInput.click()">
+                <mat-icon>upload_file</mat-icon>
+                {{ ctaFile ? 'Sustituir CTA' : 'Subir CTA' }}
+              </button>
+              <input #ctaInput type="file" accept="image/*" class="hidden" (change)="onFileSelected('cta', $event)">
+            </div>
           </div>
         </div>
 
@@ -323,6 +344,9 @@ export class ClubFormDialogComponent {
   
   form: FormGroup;
   isSaving = false;
+  logoFile: File | null = null;
+  heroFile: File | null = null;
+  ctaFile: File | null = null;
 
   constructor(
     public dialogRef: MatDialogRef<ClubFormDialogComponent>,
@@ -355,42 +379,66 @@ export class ClubFormDialogComponent {
     this.form.get(controlName)?.setValue(input.value.toUpperCase());
   }
 
+  onFileSelected(field: 'logo' | 'hero' | 'cta', event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      if (field === 'logo') {
+        this.logoFile = input.files[0];
+        this.form.get('logo_url')?.disable();
+      }
+      if (field === 'hero') {
+        this.heroFile = input.files[0];
+        this.form.get('heroImage')?.disable();
+      }
+      if (field === 'cta') {
+        this.ctaFile = input.files[0];
+        this.form.get('jumpImage')?.disable();
+      }
+    }
+  }
+
   save() {
     if (this.form.invalid) return;
     this.isSaving = true;
 
-    const formValue = this.form.value;
-    const clubData: Partial<Club> = {
-      name: formValue.name,
-      slug: formValue.slug,
-      domain: formValue.domain || null,
-      logo_url: formValue.logo_url || null,
-      settings: {
-        slogan: formValue.slogan,
-        colors: {
-          primary: formValue.primary_color,
-          accent: formValue.accent_color
-        },
-        homeConfig: {
-          heroImage: formValue.heroImage,
-          ctaImage: formValue.jumpImage
-        },
-        contact: {
-          phone: formValue.phone,
-          email: formValue.email,
-          addressLine1: formValue.addressLine1,
-          addressLine2: formValue.addressLine2,
-          mapUrl: formValue.mapUrl
-        },
-        social: {
-          instagram: formValue.instagram,
-          facebook: formValue.facebook
-        }
+    const formValue = this.form.getRawValue(); // Usa getRawValue para incluir controles deshabilitados si es necesario (aunque no enviaremos la URL si hay archivo)
+    
+    const settingsObj = {
+      slogan: formValue.slogan,
+      colors: {
+        primary: formValue.primary_color,
+        accent: formValue.accent_color
+      },
+      homeConfig: {
+        heroImage: formValue.heroImage,
+        ctaImage: formValue.jumpImage
+      },
+      contact: {
+        phone: formValue.phone,
+        email: formValue.email,
+        addressLine1: formValue.addressLine1,
+        addressLine2: formValue.addressLine2,
+        mapUrl: formValue.mapUrl
+      },
+      social: {
+        instagram: formValue.instagram,
+        facebook: formValue.facebook
       }
     };
 
+    const formData = new FormData();
+    formData.append('name', formValue.name);
+    formData.append('slug', formValue.slug);
+    if (formValue.domain) formData.append('domain', formValue.domain);
+    if (!this.logoFile && formValue.logo_url) formData.append('logo_url', formValue.logo_url);
+    formData.append('settings', JSON.stringify(settingsObj));
+
+    if (this.logoFile) formData.append('logo_file', this.logoFile);
+    if (this.heroFile) formData.append('hero_file', this.heroFile);
+    if (this.ctaFile) formData.append('cta_file', this.ctaFile);
+
     if (this.data.club) {
-      this.clubService.updateClub(this.data.club.id, clubData).subscribe({
+      this.clubService.updateClubWithFormData(this.data.club.id, formData).subscribe({
         next: () => {
           this.toast.success('Club actualizado correctamente');
           this.dialogRef.close(true);
@@ -401,7 +449,7 @@ export class ClubFormDialogComponent {
         }
       });
     } else {
-      this.clubService.createClub(clubData).subscribe({
+      this.clubService.createClubWithFormData(formData).subscribe({
         next: () => {
           this.toast.success('Club creado con éxito');
           this.dialogRef.close(true);

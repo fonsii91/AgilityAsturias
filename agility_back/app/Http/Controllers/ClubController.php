@@ -39,10 +39,26 @@ class ClubController extends Controller
             'slug' => 'required|string|max:255|unique:clubs,slug',
             'domain' => 'nullable|string|max:255|unique:clubs,domain',
             'logo_url' => 'nullable|string|max:255',
-            'settings' => 'nullable|array',
+            'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'cta_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
-        $club = Club::create($validated);
+        $settings = $request->input('settings');
+        if (is_string($settings)) {
+            $settings = json_decode($settings, true);
+        }
+
+        $club = Club::create([
+            'name' => $validated['name'],
+            'slug' => $validated['slug'],
+            'domain' => $validated['domain'] ?? null,
+            'logo_url' => $validated['logo_url'] ?? null,
+            'settings' => $settings,
+        ]);
+
+        $this->handleClubFiles($request, $club);
+
         return response()->json($club, 201);
     }
 
@@ -53,11 +69,63 @@ class ClubController extends Controller
             'slug' => 'required|string|max:255|unique:clubs,slug,' . $club->id,
             'domain' => 'nullable|string|max:255|unique:clubs,domain,' . $club->id,
             'logo_url' => 'nullable|string|max:255',
-            'settings' => 'nullable|array',
+            'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
+            'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'cta_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
-        $club->update($validated);
+        $settings = $request->input('settings');
+        if (is_string($settings)) {
+            $settings = json_decode($settings, true);
+        }
+
+        $club->update([
+            'name' => $validated['name'],
+            'slug' => $validated['slug'],
+            'domain' => $validated['domain'] ?? null,
+            'logo_url' => $request->has('logo_url') ? $validated['logo_url'] : $club->logo_url,
+            'settings' => $settings,
+        ]);
+
+        $this->handleClubFiles($request, $club);
+
         return response()->json($club);
+    }
+
+    private function handleClubFiles(Request $request, Club $club)
+    {
+        $settings = $club->settings ?? [];
+        $slug = $club->slug;
+        $changed = false;
+
+        if ($request->hasFile('logo_file')) {
+            $path = $request->file('logo_file')->store("clubs/{$slug}/settings", 'public');
+            $club->logo_url = asset('storage/' . $path);
+            $changed = true;
+        }
+
+        if ($request->hasFile('hero_file')) {
+            $path = $request->file('hero_file')->store("clubs/{$slug}/settings", 'public');
+            if (!isset($settings['homeConfig'])) {
+                $settings['homeConfig'] = [];
+            }
+            $settings['homeConfig']['heroImage'] = asset('storage/' . $path);
+            $changed = true;
+        }
+
+        if ($request->hasFile('cta_file')) {
+            $path = $request->file('cta_file')->store("clubs/{$slug}/settings", 'public');
+            if (!isset($settings['homeConfig'])) {
+                $settings['homeConfig'] = [];
+            }
+            $settings['homeConfig']['ctaImage'] = asset('storage/' . $path);
+            $changed = true;
+        }
+
+        if ($changed) {
+            $club->settings = $settings;
+            $club->save();
+        }
     }
 
     public function destroy(Club $club)
