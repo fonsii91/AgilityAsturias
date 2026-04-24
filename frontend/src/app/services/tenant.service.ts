@@ -22,6 +22,7 @@ export class TenantService {
   public tenantSlug = signal<string | null>(null);
   public tenantDomain = signal<string | null>(null);
   public tenantInfo = signal<TenantInfo | null>(null);
+  public isTenantLoading = signal<boolean>(true);
 
   constructor() {
     this.detectTenant();
@@ -38,7 +39,7 @@ export class TenantService {
     const isMainDomain = MAIN_DOMAINS.includes(hostname);
 
     const parts = hostname.split('.');
-    
+
     if (parts.length > 2 && hostname.endsWith('clubagility.com')) {
       this.tenantSlug.set(parts[0]);
     } else if (parts.length === 2 && hostname.includes('localhost') && parts[0] !== 'localhost') {
@@ -46,11 +47,13 @@ export class TenantService {
     } else {
       this.tenantSlug.set(null);
     }
-    
+
     console.log(`[TenantService] Hostname: ${hostname}, Slug detectado: ${this.tenantSlug() || 'Ninguno'}`);
 
     if (!isMainDomain || this.tenantSlug()) {
       this.loadTenantInfo();
+    } else {
+      this.isTenantLoading.set(false);
     }
   }
 
@@ -75,6 +78,8 @@ export class TenantService {
     } catch (err) {
       console.error('[TenantService] Error loading tenant info', err);
       this.redirectToMainDomain();
+    } finally {
+      this.isTenantLoading.set(false);
     }
   }
 
@@ -82,16 +87,16 @@ export class TenantService {
     const hostname = window.location.hostname;
     const isLocalhost = hostname.includes('localhost');
     const port = window.location.port ? `:${window.location.port}` : '';
-    
+
     let mainDomain = '';
     if (isLocalhost) {
       mainDomain = `http://localhost${port}`;
     } else {
       mainDomain = `https://clubagility.com`;
     }
-    
+
     // Redirigir a la principal (puedes conservar la ruta si quieres, o forzar al login como se pidió)
-    window.location.href = `${mainDomain}/login`;
+    window.location.href = `${mainDomain}`;
   }
 
   private applyTheming(info: TenantInfo) {
