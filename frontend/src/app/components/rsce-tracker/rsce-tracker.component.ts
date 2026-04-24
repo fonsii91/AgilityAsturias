@@ -246,7 +246,7 @@ export class RsceTrackerComponent implements OnInit {
         let aJudges = new Set(agilityPaths.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
 
         let optionAMet = aCount >= 3 && aJudges >= 2;
-        let aScore = 3 - Math.max(Math.max(0, 3 - aCount), Math.max(0, 2 - aJudges));
+        let aScore = Math.min(3, aCount);
         this.progressValueA.set((aScore / 3) * 100);
         this.progressTitleA.set('Opción A: Sólo Agility');
         this.progressSubtitleA.set(`${aCount}/3 puntos` + (aCount > 0 && aJudges < 2 ? ' (Falta 1 juez distinto)' : ''));
@@ -258,10 +258,7 @@ export class RsceTrackerComponent implements OnInit {
         let bJudges = new Set(combinedTracks.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
 
         let optionBMet = bAgilityCount >= 2 && bJumpingCount >= 2 && bJudges >= 2;
-        let missingAgility = Math.max(0, 2 - bAgilityCount);
-        let missingJumping = Math.max(0, 2 - bJumpingCount);
-        let missingJudges = Math.max(0, 2 - bJudges);
-        let bScore = 4 - Math.max(missingAgility + missingJumping, missingJudges);
+        let bScore = Math.min(2, bAgilityCount) + Math.min(2, bJumpingCount);
         this.progressValueB.set((bScore / 4) * 100);
         
         this.progressTitleB.set('Opción B: Mix de Mangas');
@@ -287,8 +284,8 @@ export class RsceTrackerComponent implements OnInit {
         let aMet = aCount >= 3 && aJudges >= 3;
         let jMet = jCount >= 3 && jJudges >= 3;
 
-        let aScore = 3 - Math.max(Math.max(0, 3 - aCount), Math.max(0, 3 - aJudges));
-        let jScore = 3 - Math.max(Math.max(0, 3 - jCount), Math.max(0, 3 - jJudges));
+        let aScore = Math.min(3, aCount);
+        let jScore = Math.min(3, jCount);
 
         this.progressValueA.set((aScore / 3) * 100);
         this.progressValueB.set((jScore / 3) * 100);

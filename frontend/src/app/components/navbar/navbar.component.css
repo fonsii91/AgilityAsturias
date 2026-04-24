@@ -65,7 +65,7 @@ nav.desktop-nav a .material-icons {
 
 nav.desktop-nav a:hover,
 nav.desktop-nav a.active-route {
-    color: #ffd700;
+    color: var(--accent-orange, #ffd700);
     /* Gold color on hover or active */
 }
 

@@ -44,6 +44,10 @@
 
 .mobile-nav a:hover {
     background-color: rgba(255, 255, 255, 0.1);
+    color: var(--accent-orange, #ffd700);
+}
+.mobile-nav a:hover .material-icons {
+    color: var(--accent-orange, #ffd700);
 }
 
 .mobile-nav-divider {
@@ -58,14 +62,14 @@
 }
 
 .mobile-nav a.active-route {
-    color: #ffd700;
+    color: var(--accent-orange, #ffd700);
     background-color: rgba(255, 255, 255, 0.15);
-    border-left-color: #ffd700;
+    border-left-color: var(--accent-orange, #ffd700);
     font-weight: 700;
 }
 
 .mobile-nav a.active-route .material-icons {
-    color: #ffd700;
+    color: var(--accent-orange, #ffd700);
 }
 
 .mobile-nav a .material-icons {
