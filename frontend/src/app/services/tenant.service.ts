@@ -28,15 +28,18 @@ export class TenantService {
   }
 
   private detectTenant() {
-    const hostname = window.location.hostname;
+    let hostname = window.location.hostname;
+    if (hostname.startsWith('www.')) {
+      hostname = hostname.substring(4);
+    }
     this.tenantDomain.set(hostname);
 
-    const MAIN_DOMAINS = ['clubagility.com', 'www.clubagility.com', 'localhost'];
+    const MAIN_DOMAINS = ['clubagility.com', 'localhost'];
     const isMainDomain = MAIN_DOMAINS.includes(hostname);
 
     const parts = hostname.split('.');
     
-    if (parts.length > 2 && parts[0] !== 'www' && hostname.endsWith('clubagility.com')) {
+    if (parts.length > 2 && hostname.endsWith('clubagility.com')) {
       this.tenantSlug.set(parts[0]);
     } else if (parts.length === 2 && hostname.includes('localhost') && parts[0] !== 'localhost') {
       this.tenantSlug.set(parts[0]);
@@ -104,7 +107,7 @@ export class TenantService {
 
   public getTenantDomain(): string | null {
     const domain = this.tenantDomain();
-    const MAIN_DOMAINS = ['clubagility.com', 'www.clubagility.com', 'localhost'];
+    const MAIN_DOMAINS = ['clubagility.com', 'localhost'];
     if (domain && MAIN_DOMAINS.includes(domain)) {
       return null;
     }
