@@ -1,9 +1,10 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Location as AngularLocation } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
+import { TenantService } from '../../services/tenant.service';
 
 @Component({
     selector: 'app-home',
@@ -15,16 +16,45 @@ import { environment } from '../../../environments/environment';
 export class HomeComponent {
     authService = inject(AuthService);
     location = inject(AngularLocation);
+    tenantService = inject(TenantService);
     clubConfig = environment.clubConfig;
+    clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
 
     get heroImage() {
-        const imagePath = (this.clubConfig as any).homeConfig?.heroImage || 'Images/Perros/Pumba.jpeg';
-        return this.location.prepareExternalUrl(imagePath);
+        const tenantImg = this.tenantService.tenantInfo()?.settings?.homeConfig?.heroImage;
+        const imagePath = tenantImg || (this.clubConfig as any).homeConfig?.heroImage || 'Images/Perros/Pumba.jpeg';
+        return imagePath.startsWith('http') ? imagePath : this.location.prepareExternalUrl(imagePath);
     }
 
     get ctaImage() {
-        // Usa la foto de perro saltando en caso de no haber config
-        const imagePath = (this.clubConfig as any).homeConfig?.ctaImage || 'Images/Perros/perro_saltando.jpg';
-        return this.location.prepareExternalUrl(imagePath);
+        const tenantImg = this.tenantService.tenantInfo()?.settings?.homeConfig?.ctaImage;
+        const imagePath = tenantImg || (this.clubConfig as any).homeConfig?.ctaImage || 'Images/Perros/perro_saltando.jpg';
+        return imagePath.startsWith('http') ? imagePath : this.location.prepareExternalUrl(imagePath);
+    }
+
+    get slogan() {
+        return this.tenantService.tenantInfo()?.settings?.slogan || this.clubConfig.slogan;
+    }
+
+    get instagram() {
+        const url = this.tenantService.tenantInfo()?.settings?.social?.instagram || this.clubConfig.social.instagram;
+        return url && !url.startsWith('http') ? `https://instagram.com/${url}` : url;
+    }
+
+    get facebook() {
+        const url = this.tenantService.tenantInfo()?.settings?.social?.facebook || this.clubConfig.social.facebook;
+        return url && !url.startsWith('http') ? `https://facebook.com/${url}` : url;
+    }
+
+    get services() {
+        return this.tenantService.tenantInfo()?.settings?.homeConfig?.services || this.clubConfig.homeConfig.services;
+    }
+
+    get features() {
+        return this.tenantService.tenantInfo()?.settings?.homeConfig?.features || this.clubConfig.homeConfig.features;
+    }
+
+    get cta() {
+        return this.tenantService.tenantInfo()?.settings?.homeConfig?.cta || this.clubConfig.homeConfig.cta;
     }
 }

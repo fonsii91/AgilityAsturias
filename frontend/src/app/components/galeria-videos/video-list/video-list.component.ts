@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, HostListener, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { VideoService } from '../../../services/video.service';
@@ -12,6 +12,7 @@ import { RouterLink } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
+import { TenantService } from '../../../services/tenant.service';
 
 @Component({
     selector: 'app-video-list',
@@ -27,6 +28,9 @@ export class VideoListComponent implements OnInit {
     public authService = inject(AuthService);
     private toastService = inject(ToastService);
     private cdr = inject(ChangeDetectorRef);
+    tenantService = inject(TenantService);
+    clubConfig = environment.clubConfig;
+    clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
 
     videos: Video[] = [];
     currentUserId: number | null = null;

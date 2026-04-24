@@ -1,8 +1,13 @@
 import { Routes, ResolveFn } from '@angular/router';
 import { environment } from '../environments/environment';
 
+import { inject } from '@angular/core';
+import { TenantService } from './services/tenant.service';
+
 const titleResolver: ResolveFn<string> = (route, state) => {
-    return `${route.data?.['pageTitle']} | ${environment.clubConfig.name}`;
+    const tenantService = inject(TenantService);
+    const clubName = tenantService.tenantInfo()?.name || 'Club Agility';
+    return `${route.data?.['pageTitle']} | ${clubName}`;
 };
 import { LoginComponent } from './auth/login/login.component';
 import { HomeComponent } from './components/home/home.component';
@@ -66,25 +71,25 @@ export const routes: Routes = [
         path: 'admin/videos',
         loadComponent: () => import('./components/admin-videos-stats/admin-videos-stats.component').then(m => m.AdminVideosStatsComponent),
         canActivate: [adminGuard],
-        title: 'Estadísticas de Vídeos | Agility Asturias'
+        title: titleResolver, data: { pageTitle: 'Estadísticas de Vídeos' }
     },
     {
         path: 'admin/videos-borrados',
         loadComponent: () => import('./components/admin-deleted-videos/admin-deleted-videos.component').then(m => m.AdminDeletedVideosComponent),
         canActivate: [adminGuard],
-        title: 'Historial Vídeos Borrados | Agility Asturias'
+        title: titleResolver, data: { pageTitle: 'Historial Vídeos Borrados' }
     },
     {
         path: 'admin/salud-monitor',
         loadComponent: () => import('./components/admin-salud-monitor/admin-salud-monitor').then(m => m.AdminSaludMonitorComponent),
         canActivate: [adminGuard],
-        title: 'Monitor ACWR | Agility Asturias'
+        title: titleResolver, data: { pageTitle: 'Monitor ACWR' }
     },
     {
         path: 'admin/rsce-monitor',
         loadComponent: () => import('./components/admin-rsce-monitor/admin-rsce-monitor').then(m => m.AdminRsceMonitorComponent),
         canActivate: [adminGuard],
-        title: 'Monitor RSCE | Agility Asturias'
+        title: titleResolver, data: { pageTitle: 'Monitor RSCE' }
     },
     {
         path: 'gestionar-horarios',

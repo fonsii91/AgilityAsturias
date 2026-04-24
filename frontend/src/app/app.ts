@@ -26,7 +26,7 @@ import { CommonModule, DatePipe } from '@angular/common';
   styleUrl: './app.css'
 })
 export class App implements OnInit, OnDestroy {
-  protected readonly title = signal(environment.clubConfig?.name || 'Agility Asturias');
+  protected readonly title = computed(() => this.tenantService.tenantInfo()?.name || 'Club Agility');
   authService = inject(AuthService);
   tenantService = inject(TenantService);
   private toastService = inject(ToastService);

@@ -319,26 +319,104 @@
   </div>
   }
 
-  <!-- Help Modal (same as before but cleanly styled) -->
+  <!-- Help Modal -->
   @if (isHelpModalOpen()) {
-    <div class="modal-overlay" (click)="closeHelpModal()">
-      <div class="form-card accent-border modal-card help-modal-card fade-scale-in bento-card" (click)="$event.stopPropagation()" style="max-width: 700px;">
-        <div class="form-card-header d-flex justify-content-between align-items-center border-bottom pb-3 mb-3">
-          <h3 class="m-0 text-xl d-flex align-items-center gap-2"><span class="material-icons text-primary">science</span> Parámetros ACWR</h3>
-          <button class="btn-icon-close" (click)="closeHelpModal()"><span class="material-icons">close</span></button>
-        </div>
-        <div class="form-card-body" style="text-align: left; line-height: 1.6; color: var(--text-main, #334155);">
-          <!-- content preserved roughly same -->
-          <p>Esta sección emplea el protocolo de ratio estadístico ACWR (Acute:Chronic Workload Ratio) para proteger al atleta canino.</p>
-          <!-- ... omit full long text for space, but keep it structured if needed, or I can paste original. Let's keep original long text for accuracy ... -->
-          <h4 class="mt-4"><span class="material-icons align-middle text-warning mr-2">emoji_events</span> Registro y Uso</h4>
-          <ul class="d-flex flex-column gap-2 pl-0 list-unstyled mt-2">
-            <li class="d-flex gap-3"><span class="material-icons text-primary">speed</span> <span>Zonas: Azul (desentrenamiento), Verde (ideal), Naranja (riesgo moderado), Roja (gran peligro).</span></li>
-            <li class="d-flex gap-3"><span class="material-icons text-pink">hourglass_empty</span> <span>Calibración: Requiere 28 días de base.</span></li>
+  <div class="modal-overlay" (click)="closeHelpModal()">
+    <div class="form-card accent-border modal-card help-modal-card fade-scale-in bento-card" (click)="$event.stopPropagation()"
+      style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+      <div class="form-card-header d-flex justify-content-between align-items-center border-bottom pb-3 mb-3"
+        style="position: sticky; top: 0; background: var(--surface-card, #fff); z-index: 10;">
+        <h3 class="m-0 text-xl d-flex align-items-center gap-2"><span class="material-icons text-primary">science</span> Parámetros ACWR</h3>
+        <button class="btn-icon-close" (click)="closeHelpModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="form-card-body" style="text-align: left; line-height: 1.6; color: var(--text-main, #334155);">
+
+        <p>Esta sección actúa como un tablero de control para monitorizar la exigencia física y deportiva del perro.
+          Utiliza toda la información de pista recopilada para calcular y advertirte sobre la curva de adaptación
+          atlética.</p>
+
+        <h4 style="margin-top: 1.5rem; color: var(--text-dark, #0f172a);"><span class="material-icons align-middle text-warning mr-2">emoji_events</span> Registro y Uso Diario</h4>
+        <ul
+          style="list-style: none; padding-left: 0; display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons text-primary">speed</span>
+            <span><strong>Zonas de Esfuerzo (La Brújula):</strong> El medidor se divide en 4 grandes zonas estadísticas.
+              Azul (desentrenamiento), Verde (estado ideal), Naranja (acumulación de carga rápida) y Roja (riesgo
+              estadístico agudo).</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons text-pink">hourglass_empty</span>
+            <span><strong>Fases de Calibración:</strong> Los algoritmos requieren un mínimo de <strong>28 días</strong>
+              de datos constantes para alcanzar su máxima precisión. Las 2 primeras semanas el velocímetro será gris,
+              advirtiendo que aún no se ha establecido el perfil base de carga del perro.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons text-success">post_add</span>
+            <span><strong>Entrenos Manuales vs Clases:</strong> Las clases rutinarias y las competiciones (donde pases
+              lista) aparecerán arriba automáticamente y pedirán que le confirmes la <em>intensidad</em>. Para todos los
+              demás picos de esfuerzo por tu cuenta, deberás hacer clic en <em>"+ Añadir registro"</em>.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons text-primary" style="color: #8b5cf6;">history</span>
+            <span><strong>Correcciones:</strong> En el listado inferior puedes alterar registros pasados haciendo clic
+              en <span class="material-icons text-small align-middle text-primary">edit</span> o destruirlos
+              con <span class="material-icons text-small align-middle text-danger">delete</span>. Los cálculos
+              estadísticos mundiales se regenerarán automáticamente en todo el sistema al efectuar un cambio.</span>
+          </li>
+        </ul>
+
+        <div
+          style="margin-top: 2rem; padding: 1rem; background-color: var(--bg-light, #f8fafc); border-left: 4px solid #64748b; border-radius: 8px;">
+          <h4 style="margin-top: 0; color: #475569; font-size: 1rem;"><span
+              class="material-icons align-middle text-small" style="color: #64748b;">science</span> Fundamentos Técnicos
+            del Ratio ACWR</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 8px;">El medidor emplea el protocolo estadístico de <strong>Carga
+              Aguda frente a Carga Crónica (ACWR)</strong>, popularizado por Tim Gabbett (2016) en un estudio publicado
+            en el <em>British Journal of Sports Medicine</em> ("The training—injury prevention paradox: should athletes
+            be training smarter and harder?").</p>
+          <ul style="font-size: 0.9rem; margin-bottom: 1rem; padding-left: 20px;">
+            <li><strong>Carga Aguda (7 días):</strong> Representa el grado de fatiga que experimenta el atleta por todo
+              el ejercicio sumado de la última semana.</li>
+            <li><strong>Carga Crónica (28 días):</strong> Representa la base física (fitness) calculada sobre la media
+              de intensidad y duración de las últimas 4 semanas. Equivaldría a su nivel actual de tolerancia sin sufrir
+              estrés.</li>
+            <li>El sistema divide el valor agudo entre el valor crónico. El rango de seguridad histórico (Sweet Spot) se
+              sitúa mayoritariamente entre <strong>0.8 y 1.3</strong>. Valores superiores rompen el estándar estadístico
+              de tolerancia estructural.</li>
+          </ul>
+
+          <h4 style="margin-top: 1.5rem; color: #475569; font-size: 1rem;"><span
+              class="material-icons align-middle text-small" style="color: #64748b;">calculate</span> Variables y
+            Modificadores del Algoritmo</h4>
+          <p style="font-size: 0.9rem; margin-bottom: 8px;">El sistema no se limita a sumar minutos, sino que ajusta
+            matemáticamente el desgaste (Unidades Arbitrarias de Carga) ponderando mútliples factores:</p>
+          <ul style="font-size: 0.9rem; margin-bottom: 0; padding-left: 20px;">
+            <li><strong>Esfuerzo Base:</strong> Se calcula multiplicando <code>Minutos Activos × sRPE (1-10)</code>.
+            </li>
+            <li><strong>Tipo de Actividad:</strong> El <em>Agility</em> aporta el 100% de la carga (Baseline x1.0) por
+              el impacto de giros y saltos. </li>
+            <li><strong>Penalización por Estructura:</strong> "Saltar a Máxima Altura" aplica un multiplicador de castigo del <strong>+20% (x1.2)</strong> sobre la carga registrada. "Múltiples Salidas" aplica un castigo progresivo: hacer de 3 a 5 pistas suma un <strong>+30% (x1.3)</strong>, y correr más de 5 mangas estresa críticamente el sistema con un <strong>+60% (x1.6)</strong>.</li>
+            <li><strong>Tolerancia Dinámica Acumulada:</strong> La barrera de riesgo máximo (Roja) es normalmente 1.50 de
+              ACWR.
+              <ul>
+                <li>Si el perro tiene el flag de <strong>Lesión Previa</strong>, su barrera baja de 1.50 a
+                  <strong>1.35</strong> (mucho menor margen de aguante para re-lesionarse).
+                </li>
+                <li>Si el sistema detecta un bajo ratio biomecánico cruzando Altura y Peso (tejido adiposo que
+                  sobrecarga los tendones corporales), la barrera de riesgo baja otro <strong>-0.10 extra</strong>.</li>
+              </ul>
+            </li>
+            <li><strong>Cold Start (Prevención de picos falsos):</strong> Si registras entrenos con la app recién
+              instalada, el sistema divide temporalmente tu récord crónico entre bloques de "semanas activas" en lugar
+              de 4 semanas muertas. Esto evita que los primeros entrenos generen un ACWR irreal de 4.0 marcando peligro
+              rojo falso.</li>
           </ul>
         </div>
       </div>
     </div>
+  </div>
   }
 
 </div>

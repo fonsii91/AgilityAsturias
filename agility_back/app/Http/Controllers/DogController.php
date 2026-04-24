@@ -165,7 +165,8 @@ class DogController extends Controller
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             }
 
-            $path = $request->file('photo')->store('dog_photos', 'public');
+            $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+            $path = $request->file('photo')->store("clubs/{$clubSlug}/dog_photos", 'public');
             $dog->photo_url = asset('storage/' . $path);
             $dog->save();
         }

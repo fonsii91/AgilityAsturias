@@ -52,11 +52,12 @@
             <li class="mobile-nav-divider">Administrar</li>
             <li><a routerLink="/admin/usuarios" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">admin_panel_settings</span> Roles</a></li>
             <li><a routerLink="/admin/clubs" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">domain</span> Gestión de Clubes</a></li>
+            <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">report_problem</span> Ver sugerencias</a></li>
+            <li class="mobile-nav-divider" style="padding-top: 0.5rem; color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">Revisar</li>
             <li><a routerLink="/admin/videos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">video_library</span> Revisar vídeos</a></li>
             <li><a routerLink="/admin/videos-borrados" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">auto_delete</span> Vídeos Borrados</a></li>
             <li><a routerLink="/admin/salud-monitor" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">monitor_heart</span> Monitor ACWR</a></li>
             <li><a routerLink="/admin/rsce-monitor" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">query_stats</span> Monitor RSCE</a></li>
-            <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">report_problem</span> Ver sugerencias</a></li>
           }
 
           <!-- Explorar and Area Pública for logged-in users -->
@@ -170,7 +171,7 @@
       <div style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 1rem;">
         <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Busca tu club</h2>
         <div style="display: flex; gap: 1rem;">
-          <input type="text" placeholder="Ej: Agility Asturias" style="flex: 1; padding: 1rem; border-radius: 0.5rem; border: 1px solid #cbd5e1; font-size: 1rem;">
+          <input type="text" placeholder="Ej: Mi Club Agility" style="flex: 1; padding: 1rem; border-radius: 0.5rem; border: 1px solid #cbd5e1; font-size: 1rem;">
           <button style="background: #3b82f6; color: white; padding: 1rem 2rem; border-radius: 0.5rem; font-weight: 600; border: none; cursor: pointer;">Buscar</button>
         </div>
       </div>

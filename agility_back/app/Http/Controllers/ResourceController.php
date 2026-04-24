@@ -52,7 +52,8 @@ class ResourceController extends Controller
         ];
 
         if ($validated['type'] === 'document' && $request->hasFile('file')) {
-            $path = $request->file('file')->store('resources', 'public');
+            $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+            $path = $request->file('file')->store("clubs/{$clubSlug}/resources", 'public');
             $data['file_path'] = $path;
         } else {
             $data['url'] = $validated['url'];
@@ -92,7 +93,8 @@ class ResourceController extends Controller
                     if ($resource->file_path) {
                         Storage::disk('public')->delete($resource->file_path);
                     }
-                    $path = $request->file('file')->store('resources', 'public');
+                    $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+                    $path = $request->file('file')->store("clubs/{$clubSlug}/resources", 'public');
                     $data['file_path'] = $path;
                     $data['url'] = null;
                 }
@@ -110,7 +112,8 @@ class ResourceController extends Controller
                  if ($resource->file_path) {
                     Storage::disk('public')->delete($resource->file_path);
                  }
-                 $path = $request->file('file')->store('resources', 'public');
+                 $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+                 $path = $request->file('file')->store("clubs/{$clubSlug}/resources", 'public');
                  $data['file_path'] = $path;
             } elseif ($resource->type !== 'document' && isset($validated['url'])) {
                  $data['url'] = $validated['url'];

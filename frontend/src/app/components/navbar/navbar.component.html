@@ -5,8 +5,8 @@
       <span class="bar"></span>
       <span class="bar"></span>
     </button>
-    <img [src]="clubConfig.logoPath" [alt]="clubConfig.name + ' Logo'" class="nav-logo" routerLink="/">
-    <h1 class="nav-title" routerLink="/">{{ clubConfig.name }}</h1>
+    <img [src]="clubLogo()" [alt]="clubName() + ' Logo'" class="nav-logo" routerLink="/">
+    <h1 class="nav-title" routerLink="/">{{ clubName() }}</h1>
   </div>
 
   <!-- Spacer to push items to the right -->
@@ -62,11 +62,13 @@ Contacto</a></li>
     <ul class="dropdown-menu-list">
       <li><a routerLink="/admin/usuarios" routerLinkActive="active-route"><span class="material-icons">admin_panel_settings</span> Roles</a></li>
       <li><a routerLink="/admin/clubs" routerLinkActive="active-route"><span class="material-icons">domain</span> Gestión de Clubes</a></li>
+      <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route"><span class="material-icons">report_problem</span> Ver sugerencias</a></li>
+      <li class="dropdown-divider"></li>
+      <li style="padding: 4px 20px; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Revisar</li>
       <li><a routerLink="/admin/videos" routerLinkActive="active-route"><span class="material-icons">video_library</span> Revisar vídeos</a></li>
       <li><a routerLink="/admin/videos-borrados" routerLinkActive="active-route"><span class="material-icons">auto_delete</span> Vídeos Borrados</a></li>
       <li><a routerLink="/admin/salud-monitor" routerLinkActive="active-route"><span class="material-icons">monitor_heart</span> Monitor ACWR</a></li>
       <li><a routerLink="/admin/rsce-monitor" routerLinkActive="active-route"><span class="material-icons">query_stats</span> Monitor RSCE</a></li>
-      <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route"><span class="material-icons">report_problem</span> Ver sugerencias</a></li>
     </ul>
   </li>
 }
@@ -208,17 +210,15 @@ Contacto</a></li>
         <a routerLink="/mis-reservas" (click)="closeMenu()"
           class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
         }
-        <a (click)="openSugerenciaDialog()" class="dropdown-item" style="cursor: pointer;">
-          <span class="material-icons">bug_report</span> Sugerencias / Bugs
-        </a>
         <div class="dropdown-divider"></div>
         <a routerLink="/novedades" (click)="closeMenu()" class="dropdown-item">
           <span class="material-icons">new_releases</span> Novedades
         </a>
+        <a (click)="openSugerenciaDialog()" class="dropdown-item" style="cursor: pointer;">
+          <span class="material-icons">bug_report</span> Sugerencias / Bugs
+        </a>
 
-        @if (authService.isAdmin()) {
-          <div class="dropdown-divider"></div>
-        }
+        <div class="dropdown-divider"></div>
 
         <button (click)="logout()" class="dropdown-item logout-item"><span class="material-icons">logout</span>
       Cerrar Sesión</button>

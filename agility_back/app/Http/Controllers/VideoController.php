@@ -140,7 +140,8 @@ class VideoController extends Controller
             'manga_type' => 'nullable|in:Agility,Jumping,Otra,Agility 1,Agility 2,Jumping 1,Jumping 2'
         ]);
 
-        $path = $request->file('video')->store('videos', 'public');
+        $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+        $path = $request->file('video')->store("clubs/{$clubSlug}/videos", 'public');
 
         $video = Video::create([
             'dog_id' => $request->dog_id,

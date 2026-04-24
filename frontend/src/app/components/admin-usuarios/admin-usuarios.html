@@ -25,7 +25,7 @@
                   <img [src]="user.photoURL" alt="Avatar" class="avatar clickable-avatar"
                     referrerpolicy="no-referrer" (click)="openImageZoom(user.photoURL)">
                   } @else {
-                    <img [src]="clubConfig.logoPath" [alt]="clubConfig.name + ' Logo'"
+                    <img [src]="clubConfig.logoPath" [alt]="clubName() + ' Logo'"
                       class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
                     }
                     <span>{{ user.displayName }}</span>

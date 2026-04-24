@@ -27,7 +27,8 @@ class GalleryController extends Controller
         ]);
 
         if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('gallery_photos', 'public');
+            $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+            $path = $request->file('photo')->store("clubs/{$clubSlug}/gallery_photos", 'public');
             $url = asset('storage/' . $path);
 
             $image = GalleryImage::create([

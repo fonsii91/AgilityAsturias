@@ -9,8 +9,8 @@
     <div class="hero-text-col">
         <span class="hero-badge" style="background-color: var(--primary-blue, #004494); color: white;">Club
             Deportivo</span>
-        <h1 style="color: var(--primary-blue, #004494);">{{ clubConfig.name }}</h1>
-        <p class="subtitle">{{ clubConfig.slogan }}</p>
+        <h1 style="color: var(--primary-blue, #004494);">{{ clubName() }}</h1>
+        <p class="subtitle">{{ slogan }}</p>
 
         <div class="hero-btns">
             <a routerLink="/galeria" class="btn btn-outline">Ver Fotos</a>
@@ -20,14 +20,14 @@
 
         <div class="social-links-hero">
             <span class="follow-text">Síguenos en:</span>
-            <a [href]="clubConfig.social.instagram" target="_blank" rel="noopener noreferrer"
+            <a [href]="instagram" target="_blank" rel="noopener noreferrer"
                 class="social-icon instagram" aria-label="Instagram" style="--hover-color: #E1306C;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path
                         d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                 </svg>
             </a>
-            <a [href]="clubConfig.social.facebook" target="_blank" rel="noopener noreferrer"
+            <a [href]="facebook" target="_blank" rel="noopener noreferrer"
                 class="social-icon facebook" aria-label="Facebook">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                     <path
@@ -49,12 +49,12 @@
 <!-- Services Section -->
 <section class="services-section">
     <div class="container">
-        <h3 class="section-title">{{ clubConfig.homeConfig.services.title || 'Nuestros Servicios' }}</h3>
-        <p class="section-intro">{{ clubConfig.homeConfig.services.subtitle || 'Descubre todo lo que ofrecemos para ti y
+        <h3 class="section-title">{{ services.title || 'Nuestros Servicios' }}</h3>
+        <p class="section-intro">{{ services.subtitle || 'Descubre todo lo que ofrecemos para ti y
             tu perro.' }}</p>
 
         <div class="services-grid">
-            @for (service of clubConfig.homeConfig.services.items; track service.title; let i = $index) {
+            @for (service of services.items; track service.title; let i = $index) {
             <div class="service-panel slide-up delay-{{ i }}">
                 <div class="service-icon"><mat-icon>{{ service.icon }}</mat-icon></div>
                 <h4>{{ service.title }}</h4>
@@ -68,7 +68,7 @@
 <!-- Features / Values Section -->
 <section class="features-section">
     <div class="container">
-        @for (feature of clubConfig.homeConfig.features; track feature.title; let i = $index) {
+        @for (feature of features; track feature.title; let i = $index) {
         <div class="feature-card fade-in delay-{{ i }}">
             <div class="icon-wrapper"><mat-icon>{{ feature.icon }}</mat-icon></div>
             <h3>{{ feature.title }}</h3>
@@ -81,9 +81,9 @@
 <!-- CTA Section -->
 <section class="cta-section">
     <div class="cta-text-col fade-in">
-        <h2>{{ clubConfig.homeConfig.cta.title || '¿Listo para dar el primer salto?' }}</h2>
-        <p>{{ clubConfig.homeConfig.cta.subtitle ? clubConfig.homeConfig.cta.subtitle.replace('{clubName}',
-            clubConfig.name) : 'Únete a ' + clubConfig.name + ' y descubre de lo que sois capaces.' }}</p>
+        <h2>{{ cta.title || '¿Listo para dar el primer salto?' }}</h2>
+        <p>{{ cta.subtitle ? cta.subtitle.replace('{clubName}',
+            clubName()) : 'Únete a ' + clubName() + ' y descubre de lo que sois capaces.' }}</p>
         <a routerLink="/contacto" class="btn btn-large"
             style="background-color: var(--accent-orange, #ff9800);">Contactar Ahora</a>
     </div>

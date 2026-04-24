@@ -1,11 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { SuggestionService } from '../../../services/suggestion.service';
 import { environment } from '../../../../environments/environment';
-
-
+import { TenantService } from '../../../services/tenant.service';
 @Component({
   selector: 'app-sugerencia-dialog',
   standalone: true,
@@ -17,8 +16,9 @@ export class SugerenciaDialog {
   type: 'bug' | 'suggestion' = 'suggestion';
   content: string = '';
   isSubmitting = false;
+  tenantService = inject(TenantService);
   clubConfig = environment.clubConfig;
-
+  clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
   constructor(
     public dialogRef: MatDialogRef<SugerenciaDialog>,
     private suggestionService: SuggestionService

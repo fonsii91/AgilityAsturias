@@ -17,6 +17,7 @@ class ClubController extends Controller
                     'id' => $club->id,
                     'name' => $club->name,
                     'slug' => $club->slug,
+                    'domain' => $club->domain,
                     'logo_url' => $club->logo_url,
                     'settings' => $club->settings,
                 ]);
@@ -36,6 +37,7 @@ class ClubController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:clubs,slug',
+            'domain' => 'nullable|string|max:255|unique:clubs,domain',
             'logo_url' => 'nullable|string|max:255',
             'settings' => 'nullable|array',
         ]);
@@ -49,6 +51,7 @@ class ClubController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:clubs,slug,' . $club->id,
+            'domain' => 'nullable|string|max:255|unique:clubs,domain,' . $club->id,
             'logo_url' => 'nullable|string|max:255',
             'settings' => 'nullable|array',
         ]);

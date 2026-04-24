@@ -1,9 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
+import { TenantService } from '../../services/tenant.service';
 
 @Component({
     selector: 'app-login',
@@ -16,7 +17,9 @@ export class LoginComponent {
     authService = inject(AuthService);
     private fb = inject(FormBuilder);
     private router = inject(Router);
+    tenantService = inject(TenantService);
     clubConfig = environment.clubConfig;
+    clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
 
     loginForm = this.fb.group({
         email: ['', [Validators.required, Validators.email]],

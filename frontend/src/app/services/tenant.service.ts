@@ -4,6 +4,14 @@ import { environment } from '../../environments/environment';
 
 export interface ClubSettings {
   primary_color?: string;
+  colors?: {
+    primary?: string;
+    accent?: string;
+  };
+  slogan?: string;
+  contact?: any;
+  social?: any;
+  homeConfig?: any;
   [key: string]: any;
 }
 
@@ -100,12 +108,55 @@ export class TenantService {
   }
 
   private applyTheming(info: TenantInfo) {
-    if (info.settings && info.settings.primary_color) {
+    if (info.settings && info.settings.colors) {
+      if (info.settings.colors.primary) {
+        document.documentElement.style.setProperty('--primary-color', info.settings.colors.primary);
+        document.documentElement.style.setProperty('--primary-blue', info.settings.colors.primary);
+      }
+      if (info.settings.colors.accent) {
+        document.documentElement.style.setProperty('--accent-orange', info.settings.colors.accent);
+      }
+    } else if (info.settings && info.settings.primary_color) {
       document.documentElement.style.setProperty('--primary-color', info.settings.primary_color);
-      // Aquí se pueden setear más variables: --primary-hover, --accent, etc.
+      document.documentElement.style.setProperty('--primary-blue', info.settings.primary_color);
     }
+
     if (info.name) {
       document.title = info.name;
+    }
+
+    if (info.logo_url) {
+      const link: HTMLLinkElement = document.querySelector("link[rel~='icon']") || document.createElement('link');
+      link.rel = 'icon';
+      link.href = info.logo_url;
+      if (!link.parentNode) {
+        document.head.appendChild(link);
+      }
+    }
+
+    // Actualizar dinámicamente el manifest de PWA
+    const manifestLink: HTMLLinkElement | null = document.querySelector('link[rel="manifest"]');
+    if (manifestLink) {
+      const manifest = {
+        name: info.name || 'Club Agility',
+        short_name: info.name || 'Club Agility',
+        display: "standalone",
+        scope: "/",
+        start_url: "/",
+        theme_color: info.settings?.colors?.primary || info.settings?.primary_color || "#0073CF",
+        background_color: "#f8fafc",
+        icons: [
+          {
+            src: info.logo_url || "icons/icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable any"
+          }
+        ]
+      };
+      
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+      manifestLink.href = URL.createObjectURL(blob);
     }
   }
 

@@ -1,4 +1,5 @@
-import { Component, inject, effect, output } from '@angular/core';
+import { Component, inject, effect, output, computed } from '@angular/core';
+import { TenantService } from '../../services/tenant.service';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
@@ -23,7 +24,11 @@ export class NavbarComponent {
     notificationService = inject(NotificationService);
     router = inject(Router);
     dialog = inject(MatDialog);
+    tenantService = inject(TenantService);
     clubConfig = environment.clubConfig;
+    
+    clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
+    clubLogo = computed(() => this.tenantService.tenantInfo()?.logo_url || this.clubConfig.logoPath);
 
     toggleSidenav = output<void>();
 

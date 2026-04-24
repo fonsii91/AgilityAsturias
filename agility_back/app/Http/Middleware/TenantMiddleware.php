@@ -29,6 +29,7 @@ class TenantMiddleware
         
         if ($club) {
             app()->instance('active_club_id', $club->id);
+            app()->instance('active_club_slug', $club->slug);
 
                 // If user is logged in, ensure they belong to this club (unless they are admin)
                 if (auth('sanctum')->check()) {

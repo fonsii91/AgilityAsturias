@@ -5,6 +5,7 @@ import { ReservationService } from '../../services/reservation.service';
 import { AuthService } from '../../services/auth.service';
 import { Reservation } from '../../models/reservation.model';
 import { environment } from '../../../environments/environment';
+import { TenantService } from '../../services/tenant.service';
 
 @Component({
     selector: 'app-mis-reservas',
@@ -16,8 +17,9 @@ import { environment } from '../../../environments/environment';
 export class MisReservasComponent {
     private reservationService = inject(ReservationService);
     private authService = inject(AuthService);
+    tenantService = inject(TenantService);
     clubConfig = environment.clubConfig;
-
+    clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
     todayStr = new Date().toISOString().split('T')[0];
 
     // Filtramos todas las reservas para quedarnos sólo con las del usuario actual

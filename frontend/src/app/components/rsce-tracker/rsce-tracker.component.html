@@ -381,7 +381,7 @@
 
             @if (locationSelectMode() === 'otro') {
             <input type="text" [(ngModel)]="formData().location" class="form-control"
-              placeholder="Ej. Club Agility Asturias">
+              placeholder="Ej. {{ clubName() }}">
             }
           </div>
 

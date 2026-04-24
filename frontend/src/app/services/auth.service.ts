@@ -46,6 +46,17 @@ export class AuthService {
     userProfileSignal = computed(() => this.currentUserSignal());
 
     constructor() {
+        // Detect SSO token from URL for admin cross-subdomain login
+        const urlParams = new URLSearchParams(window.location.search);
+        const ssoToken = urlParams.get('sso_token');
+        if (ssoToken) {
+            localStorage.setItem('access_token', ssoToken);
+            urlParams.delete('sso_token');
+            const newSearch = urlParams.toString();
+            const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+            window.history.replaceState({}, document.title, newUrl);
+        }
+
         this.checkAuth();
     }
 

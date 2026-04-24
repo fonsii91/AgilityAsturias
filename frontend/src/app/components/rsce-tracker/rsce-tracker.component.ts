@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal, OnInit } from '@angular/core';
+import { Component, effect, inject, signal, OnInit, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -8,6 +8,7 @@ import { RsceTrackService } from '../../services/rsce-track.service';
 import { CompetitionService } from '../../services/competition.service';
 import { VideoService } from '../../services/video.service';
 import { environment } from '../../../environments/environment';
+import { TenantService } from '../../services/tenant.service';
 import { Dog } from '../../models/dog.model';
 import { RsceTrack } from '../../models/rsce-track.model';
 import { Video } from '../../models/video.model';
@@ -33,7 +34,9 @@ export class RsceTrackerComponent implements OnInit {
   private competitionService = inject(CompetitionService);
   private videoService = inject(VideoService);
   private datePipe = inject(DatePipe);
+  tenantService = inject(TenantService);
 
+  clubName = computed(() => this.tenantService.tenantInfo()?.name || environment.clubConfig.name);
   dogs = this.dogService.getDogs();
   competitions = this.competitionService.getCompetitions();
   

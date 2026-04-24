@@ -38,7 +38,7 @@ import { ToastService } from '../../services/toast.service';
         <ng-container matColumnDef="slug">
           <th mat-header-cell *matHeaderCellDef> Slug / Subdominio </th>
           <td mat-cell *matCellDef="let club"> 
-            <a [href]="'http://' + club.slug + '.clubagility.com'" target="_blank" class="text-blue-600 hover:underline">
+            <a [href]="getClubUrl(club)" target="_blank" class="text-blue-600 hover:underline">
               {{club.slug}}
             </a>
           </td>
@@ -48,7 +48,7 @@ import { ToastService } from '../../services/toast.service';
         <ng-container matColumnDef="domain">
           <th mat-header-cell *matHeaderCellDef> Dominio Propio </th>
           <td mat-cell *matCellDef="let club">
-            <a *ngIf="club.domain" [href]="'http://' + club.domain" target="_blank" class="text-blue-600 hover:underline">
+            <a *ngIf="club.domain" [href]="getSsoUrl('http://' + club.domain)" target="_blank" class="text-blue-600 hover:underline">
               {{club.domain}}
             </a>
             <span *ngIf="!club.domain" class="text-gray-400 italic">No asignado</span>
@@ -96,6 +96,23 @@ export class ClubsListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadClubs();
+  }
+
+  getSsoUrl(baseUrl: string): string {
+    const token = localStorage.getItem('access_token');
+    return token ? `${baseUrl}?sso_token=${token}` : baseUrl;
+  }
+
+  getClubUrl(club: Club): string {
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname.includes('localhost');
+    const port = window.location.port ? `:${window.location.port}` : '';
+    
+    const baseUrl = isLocalhost 
+      ? `http://${club.slug}.localhost${port}`
+      : `https://${club.slug}.clubagility.com`;
+      
+    return this.getSsoUrl(baseUrl);
   }
 
   loadClubs() {
