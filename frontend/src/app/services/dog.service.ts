@@ -68,8 +68,9 @@ export class DogService {
 
     addDog(dog: Omit<Dog, 'id'>) {
         return new Promise<Dog>((resolve, reject) => {
-            this.http.post<Dog>(this.apiUrl, dog).subscribe({
-                next: (newDog) => {
+            this.http.post<any>(this.apiUrl, dog).subscribe({
+                next: (data) => {
+                    const newDog = this.mapDog(data);
                     this.dogsSignal.update(list => [...list, newDog]);
                     resolve(newDog);
                 },
@@ -95,9 +96,11 @@ export class DogService {
             const formData = new FormData();
             formData.append('photo', photo);
 
-            this.http.post<Dog>(`${this.apiUrl}/${dogId}/photo`, formData).subscribe({
-                next: (updatedDog) => {
+            this.http.post<any>(`${this.apiUrl}/${dogId}/photo`, formData).subscribe({
+                next: (data) => {
+                    const updatedDog = this.mapDog(data);
                     this.dogsSignal.update(list => list.map(d => d.id === dogId ? updatedDog : d));
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? updatedDog : d));
                     resolve(updatedDog);
                 },
                 error: (err) => reject(err)
@@ -107,9 +110,11 @@ export class DogService {
 
     updateDog(id: number, dogData: Partial<Dog>) {
         return new Promise<Dog>((resolve, reject) => {
-            this.http.post<Dog>(`${this.apiUrl}/${id}`, dogData).subscribe({
-                next: (updatedDog) => {
+            this.http.post<any>(`${this.apiUrl}/${id}`, dogData).subscribe({
+                next: (data) => {
+                    const updatedDog = this.mapDog(data);
                     this.dogsSignal.update(list => list.map(d => d.id === id ? updatedDog : d));
+                    this.allDogsSignal.update(list => list.map(d => d.id === id ? updatedDog : d));
                     resolve(updatedDog);
                 },
                 error: (err) => reject(err)
@@ -119,12 +124,13 @@ export class DogService {
 
     giveExtraPoints(dogId: number, points: number, category: string) {
         return new Promise<Dog>((resolve, reject) => {
-            this.http.post<{message: string; dog: Dog}>(`${this.apiUrl}/${dogId}/extra-points`, { points, category }).subscribe({
+            this.http.post<{message: string; dog: any}>(`${this.apiUrl}/${dogId}/extra-points`, { points, category }).subscribe({
                 next: (res) => {
-                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
+                    const mappedDog = this.mapDog(res.dog);
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
                     // Update allDogsSignal as well if it exists in the list
-                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
-                    resolve(res.dog);
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    resolve(mappedDog);
                 },
                 error: (err) => reject(err)
             });
@@ -133,11 +139,12 @@ export class DogService {
 
     shareDog(dogId: number, email: string) {
         return new Promise<Dog>((resolve, reject) => {
-            this.http.post<{message: string; dog: Dog}>(`${this.apiUrl}/${dogId}/share`, { email }).subscribe({
+            this.http.post<{message: string; dog: any}>(`${this.apiUrl}/${dogId}/share`, { email }).subscribe({
                 next: (res) => {
-                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
-                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
-                    resolve(res.dog);
+                    const mappedDog = this.mapDog(res.dog);
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    resolve(mappedDog);
                 },
                 error: (err) => reject(err)
             });
@@ -146,11 +153,12 @@ export class DogService {
 
     removeShare(dogId: number, userId: number) {
         return new Promise<Dog>((resolve, reject) => {
-            this.http.post<{message: string; dog: Dog}>(`${this.apiUrl}/${dogId}/unshare`, { user_id: userId }).subscribe({
+            this.http.post<{message: string; dog: any}>(`${this.apiUrl}/${dogId}/unshare`, { user_id: userId }).subscribe({
                 next: (res) => {
-                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
-                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? res.dog : d));
-                    resolve(res.dog);
+                    const mappedDog = this.mapDog(res.dog);
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    resolve(mappedDog);
                 },
                 error: (err) => reject(err)
             });

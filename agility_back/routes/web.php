@@ -8,12 +8,22 @@ Route::get('/', function () {
 });
 
 // Fallback route to serve storage files directly without symlink
-Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
+Route::get('/storage/{path}', function ($path) {
+    $segments = explode('/', $path);
+    $folder = '';
+
+    if (count($segments) >= 3 && $segments[0] === 'clubs') {
+        // e.g. clubs / slug / dog_photos / img.jpg
+        $folder = $segments[2];
+    } else {
+        // e.g. dog_photos / img.jpg
+        $folder = $segments[0];
+    }
+
     if (!in_array($folder, ['profile_photos', 'dog_photos', 'competition_posters', 'competitions', 'gallery_photos', 'videos'])) {
         abort(404);
     }
 
-    $path = $folder . '/' . $filename;
     $fullPath = storage_path('app/public/' . $path);
 
     // Check if it exists in the storage directory
@@ -54,7 +64,7 @@ Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
         header('Accept-Ranges: bytes');
         header('Content-Length:' . (($end - $begin) + 1));
         header("Content-Range: bytes $begin-$end/$size");
-        header("Content-Disposition: inline; filename=$filename");
+        header("Content-Disposition: inline; filename=" . basename($fullPath));
         header("Content-Transfer-Encoding: binary");
         header("Last-Modified: $time");
 
@@ -72,5 +82,5 @@ Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
 
     // Normal images
     return response()->file($fullPath);
-});
+})->where('path', '.*');
 

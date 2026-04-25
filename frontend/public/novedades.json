@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.1.23",
+    "date": "2026-04-25",
+    "bugfixes": [
+      "Solucionado el problema técnico que impedía visualizar correctamente las fotos de perfil de los perros tras subir una nueva imagen. ¡Ya puedes presumir de peludo sin incidencias!",
+      "Hemos arreglado un pequeño contratiempo que hacía que, justo después de actualizar la foto de tu mascota, la aplicación olvidara temporalmente sus datos en otras pestañas como Salud Deportiva o Resumen."
+    ]
+  },
+  {
     "version": "1.1.22",
     "date": "2026-04-24",
     "features": [
