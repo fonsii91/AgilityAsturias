@@ -44,11 +44,8 @@ export class VideoService {
         return this.http.get<any>(this.apiUrl, { params });
     }
 
-    uploadVideo(formData: FormData): Observable<any> {
-        return this.http.post<any>(this.apiUrl, formData, {
-            reportProgress: true,
-            observe: 'events'
-        });
+    uploadVideo(formData: FormData): Observable<Video> {
+        return this.http.post<Video>(this.apiUrl, formData);
     }
 
     deleteVideo(id: number): Observable<any> {

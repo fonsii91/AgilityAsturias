@@ -10,7 +10,6 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { AuthService } from '../../../services/auth.service';
 import { Dog } from '../../../models/dog.model';
-import { HttpEventType } from '@angular/common/http';
 
 @Component({
     selector: 'app-upload-video',
@@ -38,7 +37,6 @@ export class UploadVideoComponent implements OnInit {
     isCompressing = false;
     compressionMessage = '';
     compressionProgress = 0;
-    uploadProgress = 0;
 
     detectedOrientation: 'horizontal' | 'vertical' = 'vertical';
 
@@ -54,7 +52,7 @@ export class UploadVideoComponent implements OnInit {
         effect(() => {
             const comps = this.compService.getCompetitions()();
             const today = new Date().toISOString().split('T')[0];
-            
+
             const currentCompId = this.uploadForm.get('competition_id')?.value;
             if (!currentCompId) {
                 // Find if any competition is happening today (or within its date range)
@@ -132,7 +130,7 @@ export class UploadVideoComponent implements OnInit {
         event.preventDefault();
         event.stopPropagation();
         this.isDragging = false;
-        
+
         const files = event.dataTransfer?.files;
         if (files && files.length > 0) {
             const file = files[0];
@@ -151,7 +149,7 @@ export class UploadVideoComponent implements OnInit {
             try {
                 const video = document.createElement('video');
                 const url = URL.createObjectURL(file);
-                
+
                 video.onloadedmetadata = () => {
                     URL.revokeObjectURL(url);
                     if (video.videoWidth > video.videoHeight) {
@@ -160,12 +158,12 @@ export class UploadVideoComponent implements OnInit {
                         resolve('vertical');
                     }
                 };
-                
+
                 video.onerror = () => {
                     URL.revokeObjectURL(url);
                     resolve('vertical');
                 };
-                
+
                 video.src = url;
             } catch (error) {
                 resolve('vertical');
@@ -188,17 +186,17 @@ export class UploadVideoComponent implements OnInit {
     async fetchWithProgress(url: string, mimeType: string, isMainFiles: boolean = false): Promise<string> {
         const response = await fetch(url);
         if (!response.ok) throw new Error(`Failed to fetch ${url}: ${response.statusText}`);
-        
+
         const contentLength = response.headers.get('content-length');
         const total = contentLength ? parseInt(contentLength, 10) : 0;
         let loaded = 0;
-        
+
         const reader = response.body?.getReader();
         if (!reader) {
             const blob = await response.blob();
             return URL.createObjectURL(new Blob([blob], { type: mimeType }));
         }
-        
+
         const chunks: Uint8Array[] = [];
         while (true) {
             const { done, value } = await reader.read();
@@ -213,7 +211,7 @@ export class UploadVideoComponent implements OnInit {
                 }
             }
         }
-        
+
         const blob = new Blob(chunks as any, { type: mimeType });
         return URL.createObjectURL(blob);
     }
@@ -242,7 +240,7 @@ export class UploadVideoComponent implements OnInit {
         }
 
         const OriginalWorker = window.Worker;
-        window.Worker = function(url: string | URL, options?: WorkerOptions) {
+        window.Worker = function (url: string | URL, options?: WorkerOptions) {
             // Force classic worker by stripping `{ type: 'module' }`.
             // Module workers prevent `importScripts`, which crashes the UMD worker internally.
             return new OriginalWorker(url);
@@ -319,7 +317,6 @@ export class UploadVideoComponent implements OnInit {
         }
 
         this.isUploading = true;
-        this.uploadProgress = 0;
         this.cdr.detectChanges();
 
         const formData = new FormData();
@@ -337,18 +334,11 @@ export class UploadVideoComponent implements OnInit {
         formData.append('video', finalFile);
 
         this.videoService.uploadVideo(formData).subscribe({
-            next: (event: any) => {
-                if (event.type === HttpEventType.UploadProgress) {
-                    if (event.total) {
-                        this.uploadProgress = Math.round(100 * event.loaded / event.total);
-                        this.cdr.detectChanges();
-                    }
-                } else if (event.type === HttpEventType.Response) {
-                    this.toastService.success('Vídeo subido exitosamente.');
-                    this.router.navigate(['/galeria-videos']);
-                    this.isUploading = false;
-                    this.cdr.detectChanges();
-                }
+            next: () => {
+                this.toastService.success('Vídeo subido exitosamente.');
+                this.router.navigate(['/galeria-videos']);
+                this.isUploading = false;
+                this.cdr.detectChanges();
             },
             error: (err) => {
                 console.error('Upload Error:', err);
@@ -364,11 +354,11 @@ export class UploadVideoComponent implements OnInit {
                     } else if (err.error?.message) {
                         errorMsg = err.error.message;
                     }
-                    
+
                     if (errorMsg === 'The video failed to upload.') {
                         errorMsg = 'El archivo supera el límite (upload_max_filesize) configurado en el servidor PHP local. Sube un vídeo más pequeño o aumenta este límite en tu php.ini.';
                     }
-                    
+
                     this.toastService.error(errorMsg);
                 } else if (err.status === 413) {
                     this.toastService.error('El vídeo fue rechazado por el servidor porque es demasiado pesado (Máximo 500MB).');

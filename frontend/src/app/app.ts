@@ -18,10 +18,11 @@ import { environment } from '../environments/environment';
 import { TenantService } from './services/tenant.service';
 
 import { CommonModule, DatePipe } from '@angular/common';
+import { ClubagilityComponent } from './clubagility/clubagility.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

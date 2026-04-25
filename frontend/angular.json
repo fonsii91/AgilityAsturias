@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "AgilityAsturias": {
+    "ClubAgility": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -95,13 +95,13 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "AgilityAsturias:build:production"
+              "buildTarget": "ClubAgility:build:production"
             },
             "patitas": {
-              "buildTarget": "AgilityAsturias:build:patitas"
+              "buildTarget": "ClubAgility:build:patitas"
             },
             "development": {
-              "buildTarget": "AgilityAsturias:build:development"
+              "buildTarget": "ClubAgility:build:development"
             }
           },
           "defaultConfiguration": "development"

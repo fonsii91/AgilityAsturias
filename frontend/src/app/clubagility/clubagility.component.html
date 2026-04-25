@@ -1,0 +1,27 @@
+<div class="landing-page-wrapper">
+  <!-- Dynamic Background Blobs -->
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+  <div class="bg-blob blob-3"></div>
+
+  <!-- Navbar -->
+  <app-navbar-saas (viewChange)="currentView.set($event)" [currentView]="currentView()"></app-navbar-saas>
+
+  <!-- Dynamic Views -->
+  @switch (currentView()) {
+    @case ('home') {
+      <app-home-saas></app-home-saas>
+    }
+    @case ('features') {
+      <app-features-saas></app-features-saas>
+    }
+    @case ('join') {
+      <app-join-saas></app-join-saas>
+    }
+    <!-- Más componentes en el futuro (Precios, Contacto...) -->
+  }
+
+  <footer class="landing-footer">
+    &copy; 2026 Club Agility. Todos los derechos reservados.
+  </footer>
+</div>

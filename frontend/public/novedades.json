@@ -1,12 +1,5 @@
 [
   {
-    "version": "1.1.24",
-    "date": "2026-04-25",
-    "features": [
-      "¡Tu espera ahora es más visual! Hemos incorporado una estupenda barra de progreso en tiempo real al subir vídeos en la galería. Ahora podrás ver el porcentaje exacto de carga para saber con seguridad que el sistema sigue trabajando correctamente mientras envías tus grabaciones más largas y pesadas desde el móvil."
-    ]
-  },
-  {
     "version": "1.1.23",
     "date": "2026-04-25",
     "bugfixes": [
