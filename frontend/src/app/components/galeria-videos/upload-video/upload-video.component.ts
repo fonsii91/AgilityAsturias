@@ -10,6 +10,7 @@ import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 import { AuthService } from '../../../services/auth.service';
 import { Dog } from '../../../models/dog.model';
+import { HttpEventType } from '@angular/common/http';
 
 @Component({
     selector: 'app-upload-video',
@@ -37,6 +38,7 @@ export class UploadVideoComponent implements OnInit {
     isCompressing = false;
     compressionMessage = '';
     compressionProgress = 0;
+    uploadProgress = 0;
 
     detectedOrientation: 'horizontal' | 'vertical' = 'vertical';
 
@@ -317,6 +319,7 @@ export class UploadVideoComponent implements OnInit {
         }
 
         this.isUploading = true;
+        this.uploadProgress = 0;
         this.cdr.detectChanges();
 
         const formData = new FormData();
@@ -334,11 +337,18 @@ export class UploadVideoComponent implements OnInit {
         formData.append('video', finalFile);
 
         this.videoService.uploadVideo(formData).subscribe({
-            next: () => {
-                this.toastService.success('Vídeo subido exitosamente.');
-                this.router.navigate(['/galeria-videos']);
-                this.isUploading = false;
-                this.cdr.detectChanges();
+            next: (event: any) => {
+                if (event.type === HttpEventType.UploadProgress) {
+                    if (event.total) {
+                        this.uploadProgress = Math.round(100 * event.loaded / event.total);
+                        this.cdr.detectChanges();
+                    }
+                } else if (event.type === HttpEventType.Response) {
+                    this.toastService.success('Vídeo subido exitosamente.');
+                    this.router.navigate(['/galeria-videos']);
+                    this.isUploading = false;
+                    this.cdr.detectChanges();
+                }
             },
             error: (err) => {
                 console.error('Upload Error:', err);
