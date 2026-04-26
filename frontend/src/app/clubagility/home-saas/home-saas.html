@@ -1,19 +1,127 @@
 <main class="landing-main">
-  <div class="hero-content fade-in-up">
-    <div class="badge">NUEVO</div>
-    <h1 class="main-title">
-      Digitaliza tu Club de Agility<br>
-      <span class="highlight">en minutos</span>
-    </h1>
-    <p class="subtitle">
-      Una plataforma unificada para reserva de pistas, gestión de socios, competiciones y salud deportiva.
-    </p>
+  <div class="hero-container">
+    <div class="hero-text fade-in-up">
+      <div class="badge">NUEVO</div>
+      <h1 class="main-title">
+        Digitaliza tu Club de Agility<br>
+        <span class="highlight">en minutos</span>
+      </h1>
+      <p class="subtitle">
+        Una plataforma unificada para reserva de entrenamientos, gestión de socios, competiciones y salud deportiva.
+      </p>
 
-    <div class="cta-actions pop-in">
-      <button class="btn-primary btn-glow" (click)="goToJoin()">
-        Comenzar Ahora
-        <span class="material-icons">arrow_forward</span>
-      </button>
+      <div class="cta-actions pop-in">
+        <button class="btn-primary btn-glow" (click)="goToJoin()">
+          Comenzar Ahora
+          <span class="material-icons">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Abstract Dashboard Mockup -->
+    <div class="hero-visual pop-in">
+      <div class="abstract-dashboard">
+        <div class="dash-sidebar">
+          <div class="dash-logo"></div>
+          <div class="dash-nav-item active"></div>
+          <div class="dash-nav-item"></div>
+          <div class="dash-nav-item"></div>
+          <div class="dash-nav-item mt-auto"></div>
+        </div>
+        <div class="dash-main">
+          <div class="dash-header">
+            <div class="dash-search"></div>
+            <div class="dash-avatar"></div>
+          </div>
+          <div class="dash-cards">
+            <div class="dash-card">
+              <div class="dash-icon" style="background: rgba(16, 185, 129, 0.2);"><span class="material-icons" style="color: #10b981; font-size: 1rem;">calendar_month</span></div>
+              <div class="dash-line short"></div>
+              <div class="dash-line"></div>
+            </div>
+            <div class="dash-card">
+              <div class="dash-icon" style="background: rgba(59, 130, 246, 0.2);"><span class="material-icons" style="color: #3b82f6; font-size: 1rem;">pets</span></div>
+              <div class="dash-line short"></div>
+              <div class="dash-line"></div>
+            </div>
+          </div>
+          <div class="dash-calendar">
+            <div class="dash-cal-header">
+              <div class="dash-line short"></div>
+              <div class="dash-btn"></div>
+            </div>
+            <div class="dash-cal-grid">
+              <div class="cal-block filled" style="width: 40%"></div>
+              <div class="cal-block"></div>
+              <div class="cal-block filled" style="width: 60%"></div>
+              <div class="cal-block"></div>
+              <div class="cal-block filled" style="width: 30%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
+
+  <!-- Social Proof Band -->
+  <div class="social-proof-band fade-in-up">
+    <p>La plataforma elegida por clubes y competidores para organizar sus entrenamientos</p>
+    <div class="trust-icons">
+      <div class="trust-item"><span class="material-icons">verified</span><span>RSCE Compatible</span></div>
+      <div class="trust-item"><span class="material-icons">speed</span><span>Gestión Rápida</span></div>
+      <div class="trust-item"><span class="material-icons">cloud_done</span><span>100% Cloud</span></div>
+      <div class="trust-item"><span class="material-icons">groups</span><span>Soporte 24/7</span></div>
+    </div>
+  </div>
+
+  <!-- How it Works Section -->
+  <section class="how-it-works fade-in-up" style="margin-top: 8rem; width: 100%; text-align: center;">
+    <div class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981; border-color: rgba(16, 185, 129, 0.3);">
+      FÁCIL IMPLEMENTACIÓN
+    </div>
+    <h2 class="main-title" style="font-size: 2.5rem; margin-bottom: 1rem;">
+      En marcha en <span class="highlight">3 sencillos pasos</span>
+    </h2>
+    <p class="subtitle" style="margin: 0 auto 4rem auto;">
+      Olvídate de instalaciones complejas. Configurar ClubAgility es tan rápido como montar un salto de valla.
+    </p>
+
+    <div class="steps-grid">
+      <!-- Step 1 -->
+      <div class="step-card pop-in" style="animation-delay: 0.2s;">
+        <div class="step-number">1</div>
+        <div class="step-icon-wrapper" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+          <span class="material-icons step-icon">tune</span>
+        </div>
+        <h3 class="step-title">Personaliza tu Club</h3>
+        <p class="step-desc">
+          Sube el logotipo, define el número de pistas disponibles y configura tus tarifas en menos de 5 minutos.
+        </p>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card pop-in" style="animation-delay: 0.4s;">
+        <div class="step-number">2</div>
+        <div class="step-icon-wrapper" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+          <span class="material-icons step-icon">group_add</span>
+        </div>
+        <h3 class="step-title">Invita a la Comunidad</h3>
+        <p class="step-desc">
+          Envía el enlace de invitación. Los socios completarán sus propios perfiles y los de sus perros (ACWR).
+        </p>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card pop-in" style="animation-delay: 0.6s;">
+        <div class="step-number">3</div>
+        <div class="step-icon-wrapper" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+          <span class="material-icons step-icon">query_stats</span>
+        </div>
+        <h3 class="step-title">Toma el Control</h3>
+        <p class="step-desc">
+          Disfruta viendo cómo las reservas se organizan solas y ten visibilidad total del rendimiento del club.
+        </p>
+      </div>
+    </div>
+  </section>
 </main>

@@ -49,30 +49,47 @@
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 .nav-item:hover {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(59, 130, 246, 0.05);
   color: #2563eb;
 }
 
 .nav-item.active {
-  background: #3b82f6;
-  color: white;
+  background: transparent;
+  color: #3b82f6;
 }
 
-.join-btn {
-  background: #10b981;
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 2px;
+  left: 15%;
+  width: 70%;
+  height: 2px;
+  background-color: #3b82f6;
+  border-radius: 2px;
+}
+
+.join-btn, .join-btn.active {
+  background: #3b82f6;
   color: white;
   padding: 0.5rem 1.25rem;
   border-radius: 9999px;
   font-weight: 700;
-  box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+}
+
+.join-btn.active::after {
+  display: none;
 }
 
 .join-btn:hover {
-  background: #059669;
+  background: #2563eb;
   transform: translateY(-1px);
   color: white;
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
 }
 

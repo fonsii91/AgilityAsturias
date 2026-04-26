@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -14,6 +14,7 @@ export class JoinSaas {
   
   leadForm: FormGroup;
   isSubmitted = false;
+  selectedPlan = signal<string | null>(null);
 
   constructor() {
     this.leadForm = this.fb.group({
@@ -24,11 +25,20 @@ export class JoinSaas {
     });
   }
 
+  selectPlan(planName: string) {
+    this.selectedPlan.set(planName);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  goBackToPlans() {
+    this.selectedPlan.set(null);
+  }
+
   onSubmit() {
     if (this.leadForm.valid) {
       this.isSubmitted = true;
-      // Aquí irá la llamada al backend
-      console.log('Lead request submitted:', this.leadForm.value);
+      // Aquí irá la llamada al backend, incluyendo el plan seleccionado
+      console.log('Lead request submitted:', { ...this.leadForm.value, plan: this.selectedPlan() });
     } else {
       this.leadForm.markAllAsTouched();
     }

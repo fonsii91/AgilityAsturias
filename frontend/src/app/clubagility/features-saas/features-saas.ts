@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 
 @Component({
   selector: 'app-features-saas',
@@ -8,5 +8,9 @@ import { Component } from '@angular/core';
   styleUrl: './features-saas.css',
 })
 export class FeaturesSaas {
+  showDetails = signal(false);
 
+  toggleDetails() {
+    this.showDetails.update(v => !v);
+  }
 }

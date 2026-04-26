@@ -1,72 +1,170 @@
 <main class="landing-main">
-  <div class="hero-content fade-in-up">
-    <h1 class="main-title" style="font-size: 3rem;">
-      Únete a <span class="highlight">Club Agility</span>
-    </h1>
-    <p class="subtitle">
-      Comienza a gestionar tu club de forma profesional hoy mismo.
-    </p>
 
-    <div class="glass-card pop-in">
-      
-      @if (!isSubmitted) {
-        <div class="form-header">
-          <h2>Solicita Acceso para tu Club</h2>
-          <p>Déjanos los datos básicos y prepararemos tu entorno personalizado.</p>
+  @if (!selectedPlan()) {
+    <!-- VISTA 1: SELECCIÓN DE PLAN (Hostinger Style) -->
+    <div class="pricing-view fade-in-up">
+      <div class="pricing-header-main">
+        <div class="badge badge-purple">
+          ELIGE TU PLAN
+        </div>
+        <h1 class="main-title">
+          Empieza a gestionar tu club<br>
+          <span class="highlight">sin dolores de cabeza</span>
+        </h1>
+        <p class="subtitle centered-subtitle">
+          Selecciona el plan que mejor se adapte a tus necesidades. Sin compromisos a largo plazo.
+        </p>
+      </div>
+
+      <div class="pricing-grid">
+        
+        <!-- PLAN 1: ESENCIAL -->
+        <div class="pricing-card basic-card pop-in" style="animation-delay: 0.1s;">
+          <div class="card-header">
+            <h3>Plan Esencial</h3>
+            <p class="card-desc">Para clubes pequeños que están empezando.</p>
+          </div>
+          <div class="price">
+            <span class="currency">€</span><span class="amount">29</span><span class="period">/mes</span>
+          </div>
+          <p class="billing-info">Facturación anual</p>
+          
+          <button class="btn-select-plan outline-btn" (click)="selectPlan('Esencial')">Elegir Esencial</button>
+          
+          <ul class="pricing-features">
+            <li><span class="material-icons check-icon">check</span> Hasta 50 socios</li>
+            <li><span class="material-icons check-icon">check</span> Reservas limitadas a 2 pistas</li>
+            <li><span class="material-icons check-icon">check</span> Soporte por Email</li>
+            <li class="missing"><span class="material-icons cross-icon">close</span> Módulo Salud (ACWR)</li>
+            <li class="missing"><span class="material-icons cross-icon">close</span> Gestión Competiciones</li>
+          </ul>
         </div>
 
-        <form [formGroup]="leadForm" (ngSubmit)="onSubmit()" class="lead-form">
-          <div class="form-row">
-            <div class="input-group">
-              <label for="name">Nombre del Club</label>
-              <input type="text" id="name" formControlName="name" placeholder="Ej. Club Agility Madrid">
-              @if (leadForm.get('name')?.invalid && leadForm.get('name')?.touched) {
-                <span class="error-msg">El nombre es obligatorio</span>
-              }
-            </div>
-
-            <div class="input-group">
-              <label for="slug">Subdominio deseado</label>
-              <div class="addon-input">
-                <input type="text" id="slug" formControlName="slug" placeholder="tu-club">
-                <span class="addon">.clubagility.com</span>
-              </div>
-              @if (leadForm.get('slug')?.invalid && leadForm.get('slug')?.touched) {
-                <span class="error-msg">Solo letras minúsculas y guiones permitidos</span>
-              }
-            </div>
+        <!-- PLAN 2: PRO (THE STAR) -->
+        <div class="pricing-card pro-card pop-in" style="animation-delay: 0.2s;">
+          <div class="most-popular-badge">MÁS POPULAR</div>
+          <div class="card-header">
+            <h3>Plan Pro</h3>
+            <p class="card-desc">Todo lo que necesitas para digitalizar tu club al 100%.</p>
           </div>
-
-          <div class="form-row">
-            <div class="input-group">
-              <label for="email">Email de contacto</label>
-              <input type="email" id="email" formControlName="email" placeholder="hola@tuclub.com">
-              @if (leadForm.get('email')?.invalid && leadForm.get('email')?.touched) {
-                <span class="error-msg">Introduce un email válido</span>
-              }
-            </div>
-
-            <div class="input-group">
-              <label for="phone">Teléfono</label>
-              <input type="tel" id="phone" formControlName="phone" placeholder="Ej. +34 600 000 000">
-              @if (leadForm.get('phone')?.invalid && leadForm.get('phone')?.touched) {
-                <span class="error-msg">El teléfono es obligatorio</span>
-              }
-            </div>
+          <div class="price-strike">
+            <span class="strike-amount">~~89€/mes~~</span> <span class="save-badge">Ahorras 45%</span>
           </div>
-
-          <button type="submit" class="btn-submit btn-glow">
-            Comenzar Prueba Gratuita
-          </button>
-        </form>
-      } @else {
-        <div class="success-message">
-          <span class="material-icons success-icon" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;">check_circle</span>
-          <h2>¡Solicitud Recibida!</h2>
-          <p>Hemos recibido tus datos correctamente. Nuestro equipo configurará tu espacio y te contactaremos en breve al email proporcionado para darte las credenciales de acceso.</p>
+          <div class="price">
+            <span class="currency">€</span><span class="amount">49</span><span class="period">/mes</span>
+          </div>
+          <p class="billing-info">Facturación anual (588€/año)</p>
+          
+          <button class="btn-select-plan primary-btn btn-glow" (click)="selectPlan('Pro')">Elegir Plan Pro</button>
+          
+          <ul class="pricing-features">
+            <li><span class="material-icons check-icon">check_circle</span> Socios y perros <strong>ilimitados</strong></li>
+            <li><span class="material-icons check-icon">check_circle</span> Pistas y reservas <strong>ilimitadas</strong></li>
+            <li><span class="material-icons check-icon">check_circle</span> Módulo Salud Deportiva (ACWR)</li>
+            <li><span class="material-icons check-icon">check_circle</span> Organización de Competiciones</li>
+            <li class="gift-feature"><span class="material-icons gift-icon">card_giftcard</span> <strong>Migración de datos GRATIS</strong></li>
+          </ul>
         </div>
-      }
+
+        <!-- PLAN 3: ÉLITE -->
+        <div class="pricing-card elite-card pop-in" style="animation-delay: 0.3s;">
+          <div class="card-header">
+            <h3>Plan Élite</h3>
+            <p class="card-desc">Para clubes de alto rendimiento y grandes eventos.</p>
+          </div>
+          <div class="price">
+            <span class="currency">€</span><span class="amount">99</span><span class="period">/mes</span>
+          </div>
+          <p class="billing-info">Facturación anual</p>
+          
+          <button class="btn-select-plan outline-btn" (click)="selectPlan('Élite')">Elegir Élite</button>
+          
+          <ul class="pricing-features">
+            <li><span class="material-icons check-icon">check</span> <strong>Todo lo del Plan Pro</strong></li>
+            <li><span class="material-icons check-icon">check</span> Dominio web propio personalizado</li>
+            <li><span class="material-icons check-icon">check</span> Entorno de servidor dedicado</li>
+            <li><span class="material-icons check-icon">check</span> Soporte Telefónico 24/7</li>
+            <li><span class="material-icons check-icon">check</span> Diseño de web a medida</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="guarantee-text fade-in-up" style="animation-delay: 0.5s;">
+        <span class="material-icons">verified_user</span> Garantía de devolución del dinero en 30 días. Cancela cuando quieras.
+      </div>
 
     </div>
-  </div>
+
+  } @else {
+    
+    <!-- VISTA 2: EL FORMULARIO DE ALTA -->
+    <div class="form-view fade-in-up">
+      <button class="btn-back" (click)="goBackToPlans()">
+        <span class="material-icons">arrow_back</span> Volver a los planes
+      </button>
+
+      <div class="glass-card form-container">
+        @if (!isSubmitted) {
+          <div class="form-header">
+            <div class="selected-plan-badge">Plan seleccionado: <strong>{{ selectedPlan() }}</strong></div>
+            <h2>Solicita el Alta de tu Club</h2>
+            <p>Déjanos tus datos básicos y nuestro equipo preparará tu entorno en menos de 24 horas.</p>
+          </div>
+
+          <form [formGroup]="leadForm" (ngSubmit)="onSubmit()" class="lead-form">
+            <div class="form-row">
+              <div class="input-group">
+                <label for="name">Nombre del Club</label>
+                <input type="text" id="name" formControlName="name" placeholder="Ej. Club Agility Madrid">
+                @if (leadForm.get('name')?.invalid && leadForm.get('name')?.touched) {
+                  <span class="error-msg">El nombre es obligatorio</span>
+                }
+              </div>
+
+              <div class="input-group">
+                <label for="slug">Subdominio deseado</label>
+                <div class="addon-input">
+                  <input type="text" id="slug" formControlName="slug" placeholder="tu-club">
+                  <span class="addon">.clubagility.com</span>
+                </div>
+                @if (leadForm.get('slug')?.invalid && leadForm.get('slug')?.touched) {
+                  <span class="error-msg">Solo letras minúsculas y guiones</span>
+                }
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="input-group">
+                <label for="email">Email de contacto</label>
+                <input type="email" id="email" formControlName="email" placeholder="hola@tuclub.com">
+                @if (leadForm.get('email')?.invalid && leadForm.get('email')?.touched) {
+                  <span class="error-msg">Introduce un email válido</span>
+                }
+              </div>
+
+              <div class="input-group">
+                <label for="phone">Teléfono</label>
+                <input type="tel" id="phone" formControlName="phone" placeholder="Ej. +34 600 000 000">
+                @if (leadForm.get('phone')?.invalid && leadForm.get('phone')?.touched) {
+                  <span class="error-msg">El teléfono es obligatorio</span>
+                }
+              </div>
+            </div>
+
+            <button type="submit" class="btn-submit btn-glow">
+              Completar Solicitud
+            </button>
+          </form>
+        } @else {
+          <div class="success-message">
+            <span class="material-icons success-icon" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;">check_circle</span>
+            <h2>¡Solicitud Recibida!</h2>
+            <p>Hemos registrado tu interés en el <strong>Plan {{ selectedPlan() }}</strong>. Nuestro equipo configurará tu espacio y te contactaremos al email proporcionado con tus credenciales.</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
 </main>
