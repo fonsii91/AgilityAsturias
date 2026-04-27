@@ -144,6 +144,11 @@
   color: #2e7d32;
 }
 
+.status-badge.unresolved {
+  background: #ffebee;
+  color: #c62828;
+}
+
 .card-body {
   padding: 16px;
   flex-grow: 1;

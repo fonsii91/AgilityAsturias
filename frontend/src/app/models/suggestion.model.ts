@@ -3,7 +3,7 @@ export interface Suggestion {
   user_id: number;
   type: 'bug' | 'suggestion';
   content: string;
-  status: 'pending' | 'resolved';
+  status: 'pending' | 'resolved' | 'unresolved';
   created_at: string;
   updated_at: string;
   user?: { id: number; name: string; email: string };

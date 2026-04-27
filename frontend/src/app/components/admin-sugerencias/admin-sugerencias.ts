@@ -14,7 +14,7 @@ import { ToastService } from '../../services/toast.service';
 export class AdminSugerencias implements OnInit {
   suggestions = signal<Suggestion[]>([]);
   isLoading = signal(true);
-  filter = signal<'all' | 'pending' | 'resolved'>('pending');
+  filter = signal<'all' | 'pending' | 'resolved' | 'unresolved'>('pending');
 
   filteredSuggestions = computed(() => {
     const f = this.filter();
@@ -47,7 +47,7 @@ export class AdminSugerencias implements OnInit {
     });
   }
 
-  setFilter(newFilter: 'all' | 'pending' | 'resolved') {
+  setFilter(newFilter: 'all' | 'pending' | 'resolved' | 'unresolved') {
       this.filter.set(newFilter);
   }
 
@@ -83,12 +83,12 @@ export class AdminSugerencias implements OnInit {
 
     this.suggestionService.unresolveSuggestion(id).subscribe({
       next: () => {
-        this.toastService.success('Reporte revertido a pendiente');
+        this.toastService.success('Reporte marcado como no resuelto');
         this.suggestions.update(sugs => {
             const ix = sugs.findIndex(s => s.id === id);
             if (ix !== -1) {
                 const updated = [...sugs];
-                updated[ix] = { ...updated[ix], status: 'pending' };
+                updated[ix] = { ...updated[ix], status: 'unresolved' };
                 return updated;
             }
             return sugs;

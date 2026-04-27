@@ -1,14 +1,23 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { toObservable } from '@angular/core/rxjs-interop';
+import { filter, firstValueFrom } from 'rxjs';
 
 export const authGuard: CanActivateFn = async (route, state) => {
     const authService = inject(AuthService);
     const router = inject(Router);
 
-    const user = await authService.getAuthState();
+    // Wait for auth loading to complete
+    if (authService.checkAuthLoading()) {
+        await firstValueFrom(
+            toObservable(authService.checkAuthLoading).pipe(
+                filter(loading => !loading)
+            )
+        );
+    }
 
-    if (user) {
+    if (authService.isLoggedIn()) {
         return true;
     } else {
         // Redirect to login page with return url if needed, or just login

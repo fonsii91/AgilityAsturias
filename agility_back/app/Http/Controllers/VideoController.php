@@ -156,7 +156,19 @@ class VideoController extends Controller
             'is_public' => true
         ]);
 
-        return response()->json($video->load(['dog.users:id,name', 'user', 'competition']), 201);
+        $video->load(['dog.users', 'user', 'competition']);
+
+        // Notify dog owners
+        if ($video->dog) {
+            foreach ($video->dog->users as $owner) {
+                // Remove the condition temporarily to allow the user to test with their own dog
+                // if ($owner->id !== $video->user_id) {
+                    $owner->notify(new \App\Notifications\NewVideoNotification($video));
+                // }
+            }
+        }
+
+        return response()->json($video, 201);
     }
 
     public function update(Request $request, $id)

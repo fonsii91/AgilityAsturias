@@ -14,9 +14,9 @@ class SuggestionController extends Controller
     public function index()
     {
         try {
-            // Get all suggestions, order by pending first, then by date desc
+            // Get all suggestions, order by pending first, then unresolved, then resolved, then by date desc
             $suggestions = Suggestion::with('user:id,name,email')
-                ->orderByRaw("FIELD(status, 'pending', 'resolved')")
+                ->orderByRaw("FIELD(status, 'pending', 'unresolved', 'resolved')")
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -79,13 +79,13 @@ class SuggestionController extends Controller
     }
 
     /**
-     * Mark a suggestion as unresolved (pending) (Only for Admin)
+     * Mark a suggestion as unresolved (Only for Admin)
      */
     public function unresolve($id)
     {
         try {
             $suggestion = Suggestion::findOrFail($id);
-            $suggestion->status = 'pending';
+            $suggestion->status = 'unresolved';
             $suggestion->save();
 
             // Do not send notification here

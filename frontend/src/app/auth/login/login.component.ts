@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
@@ -29,7 +29,13 @@ export class LoginComponent {
     isLoading = signal(false);
     errorMessage = signal('');
 
-    constructor() { }
+    constructor() {
+        effect(() => {
+            if (!this.authService.checkAuthLoading() && this.authService.isLoggedIn()) {
+                this.router.navigate(['/calendario']);
+            }
+        });
+    }
 
     login() {
         if (this.loginForm.invalid) return;

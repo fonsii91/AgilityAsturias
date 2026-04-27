@@ -1,5 +1,5 @@
-import { Component, inject, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, inject, computed, effect } from '@angular/core';
+import { RouterLink, Router } from '@angular/router';
 import { Location as AngularLocation } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
@@ -14,7 +14,16 @@ import { TenantService } from '../../services/tenant.service';
     styleUrl: './home.component.css'
 })
 export class HomeComponent {
+    private router = inject(Router);
     authService = inject(AuthService);
+
+    constructor() {
+        effect(() => {
+            if (!this.authService.checkAuthLoading() && this.authService.isLoggedIn()) {
+                this.router.navigate(['/calendario']);
+            }
+        });
+    }
     location = inject(AngularLocation);
     tenantService = inject(TenantService);
     clubConfig = environment.clubConfig;

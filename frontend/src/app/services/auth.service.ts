@@ -148,7 +148,7 @@ export class AuthService {
         const mappedUser = this.mapUser(response.user);
         this.currentUserSignal.set(mappedUser);
         this.isLoading.set(false);
-        this.router.navigate(['/']);
+        this.router.navigate(['/calendario']);
     }
 
     private handleAuthLogout() {

@@ -60,11 +60,11 @@ export class CalendarioComponent implements AfterViewInit {
         this.currentYear.update(y => y + offset);
     }
 
-    // Modal state
     selectedCompetition: any = null;
     selectedCompetitions: any[] = []; // List to show in modal if multiple
     selectedDeadlines: any[] = [];
     selectedPersonalEvents: PersonalEvent[] = []; // Personal events for the selected day
+    selectedDay: CalendarDay | null = null; // Track the selected day
     isModalOpen = false;
     isHelpModalOpen = false;
     activeModalTab: 'info' | 'asistencia' = 'info'; // Tab state
@@ -107,7 +107,22 @@ export class CalendarioComponent implements AfterViewInit {
         }
     }
 
+    handleDayClick(day: CalendarDay) {
+        if (day.isOtherMonth) return;
+
+        const totalItems = day.competitions.length + day.deadlines.length + day.personalEvents.length;
+
+        if (totalItems > 0) {
+            this.openModal(day);
+        } else {
+            if (this.authService.currentUserSignal()) {
+                this.openPersonalEventModal(day);
+            }
+        }
+    }
+
     openModal(day: CalendarDay) {
+        this.selectedDay = day;
         this.selectedCompetitions = day.competitions || [];
         this.selectedDeadlines = day.deadlines || [];
         this.selectedPersonalEvents = day.personalEvents || [];
@@ -122,7 +137,7 @@ export class CalendarioComponent implements AfterViewInit {
             this.resetAttendanceState();
         } else if (totalItems === 1 && this.selectedPersonalEvents.length === 1) {
             // Si solo hay 1 evento personal, abrimos directamente el modal de evento personal y no el modal general
-            this.openPersonalEventModal(undefined, this.selectedPersonalEvents[0]);
+            this.openPersonalEventModal(day, this.selectedPersonalEvents[0]);
             return;
         } else {
             this.selectedCompetition = null; // Show list if multiple items
@@ -242,6 +257,7 @@ export class CalendarioComponent implements AfterViewInit {
 
     closeModal() {
         this.isModalOpen = false;
+        this.selectedDay = null;
         this.selectedCompetition = null;
         this.selectedCompetitions = [];
         this.isImageExpanded = false; // Reset expansion
@@ -454,6 +470,20 @@ export class CalendarioComponent implements AfterViewInit {
     editPersonalEvent() {
         this.isViewingPersonalEvent = false;
         this.isEditingPersonalEvent = true;
+    }
+
+    openNewPersonalEventSameDay() {
+        const currentDate = this.personalEventForm.start_date;
+        this.isViewingPersonalEvent = false;
+        this.isEditingPersonalEvent = false;
+        
+        this.personalEventForm = {
+            title: '',
+            type: 'veterinario',
+            start_date: currentDate,
+            notes: '',
+            dog_id: this.userDogs()?.length > 0 ? this.userDogs()[0].id : undefined
+        };
     }
 
     closePersonalEventModal() {

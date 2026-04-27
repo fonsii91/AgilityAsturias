@@ -3,6 +3,7 @@
     <h1>Administración de Sugerencias y Errores</h1>
     <div class="filter-controls">
       <button class="filter-btn" [class.active]="filter() === 'pending'" (click)="setFilter('pending')">Pendientes</button>
+      <button class="filter-btn" [class.active]="filter() === 'unresolved'" (click)="setFilter('unresolved')">No Resueltos</button>
       <button class="filter-btn" [class.active]="filter() === 'resolved'" (click)="setFilter('resolved')">Resueltos</button>
       <button class="filter-btn" [class.active]="filter() === 'all'" (click)="setFilter('all')">Todos</button>
     </div>
@@ -17,7 +18,7 @@
   @if (!isLoading() && filteredSuggestions().length === 0) {
     <div class="empty-state">
       <span class="material-icons">sentiment_satisfied_alt</span>
-      <p>No hay reportes {{ filter() === 'pending' ? 'pendientes' : filter() === 'resolved' ? 'resueltos' : '' }} en este momento.</p>
+      <p>No hay reportes {{ filter() === 'pending' ? 'pendientes' : filter() === 'resolved' ? 'resueltos' : filter() === 'unresolved' ? 'no resueltos' : '' }} en este momento.</p>
     </div>
   }
 
@@ -31,7 +32,7 @@
               {{ suggestion.type === 'bug' ? 'Bug' : 'Sugerencia' }}
             </div>
             <div class="status-badge" [ngClass]="suggestion.status">
-              {{ suggestion.status === 'pending' ? 'Pendiente' : 'Resuelto' }}
+              {{ suggestion.status === 'pending' ? 'Pendiente' : suggestion.status === 'resolved' ? 'Resuelto' : 'No Resuelto' }}
             </div>
           </div>
           
@@ -46,14 +47,25 @@
             </div>
             
             @if (suggestion.status === 'pending') {
+              <div style="display: flex; gap: 8px;">
+                <button class="btn-resolve" 
+                        (click)="markAsResolved(suggestion.id)">
+                  <span class="material-icons">check_circle</span> Marcar Resuelto
+                </button>
+                <button class="btn-resolve" style="background-color: #f44336; color: white;"
+                        (click)="markAsUnresolved(suggestion.id)">
+                  <span class="material-icons">cancel</span> Marcar No Resuelto
+                </button>
+              </div>
+            } @else if (suggestion.status === 'unresolved') {
               <button class="btn-resolve" 
                       (click)="markAsResolved(suggestion.id)">
                 <span class="material-icons">check_circle</span> Marcar Resuelto
               </button>
             } @else {
-              <button class="btn-resolve" style="background-color: #64748b; color: white;"
+              <button class="btn-resolve" style="background-color: #f44336; color: white;"
                       (click)="markAsUnresolved(suggestion.id)">
-                <span class="material-icons">undo</span> Marcar No Resuelto
+                <span class="material-icons">cancel</span> Marcar No Resuelto
               </button>
             }
           </div>

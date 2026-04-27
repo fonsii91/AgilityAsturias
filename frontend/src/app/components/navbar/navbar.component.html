@@ -137,7 +137,8 @@
                                 'point-icon': notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point',
                                 'cancel-icon': notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled',
                                 'suggestion-icon': notif.type.includes('NewSuggestionNotification') || notif.data.type === 'new_suggestion',
-                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' && !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion'
+                                'video-icon': notif.type.includes('NewVideoNotification') || notif.data.type === 'new_video',
+                                'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' && !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion' && !notif.type.includes('NewVideoNotification') && notif.data.type !== 'new_video'
                             }">
                 @if (notif.type.includes('NewEventNotification') || notif.data.type === 'new_event') {
                   <span class="material-icons"
@@ -155,7 +156,11 @@
                   <span class="material-icons"
                   >bug_report</span>
                 }
-                @if (!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' && !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion') {
+                @if (notif.type.includes('NewVideoNotification') || notif.data.type === 'new_video') {
+                  <span class="material-icons"
+                  >videocam</span>
+                }
+                @if (!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' && !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion' && !notif.type.includes('NewVideoNotification') && notif.data.type !== 'new_video') {
                   <span class="material-icons"
                   >notifications</span>
                 }
