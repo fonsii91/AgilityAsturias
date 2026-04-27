@@ -7,7 +7,11 @@
       <h2><span class="material-icons" style="vertical-align: middle; margin-right: 8px;">calendar_month</span> Gestión de Horarios Maestros</h2>
       <p class="subtitle">Configura los horarios disponibles por defecto para las clases del club.</p>
     </div>
-    <div>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+      <button class="btn-secondary" routerLink="/reservas" style="display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; background: white; color: var(--text-secondary); border-radius: 10px; padding: 10px 20px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+        <span class="material-icons btn-icon-small">arrow_back</span>
+        Volver a Reservas
+      </button>
       <button class="btn-primary-action" (click)="openModal()">
         <span class="material-icons btn-icon-small">add</span>
         Añadir Horario
@@ -55,6 +59,9 @@
                       </span>
                     </div>
                     <div class="slot-info-main">
+                      @if (slot.name) {
+                        <span class="slot-name" style="font-weight: 600; font-size: 1.1rem; margin-bottom: 2px;">{{ slot.name }}</span>
+                      }
                       <span class="time-range">{{ slot.start_time | slice:0:5 }} - {{ slot.end_time | slice:0:5 }}</span>
                       <span class="capacity-badge">
                         <span class="material-icons icon-tiny">person</span>
@@ -143,6 +150,14 @@
               }
             </div>
             
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label>Nombre de la clase (Opcional)</label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">label</span>
+                <input type="text" [(ngModel)]="slotForm.name" class="modern-input with-icon" placeholder="Ej. Iniciación, Avanzado..." />
+              </div>
+            </div>
+
             <div class="form-group">
               <label>Hora Inicio</label>
               <div class="input-with-icon">

@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
 import { TimeSlotService } from '../../services/time-slot.service';
 import { ToastService } from '../../services/toast.service';
 import { TimeSlot } from '../../models/time-slot.model';
@@ -10,7 +11,7 @@ import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-gestionar-horarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, RouterModule],
   templateUrl: './gestionar-horarios.component.html',
   styleUrl: './gestionar-horarios.component.css'
 })
@@ -62,6 +63,7 @@ export class GestionarHorariosComponent {
   isModalOpen = false;
   slotForm = {
     days: ['Lunes'] as string[],
+    name: '' as string | null,
     startTime: '10:00',
     endTime: '11:00',
     maxBookings: 5
@@ -72,6 +74,7 @@ export class GestionarHorariosComponent {
     this.editingSlot = null;
     this.slotForm = {
       days: ['Lunes'],
+      name: '',
       startTime: '10:00',
       endTime: '11:00',
       maxBookings: 5
@@ -88,6 +91,7 @@ export class GestionarHorariosComponent {
     this.editingSlot = slot;
     this.slotForm = {
       days: [slot.day],
+      name: slot.name || '',
       startTime: slot.start_time,
       endTime: slot.end_time,
       maxBookings: slot.max_bookings
@@ -116,6 +120,7 @@ export class GestionarHorariosComponent {
       if (this.editingSlot) {
         const slotData = {
           day: this.slotForm.days[0], // Edición no masiva
+          name: this.slotForm.name || null,
           start_time: this.slotForm.startTime,
           end_time: this.slotForm.endTime,
           max_bookings: this.slotForm.maxBookings
@@ -127,6 +132,7 @@ export class GestionarHorariosComponent {
         for (const day of this.slotForm.days) {
           const slotData = {
             day: day,
+            name: this.slotForm.name || null,
             start_time: this.slotForm.startTime,
             end_time: this.slotForm.endTime,
             max_bookings: this.slotForm.maxBookings

@@ -101,7 +101,7 @@
     "bugfixes": [
       "Hemos erradicado por completo el 'error de servidor interno' que bloqueaba de forma persistente la pantalla de Clasificación (Ranking) bajo algunas circunstancias.",
       "Se ha pulido y reforzado visualmente hasta el último milímetro la interfaz del Seguimiento de carrera en la RSCE.",
-      "Puestos cinturones de seguridad internos: las clases o asistencias que queden 'huérfanas' al eliminar franjas horarias grandes ahora se eliminarán de forma segura en cascada.",
+      "Puestos cinturones de seguridad internos: las clases o asistencias que queden 'huérfanas' al eliminar clases grandes ahora se eliminarán de forma segura en cascada.",
       "Inyectamos vitaminas a la plataforma en móviles: los teléfonos que bloquaban la pantalla sin cerrar la aplicación volverán ahora a conectarse en una fracción de segundo, refrescando al instante la campanita y vuestro panel de perros."
     ]
   },
@@ -128,7 +128,7 @@
       "¡Despídete de los entrenamientos fantasma! Hemos solucionado un comportamiento extraño que ocurría al intentar confirmar o desmarcar la asistencia a clases pasadas cuyo horario original había sido borrado por la administración."
     ],
     "features": [
-      "Mantenimiento automático e invisible: A partir de ahora, cuando el equipo del club elimine una franja horaria completa, el sistema se encargará él solo de limpiar y cancelar automáticamente todas las reservas asociadas a esa hora para que todo esté siempre impecable."
+      "Mantenimiento automático e invisible: A partir de ahora, cuando el equipo del club elimine una clase completa, el sistema se encargará él solo de limpiar y cancelar automáticamente todas las reservas asociadas a esa hora para que todo esté siempre impecable."
     ]
   },
   {
@@ -155,7 +155,7 @@
     "version": "1.1.7",
     "date": "2026-04-11",
     "features": [
-      "Hemos ajustado el calendario de reservas para asegurarnos de que todas las clases y franjas horarias se muestren estrictamente ordenadas siempre, para que así sea más fácil encajar tus planes diarios."
+      "Hemos ajustado el calendario de reservas para asegurarnos de que todas las clases se muestren estrictamente ordenadas siempre, para que así sea más fácil encajar tus planes diarios."
     ],
     "bugfixes": [
       "Los fines de semana vuelven a ser visibles con normalidad tras subsanar un pequeño contratiempo que escondía los sábados en algunas ocasiones."

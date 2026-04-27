@@ -26,6 +26,7 @@ class TimeSlotController extends Controller
 
         $validated = $request->validate([
             'day' => 'required|string',
+            'name' => 'nullable|string|max:255',
             'start_time' => 'required|string',
             'end_time' => 'required|string',
             'max_bookings' => 'required|integer',
@@ -57,6 +58,7 @@ class TimeSlotController extends Controller
 
         $validated = $request->validate([
             'day' => 'string',
+            'name' => 'nullable|string|max:255',
             'start_time' => 'string',
             'end_time' => 'string',
             'max_bookings' => 'integer',

@@ -210,7 +210,7 @@ class ReservationController extends Controller
 
         if ($existingReservations->count() > 0) {
             return response()->json([
-                'message' => 'Uno o más perros seleccionados ya tienen reserva en esta franja.'
+                'message' => 'Uno o más perros seleccionados ya tienen reserva en esta clase.'
             ], 422);
         }
 

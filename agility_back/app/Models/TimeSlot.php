@@ -15,6 +15,7 @@ class TimeSlot extends Model
 
     protected $fillable = [
         'day',
+        'name',
         'start_time',
         'end_time',
         'max_bookings',

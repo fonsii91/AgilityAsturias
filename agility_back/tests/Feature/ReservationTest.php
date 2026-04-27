@@ -102,7 +102,7 @@ class ReservationTest extends TestCase
         ]);
 
         $response->assertStatus(422);
-        $this->assertStringContainsString('Uno o más perros seleccionados ya tienen reserva en esta franja', $response->json('message'));
+        $this->assertStringContainsString('Uno o más perros seleccionados ya tienen reserva en esta clase', $response->json('message'));
     }
 
     public function test_destroy_block_deletes_all_reservations_for_user_slot_and_date()

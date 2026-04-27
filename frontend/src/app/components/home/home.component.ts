@@ -17,13 +17,8 @@ export class HomeComponent {
     private router = inject(Router);
     authService = inject(AuthService);
 
-    constructor() {
-        effect(() => {
-            if (!this.authService.checkAuthLoading() && this.authService.isLoggedIn()) {
-                this.router.navigate(['/calendario']);
-            }
-        });
-    }
+    // Se ha eliminado la redirección automática a /calendario para que los usuarios logueados
+    // también puedan visitar la página de bienvenida.
     location = inject(AngularLocation);
     tenantService = inject(TenantService);
     clubConfig = environment.clubConfig;
