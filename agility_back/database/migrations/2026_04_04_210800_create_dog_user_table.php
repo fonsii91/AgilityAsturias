@@ -30,7 +30,7 @@ return new class extends Migration
             // Foreign key might not exist, proceed
         }
 
-        if (Schema::hasColumn('dogs', 'user_id')) {
+        if (Schema::hasColumn('dogs', 'user_id') && DB::connection()->getDriverName() !== 'sqlite') {
             Schema::table('dogs', function (Blueprint $table) {
                 $table->dropColumn('user_id');
             });

@@ -7,13 +7,12 @@ import { DogService } from '../../services/dog.service';
 import { ImageCompressorService } from '../../services/image-compressor.service';
 import { ToastService } from '../../services/toast.service';
 import { Dog } from '../../models/dog.model';
-import { FichaPerroComponent } from '../ficha-perro/ficha-perro.component';
 import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, FichaPerroComponent],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css'
 })
@@ -29,9 +28,7 @@ export class Perfil {
   imageModalOpen = signal(false);
   selectedImage = signal<string | null>(null);
 
-  // Ficha Perro Modal state
-  fichaModalOpen = signal(false);
-  selectedDogFicha = signal<Dog | null>(null);
+
 
   // Name editing state
   isEditingName = signal(false);
@@ -55,7 +52,7 @@ export class Perfil {
             expiration: user.rfec_expiration_date ? user.rfec_expiration_date.split('T')[0] : '' 
         };
       }
-    });
+    }, { allowSignalWrites: true });
   }
 
   toggleEditName() {
@@ -174,15 +171,5 @@ export class Perfil {
   closeImageModal() {
     this.imageModalOpen.set(false);
     this.selectedImage.set(null);
-  }
-
-  openFicha(dog: Dog) {
-    this.selectedDogFicha.set(dog);
-    this.fichaModalOpen.set(true);
-  }
-
-  closeFicha() {
-    this.fichaModalOpen.set(false);
-    this.selectedDogFicha.set(null);
   }
 }

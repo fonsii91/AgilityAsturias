@@ -11,7 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE suggestions MODIFY COLUMN status ENUM('pending', 'resolved', 'unresolved') DEFAULT 'pending'");
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE suggestions MODIFY COLUMN status ENUM('pending', 'resolved', 'unresolved') DEFAULT 'pending'");
+        }
     }
 
     /**
@@ -19,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        \Illuminate\Support\Facades\DB::statement("ALTER TABLE suggestions MODIFY COLUMN status ENUM('pending', 'resolved') DEFAULT 'pending'");
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE suggestions MODIFY COLUMN status ENUM('pending', 'resolved') DEFAULT 'pending'");
+        }
     }
 };

@@ -16,15 +16,17 @@ return new class extends Migration
         });
 
         // Asegurarse de que cada perro tenga al menos 1 dueño principal (el más antiguo de la tabla)
-        \Illuminate\Support\Facades\DB::statement('
-            UPDATE dog_user du1
-            JOIN (
-                SELECT MIN(id) as first_id
-                FROM dog_user
-                GROUP BY dog_id
-            ) du2 ON du1.id = du2.first_id
-            SET du1.is_primary_owner = true
-        ');
+        if (\Illuminate\Support\Facades\DB::connection()->getDriverName() !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement('
+                UPDATE dog_user du1
+                JOIN (
+                    SELECT MIN(id) as first_id
+                    FROM dog_user
+                    GROUP BY dog_id
+                ) du2 ON du1.id = du2.first_id
+                SET du1.is_primary_owner = true
+            ');
+        }
     }
 
     /**

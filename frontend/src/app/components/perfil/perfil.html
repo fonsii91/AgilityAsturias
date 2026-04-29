@@ -111,7 +111,7 @@
       </div>
       }
       @for (dog of dogs(); track dog) {
-      <div class="glass-card dog-card" (click)="openFicha(dog)" title="Ver Ficha de {{dog.name}}">
+      <div class="glass-card dog-card" [routerLink]="['/gestionar-perros', dog.id, 'resumen']" title="Gestionar a {{dog.name}}">
         <div class="dog-card-content">
           <div class="dog-icon-container">
             @if (dog.photo_url) {
@@ -149,10 +149,4 @@
   </div>
   }
 </div>
-}
-
-<!-- Ficha Perro Modal -->
-@if (selectedDogFicha()) {
-<app-ficha-perro [dog]="selectedDogFicha()!" [isOpen]="fichaModalOpen()" (close)="closeFicha()">
-</app-ficha-perro>
 }

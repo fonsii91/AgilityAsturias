@@ -59,7 +59,13 @@ class DogController extends Controller
             'rsce_grade' => collect($validated)->get('rsce_grade'),
         ];
 
-        $dog = $request->user()->dogs()->create($dogData, $pivotData);
+        $dog = new Dog($dogData);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('dogs', 'user_id')) {
+            $dog->user_id = Auth::id();
+        }
+        $dog->save();
+        
+        $request->user()->dogs()->attach($dog->id, $pivotData);
         $dog->load('users:id,name,email');
 
         return response()->json($dog, 201);

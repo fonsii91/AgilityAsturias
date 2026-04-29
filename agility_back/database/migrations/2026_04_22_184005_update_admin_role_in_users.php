@@ -11,11 +11,15 @@ return new class extends Migration
     public function up(): void
     {
         // Solo permitimos admin, no super_admin
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('user', 'member', 'staff', 'admin') DEFAULT 'user' NOT NULL");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('user', 'member', 'staff', 'admin') DEFAULT 'user' NOT NULL");
+        }
     }
 
     public function down(): void
     {
-        DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('user', 'member', 'staff', 'admin') DEFAULT 'user' NOT NULL");
+        if (DB::connection()->getDriverName() !== 'sqlite') {
+            DB::statement("ALTER TABLE users MODIFY COLUMN role ENUM('user', 'member', 'staff', 'admin') DEFAULT 'user' NOT NULL");
+        }
     }
 };
