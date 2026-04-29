@@ -27,6 +27,52 @@ class ClubController extends Controller
         return response()->json(null, 404);
     }
 
+    public function manifest(Request $request)
+    {
+        $club = null;
+        if (app()->bound('active_club_id')) {
+            $club = Club::find(app('active_club_id'));
+        }
+
+        if ($club) {
+            $primaryColor = $club->settings['colors']['primary'] ?? ($club->settings['primary_color'] ?? '#0073CF');
+            return response()->json([
+                'name' => $club->name,
+                'short_name' => $club->name,
+                'display' => 'standalone',
+                'start_url' => '/',
+                'theme_color' => $primaryColor,
+                'background_color' => '#f8fafc',
+                'icons' => [
+                    [
+                        'src' => $club->logo_url ?? '/icons/icon-512x512.png',
+                        'sizes' => '192x192 512x512',
+                        'type' => 'image/png',
+                        'purpose' => 'any maskable'
+                    ]
+                ]
+            ]);
+        }
+        
+        // Default manifest if no club found
+        return response()->json([
+            'name' => 'Club Agility',
+            'short_name' => 'Club Agility',
+            'display' => 'standalone',
+            'start_url' => '/',
+            'theme_color' => '#0073CF',
+            'background_color' => '#f8fafc',
+            'icons' => [
+                [
+                    'src' => '/icons/icon-512x512.png',
+                    'sizes' => '192x192 512x512',
+                    'type' => 'image/png',
+                    'purpose' => 'any maskable'
+                ]
+            ]
+        ]);
+    }
+
     public function index()
     {
         return response()->json(Club::all());

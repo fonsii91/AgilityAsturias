@@ -110,10 +110,10 @@ class Dog extends Model
         $sevenDaysAgo = $now->copy()->subDays(7);
         $twentyEightDaysAgo = $now->copy()->subDays(28);
 
-        // Fetch workloads for the last 28 days that are confirmed
+        // Fetch workloads for the last 28 days that are confirmed or pending
         // Se eager load si no están previamente cargadas para evitar N+1 si procesamos multiples perros
         $workloads = $this->workloads()
-            ->whereIn('status', ['confirmed', 'auto_confirmed'])
+            ->whereIn('status', ['confirmed', 'auto_confirmed', 'pending_review'])
             ->where('date', '>=', $twentyEightDaysAgo)
             ->get();
 
@@ -149,7 +149,7 @@ class Dog extends Model
         }
 
         // --- CORRECCIÓN DE ONBOARDING (COLD START) ---
-        $firstWorkloadDate = $this->workloads()->whereIn('status', ['confirmed', 'auto_confirmed'])->orderBy('date', 'asc')->value('date');
+        $firstWorkloadDate = $this->workloads()->whereIn('status', ['confirmed', 'auto_confirmed', 'pending_review'])->orderBy('date', 'asc')->value('date');
         $activeWeeks = 4;
         
         if ($firstWorkloadDate) {
@@ -213,7 +213,7 @@ class Dog extends Model
             'red_threshold' => $redThreshold,
             'calibration_days' => $calibrationDays,
             'is_calibrating' => $isCalibrating,
-            'recent_history' => $workloads,
+            'recent_history' => $workloads->whereIn('status', ['confirmed', 'auto_confirmed'])->values(),
             'status_color' => $statusColor
         ];
     }

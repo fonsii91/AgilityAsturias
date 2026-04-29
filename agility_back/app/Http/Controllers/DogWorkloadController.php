@@ -57,23 +57,50 @@ class DogWorkloadController extends Controller
             ->whereHas('attendingDogs', function($q) use ($dog) {
                 $q->where('dogs.id', $dog->id);
             })
+            ->with([
+                'attendingDogs' => function($q) use ($dog) {
+                    $q->where('dogs.id', $dog->id);
+                },
+                'attendees'
+            ])
             ->get();
             
         foreach ($unverifiedCompetitions as $comp) {
-            \App\Models\DogWorkload::firstOrCreate(
-                [
-                    'dog_id' => $dog->id,
-                    'source_type' => 'auto_competition',
-                    'source_id' => $comp->id
-                ],
-                [
-                    'date' => $comp->fecha_evento,
-                    'duration_min' => 5,
-                    'intensity_rpe' => 9,
-                    'status' => 'pending_review',
-                    'is_staff_verified' => false
-                ]
-            );
+            $diasAsistencia = [$comp->fecha_evento]; // Default to start date
+
+            if ($comp->attendingDogs->isNotEmpty()) {
+                $dogPivot = $comp->attendingDogs->first()->pivot;
+                $userId = $dogPivot->user_id;
+
+                if ($userId) {
+                    $userAttendance = $comp->attendees->where('id', $userId)->first();
+                    if ($userAttendance && $userAttendance->pivot->dias_asistencia) {
+                        $parsed = json_decode($userAttendance->pivot->dias_asistencia, true);
+                        if (!empty($parsed)) {
+                            $diasAsistencia = $parsed;
+                        }
+                    }
+                }
+            }
+
+            foreach ($diasAsistencia as $dia) {
+                if ($dia <= $today) {
+                    \App\Models\DogWorkload::firstOrCreate(
+                        [
+                            'dog_id' => $dog->id,
+                            'source_type' => 'auto_competition',
+                            'source_id' => $comp->id,
+                            'date' => $dia
+                        ],
+                        [
+                            'duration_min' => 5,
+                            'intensity_rpe' => 9,
+                            'status' => 'pending_review',
+                            'is_staff_verified' => false
+                        ]
+                    );
+                }
+            }
         }
 
         $pending = $dog->workloads()

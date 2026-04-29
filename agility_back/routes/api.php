@@ -29,6 +29,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset-password', [AuthController::class, 'resetPasswordWithToken']);
 
 Route::get('/tenant/info', [\App\Http\Controllers\ClubController::class, 'current']);
+Route::get('/manifest.json', [\App\Http\Controllers\ClubController::class, 'manifest']);
 
 Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/{id}', [CompetitionController::class, 'show']);

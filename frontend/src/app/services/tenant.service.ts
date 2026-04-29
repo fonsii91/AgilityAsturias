@@ -134,29 +134,26 @@ export class TenantService {
       }
     }
 
-    // Actualizar dinámicamente el manifest de PWA
+    // Actualizar dinámicamente el manifest de PWA desde el backend
     const manifestLink: HTMLLinkElement | null = document.querySelector('link[rel="manifest"]');
     if (manifestLink) {
-      const manifest = {
-        name: info.name || 'Club Agility',
-        short_name: info.name || 'Club Agility',
-        display: "standalone",
-        scope: "/",
-        start_url: "/",
-        theme_color: info.settings?.colors?.primary || info.settings?.primary_color || "#0073CF",
-        background_color: "#f8fafc",
-        icons: [
-          {
-            src: info.logo_url || "icons/icon-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-            purpose: "maskable any"
-          }
-        ]
-      };
-      
-      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-      manifestLink.href = URL.createObjectURL(blob);
+      let manifestUrl = `${environment.apiUrl}/manifest.json`;
+      if (this.tenantSlug()) {
+        manifestUrl += `?slug=${this.tenantSlug()}`;
+      } else if (this.getTenantDomain()) {
+        manifestUrl += `?domain=${this.getTenantDomain()}`;
+      }
+      manifestLink.href = manifestUrl;
+    }
+
+    // Soporte para iOS (Apple Touch Icon)
+    if (info.logo_url) {
+      const appleLink: HTMLLinkElement = document.querySelector("link[rel~='apple-touch-icon']") || document.createElement('link');
+      appleLink.rel = 'apple-touch-icon';
+      appleLink.href = info.logo_url;
+      if (!appleLink.parentNode) {
+        document.head.appendChild(appleLink);
+      }
     }
   }
 

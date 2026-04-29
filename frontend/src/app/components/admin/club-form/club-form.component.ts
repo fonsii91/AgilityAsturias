@@ -94,6 +94,10 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
                     </mat-form-field>
                   </div>
                 </div>
+                
+                <p class="help-text" style="margin-top: -0.5rem; margin-bottom: 0.5rem;">
+                  * Recomendado: Imagen cuadrada (1:1), ej. 512x512px en formato PNG. Este icono se utilizará al instalar la aplicación en el móvil.
+                </p>
 
                 <mat-form-field appearance="outline" class="w-full full-width">
                   <mat-label>Slogan / Lema</mat-label>

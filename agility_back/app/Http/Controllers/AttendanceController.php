@@ -254,13 +254,35 @@ class AttendanceController extends Controller
 
                         // Solo registrar cargas de trabajo automáticas para eventos deportivos (Competiciones reales)
                         if ($competition->tipo === 'competicion') {
-                            // Auto-create or confirm premature workload for competition
-                            $compWorkload = \App\Models\DogWorkload::firstOrCreate(
-                                ['dog_id' => $dog->id, 'source_type' => 'auto_competition', 'source_id' => $competitionId],
-                                ['date' => $competition->fecha_evento, 'duration_min' => 10, 'intensity_rpe' => 9, 'status' => 'pending_review']
-                            );
-                            $compWorkload->is_staff_verified = true;
-                            $compWorkload->save();
+                            $diasAsistencia = [$competition->fecha_evento]; // Default
+
+                            if (isset($data['user_id']) && $data['user_id']) {
+                                $userAttendance = $competition->attendees()->where('users.id', $data['user_id'])->first();
+                                if ($userAttendance && $userAttendance->pivot->dias_asistencia) {
+                                    $parsed = json_decode($userAttendance->pivot->dias_asistencia, true);
+                                    if (!empty($parsed)) {
+                                        $diasAsistencia = $parsed;
+                                    }
+                                }
+                            }
+
+                            foreach ($diasAsistencia as $dia) {
+                                $compWorkload = \App\Models\DogWorkload::firstOrCreate(
+                                    [
+                                        'dog_id' => $dog->id,
+                                        'source_type' => 'auto_competition',
+                                        'source_id' => $competitionId,
+                                        'date' => $dia
+                                    ],
+                                    [
+                                        'duration_min' => 10,
+                                        'intensity_rpe' => 9,
+                                        'status' => 'pending_review'
+                                    ]
+                                );
+                                $compWorkload->is_staff_verified = true;
+                                $compWorkload->save();
+                            }
                         }
                     }
                 }

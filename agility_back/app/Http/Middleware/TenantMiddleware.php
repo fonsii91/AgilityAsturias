@@ -16,8 +16,26 @@ class TenantMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $clubDomain = $request->header('X-Club-Domain');
-        $clubSlug = $request->header('X-Club-Slug');
+        $clubDomain = $request->header('X-Club-Domain') ?: $request->query('domain');
+        $clubSlug = $request->header('X-Club-Slug') ?: $request->query('slug');
+
+        if (!$clubDomain && !$clubSlug) {
+            $host = $request->getHost();
+            if (str_starts_with($host, 'www.')) {
+                $host = substr($host, 4);
+            }
+            
+            $mainDomains = ['clubagility.com', 'localhost'];
+            if (!in_array($host, $mainDomains)) {
+                if (str_ends_with($host, '.clubagility.com')) {
+                    $clubSlug = explode('.', $host)[0];
+                } elseif (str_ends_with($host, '.localhost') && $host !== 'localhost') {
+                    $clubSlug = explode('.', $host)[0];
+                } else {
+                    $clubDomain = $host;
+                }
+            }
+        }
         
         $club = null;
         if ($clubDomain) {
