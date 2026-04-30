@@ -1,8 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import 'zone.js';
-import 'zone.js/testing';
+
 import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 import { MisReservasComponent } from './mis-reservas.component';
@@ -24,13 +23,6 @@ describe('MisReservasComponent Logic', () => {
 
     let currentUserSignal: any;
     let reservationsSignal: any;
-
-    beforeAll(() => {
-        try {
-            TestBed.resetTestEnvironment();
-            TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
-        } catch (e) {}
-    });
 
     beforeEach(async () => {
         TestBed.resetTestingModule();

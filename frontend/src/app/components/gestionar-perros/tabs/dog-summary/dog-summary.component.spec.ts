@@ -48,6 +48,10 @@ describe('DogSummaryComponent', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
   it('debe crearse correctamente', () => {
     expect(component).toBeTruthy();
   });

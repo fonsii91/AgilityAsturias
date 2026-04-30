@@ -223,7 +223,7 @@ export class DogTrainingComponent {
     if (y === 0 && m === 0) return null; // No values provided
     
     const date = new Date(birthDateStr);
-    date.setMonth(date.getMonth() + (y * 12) + m);
+    date.setUTCMonth(date.getUTCMonth() + (y * 12) + m);
     return date.toISOString().split('T')[0];
   }
 }

@@ -13,11 +13,7 @@ import { NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 };
 
 describe('WorkloadGaugeComponent', () => {
-  beforeAll(() => {
-    if (!getTestBed().platform) {
-      getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
-    }
-  });
+
 
   let component: WorkloadGaugeComponent;
   let fixture: ComponentFixture<WorkloadGaugeComponent>;
@@ -27,7 +23,7 @@ describe('WorkloadGaugeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [WorkloadGaugeComponent],
       providers: [
-        { provide: NGX_ECHARTS_CONFIG, useValue: { echarts: { init: () => ({ setOption: vi.fn(), resize: vi.fn(), dispose: vi.fn(), on: vi.fn() }) } } }
+        { provide: NGX_ECHARTS_CONFIG, useValue: { echarts: { init: () => ({ setOption: vi.fn(), resize: vi.fn(), dispose: vi.fn(), on: vi.fn(), isDisposed: vi.fn().mockReturnValue(false) }) } } }
       ]
     }).compileComponents();
 
@@ -62,6 +58,7 @@ describe('WorkloadGaugeComponent', () => {
       yellow_threshold: 1.3,
       red_threshold: 1.5
     } as AcwrData);
+    TestBed.flushEffects();
     fixture.detectChanges();
     expect(component.statusText).toBe('⚠️ ZONA DE FATIGA');
   });
@@ -73,6 +70,7 @@ describe('WorkloadGaugeComponent', () => {
       yellow_threshold: 1.3,
       red_threshold: 1.5
     } as AcwrData);
+    TestBed.flushEffects();
     fixture.detectChanges();
     expect(component.statusText).toBe('🔬 FASE DE CALIBRACIÓN');
     expect(component.confidenceText).toBe('Fiabilidad: Baja (Calibrando)');

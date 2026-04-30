@@ -1,8 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import 'zone.js';
-import 'zone.js/testing';
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DogFamilyComponent } from './dog-family.component';
 import { DogStateService } from '../../services/dog-state.service';
@@ -21,12 +20,7 @@ describe('DogFamilyComponent', () => {
   let mockToastService: any;
   let mockAuthService: any;
 
-  beforeAll(() => {
-    try {
-      TestBed.resetTestEnvironment();
-      TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
-    } catch (e) {}
-  });
+  
 
   beforeEach(async () => {
     TestBed.resetTestingModule();

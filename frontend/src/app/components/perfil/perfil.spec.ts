@@ -17,14 +17,7 @@ describe('Perfil Component', () => {
     let mockImageCompressor: any;
     let mockToastService: any;
 
-    beforeAll(() => {
-        try {
-            TestBed.resetTestEnvironment();
-            TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
-        } catch (e) {
-            // Ignore if already initialized
-        }
-    });
+    
 
     beforeEach(async () => {
         TestBed.resetTestingModule();

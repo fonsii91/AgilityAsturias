@@ -1,5 +1,4 @@
-import 'zone.js';
-import 'zone.js/testing';
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DogFormComponent } from './dog-form.component';
 import { DogService } from '../../../services/dog.service';
@@ -23,14 +22,7 @@ describe('DogFormComponent', () => {
   let mockRouter: any;
   let mockImageCompressor: any;
 
-  beforeAll(() => {
-    try {
-      TestBed.resetTestEnvironment();
-      TestBed.initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
-    } catch (e) {
-      // Ignore if already initialized
-    }
-  });
+  
 
   beforeEach(async () => {
     TestBed.resetTestingModule();
