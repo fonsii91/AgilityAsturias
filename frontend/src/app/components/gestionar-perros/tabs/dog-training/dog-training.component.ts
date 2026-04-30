@@ -222,8 +222,15 @@ export class DogTrainingComponent {
     const m = months || 0;
     if (y === 0 && m === 0) return null; // No values provided
     
-    const date = new Date(birthDateStr);
-    date.setUTCMonth(date.getUTCMonth() + (y * 12) + m);
-    return date.toISOString().split('T')[0];
+    const [yearStr, monthStr, dayStr] = birthDateStr.split('T')[0].split('-');
+    const date = new Date(Number(yearStr), Number(monthStr) - 1, Number(dayStr));
+    
+    date.setMonth(date.getMonth() + (y * 12) + m);
+    
+    const outYear = date.getFullYear();
+    const outMonth = String(date.getMonth() + 1).padStart(2, '0');
+    const outDay = String(date.getDate()).padStart(2, '0');
+    
+    return `${outYear}-${outMonth}-${outDay}`;
   }
 }

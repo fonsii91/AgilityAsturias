@@ -41,15 +41,19 @@ export class ImageCompressorService {
                     canvas.height = height;
                     ctx.drawImage(img, 0, 0, width, height);
 
+                    const isTransparent = file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/svg+xml';
+                    const outputType = isTransparent ? 'image/webp' : 'image/jpeg';
+                    const ext = isTransparent ? '.webp' : '.jpg';
+
                     canvas.toBlob((blob) => {
                         if (!blob) return reject('Compression failed');
-                        const newFilename = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+                        const newFilename = file.name.replace(/\.[^/.]+$/, "") + ext;
                         const compressedFile = new File([blob], newFilename, {
-                            type: 'image/jpeg',
+                            type: outputType,
                             lastModified: Date.now(),
                         });
                         resolve(compressedFile);
-                    }, 'image/jpeg', 0.7); // 70% quality
+                    }, outputType, 0.8); 
                 };
                 img.onerror = (error) => reject(error);
             };

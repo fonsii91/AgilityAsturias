@@ -1,10 +1,16 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
 .landing-header {
   padding: 1.5rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   position: relative;
-  z-index: 10;
 }
 
 .glass-header {
@@ -28,9 +34,10 @@
   transform: scale(1.02);
 }
 
-.logo-icon {
-  color: #3b82f6;
-  font-size: 2rem;
+.logo-image {
+  height: 2rem;
+  width: auto;
+  object-fit: contain;
 }
 
 .saas-nav {

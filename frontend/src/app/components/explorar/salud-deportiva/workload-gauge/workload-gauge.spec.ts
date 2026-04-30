@@ -23,7 +23,7 @@ describe('WorkloadGaugeComponent', () => {
     await TestBed.configureTestingModule({
       imports: [WorkloadGaugeComponent],
       providers: [
-        { provide: NGX_ECHARTS_CONFIG, useValue: { echarts: { init: () => ({ setOption: vi.fn(), resize: vi.fn(), dispose: vi.fn(), on: vi.fn(), isDisposed: vi.fn().mockReturnValue(false) }) } } }
+        { provide: NGX_ECHARTS_CONFIG, useValue: { echarts: { init: () => ({ setOption: () => {}, resize: () => {}, dispose: () => {}, on: () => {}, isDisposed: () => false }), getInstanceByDom: () => null } } }
       ]
     }).compileComponents();
 

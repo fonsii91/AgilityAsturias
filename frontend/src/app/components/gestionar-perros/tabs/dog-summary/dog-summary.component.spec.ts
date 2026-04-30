@@ -48,7 +48,7 @@ describe('DogSummaryComponent', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => {
+  beforeEach(() => {
     vi.clearAllMocks();
   });
 

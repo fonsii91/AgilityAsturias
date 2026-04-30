@@ -1152,3 +1152,96 @@ input:checked + .slider:before { transform: translateX(24px); }
     }
 }
 
+/* Mobile Responsiveness Improvements */
+@media (max-width: 768px) {
+    .bento-container {
+        padding: 1rem;
+    }
+
+    .bento-dashboard {
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .hero-profile-bento {
+        height: 200px;
+        border-radius: 20px;
+    }
+
+    .profile-content {
+        padding: 1.5rem;
+    }
+
+    .hero-dog-name {
+        font-size: 2.2rem;
+    }
+
+    .hero-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .bento-select {
+        font-size: 1rem;
+        padding: 10px 40px 10px 15px;
+    }
+
+    .history-list-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .hi-left {
+        width: 100%;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 12px;
+    }
+
+    .hi-middle {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        width: 100%;
+        padding: 4px 0;
+    }
+
+    .hi-right {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .form-modifier-row {
+        flex-direction: row !important;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+
+    .form-card-footer {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .form-card-footer button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .modal-card {
+        padding: 1.25rem;
+        border-radius: 16px;
+    }
+
+    .alert-box {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .alert-icon-wrapper {
+        margin-bottom: 0.5rem;
+    }
+}
+

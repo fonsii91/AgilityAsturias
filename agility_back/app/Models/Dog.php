@@ -27,6 +27,8 @@ class Dog extends Model
         'sterilized_at',
         'weight_kg',
         'height_cm',
+        'user_id',
+        'club_id',
     ];
 
     protected $casts = [

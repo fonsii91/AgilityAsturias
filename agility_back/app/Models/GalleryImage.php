@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Traits\HasClub;
-
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -15,5 +14,6 @@ class GalleryImage extends Model
     protected $fillable = [
         'url',
         'alt',
+        'club_id',
     ];
 }

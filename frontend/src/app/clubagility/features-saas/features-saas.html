@@ -9,53 +9,76 @@
 
     <div class="features-grid pop-in">
       <div class="feature-card glass-card">
-        <span class="material-icons feature-icon">public</span>
+        <div class="feature-header">
+          <span class="material-icons feature-icon">public</span>
+          <span class="feature-badge badge-public">Público</span>
+        </div>
         <h3>Presencia Web Pública</h3>
         <p>Tu propia página con bienvenida, galería de imágenes, videoteca y contacto para atraer nuevos socios.</p>
       </div>
       <div class="feature-card glass-card">
-        <span class="material-icons feature-icon">video_library</span>
+        <div class="feature-header">
+          <span class="material-icons feature-icon">video_library</span>
+          <span class="feature-badge badge-socios">Socios</span>
+        </div>
         <h3>Videoteca y Análisis</h3>
         <p>Sube, comparte y analiza vídeos de entrenamientos o competiciones con toda la comunidad del club.</p>
       </div>
       <div class="feature-card glass-card">
-        <span class="material-icons feature-icon">pets</span>
+        <div class="feature-header">
+          <span class="material-icons feature-icon">pets</span>
+          <span class="feature-badge badge-socios">Socios</span>
+        </div>
         <h3>Gestión de "Mi Manada"</h3>
-        <p>Perfiles detallados por perro con historial médico, prevención de lesiones (ACWR), entrenamientos y documentos.</p>
+        <p>Perfiles detallados por perro con historial médico, prevención de lesiones (ACWR), entrenamientos y
+          documentos.</p>
       </div>
       <div class="feature-card glass-card">
-        <span class="material-icons feature-icon">calendar_month</span>
+        <div class="feature-header">
+          <span class="material-icons feature-icon">calendar_month</span>
+          <span class="feature-badge badge-directiva">Directiva</span>
+        </div>
         <h3>Reservas y Horarios</h3>
-        <p>Control total sobre las pistas. Gestiona clases, excepciones, evita solapamientos y consulta las reservas globales.</p>
+        <p>Control total sobre las pistas. Gestiona clases, excepciones, evita solapamientos y consulta las reservas
+          globales.</p>
       </div>
       <div class="feature-card glass-card">
-        <span class="material-icons feature-icon">emoji_events</span>
+        <div class="feature-header">
+          <span class="material-icons feature-icon">emoji_events</span>
+          <span class="feature-badge badge-directiva">Directiva</span>
+        </div>
         <h3>Eventos y Competiciones</h3>
-        <p>Coordina la asistencia a competiciones oficiales, informa a tus socios y mantén una bitácora personalizada de pistas RSCE.</p>
+        <p>Coordina la asistencia a competiciones oficiales, informa a tus socios y mantén una bitácora personalizada de
+          pistas RSCE.</p>
       </div>
       <div class="feature-card glass-card">
-        <span class="material-icons feature-icon">forum</span>
+        <div class="feature-header">
+          <span class="material-icons feature-icon">forum</span>
+          <span class="feature-badge badge-socios">Socios</span>
+        </div>
         <h3>Comunidad y Gamificación</h3>
-        <p>Tablones, recursos compartidos y un sistema de ranking con puntos extra para mantener motivados a los socios.</p>
+        <p>Tablones, recursos compartidos y un sistema de ranking con puntos extra para mantener motivados a los socios.
+        </p>
       </div>
     </div>
 
     <div class="cta-details-container fade-in-up" style="text-align: center; margin-top: 4rem;">
-      <button class="btn-primary" (click)="toggleDetails()">
+      <button class="btn-secondary" (click)="toggleDetails()">
         @if (showDetails()) {
-          Ocultar desglose técnico
+        Ocultar desglose técnico
         } @else {
-          Ver desglose técnico completo
+        Ver desglose técnico completo
         }
       </button>
     </div>
   </div>
 
   @if (showDetails()) {
-    <section class="detailed-features-section fade-in-up">
+  <section class="detailed-features-section fade-in-up">
     <div class="detailed-header">
       <h2 class="main-title" style="font-size: 2.5rem;">Características <span class="highlight">Detalladas</span></h2>
-      <p class="subtitle" style="margin-bottom: 2rem;">Desglose completo de herramientas por nivel de acceso en la plataforma.</p>
+      <p class="subtitle" style="margin-bottom: 2rem;">Desglose completo de herramientas por nivel de acceso en la
+        plataforma.</p>
     </div>
 
     <div class="roles-breakdown">
@@ -63,24 +86,32 @@
         <div class="role-header">
           <span class="material-icons role-icon">public</span>
           <h2>1. Presencia Pública (Landing Web)</h2>
-          <p>La carta de presentación perfecta para atraer nuevos socios a tu club.</p>
+          <p class="role-quote">"Cómo doy a conocer mi club y atraigo gente."</p>
         </div>
         <ul class="role-features-list" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
           <li>
-            <span class="material-icons check-icon" style="color: #3b82f6;">check_circle</span> 
-            <div class="feature-text"><strong>Bienvenida y Presentación</strong><p>Página de inicio (Home) con información general, filosofía y servicios del club.</p></div>
+            <span class="material-icons check-icon" style="color: #3b82f6;">check_circle</span>
+            <div class="feature-text"><strong>Bienvenida y Presentación</strong>
+              <p>Página de inicio (Home) con información general, filosofía y servicios del club.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon" style="color: #3b82f6;">check_circle</span> 
-            <div class="feature-text"><strong>Galería Fotográfica</strong><p>Visor público de las fotografías y momentos destacados seleccionados por el club.</p></div>
+            <span class="material-icons check-icon" style="color: #3b82f6;">check_circle</span>
+            <div class="feature-text"><strong>Galería Fotográfica</strong>
+              <p>Visor público de las fotografías y momentos destacados seleccionados por el club.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon" style="color: #3b82f6;">check_circle</span> 
-            <div class="feature-text"><strong>Videoteca Comunitaria</strong><p>Espacio para mostrar al mundo los vídeos de entrenamientos y competiciones.</p></div>
+            <span class="material-icons check-icon" style="color: #3b82f6;">check_circle</span>
+            <div class="feature-text"><strong>Videoteca Comunitaria</strong>
+              <p>Espacio para mostrar al mundo los vídeos de entrenamientos y competiciones.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon" style="color: #3b82f6;">check_circle</span> 
-            <div class="feature-text"><strong>Contacto Integrado</strong><p>Formulario directo para solicitar información o tramitar nuevas inscripciones al club.</p></div>
+            <span class="material-icons check-icon" style="color: #3b82f6;">check_circle</span>
+            <div class="feature-text"><strong>Contacto Integrado</strong>
+              <p>Formulario directo para solicitar información o tramitar nuevas inscripciones al club.</p>
+            </div>
           </li>
         </ul>
       </div>
@@ -89,56 +120,80 @@
         <div class="role-header">
           <span class="material-icons role-icon">groups</span>
           <h2>2. Para tu Comunidad</h2>
-          <p>Una experiencia premium para tus socios.</p>
+          <p class="role-quote">"Cómo mantengo a mis alumnos contentos y fidelizados."</p>
         </div>
         <ul class="role-features-list">
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Actualización de Perfil</strong><p>Edita datos y gestiona la seguridad de la cuenta.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Actualización de Perfil</strong>
+              <p>Edita datos y gestiona la seguridad de la cuenta.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Perfil "Mi Manada"</strong><p>Crea y edita los perfiles completos de tus perros.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Perfil "Mi Manada"</strong>
+              <p>Crea y edita los perfiles completos de tus perros.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Progreso y Salud</strong><p>Sigue entrenamientos y almacena historial médico.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Progreso y Salud</strong>
+              <p>Sigue entrenamientos y almacena historial médico.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Documentos y Compartir</strong><p>Sube cartillas y vincula a perros con la familia.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Documentos y Compartir</strong>
+              <p>Sube cartillas y vincula a perros con la familia.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Salud Deportiva ACWR</strong><p>Registra cargas de trabajo y revisa riesgo de lesión.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Salud Deportiva ACWR</strong>
+              <p>Registra cargas de trabajo y revisa riesgo de lesión.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Calendario Global</strong><p>Visualiza pista, eventos y competiciones.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Calendario Global</strong>
+              <p>Visualiza pista, eventos y competiciones.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Gestión de Reservas</strong><p>Reserva clases y añade recordatorios personales.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Gestión de Reservas</strong>
+              <p>Reserva clases y añade recordatorios personales.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Videoteca y Galería</strong><p>Sube, descarga e interactúa con vídeos comunitarios.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Videoteca y Galería</strong>
+              <p>Sube, descarga e interactúa con vídeos comunitarios.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Recursos y Tablón</strong><p>Accede a material educativo, anuncios y notificaciones.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Recursos y Tablón</strong>
+              <p>Accede a material educativo, anuncios y notificaciones.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Sugerencias</strong><p>Envía reportes o ideas directamente a la directiva.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Sugerencias</strong>
+              <p>Envía reportes o ideas directamente a la directiva.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Eventos y Competiciones</strong><p>Apúntate y coordínate con el resto del club para asistir a eventos oficiales.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Eventos y Competiciones</strong>
+              <p>Apúntate y coordínate con el resto del club para asistir a eventos oficiales.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Ranking y Bitácora</strong><p>Consulta clasificaciones y lleva tu control de pistas RSCE.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Ranking y Bitácora</strong>
+              <p>Consulta clasificaciones y lleva tu control de pistas RSCE.</p>
+            </div>
           </li>
         </ul>
       </div>
@@ -147,52 +202,74 @@
         <div class="role-header">
           <span class="material-icons role-icon">admin_panel_settings</span>
           <h2>3. Para la Directiva y Staff</h2>
-          <p>Control absoluto y herramientas de gestión avanzada.</p>
+          <p class="role-quote">"Cómo me ahorro horas de gestión y evito el caos de WhatsApp."</p>
         </div>
         <ul class="role-features-list">
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Time Slots</strong><p>Configura y gestiona las clases reservables.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Time Slots</strong>
+              <p>Configura y gestiona las clases reservables.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Bloqueo de Calendario</strong><p>Crea excepciones por festivos o mantenimiento.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Bloqueo de Calendario</strong>
+              <p>Crea excepciones por festivos o mantenimiento.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Info Reservas Global</strong><p>Monitoriza el uso diario de las instalaciones.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Info Reservas Global</strong>
+              <p>Monitoriza el uso diario de las instalaciones.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Agenda de Competiciones</strong><p>Informa al club de las competiciones a las que vais a ir y coordina la asistencia.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Agenda de Competiciones</strong>
+              <p>Informa al club de las competiciones a las que vais a ir y coordina la asistencia.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Verificar Asistencia</strong><p>Pasa lista oficial a eventos y entrenamientos.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Verificar Asistencia</strong>
+              <p>Pasa lista oficial a eventos y entrenamientos.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Gestión de Miembros</strong><p>Listado de socios y actualización de roles.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Gestión de Miembros</strong>
+              <p>Listado de socios y actualización de roles.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Soporte Técnico</strong><p>Generación de enlaces para reseteo de contraseñas.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Soporte Técnico</strong>
+              <p>Generación de enlaces para reseteo de contraseñas.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Comunicación Oficial</strong><p>Redacta anuncios y publica recursos PDF.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Comunicación Oficial</strong>
+              <p>Redacta anuncios y publica recursos PDF.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Moderación de Galería</strong><p>Administra imágenes y decide qué vídeos son públicos.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Moderación de Galería</strong>
+              <p>Administra imágenes y decide qué vídeos son públicos.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Puntos Extra</strong><p>Asignación manual de méritos al ranking interno.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Puntos Extra</strong>
+              <p>Asignación manual de méritos al ranking interno.</p>
+            </div>
           </li>
           <li>
-            <span class="material-icons check-icon">check_circle</span> 
-            <div class="feature-text"><strong>Revisión Médica</strong><p>Supervisa los registros físicos de ACWR de los socios.</p></div>
+            <span class="material-icons check-icon">check_circle</span>
+            <div class="feature-text"><strong>Revisión Médica</strong>
+              <p>Supervisa los registros físicos de ACWR de los socios.</p>
+            </div>
           </li>
         </ul>
       </div>
