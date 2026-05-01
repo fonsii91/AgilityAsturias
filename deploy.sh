@@ -25,9 +25,12 @@ fi
 if [ -d "frontend" ]; then
     echo "➡️  Compilando Frontend (Angular)..."
     cd frontend
+    echo "🧹  Limpiando compilaciones anteriores..."
+    rm -rf dist/*
     npm install --legacy-peer-deps
     # Usamos npx para asegurar el uso local de NG (Angular CLI)
     npx ng build --configuration production
+    chown -R www-data:www-data dist/
     cd ..
 else
     echo "⚠️  No se encontró la carpeta 'frontend', omitiendo front."
