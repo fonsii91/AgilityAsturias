@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.1.27",
+    "date": "2026-05-01",
+    "features": [
+      "¡Salud Deportiva ahora es más intuitiva e inteligente! Hemos rediseñado el formulario de registro manual de entrenamientos para que sea mucho más ágil y cómodo de usar.",
+      "A partir de ahora, la plataforma aprende del contexto: cuando asistas a clases o competiciones, te sugerirá automáticamente predicciones muy precisas sobre los minutos en pista y el nivel de esfuerzo de tu perro, permitiéndote confirmar la sesión prácticamente con un solo clic.",
+      "Para que siempre tomes las mejores decisiones, hemos añadido una completa guía en las instrucciones de la sección. En ella encontrarás recomendaciones avaladas por expertos veterinarios sobre los tiempos ideales de pista, explicándote desde las micro-sesiones óptimas hasta cómo detectar situaciones de sobreesfuerzo articular."
+    ],
+    "bugfixes": [
+      "Hemos resuelto un pequeño inconveniente en la ventana de registro manual que impedía deslizar hacia abajo en ciertas pantallas, asegurando que ahora puedas guardar tus progresos de forma cómoda y fluida."
+    ]
+  },
+  {
     "version": "1.1.26",
     "date": "2026-05-01",
     "features": [

@@ -1,139 +1,217 @@
 <h2 mat-dialog-title class="d-flex align-items-center gap-2 m-0" style="color: var(--text-main); font-weight: 700;">
   <mat-icon class="text-warning">pending_actions</mat-icon> Pendientes de Validar
 </h2>
-<button mat-icon-button (click)="close()" style="position: absolute; right: 8px; top: 8px; color: var(--text-secondary);">
+<button mat-icon-button (click)="close()"
+  style="position: absolute; right: 8px; top: 8px; color: var(--text-secondary);">
   <mat-icon>close</mat-icon>
 </button>
 
 <mat-dialog-content class="mat-typography">
 
   <div class="pending-list-container" style="display: flex; flex-direction: column; padding-bottom: 1rem;">
-  @if (currentPending(); as currentItem) {
-    <div class="progress-indicator mb-3 d-flex align-items-center justify-content-between fade-in" style="animation-duration: 0.3s;">
-      <span class="text-secondary font-weight-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">SESIÓN {{ currentIndex() }} DE {{ totalPending() }}</span>
-      <div class="progress-bar-wrapper" style="flex: 1; height: 6px; background-color: rgba(0,0,0,0.05); border-radius: 4px; margin-left: 1rem; overflow: hidden;">
-        <div class="progress-bar-fill" [style.width]="(currentIndex() / totalPending() * 100) + '%'" style="height: 100%; background-color: var(--primary-main, #3b82f6); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 4px;"></div>
+    @if (currentPending(); as currentItem) {
+    <div class="progress-indicator mb-3 d-flex align-items-center justify-content-between fade-in"
+      style="animation-duration: 0.3s;">
+      <span class="text-secondary font-weight-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">SESIÓN {{
+        currentIndex() }} DE {{ totalPending() }}</span>
+      <div class="progress-bar-wrapper"
+        style="flex: 1; height: 6px; background-color: rgba(0,0,0,0.05); border-radius: 4px; margin-left: 1rem; overflow: hidden;">
+        <div class="progress-bar-fill" [style.width]="(currentIndex() / totalPending() * 100) + '%'"
+          style="height: 100%; background-color: var(--primary-main, #3b82f6); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 4px;">
+        </div>
       </div>
     </div>
 
     @for (pending of [currentItem]; track pending.id) {
-    <div class="form-card bento-card border-left-success fade-in-up" style="animation-duration: 0.4s; animation-fill-mode: both;">
+    <div class="form-card bento-card border-left-success fade-in-up"
+      style="animation-duration: 0.4s; animation-fill-mode: both;">
       <div class="form-card-body">
         <div class="pending-header mb-3">
-        <div class="date"><mat-icon class="text-success align-middle mr-1" style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">event_available</mat-icon> {{ pending.date | date:'dd MMM yyyy' }}</div>
-        <div class="source-badge">
-          <mat-icon class="text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">sell</mat-icon>
-          {{ pending.source_type === 'auto_attendance' ? 'Entrenamiento' : 'Competición' }}
-        </div>
-      </div>
-
-      <div class="mb-3 mt-2" style="width: 100%; text-align: center; position: relative;">
-         <div style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid white; z-index: 2; position: relative; background-color: #f1f5f9;">
-            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
-                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(1) + ')'"
-                 [style.opacity]="currentRpe() <= 2 ? 1 : 0"></div>
-                 
-            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
-                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(2) + ')'"
-                 [style.opacity]="currentRpe() > 2 && currentRpe() <= 4 ? 1 : 0"></div>
-                 
-            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
-                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(3) + ')'"
-                 [style.opacity]="currentRpe() > 4 && currentRpe() <= 6 ? 1 : 0"></div>
-                 
-            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
-                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(4) + ')'"
-                 [style.opacity]="currentRpe() > 6 && currentRpe() <= 8 ? 1 : 0"></div>
-                 
-            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
-                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(5) + ')'"
-                 [style.opacity]="currentRpe() > 8 ? 1 : 0"></div>
-         </div>
-      </div>
-
-      <div class="form-group mb-4" style="background: #f8fafc; padding: 1.2rem; border-radius: 16px; border: 1px solid #e2e8f0;">
-        <div class="intensity-header d-flex align-items-center justify-content-between mb-3">
-          <label class="mb-0" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Esfuerzo Percibido</label>
-          <div class="intensity-badge">
-            <mat-icon class="emoji-indicator" style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">{{ getIconForIntensity(pending.intensity_rpe) }}</mat-icon>
-            {{ pending.intensity_rpe }} <small>/ 10</small>
+          <div class="date"><mat-icon class="text-success align-middle mr-1"
+              style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">event_available</mat-icon> {{ pending.date |
+            date:'dd MMM yyyy' }}</div>
+          <div class="source-badge">
+            <mat-icon class="text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">sell</mat-icon>
+            {{ pending.source_type === 'auto_attendance' ? 'Entrenamiento' : 'Competición' }}
           </div>
         </div>
 
-        <div class="intensity-slider-wrap">
-          <span class="slider-label"><mat-icon class="align-middle text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">pets</mat-icon> Fácil</span>
-          <input type="range" class="custom-range premium-range" 
-                 [ngModel]="pending.intensity_rpe" 
-                 (ngModelChange)="updateRpe(pending, $event)" 
-                 min="1" max="10" step="1">
-          <span class="slider-label danger"><mat-icon class="align-middle text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">local_fire_department</mat-icon> Max</span>
-        </div>
-      </div>
+        <div class="mb-3 mt-2" style="width: 100%; text-align: center; position: relative;">
+          <div
+            style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid white; z-index: 2; position: relative; background-color: #f1f5f9;">
+            <div
+              style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+              [style.backgroundImage]="'url(' + getSafeAvatarUrl(1) + ')'" [style.opacity]="currentRpe() <= 2 ? 1 : 0">
+            </div>
 
-      <div class="form-row">
-        <div class="form-group flex-1">
-          <label>
-            Minutos Activos (En Pista)
-            <span class="trust-marker" (click)="showInfo('time')" title="Info">
-              <mat-icon style="font-size: 1rem; height: 1rem; width: 1rem;">info</mat-icon>
-            </span>
-          </label>
-          <div class="time-stepper">
-            <button class="stepper-btn" (click)="decreasePendingDuration(pending)">
-              <mat-icon>remove</mat-icon>
-            </button>
-            <input type="number" class="stepper-input" [(ngModel)]="pending.duration_min" min="1">
-            <div class="stepper-label">min</div>
-            <button class="stepper-btn" (click)="increasePendingDuration(pending)">
-              <mat-icon>add</mat-icon>
-            </button>
+            <div
+              style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+              [style.backgroundImage]="'url(' + getSafeAvatarUrl(2) + ')'"
+              [style.opacity]="currentRpe() > 2 && currentRpe() <= 4 ? 1 : 0"></div>
+
+            <div
+              style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+              [style.backgroundImage]="'url(' + getSafeAvatarUrl(3) + ')'"
+              [style.opacity]="currentRpe() > 4 && currentRpe() <= 6 ? 1 : 0"></div>
+
+            <div
+              style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+              [style.backgroundImage]="'url(' + getSafeAvatarUrl(4) + ')'"
+              [style.opacity]="currentRpe() > 6 && currentRpe() <= 8 ? 1 : 0"></div>
+
+            <div
+              style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+              [style.backgroundImage]="'url(' + getSafeAvatarUrl(5) + ')'" [style.opacity]="currentRpe() > 8 ? 1 : 0">
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="pending-modifiers mt-4 d-flex gap-15">
-        <div class="form-group flex-2 d-flex justify-content-between align-items-center form-modifier-row">
-          <label class="mb-0">
-            ¿Saltó a su máxima altura?
-            <span class="trust-marker" (click)="showInfo('jump')"><mat-icon style="font-size: 1rem; height: 1rem; width: 1rem;">info</mat-icon></span>
-          </label>
-          <div class="toggle-switch-wrapper mini">
-            <label class="switch mini-switch">
-              <input type="checkbox" [(ngModel)]="pending.jumped_max_height">
-              <span class="slider round premium-slider"></span>
+        <div class="form-group mb-4"
+          style="background: #f8fafc; padding: 1.2rem; border-radius: 16px; border: 1px solid #e2e8f0;">
+          <div class="intensity-header d-flex align-items-center justify-content-between mb-3">
+            <label class="mb-0" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Esfuerzo
+              Percibido</label>
+            <div class="intensity-badge">
+              <mat-icon class="emoji-indicator" style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">{{
+                getIconForIntensity(pending.intensity_rpe) }}</mat-icon>
+              {{ pending.intensity_rpe }} <small>/ 10</small>
+            </div>
+          </div>
+
+          <div class="intensity-slider-wrap" style="flex-direction: column; align-items: stretch; gap: 8px;">
+            <input type="range" class="custom-range premium-range" [ngModel]="pending.intensity_rpe"
+              (ngModelChange)="updateRpe(pending, $event)" min="1" max="10" step="1" style="width: 100%;">
+            <div class="d-flex justify-content-between w-100 px-1">
+              <span class="slider-label text-muted d-flex align-items-center"
+                style="font-size: 0.75rem; min-width: auto;"><mat-icon class="mr-1"
+                  style="font-size: 14px; height: 14px; width: 14px;">pets</mat-icon> Fácil</span>
+              <span class="slider-label danger d-flex align-items-center justify-content-end"
+                style="font-size: 0.75rem; min-width: auto; color: #ef4444;"><mat-icon class="mr-1"
+                  style="font-size: 14px; height: 14px; width: 14px;">local_fire_department</mat-icon> Max</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group flex-1">
+            <label>
+              Minutos Activos (En Pista)
+              <span class="trust-marker" (click)="showInfo('time')" title="Info">
+                <mat-icon style="font-size: 1rem; height: 1rem; width: 1rem;">info</mat-icon>
+              </span>
             </label>
+            <div class="time-stepper">
+              <button class="stepper-btn" (click)="decreasePendingDuration(pending)">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <input type="number" class="stepper-input" [(ngModel)]="pending.duration_min" min="1">
+              <div class="stepper-label">min</div>
+              <button class="stepper-btn" (click)="increasePendingDuration(pending)">
+                <mat-icon>add</mat-icon>
+              </button>
+            </div>
+
+
+            <!-- Dynamic Context Feedback -->
+            <div class="duration-feedback mt-2 p-2" style="border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.75rem; display: flex; align-items: center; gap: 8px; transition: all 0.3s; min-height: 40px;">
+              @if (pending.duration_min <= 3) {
+                <div style="background: #d1fae5; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><mat-icon style="color: #10b981; font-size: 14px; height: 14px; width: 14px;">bolt</mat-icon></div>
+                <span style="color: #059669; font-weight: 600; line-height: 1.1;">Micro-sesión óptima (Máximo foco)</span>
+              } @else if (pending.duration_min <= 7) {
+                <div style="background: #fef08a; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><mat-icon style="color: #eab308; font-size: 14px; height: 14px; width: 14px;">directions_run</mat-icon></div>
+                <span style="color: #ca8a04; font-weight: 600; line-height: 1.1;">Sesión de pista estándar</span>
+              } @else if (pending.duration_min <= 12) {
+                <div style="background: #ffedd5; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><mat-icon style="color: #f97316; font-size: 14px; height: 14px; width: 14px;">battery_charging_full</mat-icon></div>
+                <span style="color: #c2410c; font-weight: 600; line-height: 1.1;">Carga alta (Exige gran condición física)</span>
+              } @else {
+                <div style="background: #fee2e2; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><mat-icon style="color: #ef4444; font-size: 14px; height: 14px; width: 14px;">warning</mat-icon></div>
+                <span style="color: #b91c1c; font-weight: 600; line-height: 1.1;">¡Riesgo de sobreesfuerzo articular y fatiga!</span>
+              }
+            </div>
           </div>
         </div>
-        <div class="form-group flex-1">
+
+        <div class="form-group mt-4">
+          <label class="mb-2">
+            Altura de los saltos
+            <span class="trust-marker" (click)="showInfo('jump')"><mat-icon
+                style="font-size: 1rem; height: 1rem; width: 1rem;">info</mat-icon></span>
+          </label>
+          <div class="d-flex" style="gap: 10px;">
+            <!-- Card: Salto Bajo (false) -->
+            <div class="jump-card" (click)="pending.jumped_max_height = false"
+              style="flex: 1; min-width: 0; border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #f8fafc; overflow: hidden; position: relative;"
+              [style.borderColor]="pending.jumped_max_height === false ? 'var(--primary-color)' : '#e2e8f0'"
+              [style.boxShadow]="pending.jumped_max_height === false ? '0 4px 6px -1px rgba(0,0,0,0.1)' : 'none'">
+              @if (pending.jumped_max_height === false) {
+              <div
+                style="position: absolute; top: 6px; right: 6px; background: var(--primary-color); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
+              </div>
+              }
+              <div
+                style="height: 100px; background-image: url('/Images/Salud/collie-salto-bajo.png'); background-size: cover; background-position: center; transition: opacity 0.3s;"
+                [style.opacity]="pending.jumped_max_height === true ? '0.4' : '1'"></div>
+              <div style="padding: 8px 4px; text-align: center; font-weight: 700; font-size: 0.75rem; line-height: 1.2;"
+                [style.color]="pending.jumped_max_height === false ? 'var(--primary-color)' : 'var(--text-secondary)'">
+                Altura Reducida</div>
+            </div>
+
+            <!-- Card: Salto Alto (true) -->
+            <div class="jump-card" (click)="pending.jumped_max_height = true"
+              style="flex: 1; min-width: 0; border: 2px solid transparent; border-radius: 12px; cursor: pointer; transition: all 0.2s; background: #f8fafc; overflow: hidden; position: relative;"
+              [style.borderColor]="pending.jumped_max_height === true ? 'var(--primary-color)' : '#e2e8f0'"
+              [style.boxShadow]="pending.jumped_max_height === true ? '0 4px 6px -1px rgba(0,0,0,0.1)' : 'none'">
+              @if (pending.jumped_max_height === true) {
+              <div
+                style="position: absolute; top: 6px; right: 6px; background: var(--primary-color); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; z-index: 2; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">check</mat-icon>
+              </div>
+              }
+              <div
+                style="height: 100px; background-image: url('/Images/Salud/collie-salto-alto.png'); background-size: cover; background-position: center; transition: opacity 0.3s;"
+                [style.opacity]="pending.jumped_max_height === false ? '0.4' : '1'"></div>
+              <div style="padding: 8px 4px; text-align: center; font-weight: 700; font-size: 0.75rem; line-height: 1.2;"
+                [style.color]="pending.jumped_max_height === true ? 'var(--primary-color)' : 'var(--text-secondary)'">
+                Altura Máxima</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group mt-3">
           <label>Salidas a pista</label>
           <div class="run-selector d-flex gap-2 mt-1">
-            <button class="run-chip" [class.active]="pending.number_of_runs == 2" (click)="pending.number_of_runs = (pending.number_of_runs == 2 ? undefined : 2)">1-2</button>
-            <button class="run-chip" [class.active]="pending.number_of_runs == 4" (click)="pending.number_of_runs = (pending.number_of_runs == 4 ? undefined : 4)">3-5</button>
-            <button class="run-chip" [class.active]="pending.number_of_runs == 6" (click)="pending.number_of_runs = (pending.number_of_runs == 6 ? undefined : 6)">+5</button>
+            <button class="run-chip" style="flex: 1; text-align: center;" [class.active]="pending.number_of_runs == 2"
+              (click)="pending.number_of_runs = (pending.number_of_runs == 2 ? undefined : 2)">1-2</button>
+            <button class="run-chip" style="flex: 1; text-align: center;" [class.active]="pending.number_of_runs == 4"
+              (click)="pending.number_of_runs = (pending.number_of_runs == 4 ? undefined : 4)">3-5</button>
+            <button class="run-chip" style="flex: 1; text-align: center;" [class.active]="pending.number_of_runs == 6"
+              (click)="pending.number_of_runs = (pending.number_of_runs == 6 ? undefined : 6)">+5</button>
           </div>
         </div>
-      </div>
 
-      <button mat-flat-button style="width: 100%; margin-top: 1.5rem; border-radius: 12px; padding: 24px 0; font-size: 1.1rem; font-weight: 600; background-color: var(--primary-color); color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);" (click)="confirmPending(pending)" [disabled]="confirmingIds().includes(pending.id)">
-        @if(confirmingIds().includes(pending.id)) {
-        <span class="d-flex align-items-center justify-content-center gap-2">
-          <span class="spinner-small" style="border-top-color: white;"></span> Regenerando Gráficas...
-        </span>
-        } @else {
-        <span class="d-flex align-items-center justify-content-center gap-2">
-          <mat-icon>check_circle</mat-icon> Confirmar Sesión
-        </span>
-        }
-      </button>
+        <button mat-flat-button
+          style="width: 100%; margin-top: 1.5rem; border-radius: 12px; padding: 24px 0; font-size: 1.1rem; font-weight: 600; background-color: var(--primary-color); color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);"
+          (click)="confirmPending(pending)" [disabled]="confirmingIds().includes(pending.id)">
+          @if(confirmingIds().includes(pending.id)) {
+          <span class="d-flex align-items-center justify-content-center gap-2">
+            <span class="spinner-small" style="border-top-color: white;"></span> Regenerando Gráficas...
+          </span>
+          } @else {
+          <span class="d-flex align-items-center justify-content-center gap-2">
+            <mat-icon>check_circle</mat-icon> Confirmar Sesión
+          </span>
+          }
+        </button>
+      </div>
     </div>
-  </div>
     }
-  } @else {
+    } @else {
     <div class="empty-state d-flex flex-column align-items-center justify-content-center py-5 fade-in">
       <mat-icon class="text-success mb-3" style="font-size: 3rem; height: 3rem; width: 3rem;">task_alt</mat-icon>
       <h3 class="m-0">¡Todo al día!</h3>
       <p class="text-secondary mt-2 text-center">Has validado todos los entrenamientos.</p>
     </div>
-  }
+    }
   </div>
 </mat-dialog-content>

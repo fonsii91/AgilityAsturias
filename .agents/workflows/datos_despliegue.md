@@ -31,6 +31,7 @@ description: Datos para desplegar en producción el proyecto
 - **[Completado]** Fase 7: Instalado y configurado phpMyAdmin sobre Nginx. Se permite tráfico por el puerto 8080 mediante UFW. Accesible en: http://157.173.121.242:8080
 - **[Completado]** Fase 8: Configurado sistema de backups locales automáticos diarios de la base de datos con rotación.
 - **[Completado]** Despliegue v1.1.25 (01/05/2026): Despliegue en producción finalizado con éxito tras ejecutar todas las baterías de tests (130 backend, 244 frontend). Incluidas mejoras en Salud Deportiva y ajustes visuales.
+- **[Completado]** Despliegue v1.1.26 (01/05/2026): Despliegue en producción finalizado con éxito tras refactorizar el sistema de avatares a 5 niveles de fatiga y aplicar efectos de crossfade suaves. (130 backend tests, 244 frontend tests superados).
 
 
 ---

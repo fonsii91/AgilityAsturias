@@ -689,7 +689,8 @@ input:checked + .slider:before { transform: translateX(24px); }
     border-radius: var(--border-radius-lg, 16px);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
     max-height: 90vh;
-    overflow-y: auto;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 }
 
 .danger-border {

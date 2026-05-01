@@ -90,11 +90,13 @@ export class PendingReviewsDialogComponent {
     return 'local_fire_department'; 
   }
 
-  showInfo(type: 'time' | 'jump') {
+  showInfo(type: 'time' | 'jump' | 'studies') {
     if (type === 'time') {
-      this.toast.info('Se cuenta ÚNICAMENTE el tiempo de máxima intensidad. 1 h de clase suele suponer entre 6 y 8 min reales en pista.', 8000);
-    } else {
+      this.toast.info('Se cuenta ÚNICAMENTE el tiempo de máxima intensidad. 1 h de clase suele suponer entre 4 y 6 min reales en pista.', 8000);
+    } else if (type === 'jump') {
       this.toast.info('Cruzar el umbral de altura a la cruz aumenta el impacto articular exponencialmente.', 5000);
+    } else if (type === 'studies') {
+      this.toast.info('Basado en consensos veterinarios (CPT Training, VetBloom): Las micro-sesiones (3-5m) son óptimas. Más de 12 min puramente activos elevan drásticamente el riesgo de lesión.', 10000);
     }
   }
 

@@ -42,7 +42,7 @@ class DogWorkloadController extends Controller
                 ],
                 [
                     'date' => $res->date,
-                    'duration_min' => 10, // Se recalculará sobre la marcha abajo
+                    'duration_min' => 5,
                     'intensity_rpe' => 6,
                     'status' => 'pending_review',
                     'is_staff_verified' => false
@@ -93,8 +93,8 @@ class DogWorkloadController extends Controller
                             'date' => $dia
                         ],
                         [
-                            'duration_min' => 5,
-                            'intensity_rpe' => 9,
+                            'duration_min' => 2,
+                            'intensity_rpe' => 8,
                             'status' => 'pending_review',
                             'is_staff_verified' => false
                         ]
@@ -108,24 +108,7 @@ class DogWorkloadController extends Controller
             ->orderBy('date', 'desc')
             ->get();
             
-        // Calcular dinámicamente "al vuelo" para no anclar estimaciones viejas
-        foreach ($pending as $p) {
-            if ($p->source_type === 'auto_competition') {
-                $p->duration_min = 5;
-            } else if ($p->source_type === 'auto_attendance' && $p->source_id) {
-                $res = \App\Models\Reservation::with('timeSlot')->find($p->source_id);
-                if ($res && $res->timeSlot) {
-                    $start = \Carbon\Carbon::parse($res->timeSlot->start_time);
-                    $end = \Carbon\Carbon::parse($res->timeSlot->end_time);
-                    $classLength = $start->diffInMinutes($end);
-                    $p->duration_min = max(1, (int) round($classLength * (8 / 60)));
-                } else {
-                    $p->duration_min = 8;
-                }
-            } else {
-                $p->duration_min = 8;
-            }
-        }
+        // (On the fly calculation removed: we now rely on DB defaults and frontend logic)
             
         return response()->json($pending);
     }

@@ -104,10 +104,9 @@ class AttendanceController extends Controller
                             }
                         }
 
-                        // Auto-create or confirm premature workload
                         $workload = \App\Models\DogWorkload::firstOrCreate(
                             ['dog_id' => $res->dog->id, 'source_type' => 'auto_attendance', 'source_id' => $res->id],
-                            ['date' => $date, 'duration_min' => 10, 'intensity_rpe' => 5, 'status' => 'pending_review']
+                            ['date' => $date, 'duration_min' => 5, 'intensity_rpe' => 6, 'status' => 'pending_review']
                         );
                         $workload->is_staff_verified = true;
                         $workload->save();
@@ -275,8 +274,8 @@ class AttendanceController extends Controller
                                         'date' => $dia
                                     ],
                                     [
-                                        'duration_min' => 10,
-                                        'intensity_rpe' => 9,
+                                        'duration_min' => 2,
+                                        'intensity_rpe' => 8,
                                         'status' => 'pending_review'
                                     ]
                                 );

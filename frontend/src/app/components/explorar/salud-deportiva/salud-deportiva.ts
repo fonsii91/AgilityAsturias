@@ -62,11 +62,12 @@ export class SaludDeportivaComponent implements OnInit {
   });
 
   editingWorkloadId = signal<number | null>(null);
+
   manualDate = signal<string>(new Date().toISOString().split('T')[0]);
-  manualDuration = signal<number>(8);
-  manualIntensity = signal<number>(8); // Agility default RPE
+  manualDuration = signal<number>(5);
+  manualIntensity = signal<number>(6);
   manualJumpedMaxHeight = signal<boolean>(false);
-  manualNumberOfRuns = signal<number | null>(2); // Preselected 1-2
+  manualNumberOfRuns = signal<number | null>(null); // Preselected 1-2
   isSubmitting = signal<boolean>(false);
 
   getSafeAvatarUrl(level: number): string {
@@ -123,12 +124,15 @@ export class SaludDeportivaComponent implements OnInit {
     });
 
     this.workloadService.getPendingReviews(dogId).subscribe(pending => {
-      this.pendingReviews.set(pending.map(p => ({
-        ...p,
-        duration_min: p.duration_min || 8, // Respeta el valor dinámico calculado en backend
-        intensity_rpe: p.intensity_rpe || 5,
-        number_of_runs: p.number_of_runs || 2 // Preselect 1-2
-      })));
+      this.pendingReviews.set(pending.map(p => {
+        const isCompetition = p.source_type && p.source_type.toLowerCase().includes('competition');
+        return {
+          ...p,
+          duration_min: p.duration_min || (isCompetition ? 2 : 5),
+          intensity_rpe: p.intensity_rpe || (isCompetition ? 8 : 6),
+          number_of_runs: p.number_of_runs || (isCompetition ? 2 : 4)
+        };
+      }));
     });
   }
 
@@ -142,10 +146,10 @@ export class SaludDeportivaComponent implements OnInit {
   resetManualForm() {
     this.editingWorkloadId.set(null);
     this.manualDate.set(new Date().toISOString().split('T')[0]);
-    this.manualDuration.set(8);
-    this.manualIntensity.set(8);
+    this.manualDuration.set(5);
+    this.manualIntensity.set(6);
     this.manualJumpedMaxHeight.set(false);
-    this.manualNumberOfRuns.set(2);
+    this.manualNumberOfRuns.set(null);
   }
 
   startEditWorkload(w: DogWorkload) {
@@ -175,11 +179,13 @@ export class SaludDeportivaComponent implements OnInit {
     this.isHelpModalOpen.set(true);
   }
 
-  showInfo(type: 'time' | 'jump') {
+  showInfo(type: 'time' | 'jump' | 'studies') {
     if (type === 'time') {
-      this.toast.info('Se cuenta ÚNICAMENTE el tiempo de máxima intensidad. 1 h de clase suele suponer entre 6 y 8 min reales en pista.', 8000);
-    } else {
+      this.toast.info('Se cuenta ÚNICAMENTE el tiempo de máxima intensidad. 1 h de clase suele suponer entre 4 y 6 min reales en pista.', 8000);
+    } else if (type === 'jump') {
       this.toast.info('Cruzar el umbral de altura a la cruz aumenta el impacto articular exponencialmente.', 5000);
+    } else if (type === 'studies') {
+      this.toast.info('Basado en consensos veterinarios (CPT Training, VetBloom): Las micro-sesiones (3-5m) son óptimas. Más de 12 min puramente activos elevan drásticamente el riesgo de lesión.', 10000);
     }
   }
 
