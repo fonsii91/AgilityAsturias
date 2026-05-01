@@ -1,0 +1,21 @@
+<div class="bento-card shadow-premium"
+  style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+
+  <!-- Dog Profile Header -->
+  <div class="hero-profile-bento" [ngStyle]="{'background-image': 'url(' + heroImageUrl() + ')'}"
+    style="border-radius: 0; box-shadow: none; transition: background-image 0.5s ease-in-out;">
+    <div class="profile-gradient-overlay"></div>
+    <div class="profile-content">
+      <h1 class="hero-dog-name m-0">{{ dogName() }}</h1>
+      <span class="hero-subtitle">PERFIL ATLÉTICO</span>
+    </div>
+  </div>
+
+  <!-- Gauge Data Body -->
+  <div class="gauge-bento-card" [ngClass]="'border-top-' + acwrData().status_color"
+    style="border-radius: 0; box-shadow: none; border-left: none; border-right: none; border-bottom: none;">
+    <app-workload-gauge [acwrData]="acwrData()" [dogName]="dogName()" [transparentMode]="false">
+    </app-workload-gauge>
+  </div>
+
+</div>

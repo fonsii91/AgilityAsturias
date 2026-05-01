@@ -12,11 +12,15 @@ import { TimeSlot } from '../../models/time-slot.model';
 import { ToastService } from '../../services/toast.service';
 
 import { RouterModule } from '@angular/router';
+import { AthleticProfileCardComponent } from '../../components/ui/athletic-profile-card/athletic-profile-card.component';
+import { FichaPerroComponent } from '../../components/ficha-perro/ficha-perro.component';
+import { DogWorkloadService } from '../../services/dog-workload.service';
+import { AcwrData } from '../../models/dog-workload.model';
 
 @Component({
     selector: 'app-gestionar-reservas',
     standalone: true,
-    imports: [CommonModule, FormsModule, MatIconModule, RouterModule],
+    imports: [CommonModule, FormsModule, MatIconModule, RouterModule, AthleticProfileCardComponent, FichaPerroComponent],
     templateUrl: './gestionar-reservas.component.html',
     styleUrl: './gestionar-reservas.component.css'
 })
@@ -26,6 +30,7 @@ export class GestionarReservasComponent {
     dogService = inject(DogService);
     timeSlotService = inject(TimeSlotService);
     toastService = inject(ToastService);
+    dogWorkloadService = inject(DogWorkloadService);
 
     // Modal state
     isModalOpen = false;
@@ -71,6 +76,7 @@ export class GestionarReservasComponent {
 
     // UI State for expanding attendees
     expandedSlots = signal<Set<number>>(new Set());
+    editingSlots = signal<Set<number>>(new Set());
 
     // Week State
     selectedWeek = signal<'current' | 'next'>('current');
@@ -86,6 +92,11 @@ export class GestionarReservasComponent {
     // Image Modal State
     enlargedImageStr: string | null = null;
 
+    // Dog Profile State
+    selectedDogForAcwr = signal<{id: number, name: string, image: string | null, acwrData: AcwrData | null} | null>(null);
+    isLoadingProfile = signal(false);
+    selectedDogModal = signal<any | null>(null);
+    fichaModalOpen = signal(false);
 
 
     constructor() {
@@ -280,6 +291,73 @@ export class GestionarReservasComponent {
         this.enlargedImageStr = null;
     }
 
+    getAcwrColorHex(color: string): string {
+        switch (color) {
+            case 'green': return '#22c55e';
+            case 'yellow': return '#eab308';
+            case 'red': return '#ef4444';
+            case 'blue': return '#3b82f6';
+            default: return '#64748b';
+        }
+    }
+
+    openDogProfile(dogId: number | null, dogName: string, dogImage: string | null) {
+        if (!dogId) {
+            this.enlargeImage(dogImage);
+            return;
+        }
+
+        const user = this.authService.currentUserSignal();
+        if (!user) return;
+        
+        const isAdminOrStaff = ['admin', 'staff'].includes(user.role || '');
+        const isOwner = this.myDogs().some(d => d.id === dogId);
+
+        if (isAdminOrStaff || isOwner) {
+            this.isLoadingProfile.set(true);
+            this.selectedDogForAcwr.set({ id: dogId, name: dogName, image: dogImage, acwrData: null });
+            
+            this.dogWorkloadService.getAcwrData(dogId).subscribe({
+                next: (data) => {
+                    this.selectedDogForAcwr.set({ id: dogId, name: dogName, image: dogImage, acwrData: data });
+                    this.isLoadingProfile.set(false);
+                },
+                error: (err) => {
+                    this.toastService.error('Error al cargar datos de salud.');
+                    this.selectedDogForAcwr.set(null);
+                    this.isLoadingProfile.set(false);
+                }
+            });
+        } else {
+            this.isLoadingProfile.set(true);
+            this.reservationService.getRanking().subscribe({
+                next: (rankingData) => {
+                    const dogData = rankingData.find((d: any) => d.id === dogId);
+                    if (dogData) {
+                        this.selectedDogModal.set(dogData);
+                        this.fichaModalOpen.set(true);
+                    } else {
+                        this.enlargeImage(dogImage);
+                    }
+                    this.isLoadingProfile.set(false);
+                },
+                error: () => {
+                    this.enlargeImage(dogImage);
+                    this.isLoadingProfile.set(false);
+                }
+            });
+        }
+    }
+
+    closeAcwrModal() {
+        this.selectedDogForAcwr.set(null);
+    }
+
+    closeFicha() {
+        this.fichaModalOpen.set(false);
+        this.selectedDogModal.set(null);
+    }
+
 
 
     bookSlot(slot: TimeSlot & { date: string }) {
@@ -334,6 +412,21 @@ export class GestionarReservasComponent {
             currentSet.add(slotId);
         }
         this.expandedSlots.set(currentSet);
+    }
+
+    toggleEditMode(slotId: number, event: Event) {
+        event.stopPropagation();
+        const newSet = new Set(this.editingSlots());
+        if (newSet.has(slotId)) {
+            newSet.delete(slotId);
+        } else {
+            newSet.add(slotId);
+            // Ensure expanded when editing
+            const expSet = new Set(this.expandedSlots());
+            expSet.add(slotId);
+            this.expandedSlots.set(expSet);
+        }
+        this.editingSlots.set(newSet);
     }
 
     toggleDogSelection(dogId: number) {

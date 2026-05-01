@@ -103,8 +103,16 @@
                     <span class="material-icons group-icon">group</span>
                     <span>Ver asistentes ({{ slot.reservations.length }})</span>
                   </div>
-                  <span class="material-icons chevron"
-                  [class.open]="expandedSlots().has(slot.id)">expand_more</span>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+                      <button style="border: none; background: transparent; padding: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; transition: all 0.2s;"
+                              [style.background]="editingSlots().has(slot.id) ? '#eff6ff' : 'transparent'"
+                              (click)="toggleEditMode(slot.id, $event)" title="Modo edición de asistentes">
+                        <span class="material-icons" style="font-size: 18px;" [style.color]="editingSlots().has(slot.id) ? 'var(--primary-blue)' : '#94a3b8'">edit</span>
+                      </button>
+                    }
+                    <span class="material-icons chevron" [class.open]="expandedSlots().has(slot.id)">expand_more</span>
+                  </div>
                 </button>
                 <div class="attendees-list-wrapper" [class.expanded]="expandedSlots().has(slot.id)">
                   <div class="attendees-list">
@@ -121,7 +129,7 @@
                         <div class="attendee-info" style="flex: 1;">
                           <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                             <span class="attendee-name">{{ res.userName }}</span>
-                            @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
+                            @if (editingSlots().has(slot.id)) {
                               <button class="btn-icon-action delete" style="padding: 2px; height: 24px; width: 24px; color: #f44336; flex-shrink: 0;"
                                 (click)="openStaffDeleteUserModal(slot.id, slot.date, res.userId, res.userName)" title="Eliminar reservas de este miembro">
                                 <span class="material-icons" style="font-size: 18px;">delete_outline</span>
@@ -130,16 +138,17 @@
                           </div>
                           <div class="attendee-dogs">
                             @for (dog of res.selectedDogs; track dog) {
-                              <span class="dog-tag" style="display: inline-flex; align-items: center; position: relative;" [style.paddingRight]="['admin', 'staff'].includes(authService.currentUserSignal()?.role || '') && res.selectedDogs.length > 1 ? '24px' : '8px'">
-                                <span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 2px;">pets</span>
+                              <span class="dog-tag" style="display: inline-flex; align-items: center; position: relative;" [style.paddingRight]="editingSlots().has(slot.id) && res.selectedDogs.length > 1 ? '24px' : '8px'">
+                                <span class="material-icons" style="font-size: 14px; vertical-align: middle; margin-right: 4px;"
+                                      [style.color]="(['admin', 'staff'].includes(authService.currentUserSignal()?.role || '') || dog.acwr_color === 'none') ? getAcwrColorHex(dog.acwr_color) : '#64748b'">pets</span>
                                 @if (dog.image) {
                                   <span class="dog-name-link"
-                                  (click)="enlargeImage(dog.image)">{{ dog.name }}</span>
+                                  (click)="openDogProfile(dog.id, dog.name, dog.image)">{{ dog.name }}</span>
                                 }
                                 @if (!dog.image) {
-                                  <span>{{ dog.name || dog }}</span>
+                                  <span class="dog-name-link" (click)="openDogProfile(dog.id, dog.name || dog, null)" style="cursor: pointer;">{{ dog.name || dog }}</span>
                                 }
-                                @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '') && res.selectedDogs.length > 1) {
+                                @if (editingSlots().has(slot.id) && res.selectedDogs.length > 1) {
                                   <button class="btn-icon-action delete-dog" style="position: absolute; right: 4px; padding: 0; display: flex; align-items: center; justify-content: center; height: 16px; width: 16px; color: #f44336; border: none; background: rgba(244, 67, 54, 0.1); border-radius: 50%; cursor: pointer; transition: background 0.2s;"
                                     onmouseover="this.style.background='rgba(244, 67, 54, 0.2)'" onmouseout="this.style.background='rgba(244, 67, 54, 0.1)'"
                                     (click)="openStaffDeleteDogModal(dog.reservation_id, dog.name, res.userName)" title="Eliminar reserva solo de este perro">
@@ -268,6 +277,39 @@
     </div>
   }
 
+  <!-- Athletic Profile Modal -->
+  @if (selectedDogForAcwr()) {
+    <div class="modal-backdrop" style="z-index: 9999; padding: 80px 24px 24px 24px; box-sizing: border-box; align-items: center; justify-content: center;" (click)="closeAcwrModal()">
+      <div class="modal-content profile-card-modal" style="position: relative; padding: 0; background: transparent; box-shadow: none; max-width: 450px; width: 100%; max-height: 85vh; overflow-y: auto; border: none; margin: auto;" (click)="$event.stopPropagation()">
+        
+        <button style="position: absolute; top: 16px; right: 16px; z-index: 10; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); color: white; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: background 0.2s;" (click)="closeAcwrModal()" onmouseover="this.style.background='rgba(0, 0, 0, 0.5)'" onmouseout="this.style.background='rgba(0, 0, 0, 0.3)'">
+          <span class="material-icons" style="font-size: 20px;">close</span>
+        </button>
+
+        @if (selectedDogForAcwr()?.acwrData) {
+          <app-athletic-profile-card 
+             [dogName]="selectedDogForAcwr()?.name || ''"
+             [heroImageUrl]="selectedDogForAcwr()?.image || ''"
+             [acwrData]="selectedDogForAcwr()?.acwrData!">
+          </app-athletic-profile-card>
+        } @else {
+          <div style="background: white; padding: 2rem; border-radius: 12px; text-align: center;">
+            <div class="spinner-small" style="margin: 0 auto 10px;"></div>
+            <p>Cargando datos médicos...</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Public Profile Modal -->
+  @if (fichaModalOpen() && selectedDogModal()) {
+    <app-ficha-perro
+        [dog]="selectedDogModal()"
+        (close)="closeFicha()">
+    </app-ficha-perro>
+  }
+
   <!-- Staff Anular Clase Modal -->
   @if (isStaffCancelModalOpen) {
     <div class="modal-backdrop" (click)="closeStaffCancelModal()">
@@ -350,8 +392,8 @@
 
   <!-- Help Modal -->
   @if (isHelpModalOpen) {
-    <div class="modal-backdrop" (click)="closeHelpModal($event)">
-      <div class="modal-content large-modal" style="max-height: 80vh; overflow-y: auto;" (click)="$event.stopPropagation()">
+    <div class="modal-backdrop" style="z-index: 9999; padding: 80px 24px 24px 24px; box-sizing: border-box; align-items: center; justify-content: center;" (click)="closeHelpModal($event)">
+      <div class="modal-content" style="width: 100%; max-width: 600px; height: auto; max-height: 85vh; border-radius: 24px; overflow-y: auto; background: white; margin: auto;" (click)="$event.stopPropagation()">
         <div class="modal-header header-light" style="padding: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0;">
           <h3 style="margin: 0; color: #1e293b; display: flex; align-items: center; gap: 8px;">
             <span class="material-icons" style="color: #3b82f6;">help_outline</span> Guía de Reservas
@@ -360,29 +402,68 @@
             <span class="material-icons">close</span>
           </button>
         </div>
-        <div class="modal-body" style="padding: 1.5rem; color: #334155; line-height: 1.6;">
+        <div class="modal-body" style="padding: 1.5rem; color: #334155; line-height: 1.6; text-align: left;">
           
-          <h4 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">1. Reglas para los Socios</h4>
-          <ul style="padding-left: 20px; margin-bottom: 1.5rem;">
-            <li><strong>Regla de Cierre (24 Horas):</strong> No es posible apuntarse ni cancelar una reserva mediante la app si faltan menos de 24 horas para que empiece la clase.</li>
-            <li><strong>El Margen de Cortesía (15 Minutos):</strong> Si un socio cancela una plaza por error, dispone de 15 minutos exactos para rectificar y volverse a apuntar mágicamente, incluso rompiendo la regla de las 24 horas. Pasados esos 15 minutos, la plaza queda liberada definitivamente.</li>
-            <li>Los miembros normales solo pueden apuntar a sus propios perros y gestionar sus propias reservas.</li>
+          <h4 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Reglas para los Socios</h4>
+          <ul style="padding-left: 0; list-style: none; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 16px;">
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">event_available</span>
+              <span><strong>Consulta de Horarios:</strong> Aquí puedes ver todas las sesiones disponibles. Los miembros normales solo pueden apuntar a sus propios perros y gestionar sus reservas.</span>
+            </li>
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">schedule</span>
+              <span><strong>Regla de Cierre (24 Horas):</strong> No es posible apuntarse ni cancelar una reserva mediante la app si faltan menos de 24 horas para que empiece la clase.</span>
+            </li>
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">timer</span>
+              <span><strong>El Margen de Cortesía (15 Minutos):</strong> Si cancelas una plaza por error, dispones de 15 minutos exactos para rectificar y volverte a apuntar mágicamente, incluso rompiendo la regla de las 24 horas. Pasados esos 15 minutos, la plaza queda liberada definitivamente.</span>
+            </li>
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span class="material-icons" style="color: #eab308; flex-shrink: 0; margin-top: 2px;">groups</span>
+              <span><strong>Comunidad:</strong> Al desplegar "Ver asistentes", podrás ver a tus compañeros. Haciendo clic en el nombre de cualquier perro podrás ver su Ficha Pública.</span>
+            </li>
           </ul>
 
           @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
-            <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">2. Opciones de Administrador y Staff</h4>
-            <ul style="padding-left: 20px; margin-bottom: 1.5rem;">
-              <li><strong>Inscripción Ilimitada:</strong> El Staff ignora cualquier bloqueo de tiempo (24h) y de aforos completos. Podéis pulsar el botón de 'Reservar' de forma ilimitada. Si desplegáis la lista de usuarios, podréis buscar el nombre de otro socio y apuntar a los perros que queráis en su nombre.</li>
-              <li><strong>Desapuntar Rápidamente:</strong> Si desplegáis la lista de <i>"Ver asistentes"</i> en una clase, hay una papelera roja al lado de cada persona. Al pulsarla, eliminaréis a esa persona de la clase junto a todos sus perros ignorando la regla de las 24 horas.</li>
-              <li><strong>Cancelar Clases por Lluvia:</strong> En la cabecera de cada tarjeta existe un botón rojo para "Anular Clase". La clase se coloreará en rojo y los socios perderán la reserva con una notificación. Podéis usar el botón de nuevo parar restaurar la normalidad.</li>
+            <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Exclusivo para Staff y Administración</h4>
+            <ul style="padding-left: 0; list-style: none; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 16px;">
+              <li style="display: flex; gap: 10px; align-items: flex-start;">
+                <span class="material-icons" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">admin_panel_settings</span>
+                <span><strong>Inscripción Ilimitada:</strong> El Staff ignora bloqueos de tiempo (24h) y aforos. Puedes pulsar 'Reservar' ilimitadamente y buscar el nombre de otro socio para apuntar a sus perros.</span>
+              </li>
+              <li style="display: flex; gap: 10px; align-items: flex-start;">
+                <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">pets</span>
+                <span><strong>Semáforo de Cansancio:</strong> La huella junto a cada perro detecta automáticamente si el perro ha entrenado demasiado y cambia de color para alertarte de su fatiga.</span>
+              </li>
+              <li style="display: flex; gap: 10px; align-items: flex-start;">
+                <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">monitor_heart</span>
+                <span><strong>Perfil Atlético Deportivo:</strong> Al hacer clic en el nombre de un perro con semáforo en color, accederás a su Perfil Atlético para adaptar su entrenamiento usando su gráfica biomecánica.</span>
+              </li>
+              <li style="display: flex; gap: 10px; align-items: flex-start;">
+                <span class="material-icons" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">edit</span>
+                <span><strong>Modo Edición Segura:</strong> Para cancelar rápidamente a un alumno, debes pulsar el <strong>Lápiz</strong> junto a "Ver asistentes". Esto revelará las papeleras (ignoran la regla de 24h). Vuelve a pulsarlo para bloquear accidentes.</span>
+              </li>
+              <li style="display: flex; gap: 10px; align-items: flex-start;">
+                <span class="material-icons" style="color: #dc2626; flex-shrink: 0; margin-top: 2px;">block</span>
+                <span><strong>Cancelar Clases (Lluvia):</strong> En la cabecera de cada tarjeta existe un botón rojo de "Anular". La clase se pondrá en rojo y los socios perderán su reserva con notificación.</span>
+              </li>
             </ul>
 
-            <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">3. Gestión del Horario (Largo Plazo)</h4>
-            <p style="margin-bottom: 0.5rem; color: #475569;">Esta herramienta está en la esquina de arriba a la derecha y sirve para programar y editar la estructura base del club.</p>
-            <ul style="padding-left: 20px; margin-bottom: 0;">
-              <li><strong>Crear nueva clase:</strong> Te permite designar un horario fijo y aforo a los Lunes (por ejemplo). Se aplicará para todos los lunes del año.</li>
-              <li><strong>Modificar Aforo:</strong> Te permite editar las plazas con el lápiz verde. El sistema aplicará el nuevo límite de reservas instantaneamente para que pueda apuntarse más gente.</li>
-              <li><strong>Eliminar Clase:</strong> Usando la papelera borrarás de forma fulminante la ficha del sistema. Se perderán las reservas pasadas o futuras y la hora desaparecerá para los usuarios.</li>
+            <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Gestión del Horario (Largo Plazo)</h4>
+            <p style="margin-bottom: 0.5rem; color: #475569;">Herramienta en la esquina superior derecha para programar la estructura base del club.</p>
+            <ul style="padding-left: 0; list-style: none; margin-bottom: 0; display: flex; flex-direction: column; gap: 16px;">
+              <li style="display: flex; gap: 10px; align-items: flex-start;">
+                <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">add_circle_outline</span>
+                <span><strong>Crear nueva clase:</strong> Asigna un horario y aforo fijos (ej. los Lunes). Se aplicará para todos los lunes del año.</span>
+              </li>
+              <li style="display: flex; gap: 10px; align-items: flex-start;">
+                <span class="material-icons" style="color: #eab308; flex-shrink: 0; margin-top: 2px;">edit_calendar</span>
+                <span><strong>Modificar Aforo:</strong> Edita las plazas con el lápiz verde. El nuevo límite se aplicará instantáneamente en las reservas.</span>
+              </li>
+              <li style="display: flex; gap: 10px; align-items: flex-start;">
+                <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">delete_sweep</span>
+                <span><strong>Eliminar Clase:</strong> Borra de forma fulminante la ficha del sistema. Se perderán reservas y la hora desaparecerá.</span>
+              </li>
             </ul>
           }
         </div>

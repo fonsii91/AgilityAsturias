@@ -4,7 +4,7 @@ import { DogWorkloadService } from '../../../services/dog-workload.service';
 import { DogService } from '../../../services/dog.service';
 import { AcwrData, DogWorkload } from '../../../models/dog-workload.model';
 import { Dog } from '../../../models/dog.model';
-import { WorkloadGaugeComponent } from './workload-gauge/workload-gauge';
+import { AthleticProfileCardComponent } from '../../ui/athletic-profile-card/athletic-profile-card.component';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -17,7 +17,7 @@ import { HistoryDialogComponent } from './history-dialog/history-dialog.componen
 @Component({
   selector: 'app-salud-deportiva',
   standalone: true,
-  imports: [CommonModule, FormsModule, WorkloadGaugeComponent, MatDialogModule, MatButtonModule, MatIconModule, MatRippleModule],
+  imports: [CommonModule, FormsModule, AthleticProfileCardComponent, MatDialogModule, MatButtonModule, MatIconModule, MatRippleModule],
   templateUrl: './salud-deportiva.html',
   styleUrls: ['./salud-deportiva.css']
 })
@@ -52,7 +52,6 @@ export class SaludDeportivaComponent implements OnInit {
   });
 
   // Formularios manuales
-  isManualFormOpen = signal<boolean>(false);
   isHelpModalOpen = signal<boolean>(false);
 
   visibleHistory = computed(() => {
@@ -60,15 +59,6 @@ export class SaludDeportivaComponent implements OnInit {
     if (!data || !data.recent_history) return [];
     return data.recent_history.slice(0, 2);
   });
-
-  editingWorkloadId = signal<number | null>(null);
-
-  manualDate = signal<string>(new Date().toISOString().split('T')[0]);
-  manualDuration = signal<number>(5);
-  manualIntensity = signal<number>(6);
-  manualJumpedMaxHeight = signal<boolean>(false);
-  manualNumberOfRuns = signal<number | null>(null); // Preselected 1-2
-  isSubmitting = signal<boolean>(false);
 
   getSafeAvatarUrl(level: number): string {
     const d = this.selectedDog();
@@ -137,42 +127,33 @@ export class SaludDeportivaComponent implements OnInit {
   }
 
   toggleManualForm() {
-    this.isManualFormOpen.update(val => !val);
-    if (!this.isManualFormOpen()) {
-      this.resetManualForm();
-    }
+    this.openManualModal();
   }
 
-  resetManualForm() {
-    this.editingWorkloadId.set(null);
-    this.manualDate.set(new Date().toISOString().split('T')[0]);
-    this.manualDuration.set(5);
-    this.manualIntensity.set(6);
-    this.manualJumpedMaxHeight.set(false);
-    this.manualNumberOfRuns.set(null);
+  openManualModal(workloadToEdit?: DogWorkload) {
+    const dialogRef = this.dialog.open(PendingReviewsDialogComponent, {
+      width: '650px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'bento-dialog-panel',
+      data: {
+        pendingReviews: [],
+        dogId: this.selectedDogId(),
+        dog: this.selectedDog(),
+        isManual: true,
+        manualWorkload: workloadToEdit
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadDogData();
+      }
+    });
   }
 
   startEditWorkload(w: DogWorkload) {
-    this.editingWorkloadId.set(w.id);
-    this.manualDate.set(w.date.split('T')[0]);
-    this.manualDuration.set(w.duration_min);
-    this.manualIntensity.set(w.intensity_rpe);
-    this.manualJumpedMaxHeight.set(!!w.jumped_max_height);
-    this.manualNumberOfRuns.set(w.number_of_runs || null);
-
-    this.isManualFormOpen.set(true);
-    window.scrollTo({ top: 300, behavior: 'smooth' });
-  }
-
-  decreaseManualDuration() {
-    let val = this.manualDuration();
-    if (val > 1) {
-      this.manualDuration.set(val - 1);
-    }
-  }
-
-  increaseManualDuration() {
-    this.manualDuration.set(this.manualDuration() + 1);
+    this.openManualModal(w);
   }
 
   openHelpModal() {
@@ -291,51 +272,5 @@ export class SaludDeportivaComponent implements OnInit {
     });
   }
 
-  submitManualWorkload() {
-    const dogId = this.selectedDogId();
-    if (!dogId || !this.manualDate() || !this.manualDuration() || !this.manualIntensity()) return;
 
-    this.isSubmitting.set(true);
-    const data = {
-      date: this.manualDate(),
-      duration_min: this.manualDuration(),
-      intensity_rpe: this.manualIntensity(),
-      activity_type: 'agility',
-      jumped_max_height: this.manualJumpedMaxHeight(),
-      number_of_runs: this.manualNumberOfRuns() || undefined
-    };
-
-    const editingId = this.editingWorkloadId();
-    if (editingId) {
-      this.workloadService.updateWorkload(editingId, data as any).subscribe({
-        next: () => {
-          this.toast.success('Registro actualizado correctamente');
-          this.isSubmitting.set(false);
-          this.isManualFormOpen.set(false);
-          this.resetManualForm();
-          this.loadDogData();
-        },
-        error: (err) => {
-          console.error("Error updating workload", err);
-          this.toast.error('Error al actualizar el registro');
-          this.isSubmitting.set(false);
-        }
-      });
-    } else {
-      this.workloadService.storeManualWorkload(dogId, data).subscribe({
-        next: () => {
-          this.toast.success('Registro añadido correctamente');
-          this.isSubmitting.set(false);
-          this.isManualFormOpen.set(false);
-          this.resetManualForm();
-          this.loadDogData();
-        },
-        error: (err) => {
-          console.error("Error saving manual workload", err);
-          this.toast.error('Error al guardar el registro');
-          this.isSubmitting.set(false);
-        }
-      });
-    }
-  }
 }

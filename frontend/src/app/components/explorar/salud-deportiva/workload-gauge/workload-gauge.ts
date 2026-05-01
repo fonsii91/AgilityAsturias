@@ -92,6 +92,56 @@ export class WorkloadGaugeComponent {
       else valueColor = '#ef4444';
     }
     
+    const currentRatio = Math.min(1, data.acwr / maxVal);
+    const trackColor = this.transparentMode() ? 'rgba(255, 255, 255, 0.1)' : '#e2e8f0';
+
+    let dynamicColors: any[] = [];
+    if (!isPhase1) {
+      if (currentRatio > 0) {
+        if (currentRatio <= underPreparedEnd) {
+          dynamicColors.push([currentRatio, '#3b82f6']);
+        } else {
+          dynamicColors.push([underPreparedEnd, '#3b82f6']);
+          if (currentRatio <= optimalEnd) {
+            dynamicColors.push([currentRatio, '#10b981']);
+          } else {
+            dynamicColors.push([optimalEnd, '#10b981']);
+            if (currentRatio <= cautionEnd) {
+              dynamicColors.push([currentRatio, '#f97316']);
+            } else {
+              dynamicColors.push([cautionEnd, '#f97316']);
+              dynamicColors.push([currentRatio, '#ef4444']);
+            }
+          }
+        }
+      }
+      if (currentRatio < 1) {
+        dynamicColors.push([1, trackColor]);
+      }
+    } else {
+      if (currentRatio > 0) {
+        if (currentRatio <= underPreparedEnd) {
+          dynamicColors.push([currentRatio, '#cbd5e1']);
+        } else {
+          dynamicColors.push([underPreparedEnd, '#cbd5e1']);
+          if (currentRatio <= optimalEnd) {
+            dynamicColors.push([currentRatio, '#94a3b8']);
+          } else {
+            dynamicColors.push([optimalEnd, '#94a3b8']);
+            if (currentRatio <= cautionEnd) {
+              dynamicColors.push([currentRatio, '#64748b']);
+            } else {
+              dynamicColors.push([cautionEnd, '#64748b']);
+              dynamicColors.push([currentRatio, '#475569']);
+            }
+          }
+        }
+      }
+      if (currentRatio < 1) {
+        dynamicColors.push([1, trackColor]);
+      }
+    }
+
     this.chartOptions.set({
       series: [
         {
@@ -100,56 +150,57 @@ export class WorkloadGaugeComponent {
           max: maxVal,
           startAngle: 180,
           endAngle: 0,
-          radius: '100%',
-          center: ['50%', '70%'], // Baja el centro porque es un medio círculo
+          radius: '125%', // Un punto medio perfecto
+          center: ['50%', '80%'], // Lo mantenemos en 80% para tener buen margen superior
+          splitNumber: 10,
+          progress: {
+            show: false // No anillo continuo
+          },
           axisLine: {
+            show: true,
             lineStyle: {
-              width: 25,
-              color: activeColors as any
+              width: 0, // Pista invisible, solo usamos su mapa de colores
+              color: dynamicColors,
             }
           },
           pointer: {
-            itemStyle: {
-              color: '#334155' // Slate 700 aguja
-            },
-            length: '50%',
-            width: 6
+            show: false
+          },
+          anchor: {
+            show: false
           },
           axisTick: {
-            distance: -25,
-            length: 8,
+            show: true,
+            splitNumber: 4,
+            distance: 0,
+            length: 28, // Píldoras un poco más cortas pero más "gorditas"
             lineStyle: {
-              color: '#fff',
-              width: 2
+              width: 6, // Más grosor para efecto LED
+              color: 'auto',
+              cap: 'round'
             }
           },
           splitLine: {
-            distance: -25,
-            length: 25,
+            show: true,
+            distance: 0,
+            length: 28,
             lineStyle: {
-              color: '#fff',
-              width: 3
+              width: 6,
+              color: 'auto',
+              cap: 'round'
             }
           },
           axisLabel: {
-            color: 'inherit',
-            distance: 35,
-            fontSize: 12,
-            formatter: (value: number) => {
-              if (value === 0.8 || value === Number(yThresh.toFixed(1)) || value === Number(rThresh.toFixed(1))) {
-                return value.toFixed(1);
-              }
-              return '';
-            }
+            show: false
           },
           detail: {
             valueAnimation: true,
             formatter: '{value}',
-            color: valueColor,
-            fontSize: 34,
-            fontWeight: 'bold',
-            align: 'center',
-            offsetCenter: [0, '25%'] // Centrado exacto debajo de la aguja sin el título estorbando
+            color: valueColor, 
+            fontSize: 44, // Un poco más pequeño para mayor elegancia
+            fontWeight: 900,
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            offsetCenter: [0, '-10%'] // Reajustamos altura al ser más pequeño
           },
           data: [
             {

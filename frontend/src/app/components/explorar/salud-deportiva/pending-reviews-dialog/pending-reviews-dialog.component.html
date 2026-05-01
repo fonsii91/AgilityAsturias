@@ -1,5 +1,6 @@
 <h2 mat-dialog-title class="d-flex align-items-center gap-2 m-0" style="color: var(--text-main); font-weight: 700;">
-  <mat-icon class="text-warning">pending_actions</mat-icon> Pendientes de Validar
+  <mat-icon class="text-warning">{{ isManual() ? (currentPending()?.id ? 'edit' : 'add_circle') : 'pending_actions' }}</mat-icon> 
+  {{ isManual() ? (currentPending()?.id ? 'Modificar Registro' : 'Nuevo Esfuerzo') : 'Pendientes de Validar' }}
 </h2>
 <button mat-icon-button (click)="close()"
   style="position: absolute; right: 8px; top: 8px; color: var(--text-secondary);">
@@ -10,6 +11,7 @@
 
   <div class="pending-list-container" style="display: flex; flex-direction: column; padding-bottom: 1rem;">
     @if (currentPending(); as currentItem) {
+    @if (!isManual()) {
     <div class="progress-indicator mb-3 d-flex align-items-center justify-content-between fade-in"
       style="animation-duration: 0.3s;">
       <span class="text-secondary font-weight-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">SESIÓN {{
@@ -21,12 +23,14 @@
         </div>
       </div>
     </div>
+    }
 
     @for (pending of [currentItem]; track pending.id) {
-    <div class="form-card bento-card border-left-success fade-in-up"
-      style="animation-duration: 0.4s; animation-fill-mode: both;">
-      <div class="form-card-body">
-        <div class="pending-header mb-3">
+    <div class="form-card bento-card fade-in-up m-0"
+      style="animation-duration: 0.4s; animation-fill-mode: both; border-radius: 12px; border: none; box-shadow: none;">
+      <div class="form-card-body" style="padding: 0.5rem 0.25rem; background: #fcfcfc;">
+        <div class="pending-header mb-3" [class.flex-column]="isManual()" [class.align-items-start]="isManual()">
+          @if (!isManual()) {
           <div class="date"><mat-icon class="text-success align-middle mr-1"
               style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">event_available</mat-icon> {{ pending.date |
             date:'dd MMM yyyy' }}</div>
@@ -34,9 +38,19 @@
             <mat-icon class="text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">sell</mat-icon>
             {{ pending.source_type === 'auto_attendance' ? 'Entrenamiento' : 'Competición' }}
           </div>
+          } @else {
+             <div class="form-group w-100 mb-2 mt-2" style="background: #ffffff; padding: 1.25rem; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <label class="d-flex align-items-center mb-3" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
+                  Fecha de la sesión
+                  <mat-icon class="text-primary ml-2" style="font-size: 1.1rem; height: 1.1rem; width: 1.1rem; margin-top: -2px;">event</mat-icon>
+                </label>
+                <input type="date" class="custom-input" [(ngModel)]="pending.date"
+                  style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--text-main); background: #f8fafc; cursor: pointer;">
+             </div>
+          }
         </div>
 
-        <div class="mb-3 mt-2" style="width: 100%; text-align: center; position: relative;">
+        <div class="mb-4 mt-3" style="width: 100%; text-align: center; position: relative;">
           <div
             style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid white; z-index: 2; position: relative; background-color: #f1f5f9;">
             <div
@@ -66,7 +80,7 @@
           </div>
         </div>
 
-        <div class="form-group mb-4"
+        <div class="form-group mt-3 mb-4"
           style="background: #f8fafc; padding: 1.2rem; border-radius: 16px; border: 1px solid #e2e8f0;">
           <div class="intensity-header d-flex align-items-center justify-content-between mb-3">
             <label class="mb-0" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Esfuerzo
@@ -92,12 +106,12 @@
           </div>
         </div>
 
-        <div class="form-row">
-          <div class="form-group flex-1">
-            <label>
+        <div class="form-row mt-3 mb-4">
+          <div class="form-group flex-1" style="background: #ffffff; padding: 1.25rem; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            <label class="d-flex align-items-center mb-3" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
               Minutos Activos (En Pista)
-              <span class="trust-marker" (click)="showInfo('time')" title="Info">
-                <mat-icon style="font-size: 1rem; height: 1rem; width: 1rem;">info</mat-icon>
+              <span class="trust-marker ml-2" (click)="showInfo('time')" title="Info">
+                <mat-icon style="font-size: 1.1rem; height: 1.1rem; width: 1.1rem; margin-top: -2px;">info</mat-icon>
               </span>
             </label>
             <div class="time-stepper">
@@ -113,7 +127,7 @@
 
 
             <!-- Dynamic Context Feedback -->
-            <div class="duration-feedback mt-2 p-2" style="border-radius: 8px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.75rem; display: flex; align-items: center; gap: 8px; transition: all 0.3s; min-height: 40px;">
+            <div class="duration-feedback mt-3 p-3" style="border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 0.8rem; display: flex; align-items: center; gap: 12px; transition: all 0.3s; min-height: 48px;">
               @if (pending.duration_min <= 3) {
                 <div style="background: #d1fae5; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><mat-icon style="color: #10b981; font-size: 14px; height: 14px; width: 14px;">bolt</mat-icon></div>
                 <span style="color: #059669; font-weight: 600; line-height: 1.1;">Micro-sesión óptima (Máximo foco)</span>
@@ -131,11 +145,11 @@
           </div>
         </div>
 
-        <div class="form-group mt-4">
-          <label class="mb-2">
+        <div class="form-group mt-3 mb-4" style="background: #ffffff; padding: 1.25rem; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+          <label class="d-flex align-items-center mb-3" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
             Altura de los saltos
-            <span class="trust-marker" (click)="showInfo('jump')"><mat-icon
-                style="font-size: 1rem; height: 1rem; width: 1rem;">info</mat-icon></span>
+            <span class="trust-marker ml-2" (click)="showInfo('jump')"><mat-icon
+                style="font-size: 1.1rem; height: 1.1rem; width: 1.1rem; margin-top: -2px;">info</mat-icon></span>
           </label>
           <div class="d-flex" style="gap: 10px;">
             <!-- Card: Salto Bajo (false) -->
@@ -150,7 +164,7 @@
               </div>
               }
               <div
-                style="height: 100px; background-image: url('/Images/Salud/collie-salto-bajo.png'); background-size: cover; background-position: center; transition: opacity 0.3s;"
+                style="height: 140px; background-image: url('/Images/Salud/collie-salto-bajo.png'); background-size: cover; background-position: center; transition: opacity 0.3s;"
                 [style.opacity]="pending.jumped_max_height === true ? '0.4' : '1'"></div>
               <div style="padding: 8px 4px; text-align: center; font-weight: 700; font-size: 0.75rem; line-height: 1.2;"
                 [style.color]="pending.jumped_max_height === false ? 'var(--primary-color)' : 'var(--text-secondary)'">
@@ -169,7 +183,7 @@
               </div>
               }
               <div
-                style="height: 100px; background-image: url('/Images/Salud/collie-salto-alto.png'); background-size: cover; background-position: center; transition: opacity 0.3s;"
+                style="height: 140px; background-image: url('/Images/Salud/collie-salto-alto.png'); background-size: cover; background-position: center; transition: opacity 0.3s;"
                 [style.opacity]="pending.jumped_max_height === false ? '0.4' : '1'"></div>
               <div style="padding: 8px 4px; text-align: center; font-weight: 700; font-size: 0.75rem; line-height: 1.2;"
                 [style.color]="pending.jumped_max_height === true ? 'var(--primary-color)' : 'var(--text-secondary)'">
@@ -178,8 +192,8 @@
           </div>
         </div>
 
-        <div class="form-group mt-3">
-          <label>Salidas a pista</label>
+        <div class="form-group mt-3 mb-4" style="background: #ffffff; padding: 1.25rem; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+          <label class="d-flex align-items-center mb-3" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Salidas a pista</label>
           <div class="run-selector d-flex gap-2 mt-1">
             <button class="run-chip" style="flex: 1; text-align: center;" [class.active]="pending.number_of_runs == 2"
               (click)="pending.number_of_runs = (pending.number_of_runs == 2 ? undefined : 2)">1-2</button>
@@ -191,15 +205,15 @@
         </div>
 
         <button mat-flat-button
-          style="width: 100%; margin-top: 1.5rem; border-radius: 12px; padding: 24px 0; font-size: 1.1rem; font-weight: 600; background-color: var(--primary-color); color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);"
-          (click)="confirmPending(pending)" [disabled]="confirmingIds().includes(pending.id)">
-          @if(confirmingIds().includes(pending.id)) {
+          style="width: 100%; margin-top: 2rem; margin-bottom: 0.5rem; border-radius: 12px; padding: 24px 0; font-size: 1.1rem; font-weight: 600; background-color: var(--primary-color); color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);"
+          (click)="confirmPending(pending)" [disabled]="confirmingIds().includes(pending.id || 0)">
+          @if(confirmingIds().includes(pending.id || 0)) {
           <span class="d-flex align-items-center justify-content-center gap-2">
-            <span class="spinner-small" style="border-top-color: white;"></span> Regenerando Gráficas...
+            <span class="spinner-small" style="border-top-color: white;"></span> {{ isManual() ? 'Guardando...' : 'Regenerando Gráficas...' }}
           </span>
           } @else {
           <span class="d-flex align-items-center justify-content-center gap-2">
-            <mat-icon>check_circle</mat-icon> Confirmar Sesión
+            <mat-icon>{{ isManual() ? 'save' : 'check_circle' }}</mat-icon> {{ isManual() ? (pending.id ? 'Actualizar' : 'Guardar') : 'Confirmar Sesión' }}
           </span>
           }
         </button>

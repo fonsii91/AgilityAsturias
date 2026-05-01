@@ -14,6 +14,8 @@ export interface PendingReviewsData {
   pendingReviews: DogWorkload[];
   dogId: number;
   dog?: Dog | null;
+  isManual?: boolean;
+  manualWorkload?: Partial<DogWorkload>;
 }
 
 @Component({
@@ -38,6 +40,7 @@ export class PendingReviewsDialogComponent {
   currentIndex = computed(() => this.totalPending() - this.pendingReviews().length + 1);
 
   currentRpe = signal<number>(5);
+  isManual = signal<boolean>(false);
 
   getSafeAvatarUrl(level: number): string {
     const d = this.dog();
@@ -57,15 +60,29 @@ export class PendingReviewsDialogComponent {
   }
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: PendingReviewsData) {
-    this.pendingReviews.set([...data.pendingReviews]);
+    this.isManual.set(!!data.isManual);
     this.dogId = data.dogId;
     if (data.dog) {
       this.dog.set(data.dog);
     }
     
-    const current = this.currentPending();
-    if (current) {
-        this.currentRpe.set(current.intensity_rpe || 5);
+    if (this.isManual()) {
+      const w = data.manualWorkload || {
+        id: 0,
+        date: new Date().toISOString().split('T')[0],
+        duration_min: 5,
+        intensity_rpe: 6,
+        jumped_max_height: false,
+        number_of_runs: null
+      };
+      this.pendingReviews.set([w as DogWorkload]);
+      this.currentRpe.set(w.intensity_rpe || 5);
+    } else {
+      this.pendingReviews.set([...data.pendingReviews]);
+      const current = this.currentPending();
+      if (current) {
+          this.currentRpe.set(current.intensity_rpe || 5);
+      }
     }
   }
 
@@ -111,6 +128,44 @@ export class PendingReviewsDialogComponent {
     if (!workload.intensity_rpe) {
        this.toast.error('Por favor, evalúa el cansancio de tu perro.');
        return;
+    }
+
+    if (this.isManual()) {
+        const dataToSave = {
+            date: workload.date,
+            duration_min: workload.duration_min,
+            intensity_rpe: workload.intensity_rpe,
+            activity_type: 'agility',
+            jumped_max_height: workload.jumped_max_height,
+            number_of_runs: workload.number_of_runs || undefined
+        };
+        
+        this.confirmingIds.update(ids => [...ids, workload.id || 0]);
+        
+        if (workload.id) {
+            this.workloadService.updateWorkload(workload.id, dataToSave as any).subscribe({
+                next: () => {
+                    this.toast.success('Registro actualizado correctamente');
+                    this.dialogRef.close(true);
+                },
+                error: () => {
+                    this.confirmingIds.update(ids => ids.filter(id => id !== workload.id));
+                    this.toast.error('Error al actualizar el registro');
+                }
+            });
+        } else {
+            this.workloadService.storeManualWorkload(this.dogId, dataToSave).subscribe({
+                next: () => {
+                    this.toast.success('Registro añadido correctamente');
+                    this.dialogRef.close(true);
+                },
+                error: () => {
+                    this.confirmingIds.update(ids => ids.filter(id => id !== 0));
+                    this.toast.error('Error al guardar el registro');
+                }
+            });
+        }
+        return;
     }
 
     this.confirmingIds.update(ids => [...ids, workload.id]);

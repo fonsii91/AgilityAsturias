@@ -112,6 +112,7 @@ class ReservationController extends Controller
                     'user_image' => $userImage,
                     'dogs' => [
                         [
+                            'id' => $reservation->dog ? $reservation->dog->id : null,
                             'name' => $dogName, 
                             'image' => $dogPhoto, 
                             'reservation_id' => $reservation->id,
@@ -121,6 +122,7 @@ class ReservationController extends Controller
                 ];
             } else {
                 $availability[$key]['attendees'][$foundUserIdx]['dogs'][] = [
+                    'id' => $reservation->dog ? $reservation->dog->id : null,
                     'name' => $dogName,
                     'image' => $dogPhoto,
                     'reservation_id' => $reservation->id,
