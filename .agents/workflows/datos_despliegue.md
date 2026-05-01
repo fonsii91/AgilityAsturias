@@ -30,6 +30,7 @@ description: Datos para desplegar en producción el proyecto
 - **[Completado]** Fase 6: Instalado y configurado Netdata para monitorización del servidor. Se permite tráfico por el puerto 19999 mediante UFW. Accesible en: http://157.173.121.242:19999
 - **[Completado]** Fase 7: Instalado y configurado phpMyAdmin sobre Nginx. Se permite tráfico por el puerto 8080 mediante UFW. Accesible en: http://157.173.121.242:8080
 - **[Completado]** Fase 8: Configurado sistema de backups locales automáticos diarios de la base de datos con rotación.
+- **[Completado]** Despliegue v1.1.25 (01/05/2026): Despliegue en producción finalizado con éxito tras ejecutar todas las baterías de tests (130 backend, 244 frontend). Incluidas mejoras en Salud Deportiva y ajustes visuales.
 
 
 ---

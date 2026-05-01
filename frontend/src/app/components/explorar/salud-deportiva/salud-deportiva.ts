@@ -54,13 +54,13 @@ export class SaludDeportivaComponent implements OnInit {
   // Formularios manuales
   isManualFormOpen = signal<boolean>(false);
   isHelpModalOpen = signal<boolean>(false);
-  
+
   visibleHistory = computed(() => {
     const data = this.acwrData();
     if (!data || !data.recent_history) return [];
     return data.recent_history.slice(0, 2);
   });
-  
+
   editingWorkloadId = signal<number | null>(null);
   manualDate = signal<string>(new Date().toISOString().split('T')[0]);
   manualDuration = signal<number>(8);
@@ -69,30 +69,32 @@ export class SaludDeportivaComponent implements OnInit {
   manualNumberOfRuns = signal<number | null>(2); // Preselected 1-2
   isSubmitting = signal<boolean>(false);
 
-  manualAvatarUrl = computed(() => {
+  getSafeAvatarUrl(level: number): string {
     const d = this.selectedDog();
-    if (!d) return null;
-    
-    const rpe = this.manualIntensity();
+    if (!d) return `/Images/Salud/collie-cansancio-${level}.png`;
 
     let url = null;
-    if (rpe <= 3) url = d.avatar_blue_url;
-    else if (rpe <= 6) url = d.avatar_green_url;
-    else if (rpe <= 8) url = d.avatar_yellow_url;
-    else url = d.avatar_red_url;
+    if (level === 1) url = d.avatar_cansancio_1_url;
+    else if (level === 2) url = d.avatar_cansancio_2_url;
+    else if (level === 3) url = d.avatar_cansancio_3_url;
+    else if (level === 4) url = d.avatar_cansancio_4_url;
+    else if (level === 5) url = d.avatar_cansancio_5_url;
 
-    return url || d.photo_url || null;
-  });
+    if (!url || url === "null" || url === "undefined" || url.trim() === "" || !url.includes('/')) {
+      return `/Images/Salud/collie-cansancio-${level}.png`;
+    }
+    return url;
+  }
 
   workloadToDelete = signal<number | null>(null);
-  
+
   confirmingIds = signal<number[]>([]);
 
   constructor(
     private workloadService: DogWorkloadService,
     private dogService: DogService,
     private toast: ToastService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.dogService.loadUserDogs().then(dogs => {
@@ -114,7 +116,7 @@ export class SaludDeportivaComponent implements OnInit {
     const dogId = this.selectedDogId();
     if (!dogId) return;
     this.isLoading.set(true);
-    
+
     this.workloadService.getAcwrData(dogId).subscribe(data => {
       this.acwrData.set(data);
       this.isLoading.set(false);
@@ -133,7 +135,7 @@ export class SaludDeportivaComponent implements OnInit {
   toggleManualForm() {
     this.isManualFormOpen.update(val => !val);
     if (!this.isManualFormOpen()) {
-        this.resetManualForm();
+      this.resetManualForm();
     }
   }
 
@@ -153,7 +155,7 @@ export class SaludDeportivaComponent implements OnInit {
     this.manualIntensity.set(w.intensity_rpe);
     this.manualJumpedMaxHeight.set(!!w.jumped_max_height);
     this.manualNumberOfRuns.set(w.number_of_runs || null);
-    
+
     this.isManualFormOpen.set(true);
     window.scrollTo({ top: 300, behavior: 'smooth' });
   }
@@ -226,14 +228,14 @@ export class SaludDeportivaComponent implements OnInit {
   }
 
   getIconForIntensity(level: number): string {
-    if (level <= 3) return 'pets'; 
-    if (level <= 7) return 'directions_run'; 
-    return 'local_fire_department'; 
+    if (level <= 3) return 'pets';
+    if (level <= 7) return 'directions_run';
+    return 'local_fire_department';
   }
 
   getStatusText(color: string | undefined): string {
     if (!color) return 'Analizando...';
-    switch(color) {
+    switch (color) {
       case 'blue': return 'Desentrenamiento';
       case 'green': return 'Estado Óptimo';
       case 'yellow': return 'Sobrecarga Ligera';
@@ -249,7 +251,7 @@ export class SaludDeportivaComponent implements OnInit {
       'competition': 'Competición',
       'manual': 'Agility'
     };
-    
+
     for (const key in translations) {
       if (type.toLowerCase().includes(key)) {
         return translations[key];
@@ -269,7 +271,7 @@ export class SaludDeportivaComponent implements OnInit {
   confirmDeleteWorkload() {
     const id = this.workloadToDelete();
     if (!id) return;
-    
+
     this.workloadService.deleteWorkload(id).subscribe({
       next: () => {
         this.toast.success('Registro eliminado correctamente');
@@ -305,7 +307,7 @@ export class SaludDeportivaComponent implements OnInit {
           this.isSubmitting.set(false);
           this.isManualFormOpen.set(false);
           this.resetManualForm();
-          this.loadDogData(); 
+          this.loadDogData();
         },
         error: (err) => {
           console.error("Error updating workload", err);
@@ -320,7 +322,7 @@ export class SaludDeportivaComponent implements OnInit {
           this.isSubmitting.set(false);
           this.isManualFormOpen.set(false);
           this.resetManualForm();
-          this.loadDogData(); 
+          this.loadDogData();
         },
         error: (err) => {
           console.error("Error saving manual workload", err);

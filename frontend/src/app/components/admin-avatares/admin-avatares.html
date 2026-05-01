@@ -35,10 +35,11 @@
             </td>
             <td style="padding: 15px 20px; text-align: center;">
               <div style="display: flex; gap: 4px; justify-content: center;">
-                <div class="status-dot blue" [class.active]="dog.avatar_blue_url" title="Desentrenamiento"></div>
-                <div class="status-dot green" [class.active]="dog.avatar_green_url" title="Óptimo"></div>
-                <div class="status-dot yellow" [class.active]="dog.avatar_yellow_url" title="Sobrecarga"></div>
-                <div class="status-dot red" [class.active]="dog.avatar_red_url" title="Riesgo"></div>
+                <div class="status-dot" style="background-color: #3b82f6" [class.active]="dog.avatar_cansancio_1_url" title="Nivel 1"></div>
+                <div class="status-dot" style="background-color: #22c55e" [class.active]="dog.avatar_cansancio_2_url" title="Nivel 2"></div>
+                <div class="status-dot" style="background-color: #eab308" [class.active]="dog.avatar_cansancio_3_url" title="Nivel 3"></div>
+                <div class="status-dot" style="background-color: #f97316" [class.active]="dog.avatar_cansancio_4_url" title="Nivel 4"></div>
+                <div class="status-dot" style="background-color: #ef4444" [class.active]="dog.avatar_cansancio_5_url" title="Nivel 5"></div>
               </div>
             </td>
             <td style="padding: 15px 20px; text-align: right;">
@@ -107,70 +108,87 @@
 
         <p class="text-muted mb-4">O selecciona manualmente la imagen estilizada desde tu ordenador para cada zona de fatiga. Si una zona se deja en blanco, se usará la foto normal del perro.</p>
 
-        <div class="avatar-grid">
-          <!-- Blue -->
-          <div class="avatar-form-card border-blue">
-            <h4 class="color-blue"><span class="material-icons">ac_unit</span> Desentrenamiento (Azul)</h4>
-            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarBlueUrl() || '/placeholder-dog.jpg') + ')'"></div>
+        <div class="avatar-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <!-- Nivel 1 -->
+          <div class="avatar-form-card" style="border: 2px solid #3b82f6; border-radius: 12px; padding: 16px;">
+            <h4 style="color: #3b82f6; margin-top: 0;"><span class="material-icons align-middle mr-1">ac_unit</span> Nivel 1 (Fresco)</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarCansancio1Url() || '/placeholder-dog.jpg') + ')'" style="height: 150px; background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 12px;"></div>
             <div class="d-flex flex-column gap-2">
-              <input type="file" #fileInputBlue style="display: none;" accept="image/*" (change)="onFileSelected($event, 'blue')">
-              <button class="btn-outline-primary w-100" (click)="fileInputBlue.click()">
-                <span class="material-icons align-middle text-small mr-1">upload_file</span> Seleccionar Foto
+              <input type="file" #fileInput1 style="display: none;" accept="image/*" (change)="onFileSelected($event, 1)">
+              <button class="btn-outline-primary w-100" (click)="fileInput1.click()" style="padding: 6px; font-size: 0.85rem; border: 1px solid #3b82f6; color: #3b82f6; background: transparent; border-radius: 6px;">
+                <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">upload_file</span> Foto
               </button>
-              @if (avatarBlueUrl() && !clearBlue()) {
-                <button class="btn-outline-danger w-100" (click)="clearAvatar('blue')">
-                  <span class="material-icons align-middle text-small mr-1">delete</span> Eliminar Avatar
+              @if (avatarCansancio1Url() && !clearCansancio1()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar(1)" style="padding: 6px; font-size: 0.85rem; border: 1px solid #ef4444; color: #ef4444; background: transparent; border-radius: 6px;">
+                  <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">delete</span> Quitar
                 </button>
               }
             </div>
           </div>
 
-          <!-- Green -->
-          <div class="avatar-form-card border-green">
-            <h4 class="color-green"><span class="material-icons">check_circle</span> Óptimo (Verde)</h4>
-            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarGreenUrl() || '/placeholder-dog.jpg') + ')'"></div>
+          <!-- Nivel 2 -->
+          <div class="avatar-form-card" style="border: 2px solid #22c55e; border-radius: 12px; padding: 16px;">
+            <h4 style="color: #22c55e; margin-top: 0;"><span class="material-icons align-middle mr-1">check_circle</span> Nivel 2</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarCansancio2Url() || '/placeholder-dog.jpg') + ')'" style="height: 150px; background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 12px;"></div>
             <div class="d-flex flex-column gap-2">
-              <input type="file" #fileInputGreen style="display: none;" accept="image/*" (change)="onFileSelected($event, 'green')">
-              <button class="btn-outline-primary w-100" (click)="fileInputGreen.click()">
-                <span class="material-icons align-middle text-small mr-1">upload_file</span> Seleccionar Foto
+              <input type="file" #fileInput2 style="display: none;" accept="image/*" (change)="onFileSelected($event, 2)">
+              <button class="btn-outline-primary w-100" (click)="fileInput2.click()" style="padding: 6px; font-size: 0.85rem; border: 1px solid #22c55e; color: #22c55e; background: transparent; border-radius: 6px;">
+                <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">upload_file</span> Foto
               </button>
-              @if (avatarGreenUrl() && !clearGreen()) {
-                <button class="btn-outline-danger w-100" (click)="clearAvatar('green')">
-                  <span class="material-icons align-middle text-small mr-1">delete</span> Eliminar Avatar
+              @if (avatarCansancio2Url() && !clearCansancio2()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar(2)" style="padding: 6px; font-size: 0.85rem; border: 1px solid #ef4444; color: #ef4444; background: transparent; border-radius: 6px;">
+                  <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">delete</span> Quitar
                 </button>
               }
             </div>
           </div>
 
-          <!-- Yellow -->
-          <div class="avatar-form-card border-yellow">
-            <h4 class="color-yellow"><span class="material-icons">warning</span> Sobrecarga (Naranja)</h4>
-            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarYellowUrl() || '/placeholder-dog.jpg') + ')'"></div>
+          <!-- Nivel 3 -->
+          <div class="avatar-form-card" style="border: 2px solid #eab308; border-radius: 12px; padding: 16px;">
+            <h4 style="color: #eab308; margin-top: 0;"><span class="material-icons align-middle mr-1">warning</span> Nivel 3</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarCansancio3Url() || '/placeholder-dog.jpg') + ')'" style="height: 150px; background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 12px;"></div>
             <div class="d-flex flex-column gap-2">
-              <input type="file" #fileInputYellow style="display: none;" accept="image/*" (change)="onFileSelected($event, 'yellow')">
-              <button class="btn-outline-primary w-100" (click)="fileInputYellow.click()">
-                <span class="material-icons align-middle text-small mr-1">upload_file</span> Seleccionar Foto
+              <input type="file" #fileInput3 style="display: none;" accept="image/*" (change)="onFileSelected($event, 3)">
+              <button class="btn-outline-primary w-100" (click)="fileInput3.click()" style="padding: 6px; font-size: 0.85rem; border: 1px solid #eab308; color: #eab308; background: transparent; border-radius: 6px;">
+                <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">upload_file</span> Foto
               </button>
-              @if (avatarYellowUrl() && !clearYellow()) {
-                <button class="btn-outline-danger w-100" (click)="clearAvatar('yellow')">
-                  <span class="material-icons align-middle text-small mr-1">delete</span> Eliminar Avatar
+              @if (avatarCansancio3Url() && !clearCansancio3()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar(3)" style="padding: 6px; font-size: 0.85rem; border: 1px solid #ef4444; color: #ef4444; background: transparent; border-radius: 6px;">
+                  <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">delete</span> Quitar
                 </button>
               }
             </div>
           </div>
 
-          <!-- Red -->
-          <div class="avatar-form-card border-red">
-            <h4 class="color-red"><span class="material-icons">error</span> Riesgo (Rojo)</h4>
-            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarRedUrl() || '/placeholder-dog.jpg') + ')'"></div>
+          <!-- Nivel 4 -->
+          <div class="avatar-form-card" style="border: 2px solid #f97316; border-radius: 12px; padding: 16px;">
+            <h4 style="color: #f97316; margin-top: 0;"><span class="material-icons align-middle mr-1">error</span> Nivel 4</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarCansancio4Url() || '/placeholder-dog.jpg') + ')'" style="height: 150px; background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 12px;"></div>
             <div class="d-flex flex-column gap-2">
-              <input type="file" #fileInputRed style="display: none;" accept="image/*" (change)="onFileSelected($event, 'red')">
-              <button class="btn-outline-primary w-100" (click)="fileInputRed.click()">
-                <span class="material-icons align-middle text-small mr-1">upload_file</span> Seleccionar Foto
+              <input type="file" #fileInput4 style="display: none;" accept="image/*" (change)="onFileSelected($event, 4)">
+              <button class="btn-outline-primary w-100" (click)="fileInput4.click()" style="padding: 6px; font-size: 0.85rem; border: 1px solid #f97316; color: #f97316; background: transparent; border-radius: 6px;">
+                <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">upload_file</span> Foto
               </button>
-              @if (avatarRedUrl() && !clearRed()) {
-                <button class="btn-outline-danger w-100" (click)="clearAvatar('red')">
-                  <span class="material-icons align-middle text-small mr-1">delete</span> Eliminar Avatar
+              @if (avatarCansancio4Url() && !clearCansancio4()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar(4)" style="padding: 6px; font-size: 0.85rem; border: 1px solid #ef4444; color: #ef4444; background: transparent; border-radius: 6px;">
+                  <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">delete</span> Quitar
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Nivel 5 -->
+          <div class="avatar-form-card" style="border: 2px solid #ef4444; border-radius: 12px; padding: 16px;">
+            <h4 style="color: #ef4444; margin-top: 0;"><span class="material-icons align-middle mr-1">local_fire_department</span> Nivel 5 (Exhausto)</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarCansancio5Url() || '/placeholder-dog.jpg') + ')'" style="height: 150px; background-size: cover; background-position: center; border-radius: 8px; margin-bottom: 12px;"></div>
+            <div class="d-flex flex-column gap-2">
+              <input type="file" #fileInput5 style="display: none;" accept="image/*" (change)="onFileSelected($event, 5)">
+              <button class="btn-outline-primary w-100" (click)="fileInput5.click()" style="padding: 6px; font-size: 0.85rem; border: 1px solid #ef4444; color: #ef4444; background: transparent; border-radius: 6px;">
+                <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">upload_file</span> Foto
+              </button>
+              @if (avatarCansancio5Url() && !clearCansancio5()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar(5)" style="padding: 6px; font-size: 0.85rem; border: 1px solid #ef4444; color: #ef4444; background: transparent; border-radius: 6px;">
+                  <span class="material-icons align-middle text-small mr-1" style="font-size: 16px;">delete</span> Quitar
                 </button>
               }
             </div>

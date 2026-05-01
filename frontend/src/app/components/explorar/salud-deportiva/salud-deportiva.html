@@ -154,14 +154,29 @@
         <button class="btn-icon-close" (click)="toggleManualForm()"><span class="material-icons">close</span></button>
       </div>
       <div class="form-card-body p-0 mt-3">
-        @if(manualAvatarUrl()) {
-        <div class="mb-3 mt-2" style="width: 100%; text-align: center;">
-           <div class="dynamic-slider-avatar" 
-                [style.backgroundImage]="'url(' + manualAvatarUrl() + ')'" 
-                style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; background-size: cover; background-position: center; transition: background-image 0.4s ease-in-out; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid white; z-index: 2; position: relative;">
+        <div class="mb-3 mt-2" style="width: 100%; text-align: center; position: relative;">
+           <div style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid white; z-index: 2; position: relative; background-color: #f1f5f9;">
+              <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                   [style.backgroundImage]="'url(' + getSafeAvatarUrl(1) + ')'"
+                   [style.opacity]="manualIntensity() <= 2 ? 1 : 0"></div>
+                   
+              <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                   [style.backgroundImage]="'url(' + getSafeAvatarUrl(2) + ')'"
+                   [style.opacity]="manualIntensity() > 2 && manualIntensity() <= 4 ? 1 : 0"></div>
+                   
+              <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                   [style.backgroundImage]="'url(' + getSafeAvatarUrl(3) + ')'"
+                   [style.opacity]="manualIntensity() > 4 && manualIntensity() <= 6 ? 1 : 0"></div>
+                   
+              <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                   [style.backgroundImage]="'url(' + getSafeAvatarUrl(4) + ')'"
+                   [style.opacity]="manualIntensity() > 6 && manualIntensity() <= 8 ? 1 : 0"></div>
+                   
+              <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                   [style.backgroundImage]="'url(' + getSafeAvatarUrl(5) + ')'"
+                   [style.opacity]="manualIntensity() > 8 ? 1 : 0"></div>
            </div>
         </div>
-        }
 
         <!-- Intensity Row (Prominent) -->
         <div class="form-group mb-4" style="background: #f8fafc; padding: 1.2rem; border-radius: 16px; border: 1px solid #e2e8f0;">

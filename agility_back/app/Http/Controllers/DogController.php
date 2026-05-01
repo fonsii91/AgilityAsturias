@@ -105,10 +105,11 @@ class DogController extends Controller
             'sterilized_at' => 'nullable|date',
             'weight_kg' => 'nullable|numeric|min:1',
             'height_cm' => 'nullable|numeric|min:10',
-            'avatar_blue_url' => 'nullable|url',
-            'avatar_green_url' => 'nullable|url',
-            'avatar_yellow_url' => 'nullable|url',
-            'avatar_red_url' => 'nullable|url',
+            'avatar_cansancio_1_url' => 'nullable|url',
+            'avatar_cansancio_2_url' => 'nullable|url',
+            'avatar_cansancio_3_url' => 'nullable|url',
+            'avatar_cansancio_4_url' => 'nullable|url',
+            'avatar_cansancio_5_url' => 'nullable|url',
         ]);
 
         $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade'])->toArray();
@@ -298,22 +299,23 @@ class DogController extends Controller
         $dog = Dog::findOrFail($id);
 
         $request->validate([
-            'avatar_blue' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'avatar_green' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'avatar_yellow' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'avatar_red' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_cansancio_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_cansancio_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_cansancio_3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_cansancio_4' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_cansancio_5' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
 
-        $colors = ['blue', 'green', 'yellow', 'red'];
+        $levels = [1, 2, 3, 4, 5];
 
-        foreach ($colors as $color) {
-            $field = "avatar_{$color}";
-            $urlField = "avatar_{$color}_url";
+        foreach ($levels as $level) {
+            $field = "avatar_cansancio_{$level}";
+            $urlField = "avatar_cansancio_{$level}_url";
 
             // If the user wants to clear the image (e.g., they clicked the trash can)
-            if ($request->boolean("clear_{$color}")) {
+            if ($request->boolean("clear_cansancio_{$level}")) {
                 if ($dog->$urlField && str_contains($dog->$urlField, '/storage/')) {
                     $oldPath = str_replace(asset('storage/'), '', $dog->$urlField);
                     \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
@@ -392,22 +394,23 @@ class DogController extends Controller
         $baseDescription = $customDetails ? "A $breed dog, $customDetails" : "A $breed dog";
 
         $prompts = [
-            'blue' => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking very relaxed, resting peacefully, happy. Beautiful bright lighting, solid clean background.",
-            'green' => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking very energetic, active, happy, athletic pose. Beautiful bright lighting, solid clean background.",
-            'yellow' => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking tired, panting, sweating slightly, resting after exercise. Beautiful lighting, solid clean background.",
-            'red' => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking extremely exhausted, tongue out, heavily panting, struggling. Beautiful lighting, solid clean background.",
+            1 => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking very relaxed, resting peacefully, happy. Beautiful bright lighting, solid clean background.",
+            2 => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking energetic, active, happy. Beautiful bright lighting, solid clean background.",
+            3 => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking slightly tired, resting after light exercise. Beautiful lighting, solid clean background.",
+            4 => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking very tired, panting, sweating slightly, resting after heavy exercise. Beautiful lighting, solid clean background.",
+            5 => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking extremely exhausted, tongue out, heavily panting, struggling. Beautiful lighting, solid clean background.",
         ];
 
         try {
-            foreach ($prompts as $color => $prompt) {
+            foreach ($prompts as $level => $prompt) {
                 $imageBinary = $aiService->generateImage($prompt);
                 
-                $filename = "{$dog->id}_avatar_{$color}_" . time() . ".png";
+                $filename = "{$dog->id}_avatar_cansancio_{$level}_" . time() . ".png";
                 $path = "clubs/{$clubSlug}/ai_avatars/{$filename}";
                 
                 Storage::disk('public')->put($path, $imageBinary);
 
-                $urlField = "avatar_{$color}_url";
+                $urlField = "avatar_cansancio_{$level}_url";
                 
                 if ($dog->$urlField && str_contains($dog->$urlField, '/storage/')) {
                     $oldPath = str_replace(asset('storage/'), '', $dog->$urlField);

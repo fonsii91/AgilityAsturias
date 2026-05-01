@@ -39,21 +39,22 @@ export class PendingReviewsDialogComponent {
 
   currentRpe = signal<number>(5);
 
-  currentAvatarUrl = computed(() => {
+  getSafeAvatarUrl(level: number): string {
     const d = this.dog();
-    if (!d) return null;
-    
-    const rpe = this.currentRpe();
+    if (!d) return `/Images/Salud/collie-cansancio-${level}.png`;
 
     let url = null;
-    if (rpe <= 3) url = d.avatar_blue_url;
-    else if (rpe <= 6) url = d.avatar_green_url;
-    else if (rpe <= 8) url = d.avatar_yellow_url;
-    else url = d.avatar_red_url;
+    if (level === 1) url = d.avatar_cansancio_1_url;
+    else if (level === 2) url = d.avatar_cansancio_2_url;
+    else if (level === 3) url = d.avatar_cansancio_3_url;
+    else if (level === 4) url = d.avatar_cansancio_4_url;
+    else if (level === 5) url = d.avatar_cansancio_5_url;
 
-    // Fallback if specific AI avatar is not set, use normal photo
-    return url || d.photo_url || null;
-  });
+    if (!url || url === "null" || url === "undefined" || url.trim() === "" || !url.includes('/')) {
+      return `/Images/Salud/collie-cansancio-${level}.png`;
+    }
+    return url;
+  }
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: PendingReviewsData) {
     this.pendingReviews.set([...data.pendingReviews]);

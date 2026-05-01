@@ -22,22 +22,25 @@ export class AdminAvataresComponent implements OnInit {
   selectedDog = signal<Dog | null>(null);
 
   // Form inputs (previews or existing URLs)
-  avatarBlueUrl = signal<string | null>(null);
-  avatarGreenUrl = signal<string | null>(null);
-  avatarYellowUrl = signal<string | null>(null);
-  avatarRedUrl = signal<string | null>(null);
+  avatarCansancio1Url = signal<string | null>(null);
+  avatarCansancio2Url = signal<string | null>(null);
+  avatarCansancio3Url = signal<string | null>(null);
+  avatarCansancio4Url = signal<string | null>(null);
+  avatarCansancio5Url = signal<string | null>(null);
 
   // Files to upload
-  fileBlue = signal<File | null>(null);
-  fileGreen = signal<File | null>(null);
-  fileYellow = signal<File | null>(null);
-  fileRed = signal<File | null>(null);
+  fileCansancio1 = signal<File | null>(null);
+  fileCansancio2 = signal<File | null>(null);
+  fileCansancio3 = signal<File | null>(null);
+  fileCansancio4 = signal<File | null>(null);
+  fileCansancio5 = signal<File | null>(null);
 
   // Clear flags
-  clearBlue = signal(false);
-  clearGreen = signal(false);
-  clearYellow = signal(false);
-  clearRed = signal(false);
+  clearCansancio1 = signal(false);
+  clearCansancio2 = signal(false);
+  clearCansancio3 = signal(false);
+  clearCansancio4 = signal(false);
+  clearCansancio5 = signal(false);
 
   isSubmitting = signal(false);
   isGenerating = signal(false);
@@ -58,50 +61,56 @@ export class AdminAvataresComponent implements OnInit {
 
   selectDog(dog: Dog) {
     this.selectedDog.set(dog);
-    this.avatarBlueUrl.set(dog.avatar_blue_url || null);
-    this.avatarGreenUrl.set(dog.avatar_green_url || null);
-    this.avatarYellowUrl.set(dog.avatar_yellow_url || null);
-    this.avatarRedUrl.set(dog.avatar_red_url || null);
+    this.avatarCansancio1Url.set(dog.avatar_cansancio_1_url || null);
+    this.avatarCansancio2Url.set(dog.avatar_cansancio_2_url || null);
+    this.avatarCansancio3Url.set(dog.avatar_cansancio_3_url || null);
+    this.avatarCansancio4Url.set(dog.avatar_cansancio_4_url || null);
+    this.avatarCansancio5Url.set(dog.avatar_cansancio_5_url || null);
 
-    this.fileBlue.set(null);
-    this.fileGreen.set(null);
-    this.fileYellow.set(null);
-    this.fileRed.set(null);
+    this.fileCansancio1.set(null);
+    this.fileCansancio2.set(null);
+    this.fileCansancio3.set(null);
+    this.fileCansancio4.set(null);
+    this.fileCansancio5.set(null);
 
-    this.clearBlue.set(false);
-    this.clearGreen.set(false);
-    this.clearYellow.set(false);
-    this.clearRed.set(false);
+    this.clearCansancio1.set(false);
+    this.clearCansancio2.set(false);
+    this.clearCansancio3.set(false);
+    this.clearCansancio4.set(false);
+    this.clearCansancio5.set(false);
   }
 
   closeModal() {
     this.selectedDog.set(null);
   }
 
-  onFileSelected(event: any, color: 'blue'|'green'|'yellow'|'red') {
+  onFileSelected(event: any, level: 1|2|3|4|5) {
     const file: File = event.target.files[0];
     if (file) {
-      if (color === 'blue') { this.fileBlue.set(file); this.clearBlue.set(false); }
-      if (color === 'green') { this.fileGreen.set(file); this.clearGreen.set(false); }
-      if (color === 'yellow') { this.fileYellow.set(file); this.clearYellow.set(false); }
-      if (color === 'red') { this.fileRed.set(file); this.clearRed.set(false); }
+      if (level === 1) { this.fileCansancio1.set(file); this.clearCansancio1.set(false); }
+      if (level === 2) { this.fileCansancio2.set(file); this.clearCansancio2.set(false); }
+      if (level === 3) { this.fileCansancio3.set(file); this.clearCansancio3.set(false); }
+      if (level === 4) { this.fileCansancio4.set(file); this.clearCansancio4.set(false); }
+      if (level === 5) { this.fileCansancio5.set(file); this.clearCansancio5.set(false); }
 
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        if (color === 'blue') this.avatarBlueUrl.set(e.target.result);
-        if (color === 'green') this.avatarGreenUrl.set(e.target.result);
-        if (color === 'yellow') this.avatarYellowUrl.set(e.target.result);
-        if (color === 'red') this.avatarRedUrl.set(e.target.result);
+        if (level === 1) this.avatarCansancio1Url.set(e.target.result);
+        if (level === 2) this.avatarCansancio2Url.set(e.target.result);
+        if (level === 3) this.avatarCansancio3Url.set(e.target.result);
+        if (level === 4) this.avatarCansancio4Url.set(e.target.result);
+        if (level === 5) this.avatarCansancio5Url.set(e.target.result);
       };
       reader.readAsDataURL(file);
     }
   }
 
-  clearAvatar(color: 'blue'|'green'|'yellow'|'red') {
-    if (color === 'blue') { this.fileBlue.set(null); this.avatarBlueUrl.set(null); this.clearBlue.set(true); }
-    if (color === 'green') { this.fileGreen.set(null); this.avatarGreenUrl.set(null); this.clearGreen.set(true); }
-    if (color === 'yellow') { this.fileYellow.set(null); this.avatarYellowUrl.set(null); this.clearYellow.set(true); }
-    if (color === 'red') { this.fileRed.set(null); this.avatarRedUrl.set(null); this.clearRed.set(true); }
+  clearAvatar(level: 1|2|3|4|5) {
+    if (level === 1) { this.fileCansancio1.set(null); this.avatarCansancio1Url.set(null); this.clearCansancio1.set(true); }
+    if (level === 2) { this.fileCansancio2.set(null); this.avatarCansancio2Url.set(null); this.clearCansancio2.set(true); }
+    if (level === 3) { this.fileCansancio3.set(null); this.avatarCansancio3Url.set(null); this.clearCansancio3.set(true); }
+    if (level === 4) { this.fileCansancio4.set(null); this.avatarCansancio4Url.set(null); this.clearCansancio4.set(true); }
+    if (level === 5) { this.fileCansancio5.set(null); this.avatarCansancio5Url.set(null); this.clearCansancio5.set(true); }
   }
 
   saveAvatars() {
@@ -111,15 +120,17 @@ export class AdminAvataresComponent implements OnInit {
     this.isSubmitting.set(true);
 
     const formData = new FormData();
-    if (this.fileBlue()) formData.append('avatar_blue', this.fileBlue() as File);
-    if (this.fileGreen()) formData.append('avatar_green', this.fileGreen() as File);
-    if (this.fileYellow()) formData.append('avatar_yellow', this.fileYellow() as File);
-    if (this.fileRed()) formData.append('avatar_red', this.fileRed() as File);
+    if (this.fileCansancio1()) formData.append('avatar_cansancio_1', this.fileCansancio1() as File);
+    if (this.fileCansancio2()) formData.append('avatar_cansancio_2', this.fileCansancio2() as File);
+    if (this.fileCansancio3()) formData.append('avatar_cansancio_3', this.fileCansancio3() as File);
+    if (this.fileCansancio4()) formData.append('avatar_cansancio_4', this.fileCansancio4() as File);
+    if (this.fileCansancio5()) formData.append('avatar_cansancio_5', this.fileCansancio5() as File);
 
-    if (this.clearBlue()) formData.append('clear_blue', '1');
-    if (this.clearGreen()) formData.append('clear_green', '1');
-    if (this.clearYellow()) formData.append('clear_yellow', '1');
-    if (this.clearRed()) formData.append('clear_red', '1');
+    if (this.clearCansancio1()) formData.append('clear_cansancio_1', '1');
+    if (this.clearCansancio2()) formData.append('clear_cansancio_2', '1');
+    if (this.clearCansancio3()) formData.append('clear_cansancio_3', '1');
+    if (this.clearCansancio4()) formData.append('clear_cansancio_4', '1');
+    if (this.clearCansancio5()) formData.append('clear_cansancio_5', '1');
 
     this.dogService.updateAdminAvatars(dog.id, formData).then(() => {
       this.toast.success('Avatares guardados correctamente.');
@@ -143,10 +154,11 @@ export class AdminAvataresComponent implements OnInit {
       this.isGenerating.set(false);
       // Actualizar vista actual con las nuevas URLs devueltas
       this.selectedDog.set(updatedDog);
-      this.avatarBlueUrl.set(updatedDog.avatar_blue_url || null);
-      this.avatarGreenUrl.set(updatedDog.avatar_green_url || null);
-      this.avatarYellowUrl.set(updatedDog.avatar_yellow_url || null);
-      this.avatarRedUrl.set(updatedDog.avatar_red_url || null);
+      this.avatarCansancio1Url.set(updatedDog.avatar_cansancio_1_url || null);
+      this.avatarCansancio2Url.set(updatedDog.avatar_cansancio_2_url || null);
+      this.avatarCansancio3Url.set(updatedDog.avatar_cansancio_3_url || null);
+      this.avatarCansancio4Url.set(updatedDog.avatar_cansancio_4_url || null);
+      this.avatarCansancio5Url.set(updatedDog.avatar_cansancio_5_url || null);
     }).catch(err => {
       console.error(err);
       if (err.status === 429) {

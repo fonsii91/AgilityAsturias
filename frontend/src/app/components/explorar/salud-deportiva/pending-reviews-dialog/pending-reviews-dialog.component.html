@@ -27,14 +27,29 @@
         </div>
       </div>
 
-      @if(currentAvatarUrl()) {
-      <div class="mb-3 mt-2" style="width: 100%; text-align: center;">
-         <div class="dynamic-slider-avatar" 
-              [style.backgroundImage]="'url(' + currentAvatarUrl() + ')'" 
-              style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; background-size: cover; background-position: center; transition: background-image 0.4s ease-in-out; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid white; z-index: 2; position: relative;">
+      <div class="mb-3 mt-2" style="width: 100%; text-align: center; position: relative;">
+         <div style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid white; z-index: 2; position: relative; background-color: #f1f5f9;">
+            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(1) + ')'"
+                 [style.opacity]="currentRpe() <= 2 ? 1 : 0"></div>
+                 
+            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(2) + ')'"
+                 [style.opacity]="currentRpe() > 2 && currentRpe() <= 4 ? 1 : 0"></div>
+                 
+            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(3) + ')'"
+                 [style.opacity]="currentRpe() > 4 && currentRpe() <= 6 ? 1 : 0"></div>
+                 
+            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(4) + ')'"
+                 [style.opacity]="currentRpe() > 6 && currentRpe() <= 8 ? 1 : 0"></div>
+                 
+            <div style="position: absolute; inset: 0; background-size: cover; background-position: center; transition: opacity 0.5s ease-in-out;"
+                 [style.backgroundImage]="'url(' + getSafeAvatarUrl(5) + ')'"
+                 [style.opacity]="currentRpe() > 8 ? 1 : 0"></div>
          </div>
       </div>
-      }
 
       <div class="form-group mb-4" style="background: #f8fafc; padding: 1.2rem; border-radius: 16px; border: 1px solid #e2e8f0;">
         <div class="intensity-header d-flex align-items-center justify-content-between mb-3">

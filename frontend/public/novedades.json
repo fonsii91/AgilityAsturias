@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.1.26",
+    "date": "2026-05-01",
+    "features": [
+      "¡Salud Deportiva cobra vida! Hemos implementado una mejora visual increíble: a partir de ahora, cuando ajustes la barra de esfuerzo de tu perro tras un entrenamiento, verás cómo su fotografía cambia y se transforma de forma suave y dinámica para reflejar lo cansado que ha terminado.",
+      "Para conseguir este efecto mágico, hemos integrado nuevos avatares de fatiga que se adaptan al nivel de exigencia registrado, haciendo que vigilar el bienestar de tu compañero de pistas sea más interactivo y visual que nunca."
+    ]
+  },
+  {
     "version": "1.1.25",
     "date": "2026-05-01",
     "features": [
