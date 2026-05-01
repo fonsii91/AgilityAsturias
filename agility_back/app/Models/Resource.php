@@ -21,6 +21,7 @@ class Resource extends Model
         'category',
         'level',
         'uploaded_by',
+        'club_id',
     ];
 
     public function uploader()

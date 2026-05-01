@@ -55,14 +55,13 @@ export class WorkloadGaugeComponent {
     const isPhase3 = days >= 28;
     
     if (isPhase1) {
-       this.confidenceText = 'Fiabilidad: Baja (Calibrando)';
+       this.confidenceText = 'Fiabilidad: Baja';
        this.confidenceClass = 'badge-calibrating';
     } else if (isPhase2) {
-       const remainingPhase3 = Math.ceil(28 - days);
-       this.confidenceText = `Fiabilidad: Media (Faltan ${remainingPhase3} días para precisión máxima)`;
+       this.confidenceText = 'Fiabilidad: Media';
        this.confidenceClass = 'badge-maturing';
     } else {
-       this.confidenceText = 'Fiabilidad: Alta (Gold Standard)';
+       this.confidenceText = 'Fiabilidad: Alta';
        this.confidenceClass = 'badge-gold';
     }
     
@@ -82,6 +81,15 @@ export class WorkloadGaugeComponent {
         [cautionEnd, '#f97316'],       // Zona precaución (Naranja)
         [1, '#ef4444']                 // Zona Peligro (Rojo)
       ];
+    }
+    
+    // Explicit color for the text so 1.3 (which technically falls into orange logic) is orange, not green
+    let valueColor = '#64748b';
+    if (!isPhase1) {
+      if (data.acwr < 0.8) valueColor = '#3b82f6';
+      else if (data.acwr < yThresh) valueColor = '#10b981';
+      else if (data.acwr < rThresh) valueColor = '#f97316';
+      else valueColor = '#ef4444';
     }
     
     this.chartOptions.set({
@@ -137,20 +145,18 @@ export class WorkloadGaugeComponent {
           detail: {
             valueAnimation: true,
             formatter: '{value}',
-            color: 'inherit',
-            fontSize: 32,
+            color: valueColor,
+            fontSize: 34,
             fontWeight: 'bold',
-            offsetCenter: [0, '-10%']
+            align: 'center',
+            offsetCenter: [0, '25%'] // Centrado exacto debajo de la aguja sin el título estorbando
           },
           data: [
             {
               value: data.acwr,
-              name: 'Ratio ACWR',
+              name: '',
               title: {
-                offsetCenter: [0, '25%'],
-                fontSize: 14,
-                color: '#64748b',
-                fontWeight: 600
+                show: false
               }
             }
           ]
@@ -165,11 +171,11 @@ export class WorkloadGaugeComponent {
       this.statusDescription = `La brújula está aprendiendo el metabolismo de ${name}. Registra entrenamientos durante ${remaining} días más para establecer su perfil base y desbloquear la telemetría a color.`;
     } else {
       if (data.acwr < 0.8) {
-        this.statusText = '🧊 SUB-PREPARACIÓN (RIESGO)';
+        this.statusText = '🧊 SUB-PREPARACIÓN';
         this.statusClass = 'text-info';
         this.statusDescription = `Carga crónica baja detectada. Estadísticamente hay una desadaptación al esfuerzo físico intenso.`;
       } else if (data.acwr < yThresh) {
-        this.statusText = '✅ ZONA ÓPTIMA (SWEET SPOT)';
+        this.statusText = '✅ ZONA ÓPTIMA';
         this.statusClass = 'text-success';
         this.statusDescription = `La carga de trabajo se encuentra dentro de los márgenes estadísticos de mantenimiento óptimo.`;
       } else if (data.acwr < rThresh) {

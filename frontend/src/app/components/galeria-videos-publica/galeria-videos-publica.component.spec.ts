@@ -4,18 +4,19 @@ import { VideoService } from '../../services/video.service';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { of } from 'rxjs';
-import { signal } from '@angular/core';
+import { signal, ChangeDetectorRef } from '@angular/core';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 describe('GaleriaVideosPublicaComponent', () => {
   let component: GaleriaVideosPublicaComponent;
-  let fixture: ComponentFixture<GaleriaVideosPublicaComponent>;
   let mockVideoService: any;
   let mockAuthService: any;
   let mockToastService: any;
+  let mockCdr: any;
 
   beforeEach(async () => {
     mockVideoService = {
-      getPublicVideos: vitest.fn().mockReturnValue(of({
+      getPublicVideos: vi.fn().mockReturnValue(of({
         data: [
           { id: 1, title: 'Test Video 1', in_public_gallery: true },
           { id: 2, title: 'Test Video 2', in_public_gallery: true }
@@ -23,7 +24,7 @@ describe('GaleriaVideosPublicaComponent', () => {
         current_page: 1,
         last_page: 2
       })),
-      togglePublicGallery: vitest.fn()
+      togglePublicGallery: vi.fn().mockReturnValue(of({ in_public_gallery: false }))
     };
 
     mockAuthService = {
@@ -32,26 +33,31 @@ describe('GaleriaVideosPublicaComponent', () => {
     };
 
     mockToastService = {
-      success: vitest.fn(),
-      error: vitest.fn()
+      success: vi.fn(),
+      error: vi.fn()
+    };
+
+    mockCdr = {
+      detectChanges: vi.fn(),
+      markForCheck: vi.fn()
     };
 
     await TestBed.configureTestingModule({
-      imports: [GaleriaVideosPublicaComponent],
       providers: [
         { provide: VideoService, useValue: mockVideoService },
         { provide: AuthService, useValue: mockAuthService },
-        { provide: ToastService, useValue: mockToastService }
+        { provide: ToastService, useValue: mockToastService },
+        { provide: ChangeDetectorRef, useValue: mockCdr }
       ]
-    })
-    .compileComponents();
+    });
     
-    fixture = TestBed.createComponent(GaleriaVideosPublicaComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    TestBed.runInInjectionContext(() => {
+        component = new GaleriaVideosPublicaComponent();
+    });
   });
 
   it('should create and fetch public videos', () => {
+    component.ngOnInit();
     expect(component).toBeTruthy();
     expect(mockVideoService.getPublicVideos).toHaveBeenCalledWith(1);
     expect(component.videos.length).toBe(2);
@@ -60,7 +66,26 @@ describe('GaleriaVideosPublicaComponent', () => {
   });
 
   it('should change page when goToPage is called', () => {
+    component.totalPages = 2; // Setup condition to allow goto
+    component.currentPage = 1;
     component.goToPage(2);
     expect(mockVideoService.getPublicVideos).toHaveBeenCalledWith(2);
+  });
+
+  it('should remove video from public gallery', () => {
+    component.videos = [
+        { id: 1, title: 'Test Video 1', in_public_gallery: true } as any,
+        { id: 2, title: 'Test Video 2', in_public_gallery: true } as any
+    ];
+    
+    const event = new Event('click');
+    Object.defineProperty(event, 'stopPropagation', { value: vi.fn() });
+
+    component.removeFromPublic(event, component.videos[0]);
+
+    expect(mockVideoService.togglePublicGallery).toHaveBeenCalledWith(1);
+    expect(component.videos.length).toBe(1);
+    expect(component.videos[0].id).toBe(2);
+    expect(mockToastService.success).toHaveBeenCalledWith('Vídeo ocultado con éxito de la galería pública.');
   });
 });

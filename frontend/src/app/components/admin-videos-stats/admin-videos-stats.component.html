@@ -2,7 +2,10 @@
   <h2>Seguimiento de Vídeos a YouTube</h2>
   <p class="subtitle">Visión general del proceso automático de sincronización de vídeos.</p>
   
-  @if (loading()) {
+  <mat-tab-group animationDuration="0ms" class="videos-tabs" dynamicHeight>
+    <mat-tab label="Estadísticas de Vídeos">
+      <div class="tab-content" style="padding-top: 24px;">
+        @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
   }
   
@@ -121,4 +124,12 @@
       </div>
     </div>
   }
+      </div>
+    </mat-tab>
+    <mat-tab label="Vídeos Borrados">
+      <div class="tab-content" style="padding-top: 24px;">
+        <app-admin-deleted-videos></app-admin-deleted-videos>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>

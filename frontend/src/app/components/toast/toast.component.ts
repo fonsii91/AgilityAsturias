@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, ElementRef, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ToastService } from '../../services/toast.service';
 
@@ -28,7 +28,7 @@ import { ToastService } from '../../services/toast.service';
       position: fixed;
       bottom: 20px;
       right: 20px;
-      z-index: 9999;
+      z-index: 2147483647;
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -93,6 +93,19 @@ import { ToastService } from '../../services/toast.service';
     }
   `]
 })
-export class ToastComponent {
+export class ToastComponent implements OnInit, OnDestroy {
     toastService = inject(ToastService);
+    private el = inject(ElementRef);
+    private renderer = inject(Renderer2);
+
+    ngOnInit() {
+        // Movido al body para evitar problemas de "Stacking Context" con modales (ej: z-index de cdk-overlay)
+        this.renderer.appendChild(document.body, this.el.nativeElement);
+    }
+
+    ngOnDestroy() {
+        if (this.el.nativeElement.parentNode) {
+            this.renderer.removeChild(document.body, this.el.nativeElement);
+        }
+    }
 }

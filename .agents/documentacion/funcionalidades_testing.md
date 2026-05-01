@@ -31,38 +31,50 @@ Puedes ir marcando las casillas (`[x]`) a medida que completemos las pruebas de 
 
 ### Reservas y Calendario (Lado Miembro)
 - [x] **Gestión Propia:** Mis Reservas (Visualización de disponibilidad, reserva y cancelación).
-- [ ] **Vistas Comunes:** Calendario Global y Eventos Personales.
+- [x] **Vistas Comunes:** Calendario Global y Eventos Personales.
 
 ### Comunidad y Multimedia (Lado Miembro)
-- [ ] **Videoteca:** Galería de Vídeos (Subir, Visualizar, dar Likes y Descargas).
-- [ ] **Lectura Comunal:** Listado de Recursos (Descargas), Tablón de Anuncios y Notificaciones.
-- [ ] **Feedback:** Sistema de Sugerencias / Tickets.
+- [x] **Videoteca:** Galería de Vídeos (Subir, Visualizar, dar Likes y Descargas).
+- [x] **Lectura Comunal:** Listado de Recursos (Descargas), Tablón de Anuncios y Notificaciones.
+- [x] **Feedback:** Sistema de Sugerencias / Tickets.
+- [x] **Novedades:** Pantalla para descubrir las últimas actualizaciones incorporadas al propio software de la plataforma.
 
 ### Competiciones y Ranking (Lado Miembro)
-- [ ] **Asistencia:** Visualización de Competiciones y flujo de Apuntarse/Desapuntarse.
-- [ ] **Métricas:** Ranking Comunitario y Bitácora de pistas RSCE.
+- [x] **Asistencia:** Visualización de Competiciones y flujo de Apuntarse/Desapuntarse.
+- [x] **Métricas:** Ranking Comunitario y Bitácora de pistas RSCE.
 
 ---
 
 ## 3. Funcionalidades para Staff
 
 ### Gestión de Reservas e Instalaciones
-- [ ] **Configuración Base:** Gestión de Horarios / Time Slots regulares.
-- [ ] **Excepciones:** Configuración de Bloqueos de Horario y días festivos.
-- [ ] **Monitorización:** Info de Reservas Global (Vista del listado de asistentes del día).
+- [x] **Configuración Base:** Gestión de Horarios / Time Slots regulares.
+- [x] **Excepciones:** Configuración de Bloqueos de Horario y días festivos.
+- [x] **Monitorización:** Info de Reservas Global (Vista del listado de asistentes del día).
 
 ### Gestión de Eventos y Competiciones
-- [ ] **CRUD de Eventos:** Creación, modificación y cancelación de Competiciones.
-- [ ] **Asistencia Staff:** Verificación de Asistencia (Pasar lista en entrenamientos/eventos).
+- [x] **CRUD de Eventos:** Creación, modificación y cancelación de Competiciones.
+- [x] **Asistencia Staff:** Verificación de Asistencia (Pasar lista en entrenamientos/eventos).
 
 ### Gestión de Comunidad y Comunicación
-- [ ] **Directorio:** Gestión de Miembros y generación de Enlaces de Reseteo.
-- [ ] **Redacción:** Panel de control del Tablón de Anuncios (Crear/Editar comunicados).
-- [ ] **Permisos:** Solicitudes y actualización de Roles.
+- [x] **Directorio:** Gestión de Miembros y generación de Enlaces de Reseteo.
+- [x] **Redacción:** Panel de control del Tablón de Anuncios (Crear/Editar comunicados).
+- [x] **Permisos:** Solicitudes y actualización de Roles.
 
 ### Gestión de Recursos y Multimedia
-- [ ] **Archivos:** Administración de Recursos PDF/Documentos del club.
-- [ ] **Moderación:** Administración de la Galería y Aprobación/Rechazo de Vídeos Públicos.
+- [x] **Archivos:** Administración de Recursos PDF/Documentos del club.
+- [x] **Moderación:** Administración de la Galería y Aprobación/Rechazo de Vídeos Públicos.
 
 ### Gestión Deportiva
-- [ ] **Puntuación Extra:** Asignación de Puntos manuales para el Ranking y supervisión de Salud Deportiva.
+- [x] **Puntuación Extra:** Asignación de Puntos manuales para el Ranking y supervisión de Salud Deportiva.
+
+---
+
+## 4. Funcionalidades para Administrador
+
+### Gestión Global y Monitorización Avanzada
+- [x] **Panel de Usuarios:** Control total sobre las cuentas y roles de la plataforma.
+- [x] **Gestión Avanzada de Sugerencias:** Administración global de los tickets y sugerencias de la plataforma.
+- [x] **Monitorización RSCE:** Control avanzado de licencias y pistas de la comunidad.
+- [x] **Monitorización Salud:** Vista global de la salud y el ACWR de todos los perros.
+- [x] **Revisar Vídeos:** Monitorización de sincronización con YouTube (estadísticas) y visualización del historial global de vídeos borrados.

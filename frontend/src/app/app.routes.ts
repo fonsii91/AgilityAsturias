@@ -86,12 +86,6 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Estadísticas de Vídeos' }
     },
     {
-        path: 'admin/videos-borrados',
-        loadComponent: () => import('./components/admin-deleted-videos/admin-deleted-videos.component').then(m => m.AdminDeletedVideosComponent),
-        canActivate: [adminGuard],
-        title: titleResolver, data: { pageTitle: 'Historial Vídeos Borrados' }
-    },
-    {
         path: 'admin/salud-monitor',
         loadComponent: () => import('./components/admin-salud-monitor/admin-salud-monitor').then(m => m.AdminSaludMonitorComponent),
         canActivate: [adminGuard],
@@ -102,6 +96,12 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin-rsce-monitor/admin-rsce-monitor').then(m => m.AdminRsceMonitorComponent),
         canActivate: [adminGuard],
         title: titleResolver, data: { pageTitle: 'Monitor RSCE' }
+    },
+    {
+        path: 'admin/avatares',
+        loadComponent: () => import('./components/admin-avatares/admin-avatares').then(m => m.AdminAvataresComponent),
+        canActivate: [adminGuard],
+        title: titleResolver, data: { pageTitle: 'Gestión Avatares IA' }
     },
     {
         path: 'gestionar-horarios',

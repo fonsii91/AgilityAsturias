@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Traits\HasClub;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RsceTrack extends Model
 {
-    use HasClub;
+    use HasClub, HasFactory;
     protected $fillable = [
         'dog_id',
         'date',

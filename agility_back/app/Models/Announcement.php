@@ -18,6 +18,7 @@ class Announcement extends Model
         'content',
         'is_pinned',
         'category',
+        'club_id',
     ];
 
     public function user()

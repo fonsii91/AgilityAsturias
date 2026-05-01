@@ -1,0 +1,45 @@
+<h2 mat-dialog-title class="d-flex align-items-center gap-2 m-0" style="color: var(--text-main); font-weight: 700;">
+  <mat-icon class="text-primary">history</mat-icon> Historial Completo (28 días)
+</h2>
+<button mat-icon-button (click)="close()" style="position: absolute; right: 8px; top: 8px; color: var(--text-secondary);">
+  <mat-icon>close</mat-icon>
+</button>
+
+<mat-dialog-content class="mat-typography" style="padding-top: 10px;">
+  @if (data.history && data.history.length > 0) {
+  <div class="history-vertical-list">
+    @for (history of data.history; track history.id) {
+    <div class="history-list-item">
+      <div class="hi-left">
+         <div class="hi-date">
+            <span class="date-day">{{ history.date | date:'dd' }}</span>
+            <span class="date-month">{{ history.date | date:'MMM' }}</span>
+         </div>
+         <div class="hi-details">
+            <span class="hi-type badge-light">{{ translateSourceType(history.source_type) }}</span>
+            <div class="hi-metrics d-flex gap-3 mt-1">
+               <span class="d-flex align-items-center"><mat-icon class="text-muted mr-1" style="font-size: 16px; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center;">timer</mat-icon> <strong>{{ history.duration_min }}m</strong></span>
+               <span class="d-flex align-items-center" title="sRPE"><mat-icon class="emoji-indicator mr-1" style="font-size: 16px; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center;">{{ getIconForIntensity(history.intensity_rpe) }}</mat-icon> <strong>{{ history.intensity_rpe }}</strong>/10</span>
+            </div>
+         </div>
+      </div>
+      
+      <div class="hi-middle d-flex align-items-center">
+        @if(history.jumped_max_height) { <span class="badge badge-warning text-xsmall mx-1 d-inline-flex align-items-center gap-1" style="padding: 4px 8px;"><mat-icon style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;">keyboard_double_arrow_up</mat-icon> Salto Max</span> }
+        @if(history.number_of_runs! >= 3) { <span class="badge badge-warning text-xsmall mx-1 d-inline-flex align-items-center gap-1" style="padding: 4px 8px;"><mat-icon style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;">repeat</mat-icon> {{history.number_of_runs}} runs</span> }
+        @if(history.is_staff_verified) { <span class="badge badge-success text-xsmall mx-1 d-inline-flex align-items-center gap-1" style="padding: 4px 8px;"><mat-icon style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;">verified</mat-icon> Validado</span> }
+      </div>
+
+      <div class="hi-right d-flex gap-1">
+        <button mat-icon-button (click)="edit(history)" matTooltip="Modificar">
+          <mat-icon style="color: var(--primary-color)">edit</mat-icon>
+        </button>
+        <button mat-icon-button (click)="delete(history.id)" matTooltip="Eliminar">
+          <mat-icon style="color: var(--error-color, #dc3545)">delete</mat-icon>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</mat-dialog-content>

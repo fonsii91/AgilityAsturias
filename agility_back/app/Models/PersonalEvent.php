@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Traits\HasClub;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PersonalEvent extends Model
 {
-    use HasClub;
+    use HasFactory, HasClub;
     protected $fillable = [
         'user_id',
         'dog_id',

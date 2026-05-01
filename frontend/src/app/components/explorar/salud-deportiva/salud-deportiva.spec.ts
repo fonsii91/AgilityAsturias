@@ -108,27 +108,4 @@ describe('SaludDeportivaComponent', () => {
     expect(mockWorkloadService.storeManualWorkload).not.toHaveBeenCalled();
   });
 
-  it('debe confirmar una revisión pendiente correctamente', async () => {
-    await new Promise(resolve => setTimeout(resolve, 0));
-    
-    mockWorkloadService.confirmWorkload = vi.fn().mockReturnValue(of({}));
-    component.selectedDogId.set(1);
-    
-    const pendingWorkload = {
-      id: 10,
-      dog_id: 1,
-      date: '2023-10-10',
-      duration_min: 15,
-      intensity_rpe: 8,
-      status: 'pending_review',
-      jumped_max_height: false,
-      number_of_runs: 1
-    };
-    
-    component.confirmPending(pendingWorkload as any);
-    
-    expect(mockWorkloadService.confirmWorkload).toHaveBeenCalledWith(10, 15, 8, false, 1);
-    expect(mockToastService.success).toHaveBeenCalledWith('Entrenamiento validado con éxito');
-    expect(mockWorkloadService.getAcwrData).toHaveBeenCalled();
-  });
 });

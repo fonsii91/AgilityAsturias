@@ -47,8 +47,8 @@ describe('WorkloadGaugeComponent', () => {
   });
 
   it('debe calcular el estado óptimo correctamente en Fase 3', () => {
-    expect(component.statusText).toBe('✅ ZONA ÓPTIMA (SWEET SPOT)');
-    expect(component.confidenceText).toBe('Fiabilidad: Alta (Gold Standard)');
+    expect(component.statusText).toBe('✅ ZONA ÓPTIMA');
+    expect(component.confidenceText).toBe('Fiabilidad: Alta');
   });
 
   it('debe advertir sobre sobrecarga aguda (Zona de Fatiga)', () => {
@@ -73,6 +73,6 @@ describe('WorkloadGaugeComponent', () => {
     TestBed.flushEffects();
     fixture.detectChanges();
     expect(component.statusText).toBe('🔬 FASE DE CALIBRACIÓN');
-    expect(component.confidenceText).toBe('Fiabilidad: Baja (Calibrando)');
+    expect(component.confidenceText).toBe('Fiabilidad: Baja');
   });
 });

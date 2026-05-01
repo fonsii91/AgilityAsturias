@@ -24,6 +24,7 @@ class DeletedVideoHistory extends Model
         'competition_id',
         'video_date',
         'manga_type',
-        'status_before_deletion'
+        'status_before_deletion',
+        'club_id'
     ];
 }

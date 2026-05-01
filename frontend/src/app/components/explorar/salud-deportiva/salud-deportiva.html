@@ -28,180 +28,111 @@
   @if (!isLoading() && acwrData()) {
   <div class="bento-dashboard slide-fade-in">
 
+    <!-- GLOBAL ALERT ROW -->
+    @if (pendingReviews().length > 0) {
+    <div matRipple class="pending-action-banner bento-card fade-in mb-2" style="grid-column: 1 / -1; background: linear-gradient(135deg, #f97316, #f59e0b); color: white; cursor: pointer; border: none; box-shadow: 0 10px 15px -3px rgba(245, 158, 11, 0.4);" (click)="openPendingModal()">
+      <div class="d-flex align-items-center gap-3" style="padding: 16px 20px;">
+          <div class="alert-icon-wrapper" style="background: rgba(255,255,255,0.2); border-radius: 50%; min-width: 48px; min-height: 48px; margin-bottom: 0; box-shadow: none; display: flex; align-items: center; justify-content: center;">
+            <mat-icon class="pulse-animation" style="color: white;">notifications_active</mat-icon>
+          </div>
+          <div class="alert-content flex-grow-1" style="overflow: hidden; display: flex; flex-direction: column; justify-content: center;">
+            <h4 class="m-0 text-truncate" style="font-weight: 800; color: white; font-size: 1.15rem; line-height: 1.2;">{{pendingReviews().length}} Actividad(es) por validar</h4>
+            <p class="m-0 text-small mt-1 text-truncate" style="line-height: 1.2; color: rgba(255,255,255,0.95); font-weight: 500;">Requieren tu confirmación urgente para el cálculo.</p>
+          </div>
+          <div class="action-arrow d-flex align-items-center justify-content-center">
+            <mat-icon style="color: white;">chevron_right</mat-icon>
+          </div>
+      </div>
+    </div>
+    }
+
     <!-- HERO PROTAGONIST COLUMN (LEFT) -->
     <div class="bento-hero-column">
-      <!-- Dog Profile Card -->
-      <div class="hero-profile-bento shadow-premium" [ngStyle]="{'background-image': 'url(' + (selectedDog()?.photo_url || '/placeholder-dog.jpg') + ')'}">
-        <div class="profile-gradient-overlay"></div>
-        <div class="profile-content">
-          <h1 class="hero-dog-name m-0">{{ selectedDogName() }}</h1>
-          <span class="hero-subtitle">PERFIL ATLÉTICO</span>
+      <!-- Unified Hero & Gauge Card -->
+      <div class="bento-card shadow-premium" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+        
+        <!-- Dog Profile Header -->
+        <div class="hero-profile-bento" [ngStyle]="{'background-image': 'url(' + heroImageUrl() + ')'}" style="border-radius: 0; box-shadow: none; transition: background-image 0.5s ease-in-out;">
+          <div class="profile-gradient-overlay"></div>
+          <div class="profile-content">
+            <h1 class="hero-dog-name m-0">{{ selectedDogName() }}</h1>
+            <span class="hero-subtitle">PERFIL ATLÉTICO</span>
+          </div>
         </div>
+
+        <!-- Gauge Data Body -->
+        <div class="gauge-bento-card" [ngClass]="'border-top-' + acwrData()!.status_color" style="border-radius: 0; box-shadow: none; border-left: none; border-right: none; border-bottom: none;">
+          <app-workload-gauge 
+            [acwrData]="acwrData()!" 
+            [dogName]="selectedDogName()" 
+            [transparentMode]="false">
+          </app-workload-gauge>
+        </div>
+        
       </div>
 
-      <!-- Gauge Data Card -->
-      <div class="gauge-bento-card bento-card shadow-premium mt-1" [ngClass]="'border-top-' + acwrData()!.status_color">
-        <app-workload-gauge 
-          [acwrData]="acwrData()!" 
-          [dogName]="selectedDogName()" 
-          [transparentMode]="false">
-        </app-workload-gauge>
-      </div>
 
-      <div class="manual-button-wrapper mt-4">
-        <button class="btn-action giant-btn" [ngClass]="{'btn-cancel': isManualFormOpen()}" (click)="toggleManualForm()">
-          <span class="material-icons">{{ isManualFormOpen() ? 'close' : 'add' }}</span>
-          {{ isManualFormOpen() ? 'Cancelar inserción' : 'Añadir Registro Manual' }}
-        </button>
-      </div>
     </div>
 
     <!-- RIGHT DATA COLUMN -->
     <div class="bento-data-column">
 
-      @if (pendingReviews().length > 0) {
-      <div class="pending-reviews-section fade-in">
-        <div class="alert-box warning-alert premium-alert">
-          <div class="d-flex align-items-center gap-3">
-              <div class="alert-icon-wrapper"><span class="material-icons alert-icon pulse-animation">bolt</span></div>
-              <div class="alert-content">
-                <h4>{{pendingReviews().length}} Entrenamiento(s) por validar</h4>
-                <p>El Staff ha validado asistencia. Ajusta la intensidad real hoy para regenerar las gráficas mecánicas.</p>
-              </div>
-          </div>
-        </div>
 
-        @for (pending of pendingReviews(); track pending.id) {
-        <div class="form-card bento-card border-left-success fade-in-up">
-          <div class="form-card-body">
-            <div class="pending-header mb-3">
-              <div class="date"><span class="material-icons text-success align-middle mr-1">event_available</span> {{ pending.date | date:'dd MMM yyyy' }}</div>
-              <div class="source-badge">
-                <span class="material-icons text-small mr-1">sell</span>
-                {{ pending.source_type === 'auto_attendance' ? 'Entrenamiento' : 'Competición' }}
-              </div>
-            </div>
 
-            <div class="form-row">
-              <div class="form-group flex-1">
-                <label>
-                  Minutos Activos (En Pista)
-                  <span class="trust-marker" (click)="showInfo('time')" title="Info">
-                    <span class="material-icons-outlined">info</span>
-                  </span>
-                </label>
-                <div class="time-stepper">
-                  <button class="stepper-btn" (click)="decreasePendingDuration(pending)">
-                    <span class="material-icons">remove</span>
-                  </button>
-                  <input type="number" class="stepper-input" [(ngModel)]="pending.duration_min" min="1">
-                  <div class="stepper-label">min</div>
-                  <button class="stepper-btn" (click)="increasePendingDuration(pending)">
-                    <span class="material-icons">add</span>
-                  </button>
-                </div>
-              </div>
-
-              <div class="form-group flex-2">
-                <div class="intensity-header">
-                  <label>Esfuerzo Percibido</label>
-                  <div class="intensity-badge">
-                    <span class="material-icons emoji-indicator">{{ getIconForIntensity(pending.intensity_rpe) }}</span>
-                    {{ pending.intensity_rpe }} <small>/ 10</small>
-                  </div>
-                </div>
-                <div class="intensity-slider-wrap">
-                  <span class="slider-label"><span class="material-icons align-middle text-small mr-1">pets</span> Fácil</span>
-                  <input type="range" class="custom-range premium-range" [(ngModel)]="pending.intensity_rpe" min="1" max="10" step="1">
-                  <span class="slider-label danger"><span class="material-icons align-middle text-small mr-1">local_fire_department</span> Max</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="pending-modifiers mt-4 d-flex gap-15">
-              <div class="form-group flex-2 d-flex justify-content-between align-items-center form-modifier-row">
-                <label class="mb-0">
-                  ¿Saltó a su máxima altura?
-                  <span class="trust-marker" (click)="showInfo('jump')"><span class="material-icons-outlined">info</span></span>
-                </label>
-                <div class="toggle-switch-wrapper mini">
-                  <label class="switch mini-switch">
-                    <input type="checkbox" [(ngModel)]="pending.jumped_max_height">
-                    <span class="slider round premium-slider"></span>
-                  </label>
-                </div>
-              </div>
-              <div class="form-group flex-1">
-                <label>Salidas a pista</label>
-                <div class="run-selector d-flex gap-2 mt-1">
-                  <button class="run-chip" [class.active]="pending.number_of_runs == 2" (click)="pending.number_of_runs = (pending.number_of_runs == 2 ? undefined : 2)">1-2</button>
-                  <button class="run-chip" [class.active]="pending.number_of_runs == 4" (click)="pending.number_of_runs = (pending.number_of_runs == 4 ? undefined : 4)">3-5</button>
-                  <button class="run-chip" [class.active]="pending.number_of_runs == 6" (click)="pending.number_of_runs = (pending.number_of_runs == 6 ? undefined : 6)">+5</button>
-                </div>
-              </div>
-            </div>
-
-            <button class="btn-success btn-giant mt-3 full-width" (click)="confirmPending(pending)" [disabled]="confirmingIds().includes(pending.id)">
-              @if(confirmingIds().includes(pending.id)) {
-              <span class="spinner-small mr-2"></span> Regenerando Gráficas...
-              } @else {
-              <span class="material-icons mr-2">check_circle</span> Archivar Sesión
-              }
-            </button>
-          </div>
-        </div>
-        }
+      <div class="manual-button-wrapper mb-3 text-right">
+        <button class="btn-success" style="border-radius: 12px; padding: 12px 24px; font-weight: 700; width: 100%; justify-content: center; font-size: 1.05rem;" (click)="toggleManualForm()">
+          <mat-icon style="margin-right: 4px;">{{ isManualFormOpen() ? 'close' : 'add' }}</mat-icon>
+          {{ isManualFormOpen() ? 'Cancelar inserción' : 'Añadir Registro Manual' }}
+        </button>
       </div>
-      }
-
-      @if (pendingReviews().length === 0) {
-      <div class="empty-state bento-card glass-panel text-center">
-        <div class="success-ring mb-3">
-            <span class="material-icons success-icon">task_alt</span>
-        </div>
-        <h3 class="mb-2">Todo al día</h3>
-        <p class="text-muted">No tienes registros pendientes. Los cálculos están sincronizados.</p>
-      </div>
-      }
 
       <!-- Recent History Section -->
-      <div class="recent-history-section bento-card mt-4 fade-in">
-        <div class="section-title-wrap mb-4 d-flex align-items-center gap-2">
-          <div class="icon-circle"><span class="material-icons text-primary">history</span></div>
-          <h3 class="m-0">Historial (28 días)</h3>
+      <div class="recent-history-section bento-card fade-in">
+        <div class="pending-header mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <mat-icon style="color: var(--primary-color);">history</mat-icon>
+            <h3 class="m-0">Actividad Reciente</h3>
+          </div>
         </div>
         
-        @if (acwrData()!.recent_history && acwrData()!.recent_history.length > 0) {
+        @if (visibleHistory().length > 0) {
         <div class="history-vertical-list">
-          @for (history of acwrData()!.recent_history; track history.id) {
+          @for (history of visibleHistory().slice(0, 2); track history.id) {
           <div class="history-list-item">
             <div class="hi-left">
                <div class="hi-date">
                   <span class="date-day">{{ history.date | date:'dd' }}</span>
                   <span class="date-month">{{ history.date | date:'MMM' }}</span>
                </div>
-               <div class="hi-details">
+                <div class="hi-details">
                   <span class="hi-type badge-light">{{ translateSourceType(history.source_type) }}</span>
                   <div class="hi-metrics d-flex gap-3 mt-1">
-                     <span><span class="material-icons-outlined text-xsmall align-middle text-muted">timer</span> <strong>{{ history.duration_min }}m</strong></span>
-                     <span title="sRPE"><span class="material-icons text-xsmall align-middle emoji-indicator">{{ getIconForIntensity(history.intensity_rpe) }}</span> <strong>{{ history.intensity_rpe }}</strong>/10</span>
+                     <span class="d-flex align-items-center"><mat-icon class="text-muted mr-1" style="font-size: 16px; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center;">timer</mat-icon> <strong>{{ history.duration_min }}m</strong></span>
+                     <span class="d-flex align-items-center" title="sRPE"><mat-icon class="emoji-indicator mr-1" style="font-size: 16px; width: 16px; height: 16px; display: inline-flex; justify-content: center; align-items: center;">{{ getIconForIntensity(history.intensity_rpe) }}</mat-icon> <strong>{{ history.intensity_rpe }}</strong>/10</span>
                   </div>
                </div>
             </div>
             
-            <div class="hi-middle">
-              @if(history.jumped_max_height) { <span class="badge badge-warning text-xsmall mx-1"><span class="material-icons align-middle text-xsmall">keyboard_double_arrow_up</span> Salto Max</span> }
-              @if(history.number_of_runs! >= 3) { <span class="badge badge-warning text-xsmall mx-1"><span class="material-icons align-middle text-xsmall">repeat</span> {{history.number_of_runs}} runs</span> }
-              @if(history.is_staff_verified) { <span class="badge badge-success text-xsmall mx-1"><span class="material-icons align-middle text-xsmall">verified</span> Validado</span> }
+            <div class="hi-middle d-flex align-items-center">
+              @if(history.jumped_max_height) { <span class="badge badge-warning text-xsmall mx-1 d-inline-flex align-items-center gap-1" style="padding: 4px 8px;"><mat-icon style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;">keyboard_double_arrow_up</mat-icon> Salto Max</span> }
+              @if(history.number_of_runs! >= 3) { <span class="badge badge-warning text-xsmall mx-1 d-inline-flex align-items-center gap-1" style="padding: 4px 8px;"><mat-icon style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;">repeat</mat-icon> {{history.number_of_runs}} runs</span> }
+              @if(history.is_staff_verified) { <span class="badge badge-success text-xsmall mx-1 d-inline-flex align-items-center gap-1" style="padding: 4px 8px;"><mat-icon style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;">verified</mat-icon> Validado</span> }
             </div>
 
             <div class="hi-right d-flex gap-1">
-              <button class="btn-icon-minimal text-primary" (click)="startEditWorkload(history)" title="Modificar"><span class="material-icons">edit</span></button>
-              <button class="btn-icon-minimal text-danger" (click)="promptDeleteWorkload(history.id)" title="Eliminar"><span class="material-icons">delete</span></button>
+              <button mat-icon-button (click)="startEditWorkload(history)" title="Modificar"><mat-icon style="color: var(--primary-color)">edit</mat-icon></button>
+              <button mat-icon-button (click)="promptDeleteWorkload(history.id)" title="Eliminar"><mat-icon style="color: var(--error-color, #dc3545)">delete</mat-icon></button>
             </div>
           </div>
           }
         </div>
+        @if (acwrData()!.recent_history && acwrData()!.recent_history.length > 2) {
+           <div class="text-center mt-2">
+             <button mat-button color="primary" (click)="openHistoryModal()" style="font-weight: 600;">
+                Ver Historial Completo ({{acwrData()!.recent_history.length}})
+             </button>
+           </div>
+        }
         } @else {
         <div class="empty-state-mini text-muted text-center py-4">
           <span class="material-icons-outlined text-large mb-2 opacity-50">hourglass_empty</span>
@@ -222,76 +153,99 @@
         <div class="d-flex align-items-center gap-2"><span class="material-icons text-primary">{{ editingWorkloadId() ? 'edit' : 'add_circle' }}</span> <h3 class="m-0 text-xl">{{ editingWorkloadId() ? 'Modificar Registro' : 'Nuevo Esfuerzo' }}</h3></div>
         <button class="btn-icon-close" (click)="toggleManualForm()"><span class="material-icons">close</span></button>
       </div>
-      ... (manual form content remains same fundamentally but stylized)
-      <div class="form-card-body p-0">
+      <div class="form-card-body p-0 mt-3">
+        @if(manualAvatarUrl()) {
+        <div class="mb-3 mt-2" style="width: 100%; text-align: center;">
+           <div class="dynamic-slider-avatar" 
+                [style.backgroundImage]="'url(' + manualAvatarUrl() + ')'" 
+                style="width: 180px; height: 180px; margin: 0 auto; border-radius: 50%; background-size: cover; background-position: center; transition: background-image 0.4s ease-in-out; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 4px solid white; z-index: 2; position: relative;">
+           </div>
+        </div>
+        }
+
+        <!-- Intensity Row (Prominent) -->
+        <div class="form-group mb-4" style="background: #f8fafc; padding: 1.2rem; border-radius: 16px; border: 1px solid #e2e8f0;">
+          <div class="intensity-header d-flex align-items-center justify-content-between mb-3">
+            <label class="mb-0" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Esfuerzo Percibido</label>
+            <div class="intensity-badge">
+              <mat-icon class="emoji-indicator" style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">{{ getIconForIntensity(manualIntensity()) }}</mat-icon>
+              {{ manualIntensity() }} <small>/ 10</small>
+            </div>
+          </div>
+          <div class="intensity-slider-wrap">
+            <span class="slider-label"><mat-icon class="align-middle text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">pets</mat-icon> Fácil</span>
+            <input type="range" class="custom-range premium-range" [ngModel]="manualIntensity()" (ngModelChange)="manualIntensity.set($event)" min="1" max="10" step="1">
+            <span class="slider-label danger"><mat-icon class="align-middle text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">local_fire_department</mat-icon> Max</span>
+          </div>
+        </div>
+
+        <!-- Date & Time Row -->
         <div class="form-row">
           <div class="form-group flex-1">
             <label>Fecha</label>
-            <input type="date" class="custom-input" [ngModel]="manualDate()" (ngModelChange)="manualDate.set($event)">
+            <input type="date" class="custom-input" [ngModel]="manualDate()" (ngModelChange)="manualDate.set($event)" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--text-main); background: #f8fafc; cursor: pointer;">
           </div>
-
-          <div class="form-group flex-2">
+          
+          <div class="form-group flex-1">
             <label>
-              Minutos Activos (Pista)
-              <span class="trust-marker" (click)="showInfo('time')"><span class="material-icons-outlined">info</span></span>
+              Minutos Activos (En Pista)
+              <span class="trust-marker" (click)="showInfo('time')" title="Info">
+                <mat-icon style="font-size: 1rem; height: 1rem; width: 1rem;">info</mat-icon>
+              </span>
             </label>
             <div class="time-stepper">
-              <button class="stepper-btn" (click)="decreaseManualDuration()"><span class="material-icons">remove</span></button>
+              <button class="stepper-btn" (click)="decreaseManualDuration()">
+                <mat-icon>remove</mat-icon>
+              </button>
               <input type="number" class="stepper-input" [ngModel]="manualDuration()" (ngModelChange)="manualDuration.set($event)" min="1">
               <div class="stepper-label">min</div>
-              <button class="stepper-btn" (click)="increaseManualDuration()"><span class="material-icons">add</span></button>
+              <button class="stepper-btn" (click)="increaseManualDuration()">
+                <mat-icon>add</mat-icon>
+              </button>
             </div>
           </div>
         </div>
 
-        <div class="form-row mt-4">
-          <div class="form-group full-width">
-            <div class="intensity-header mb-2">
-              <label>Esfuerzo Percibido (sRPE)</label>
-              <div class="intensity-badge pulse-effect">
-                <span class="material-icons emoji-indicator">{{ getIconForIntensity(manualIntensity()) }}</span>
-                {{ manualIntensity() }} <small>/ 10</small>
-              </div>
-            </div>
-            <div class="intensity-slider-wrap bg-light-gray p-3 rounded-lg">
-              <span class="slider-label text-left"><span class="material-icons align-middle text-small mr-1">pets</span> Fácil</span>
-              <input type="range" class="custom-range premium-range" [ngModel]="manualIntensity()" (ngModelChange)="manualIntensity.set($event)" min="1" max="10" step="1">
-              <span class="slider-label danger text-right"><span class="material-icons align-middle text-small mr-1">local_fire_department</span> Max</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="form-row mt-4 mb-2">
-          <div class="form-group flex-1 d-flex justify-content-between align-items-center form-modifier-row">
-            <label class="mb-0">¿Saltó altura máxima?</label>
-            <div class="toggle-switch-wrapper">
-              <label class="switch">
+        <!-- Modifiers Row -->
+        <div class="pending-modifiers mt-4 d-flex gap-15">
+          <div class="form-group flex-2 d-flex justify-content-between align-items-center form-modifier-row">
+            <label class="mb-0">
+              ¿Saltó a su máxima altura?
+              <span class="trust-marker" (click)="showInfo('jump')"><mat-icon style="font-size: 1rem; height: 1rem; width: 1rem;">info</mat-icon></span>
+            </label>
+            <div class="toggle-switch-wrapper mini">
+              <label class="switch mini-switch">
                 <input type="checkbox" [ngModel]="manualJumpedMaxHeight()" (ngModelChange)="manualJumpedMaxHeight.set($event)">
                 <span class="slider round premium-slider"></span>
               </label>
             </div>
           </div>
-
           <div class="form-group flex-1">
             <label>Salidas a pista</label>
-            <div class="run-selector d-flex gap-2">
+            <div class="run-selector d-flex gap-2 mt-1">
               <button class="run-chip" [class.active]="manualNumberOfRuns() == 2" (click)="manualNumberOfRuns() == 2 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(2)">1-2</button>
               <button class="run-chip" [class.active]="manualNumberOfRuns() == 4" (click)="manualNumberOfRuns() == 4 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(4)">3-5</button>
               <button class="run-chip" [class.active]="manualNumberOfRuns() == 6" (click)="manualNumberOfRuns() == 6 ? manualNumberOfRuns.set(null) : manualNumberOfRuns.set(6)">+5</button>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="form-card-footer d-flex justify-content-end gap-3 mt-4 pt-4 border-top">
-        <button class="btn-text" (click)="toggleManualForm()" [disabled]="isSubmitting()">Cancelar</button>
-        <button class="btn-success btn-giant" (click)="submitManualWorkload()" [disabled]="isSubmitting()">
-          @if(isSubmitting()) {
-          <span class="spinner-small mr-2"></span> Computando...
-          } @else {
-          <span class="material-icons mr-2">{{ editingWorkloadId() ? 'update' : 'save' }}</span> {{ editingWorkloadId() ? 'Actualizar' : 'Guardar' }}
-          }
-        </button>
+        
+        <div class="d-flex gap-2 mt-4 pt-2">
+          <button mat-button style="flex: 1; border-radius: 12px; padding: 24px 0; font-size: 1.1rem; font-weight: 600; border: 1px solid #e2e8f0; color: var(--text-secondary); background: transparent;" (click)="toggleManualForm()" [disabled]="isSubmitting()">
+            Cancelar
+          </button>
+          <button mat-flat-button style="flex: 2; border-radius: 12px; padding: 24px 0; font-size: 1.1rem; font-weight: 600; background-color: var(--primary-color); color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);" (click)="submitManualWorkload()" [disabled]="isSubmitting()">
+            @if(isSubmitting()) {
+            <span class="d-flex align-items-center justify-content-center gap-2">
+              <span class="spinner-small" style="border-top-color: white;"></span> Computando...
+            </span>
+            } @else {
+            <span class="d-flex align-items-center justify-content-center gap-2">
+              <mat-icon>{{ editingWorkloadId() ? 'update' : 'save' }}</mat-icon> {{ editingWorkloadId() ? 'Actualizar' : 'Guardar' }}
+            </span>
+            }
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -418,5 +372,7 @@
     </div>
   </div>
   }
+
+
 
 </div>

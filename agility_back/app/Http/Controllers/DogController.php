@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\DogExtraPointNotification;
 use App\Models\PointHistory;
+use App\Services\CloudflareAiService;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Storage;
 
 class DogController extends Controller
 {
@@ -102,6 +105,10 @@ class DogController extends Controller
             'sterilized_at' => 'nullable|date',
             'weight_kg' => 'nullable|numeric|min:1',
             'height_cm' => 'nullable|numeric|min:10',
+            'avatar_blue_url' => 'nullable|url',
+            'avatar_green_url' => 'nullable|url',
+            'avatar_yellow_url' => 'nullable|url',
+            'avatar_red_url' => 'nullable|url',
         ]);
 
         $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade'])->toArray();
@@ -281,5 +288,148 @@ class DogController extends Controller
                 $query->orderBy('created_at', 'desc');
             }])
         ]);
+    }
+
+    /**
+     * Update AI Avatars for a dog (Admin only).
+     */
+    public function updateAvatarsAdmin(Request $request, string $id)
+    {
+        $dog = Dog::findOrFail($id);
+
+        $request->validate([
+            'avatar_blue' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_green' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_yellow' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_red' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+        ]);
+
+        $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+
+        $colors = ['blue', 'green', 'yellow', 'red'];
+
+        foreach ($colors as $color) {
+            $field = "avatar_{$color}";
+            $urlField = "avatar_{$color}_url";
+
+            // If the user wants to clear the image (e.g., they clicked the trash can)
+            if ($request->boolean("clear_{$color}")) {
+                if ($dog->$urlField && str_contains($dog->$urlField, '/storage/')) {
+                    $oldPath = str_replace(asset('storage/'), '', $dog->$urlField);
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                }
+                $dog->$urlField = null;
+            }
+
+            // If a new file is uploaded
+            if ($request->hasFile($field)) {
+                if ($dog->$urlField && str_contains($dog->$urlField, '/storage/')) {
+                    $oldPath = str_replace(asset('storage/'), '', $dog->$urlField);
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+                }
+
+                $path = $request->file($field)->store("clubs/{$clubSlug}/ai_avatars", 'public');
+                $dog->$urlField = asset('storage/' . $path);
+            }
+        }
+
+        $dog->save();
+
+        return response()->json([
+            'message' => 'Avatares actualizados exitosamente',
+            'dog' => $dog
+        ]);
+    }
+    /**
+     * Generate AI avatars via Cloudflare.
+     */
+    public function generateAvatarsAdmin(Request $request, $id, CloudflareAiService $aiService, \App\Services\GeminiVisionService $geminiService)
+    {
+        $currentUser = $request->user();
+
+        if (!in_array($currentUser->role, ['admin'])) {
+            return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
+        }
+
+        $dog = Dog::findOrFail($id);
+
+        // Rate limiting
+        $limit = env('CLOUDFLARE_AI_DAILY_LIMIT', 10);
+        $key = 'cf-ai-generation-admin-' . $request->user()->id;
+
+        if (RateLimiter::tooManyAttempts($key, $limit)) {
+            $seconds = RateLimiter::availableIn($key);
+            return response()->json([
+                'message' => "Has alcanzado el límite diario de generación gratuita. Inténtalo de nuevo en " . ceil($seconds / 3600) . " horas."
+            ], 429);
+        }
+
+        $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+        $breed = $dog->breed ?: 'mixed breed';
+        $customDetails = $request->input('prompt_details', '');
+
+        // DESHABILITADO TEMPORALMENTE (A petición del usuario: resultados no deseados)
+        /*
+        // Si no hay detalles manuales y el perro tiene foto, usar Gemini Vision para extraer los detalles
+        if (empty($customDetails) && $dog->photo_url) {
+            // Extraer ruta relativa asumiendo que la URL apunta a /storage/
+            $relativePath = str_replace(asset('storage/'), '', $dog->photo_url);
+            $localPath = storage_path('app/public/' . ltrim($relativePath, '/'));
+
+            if (file_exists($localPath)) {
+                $base64Image = base64_encode(file_get_contents($localPath));
+                $mimeType = mime_content_type($localPath);
+                
+                $geminiDetails = $geminiService->analyzeDogFeatures($base64Image, $mimeType);
+                if ($geminiDetails) {
+                    $customDetails = $geminiDetails;
+                }
+            }
+        }
+        */
+
+        // Construir la base del prompt asegurando que se aplique el estilo y la descripción
+        $baseDescription = $customDetails ? "A $breed dog, $customDetails" : "A $breed dog";
+
+        $prompts = [
+            'blue' => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking very relaxed, resting peacefully, happy. Beautiful bright lighting, solid clean background.",
+            'green' => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking very energetic, active, happy, athletic pose. Beautiful bright lighting, solid clean background.",
+            'yellow' => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking tired, panting, sweating slightly, resting after exercise. Beautiful lighting, solid clean background.",
+            'red' => "A high quality 3D Disney Pixar style cartoon illustration of $baseDescription. The dog is looking extremely exhausted, tongue out, heavily panting, struggling. Beautiful lighting, solid clean background.",
+        ];
+
+        try {
+            foreach ($prompts as $color => $prompt) {
+                $imageBinary = $aiService->generateImage($prompt);
+                
+                $filename = "{$dog->id}_avatar_{$color}_" . time() . ".png";
+                $path = "clubs/{$clubSlug}/ai_avatars/{$filename}";
+                
+                Storage::disk('public')->put($path, $imageBinary);
+
+                $urlField = "avatar_{$color}_url";
+                
+                if ($dog->$urlField && str_contains($dog->$urlField, '/storage/')) {
+                    $oldPath = str_replace(asset('storage/'), '', $dog->$urlField);
+                    Storage::disk('public')->delete($oldPath);
+                }
+
+                $dog->$urlField = asset('storage/' . $path);
+            }
+
+            $dog->save();
+            
+            RateLimiter::hit($key, 86400); // 24 hours
+
+            return response()->json([
+                'message' => 'Avatares generados y guardados exitosamente',
+                'dog' => $dog
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al generar avatares con IA: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

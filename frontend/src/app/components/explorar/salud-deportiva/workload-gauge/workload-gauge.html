@@ -2,18 +2,18 @@
   <div class="gauge-card-body">
     <div class="acwr-gauge-card text-center p-2">
       <!-- ECharts Gauge -->
-      <div style="height: 250px; width: 100%;">
-        <div echarts [options]="chartOptions()" class="demo-chart" style="height: 100%;"></div>
+      <div style="height: 200px; width: 100%;">
+        <div echarts [options]="chartOptions()" class="demo-chart" style="height: 100%; width: 100%;"></div>
       </div>
-      
+
       <div class="status-info mt-2">
-        <h4 class="mb-2" [ngClass]="statusClass">{{ statusText }}</h4>
-        <p class="text-small text-muted">{{ statusDescription }}</p>
-        
+        <h4 class="mb-2 status-title" [ngClass]="statusClass">{{ statusText }}</h4>
+        <p class="text-small text-muted status-desc">{{ statusDescription }}</p>
+
         @if (confidenceText) {
-          <div class="mt-3 p-2 rounded {{ confidenceClass }}" style="font-size: 0.8rem;">
-            <strong>{{ confidenceText }}</strong>
-          </div>
+        <div class="mt-3 p-2 rounded {{ confidenceClass }}" style="font-size: 0.8rem;">
+          <strong>{{ confidenceText }}</strong>
+        </div>
         }
       </div>
     </div>

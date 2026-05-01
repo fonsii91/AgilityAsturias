@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DogWorkloadService } from '../../../services/dog-workload.service';
 import { DogService } from '../../../services/dog.service';
@@ -7,15 +7,22 @@ import { Dog } from '../../../models/dog.model';
 import { WorkloadGaugeComponent } from './workload-gauge/workload-gauge';
 import { FormsModule } from '@angular/forms';
 import { ToastService } from '../../../services/toast.service';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatRippleModule } from '@angular/material/core';
+import { PendingReviewsDialogComponent } from './pending-reviews-dialog/pending-reviews-dialog.component';
+import { HistoryDialogComponent } from './history-dialog/history-dialog.component';
 
 @Component({
   selector: 'app-salud-deportiva',
   standalone: true,
-  imports: [CommonModule, FormsModule, WorkloadGaugeComponent],
+  imports: [CommonModule, FormsModule, WorkloadGaugeComponent, MatDialogModule, MatButtonModule, MatIconModule, MatRippleModule],
   templateUrl: './salud-deportiva.html',
   styleUrls: ['./salud-deportiva.css']
 })
 export class SaludDeportivaComponent implements OnInit {
+  dialog = inject(MatDialog);
   dogs = signal<Dog[]>([]);
   selectedDogId = signal<number | null>(null);
   // Force recompile to pick up AcwrData status_color interface change
@@ -36,9 +43,24 @@ export class SaludDeportivaComponent implements OnInit {
     return this.dogs().find(d => d.id === id) || null;
   });
 
+  heroImageUrl = computed(() => {
+    const dog = this.selectedDog();
+    if (!dog) return '/placeholder-dog.jpg';
+
+    // Se mantiene siempre la foto original del perro como foto principal.
+    return dog.photo_url || '/placeholder-dog.jpg';
+  });
+
   // Formularios manuales
   isManualFormOpen = signal<boolean>(false);
   isHelpModalOpen = signal<boolean>(false);
+  
+  visibleHistory = computed(() => {
+    const data = this.acwrData();
+    if (!data || !data.recent_history) return [];
+    return data.recent_history.slice(0, 2);
+  });
+  
   editingWorkloadId = signal<number | null>(null);
   manualDate = signal<string>(new Date().toISOString().split('T')[0]);
   manualDuration = signal<number>(8);
@@ -46,6 +68,22 @@ export class SaludDeportivaComponent implements OnInit {
   manualJumpedMaxHeight = signal<boolean>(false);
   manualNumberOfRuns = signal<number | null>(2); // Preselected 1-2
   isSubmitting = signal<boolean>(false);
+
+  manualAvatarUrl = computed(() => {
+    const d = this.selectedDog();
+    if (!d) return null;
+    
+    const rpe = this.manualIntensity();
+
+    let url = null;
+    if (rpe <= 3) url = d.avatar_blue_url;
+    else if (rpe <= 6) url = d.avatar_green_url;
+    else if (rpe <= 8) url = d.avatar_yellow_url;
+    else url = d.avatar_red_url;
+
+    return url || d.photo_url || null;
+  });
+
   workloadToDelete = signal<number | null>(null);
   
   confirmingIds = signal<number[]>([]);
@@ -92,40 +130,6 @@ export class SaludDeportivaComponent implements OnInit {
     });
   }
 
-  confirmPending(workload: DogWorkload) {
-    if (!this.selectedDogId()) return;
-    
-    if (!workload.duration_min || workload.duration_min <= 0) {
-       this.toast.error('Por favor, indica un tiempo activo mayor a 0 minutos.');
-       return;
-    }
-    
-    if (!workload.intensity_rpe) {
-       this.toast.error('Por favor, evalúa el cansancio de tu perro.');
-       return;
-    }
-
-    this.confirmingIds.update(ids => [...ids, workload.id]);
-
-    this.workloadService.confirmWorkload(
-       workload.id, 
-       workload.duration_min, 
-       workload.intensity_rpe, 
-       workload.jumped_max_height, 
-       workload.number_of_runs
-    ).subscribe({
-      next: () => {
-        this.confirmingIds.update(ids => ids.filter(id => id !== workload.id));
-        this.toast.success('Entrenamiento validado con éxito');
-        this.loadDogData();
-      },
-      error: () => {
-        this.confirmingIds.update(ids => ids.filter(id => id !== workload.id));
-        this.toast.error('Hubo un error al confirmar el entrenamiento.');
-      }
-    });
-  }
-
   toggleManualForm() {
     this.isManualFormOpen.update(val => !val);
     if (!this.isManualFormOpen()) {
@@ -154,16 +158,6 @@ export class SaludDeportivaComponent implements OnInit {
     window.scrollTo({ top: 300, behavior: 'smooth' });
   }
 
-  decreasePendingDuration(pending: DogWorkload) {
-    if (pending.duration_min > 1) {
-      pending.duration_min -= 1;
-    }
-  }
-
-  increasePendingDuration(pending: DogWorkload) {
-    pending.duration_min += 1;
-  }
-
   decreaseManualDuration() {
     let val = this.manualDuration();
     if (val > 1) {
@@ -189,6 +183,46 @@ export class SaludDeportivaComponent implements OnInit {
 
   closeHelpModal() {
     this.isHelpModalOpen.set(false);
+  }
+
+  openPendingModal() {
+    const dialogRef = this.dialog.open(PendingReviewsDialogComponent, {
+      width: '650px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'bento-dialog-panel',
+      data: {
+        pendingReviews: this.pendingReviews(),
+        dogId: this.selectedDogId(),
+        dog: this.selectedDog()
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadDogData();
+      }
+    });
+  }
+
+  openHistoryModal() {
+    const dialogRef = this.dialog.open(HistoryDialogComponent, {
+      width: '650px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      panelClass: 'bento-dialog-panel',
+      data: {
+        history: this.acwrData()?.recent_history || []
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.action === 'edit' && result.workload) {
+        this.startEditWorkload(result.workload);
+      } else if (result && result.action === 'delete' && result.id) {
+        this.promptDeleteWorkload(result.id);
+      }
+    });
   }
 
   getIconForIntensity(level: number): string {

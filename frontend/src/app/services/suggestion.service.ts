@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -13,7 +13,7 @@ export class SuggestionService {
   // Opcional, mantenerlo local
   public suggestionsSignal = signal<Suggestion[]>([]);
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   /**
    * Obtener todas las sugerencias (Admin)

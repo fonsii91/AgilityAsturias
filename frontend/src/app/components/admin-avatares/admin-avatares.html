@@ -1,0 +1,189 @@
+<div class="admin-container fade-in">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <div>
+      <h1 style="margin: 0; color: var(--primary-color);">Gestión de Avatares IA</h1>
+      <p style="margin: 5px 0 0 0; color: var(--text-secondary); font-size: 0.9rem;">
+        Sube o enlaza las imágenes estilizadas para reflejar el estado de fatiga de los perros.
+      </p>
+    </div>
+    
+    <div class="search-box">
+      <span class="material-icons search-icon">search</span>
+      <input type="text" [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)" placeholder="Buscar perro por nombre o raza..." class="search-input">
+    </div>
+  </div>
+
+  <div class="table-container glass-effect" style="border-radius: 12px; overflow: hidden; background: var(--surface-card); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);">
+    <table style="width: 100%; border-collapse: collapse;">
+      <thead style="background-color: #f8fafc; border-bottom: 2px solid #e2e8f0; text-align: left;">
+        <tr>
+          <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600; width: 60px;">Foto</th>
+          <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600;">Nombre y Raza</th>
+          <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600; text-align: center;">Avatares Configurados</th>
+          <th style="padding: 15px 20px; color: var(--text-secondary); font-weight: 600; text-align: right;">Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (dog of filteredDogs(); track dog.id) {
+          <tr style="border-bottom: 1px solid #f1f5f9; transition: background-color 0.2s;">
+            <td style="padding: 10px 20px;">
+              <div class="dog-avatar-mini" [style.backgroundImage]="'url(' + (dog.photo_url || '/placeholder-dog.jpg') + ')'"></div>
+            </td>
+            <td style="padding: 15px 20px;">
+              <div style="font-weight: 600; color: var(--text-main); font-size: 1.05rem;">{{ dog.name }}</div>
+              <div style="color: var(--text-secondary); font-size: 0.85rem;">{{ dog.breed || 'Sin raza' }}</div>
+            </td>
+            <td style="padding: 15px 20px; text-align: center;">
+              <div style="display: flex; gap: 4px; justify-content: center;">
+                <div class="status-dot blue" [class.active]="dog.avatar_blue_url" title="Desentrenamiento"></div>
+                <div class="status-dot green" [class.active]="dog.avatar_green_url" title="Óptimo"></div>
+                <div class="status-dot yellow" [class.active]="dog.avatar_yellow_url" title="Sobrecarga"></div>
+                <div class="status-dot red" [class.active]="dog.avatar_red_url" title="Riesgo"></div>
+              </div>
+            </td>
+            <td style="padding: 15px 20px; text-align: right;">
+              <button class="btn-primary" style="padding: 8px 16px; border-radius: 8px; font-size: 0.9rem;" (click)="selectDog(dog)">
+                <span class="material-icons" style="font-size: 18px; margin-right: 4px; vertical-align: bottom;">auto_awesome</span> Editar IA
+              </button>
+            </td>
+          </tr>
+        }
+        
+        @if (filteredDogs().length === 0) {
+          <tr>
+            <td colspan="4" style="padding: 40px; text-align: center; color: var(--text-light);">
+              <span class="material-icons" style="font-size: 48px; color: #cbd5e1; margin-bottom: 10px;">pets</span>
+              <p style="margin: 0;">No se encontraron perros.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal de Edición -->
+@if (selectedDog()) {
+  <div class="modal-overlay slide-fade-in" (click)="closeModal()">
+    <div class="modal-card bento-card" (click)="$event.stopPropagation()" style="width: 800px; max-width: 95vw;">
+      <div class="modal-header border-bottom pb-3 mb-4 d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center gap-3">
+          <div class="dog-avatar-mini" [style.backgroundImage]="selectedDog()?.photo_url ? 'url(' + selectedDog()?.photo_url + ')' : 'none'" style="background-color: #e2e8f0; display: flex; align-items: center; justify-content: center;">
+            @if (!selectedDog()?.photo_url) {
+              <span class="material-icons" style="color: #94a3b8; font-size: 24px;">pets</span>
+            }
+          </div>
+          <h3 class="m-0 text-xl">Avatares para {{ selectedDog()?.name }}</h3>
+        </div>
+        <button class="btn-icon-close" (click)="closeModal()"><span class="material-icons">close</span></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="ai-generator-banner mb-4 p-3" style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border-radius: 12px; border: 1px solid #bbf7d0;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;">
+            <div style="flex: 1;">
+              <h4 style="margin: 0; color: #166534; display: flex; align-items: center; gap: 8px;">
+                <span class="material-icons">auto_awesome</span> Generación Mágica
+              </h4>
+              <p style="margin: 4px 0 12px 0; color: #15803d; font-size: 0.9rem;">
+                Usa IA para generar los 4 avatares basándose en la raza del perro.
+              </p>
+              
+              <div class="form-group mb-0">
+                <label style="color: #166534; font-size: 0.85rem; font-weight: 600;">Personalizar diseño (Opcional)</label>
+                <input type="text" [(ngModel)]="aiPromptDetails" class="form-input" style="border-color: #86efac; background: white;" placeholder="Ej: color marrón claro, pecho blanco, orejas caídas...">
+                <small style="color: #15803d; font-size: 0.75rem; margin-top: 4px; display: block;">Si se deja en blanco, la IA generará un perro genérico de su raza ({{ selectedDog()?.breed || 'Mestizo' }}).</small>
+              </div>
+            </div>
+            <button class="btn-primary mt-2" style="background-color: #22c55e; border: none; font-weight: 600; padding: 10px 20px; flex-shrink: 0;" (click)="generateWithAI()" [disabled]="isGenerating() || isSubmitting()">
+              @if(isGenerating()) {
+                <span class="spinner-small" style="border-top-color: white; margin-right: 8px;"></span> Generando... (20s)
+              } @else {
+                <span class="material-icons mr-2">model_training</span> Generar con IA
+              }
+            </button>
+          </div>
+        </div>
+
+        <p class="text-muted mb-4">O selecciona manualmente la imagen estilizada desde tu ordenador para cada zona de fatiga. Si una zona se deja en blanco, se usará la foto normal del perro.</p>
+
+        <div class="avatar-grid">
+          <!-- Blue -->
+          <div class="avatar-form-card border-blue">
+            <h4 class="color-blue"><span class="material-icons">ac_unit</span> Desentrenamiento (Azul)</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarBlueUrl() || '/placeholder-dog.jpg') + ')'"></div>
+            <div class="d-flex flex-column gap-2">
+              <input type="file" #fileInputBlue style="display: none;" accept="image/*" (change)="onFileSelected($event, 'blue')">
+              <button class="btn-outline-primary w-100" (click)="fileInputBlue.click()">
+                <span class="material-icons align-middle text-small mr-1">upload_file</span> Seleccionar Foto
+              </button>
+              @if (avatarBlueUrl() && !clearBlue()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar('blue')">
+                  <span class="material-icons align-middle text-small mr-1">delete</span> Eliminar Avatar
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Green -->
+          <div class="avatar-form-card border-green">
+            <h4 class="color-green"><span class="material-icons">check_circle</span> Óptimo (Verde)</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarGreenUrl() || '/placeholder-dog.jpg') + ')'"></div>
+            <div class="d-flex flex-column gap-2">
+              <input type="file" #fileInputGreen style="display: none;" accept="image/*" (change)="onFileSelected($event, 'green')">
+              <button class="btn-outline-primary w-100" (click)="fileInputGreen.click()">
+                <span class="material-icons align-middle text-small mr-1">upload_file</span> Seleccionar Foto
+              </button>
+              @if (avatarGreenUrl() && !clearGreen()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar('green')">
+                  <span class="material-icons align-middle text-small mr-1">delete</span> Eliminar Avatar
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Yellow -->
+          <div class="avatar-form-card border-yellow">
+            <h4 class="color-yellow"><span class="material-icons">warning</span> Sobrecarga (Naranja)</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarYellowUrl() || '/placeholder-dog.jpg') + ')'"></div>
+            <div class="d-flex flex-column gap-2">
+              <input type="file" #fileInputYellow style="display: none;" accept="image/*" (change)="onFileSelected($event, 'yellow')">
+              <button class="btn-outline-primary w-100" (click)="fileInputYellow.click()">
+                <span class="material-icons align-middle text-small mr-1">upload_file</span> Seleccionar Foto
+              </button>
+              @if (avatarYellowUrl() && !clearYellow()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar('yellow')">
+                  <span class="material-icons align-middle text-small mr-1">delete</span> Eliminar Avatar
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Red -->
+          <div class="avatar-form-card border-red">
+            <h4 class="color-red"><span class="material-icons">error</span> Riesgo (Rojo)</h4>
+            <div class="preview-box" [style.backgroundImage]="'url(' + (avatarRedUrl() || '/placeholder-dog.jpg') + ')'"></div>
+            <div class="d-flex flex-column gap-2">
+              <input type="file" #fileInputRed style="display: none;" accept="image/*" (change)="onFileSelected($event, 'red')">
+              <button class="btn-outline-primary w-100" (click)="fileInputRed.click()">
+                <span class="material-icons align-middle text-small mr-1">upload_file</span> Seleccionar Foto
+              </button>
+              @if (avatarRedUrl() && !clearRed()) {
+                <button class="btn-outline-danger w-100" (click)="clearAvatar('red')">
+                  <span class="material-icons align-middle text-small mr-1">delete</span> Eliminar Avatar
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+        <button class="btn-cancel" (click)="closeModal()" [disabled]="isSubmitting()">Cancelar</button>
+        <button class="btn-primary" (click)="saveAvatars()" [disabled]="isSubmitting()">
+          <span class="material-icons mr-2">save</span> {{ isSubmitting() ? 'Guardando...' : 'Guardar Avatares' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -45,7 +45,7 @@ export class ResourceService {
   private apiUrl = environment.apiUrl + '/resources';
   private cache = new Map<string, Observable<Resource[]>>();
 
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
 
   getResources(category?: string, level?: string): Observable<Resource[]> {
     let url = this.apiUrl;

@@ -7,6 +7,10 @@ export interface Dog {
     microchip?: string;
     pedigree?: string;
     photo_url?: string;
+    avatar_blue_url?: string;
+    avatar_green_url?: string;
+    avatar_yellow_url?: string;
+    avatar_red_url?: string;
     has_previous_injuries?: boolean;
     sterilized_at?: string;
     weight_kg?: number;

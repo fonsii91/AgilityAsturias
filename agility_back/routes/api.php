@@ -125,6 +125,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware(['role:admin'])->group(function () {
         // Dog Workloads Monitor
         Route::get('/admin/salud/monitor', [\App\Http\Controllers\DogWorkloadController::class, 'adminMonitorData']);
+        // AI Avatars (Admin)
+        Route::post('/admin/dogs/{id}/avatars', [DogController::class, 'updateAvatarsAdmin']);
+        Route::post('/admin/dogs/{id}/generate-avatars', [DogController::class, 'generateAvatarsAdmin']);
         // RSCE Monitor
         Route::get('/admin/rsce/monitor', [RsceTrackController::class, 'adminMonitorData']);
         

@@ -38,10 +38,15 @@ description: Datos para desplegar en producción el proyecto
 
 Gracias al uso del script `deploy.sh` que se encuentra en la raíz del repositorio, subir los cambios a producción es muy directo. **Atención IA:** Es obligatorio seguir el paso 1 minuciosamente antes del despliegue.
 
-1. **Actualizar el archivo de Novedades (Atención IA):**
-   **ANTES** de hacer ningún `git add`, la IA debe editar obligatoriamente el archivo `frontend/public/novedades.json` para añadir una nueva entrada al principio del array (JSON) reflejando los desarrollos realizados en esta nueva versión (Incrementando la versión y poniendo la fecha actual). **Instrucción Crítica:** La redacción de las novedades (funcionalidades formadas, errores solventados y advertencias) debe estar orientada puramente a usuarios "finales" no técnicos del club. Utiliza un lenguaje cercano y fácil de entender, explicando los beneficios y evitando radicalmente utilizar jerga técnica, arquitecturas o nombres de código. **NUNCA debes incluir** en `novedades.json` desarrollos, cambios o monitores orientados exclusivamentes a los perfiles de **Administrador**, ya que el administrador está al corriente de estos y documentarlos ahí tan sólo genera ruido innecesario para los clientes finales. Si en una ronda de trabajo **solo** se han desarrollado funciones de administradores, puedes evitar incluir esas iteraciones como *features* intentando mencionar únicamente *bugfixes* generales de sistema si los hubo.
+1. **Comprobar los Tests (Atención IA):**
+   **ANTES** de hacer el commit o actualizar novedades, es obligatorio comprobar que el código es estable ejecutando la batería completa de tests en local. Si algún test falla, abortar el despliegue e informar al usuario.
+   - Para backend: ejecutar `cd agility_back && ./vendor/bin/pest` (o el comando configurado).
+   - Para frontend: ejecutar `cd frontend && npx vitest run` (o el comando configurado).
 
-2. **Guardar y Subir (Desde tu entorno Local):**  
+2. **Actualizar el archivo de Novedades (Atención IA):**
+   Una vez los tests pasen, la IA debe editar obligatoriamente el archivo `frontend/public/novedades.json` para añadir una nueva entrada al principio del array (JSON) reflejando los desarrollos realizados en esta nueva versión (Incrementando la versión y poniendo la fecha actual). **Instrucción Crítica:** La redacción de las novedades (funcionalidades formadas, errores solventados y advertencias) debe estar orientada puramente a usuarios "finales" no técnicos del club. Utiliza un lenguaje cercano y fácil de entender, explicando los beneficios y evitando radicalmente utilizar jerga técnica, arquitecturas o nombres de código. **NUNCA debes incluir** en `novedades.json` desarrollos, cambios o monitores orientados exclusivamentes a los perfiles de **Administrador**, ya que el administrador está al corriente de estos y documentarlos ahí tan sólo genera ruido innecesario para los clientes finales. Si en una ronda de trabajo **solo** se han desarrollado funciones de administradores, puedes evitar incluir esas iteraciones como *features* intentando mencionar únicamente *bugfixes* generales de sistema si los hubo.
+
+3. **Guardar y Subir (Desde tu entorno Local):**  
    Acumula tus cambios y envíalos habitualmente hacia `main`:
    ```bash
    git add .
@@ -49,7 +54,7 @@ Gracias al uso del script `deploy.sh` que se encuentra en la raíz del repositor
    git push origin main
    ```
 
-3. **Ejecutar el Despliegue (En el Servidor de Producción):**  
+4. **Ejecutar el Despliegue (En el Servidor de Producción):**  
    Simplemente ejecuta este comando desde cualquier terminal local que tenga permisos por SSH. El servidor se encargará de realizar el git pull, instalar dependencias para back/front, limpiar cachés, compilar en production y reiniciar las colas automáticamente:
    ```bash
    ssh agilityasturias "cd /var/www/agilityasturias && bash deploy.sh"

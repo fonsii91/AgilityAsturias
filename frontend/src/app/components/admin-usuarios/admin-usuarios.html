@@ -31,13 +31,19 @@
                     <span>{{ user.displayName }}</span>
                   </td>
                   <td>
-                    <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
-                      class="role-select">
-                      <option value="user">Inactivo</option>
-                      <option value="member">Miembro</option>
-                      <option value="staff">Staff</option>
-                      <option value="admin">Admin</option>
-                    </select>
+                    <div class="action-buttons-wrapper" style="display: flex; gap: 8px; align-items: center;">
+                      <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
+                        class="role-select">
+                        <option value="user">Inactivo</option>
+                        <option value="member">Miembro</option>
+                        <option value="staff">Staff</option>
+                        <option value="admin">Admin</option>
+                      </select>
+                      <button class="btn-icon reset-pwd-btn" (click)="generateResetLink(user)"
+                        title="Generar Enlace de Recuperación" style="background: transparent; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <span class="material-icons" style="font-size: 18px;">key</span>
+                      </button>
+                    </div>
                   </td>
                   <td>{{ user.email }}</td>
                   <td>

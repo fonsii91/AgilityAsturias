@@ -1,5 +1,23 @@
 [
   {
+    "version": "1.1.25",
+    "date": "2026-05-01",
+    "features": [
+      "¡Un panel de Salud Deportiva mucho más limpio y profesional! Hemos optimizado la interfaz para que sea más fácil de leer, mostrando únicamente los dos últimos registros de actividad para no saturar la pantalla. Además, hemos ajustado su diseño para que se vea perfectamente en tu teléfono móvil y nos hemos asegurado de que todo esté impecablemente en nuestro idioma."
+    ],
+    "bugfixes": [
+      "Hemos realizado ajustes técnicos invisibles solucionando pequeños errores visuales en la aplicación, como la reparación de ciertos iconos que no se mostraban correctamente, garantizando así una experiencia de uso más fluida."
+    ]
+  },
+  {
+    "version": "1.1.24",
+    "date": "2026-05-01",
+    "features": [
+      "¡Despliegue blindado! Hemos incorporado un avanzado sistema de verificación automática (con más de 370 pruebas) que revisa la plataforma cada vez que se actualiza. A partir de ahora disfrutarás de una aplicación muchísimo más robusta y sin fallos inesperados.",
+      "Hemos preparado los cimientos tecnológicos para estrenar muy pronto una herramienta de Inteligencia Artificial capaz de generar avatares y fotos de perfil de gran calidad visual. De momento, se queda cocinándose en nuestro taller de pruebas hasta alcanzar el estándar que os merecéis."
+    ]
+  },
+  {
     "version": "1.1.23",
     "date": "2026-04-25",
     "bugfixes": [

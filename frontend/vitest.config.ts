@@ -1,0 +1,12 @@
+import { defineConfig } from 'vitest/config';
+import angular from '@analogjs/vite-plugin-angular';
+
+export default defineConfig({
+  plugins: [angular()],
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['src/test-setup.ts'],
+    globals: true,
+    exclude: ['**/node_modules/**', '**/e2e/**', '**/dist/**'],
+  },
+});

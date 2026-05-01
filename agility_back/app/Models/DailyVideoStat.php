@@ -15,6 +15,7 @@ class DailyVideoStat extends Model
         'youtube_count',
         'in_queue_count',
         'failed_count',
-        'total_count'
+        'total_count',
+        'club_id'
     ];
 }

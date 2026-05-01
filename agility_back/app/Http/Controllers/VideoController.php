@@ -276,7 +276,7 @@ class VideoController extends Controller
         $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $video->title ?? ($video->dog->name ?? 'video_agility'));
         $filename = "{$safeTitle}.{$extension}";
 
-        return response()->download(storage_path("app/public/{$video->local_path}"), $filename);
+        return Storage::disk('public')->download($video->local_path, $filename);
     }
 
     public function stats()

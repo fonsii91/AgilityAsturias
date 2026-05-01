@@ -132,4 +132,49 @@ class DogWorkloadTest extends TestCase
             'intensity_rpe' => 8
         ]);
     }
+    public function test_permite_a_un_administrador_ver_el_monitor_global_de_salud()
+    {
+        $admin = $this->createUser(['role' => 'admin']);
+        $user = $this->createUser();
+        
+        $res = $this->actingAs($user)->postJson('/api/dogs', ['name' => 'Fido']);
+        $dogId = $res->json('id');
+
+        DogWorkload::forceCreate([
+            'dog_id' => $dogId,
+            'user_id' => $user->id,
+            'club_id' => $this->club->id,
+            'date' => now()->subDays(5)->toDateString(),
+            'duration_min' => 30,
+            'intensity_rpe' => 5,
+            'source_type' => 'manual',
+            'status' => 'confirmed'
+        ]);
+
+        DogWorkload::forceCreate([
+            'dog_id' => $dogId,
+            'user_id' => $user->id,
+            'club_id' => $this->club->id,
+            'date' => now()->subDays(2)->toDateString(),
+            'duration_min' => 20,
+            'intensity_rpe' => 8,
+            'source_type' => 'auto_attendance',
+            'status' => 'auto_confirmed'
+        ]);
+
+        $response = $this->actingAs($admin)->getJson('/api/admin/salud/monitor');
+
+        $response->assertStatus(200)
+                 ->assertJsonFragment(['email' => $user->email])
+                 ->assertJsonFragment(['total_workloads' => 2])
+                 ->assertJsonFragment(['manual_workloads' => 1])
+                 ->assertJsonFragment(['auto_workloads' => 1]);
+    }
+
+    public function test_no_permite_a_un_miembro_normal_ver_el_monitor_global_de_salud()
+    {
+        $user = $this->createUser();
+        $response = $this->actingAs($user)->getJson('/api/admin/salud/monitor');
+        $response->assertStatus(403);
+    }
 }

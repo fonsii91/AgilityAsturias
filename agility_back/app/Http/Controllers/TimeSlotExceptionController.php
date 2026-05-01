@@ -29,7 +29,7 @@ class TimeSlotExceptionController extends Controller
         $timeSlot = \App\Models\TimeSlot::find($validated['slot_id']);
         if ($timeSlot) {
             $reservations = \App\Models\Reservation::where('slot_id', $validated['slot_id'])
-                ->where('date', $validated['date'])
+                ->whereDate('date', $validated['date'])
                 ->get();
 
             $reservations->load('dog.users');
@@ -62,7 +62,7 @@ class TimeSlotExceptionController extends Controller
 
             // Eliminar las reservas de esta clase
             \App\Models\Reservation::where('slot_id', $validated['slot_id'])
-                ->where('date', $validated['date'])
+                ->whereDate('date', $validated['date'])
                 ->delete();
         }
 

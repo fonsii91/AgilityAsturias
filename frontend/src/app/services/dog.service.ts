@@ -164,4 +164,34 @@ export class DogService {
             });
         });
     }
+
+    updateAdminAvatars(dogId: number, formData: FormData) {
+        return new Promise<Dog>((resolve, reject) => {
+            this.http.post<{message: string; dog: any}>(`${environment.apiUrl}/admin/dogs/${dogId}/avatars`, formData).subscribe({
+                next: (res) => {
+                    const mappedDog = this.mapDog(res.dog);
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    resolve(mappedDog);
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
+
+    generateAiAvatars(dogId: number, promptDetails?: string) {
+        return new Promise<Dog>((resolve, reject) => {
+            this.http.post<{message: string; dog: any}>(`${environment.apiUrl}/admin/dogs/${dogId}/generate-avatars`, {
+                prompt_details: promptDetails
+            }).subscribe({
+                next: (res) => {
+                    const mappedDog = this.mapDog(res.dog);
+                    this.dogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    this.allDogsSignal.update(list => list.map(d => d.id === dogId ? mappedDog : d));
+                    resolve(mappedDog);
+                },
+                error: (err) => reject(err)
+            });
+        });
+    }
 }

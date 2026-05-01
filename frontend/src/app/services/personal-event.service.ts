@@ -1,4 +1,4 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { PersonalEvent } from '../models/personal-event.model';
@@ -13,7 +13,7 @@ export class PersonalEventService {
     // State
     private eventsSignal = signal<PersonalEvent[]>([]);
     
-    constructor(private http: HttpClient) {}
+    private http = inject(HttpClient);
 
     // Getters for computed signals
     getEvents() {

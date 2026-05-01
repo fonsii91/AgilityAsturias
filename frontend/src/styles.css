@@ -504,4 +504,4 @@ a:hover {
     line-height: 1.4 !important;
     text-align: center !important;
     max-width: 250px !important;
-}
+}app-toast { position: relative; z-index: 2147483647; display: block; }

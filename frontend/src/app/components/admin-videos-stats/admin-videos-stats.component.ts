@@ -8,6 +8,8 @@ import { VideoService } from '../../services/video.service';
 import { ToastService } from '../../services/toast.service';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTabsModule } from '@angular/material/tabs';
+import { AdminDeletedVideosComponent } from '../admin-deleted-videos/admin-deleted-videos.component';
 
 @Component({
   selector: 'app-admin-videos-stats',
@@ -19,7 +21,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatTabsModule,
+    AdminDeletedVideosComponent
   ],
   templateUrl: './admin-videos-stats.component.html',
   styleUrls: ['./admin-videos-stats.component.scss']

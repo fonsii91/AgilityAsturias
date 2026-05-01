@@ -216,6 +216,13 @@ class AuthController extends Controller
                     $usersCount = $dog->users()->count();
                     if ($usersCount > 1) {
                         $dog->users()->detach($targetUser->id);
+                        if ($dog->user_id === $targetUser->id) {
+                            $nextOwner = $dog->users()->first();
+                            if ($nextOwner) {
+                                $dog->user_id = $nextOwner->id;
+                                $dog->save();
+                            }
+                        }
                     } else {
                         $dog->delete();
                     }
@@ -322,8 +329,10 @@ class AuthController extends Controller
         $targetUser->reset_token = $token;
         $targetUser->save();
 
-        // En frontend tendremos una ruta /reset-password?token=...
-        $frontendUrl = env('FRONTEND_URL', 'https://agilityasturias.com');
+        // Usar el Origin de la petición para soportar subdominios multi-tenant automáticamente
+        $origin = $request->header('origin');
+        $frontendUrl = $origin ? $origin : env('FRONTEND_URL', 'https://clubagility.com');
+        
         $resetLink = rtrim($frontendUrl, '/') . '/reset-password?token=' . $token;
 
         return response()->json([

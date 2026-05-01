@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -10,7 +10,7 @@ import { DogWorkload, AcwrData, AdminWorkloadStats } from '../models/dog-workloa
 export class DogWorkloadService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  private http = inject(HttpClient);
 
   getAcwrData(dogId: number): Observable<AcwrData> {
     return this.http.get<AcwrData>(`${this.apiUrl}/dogs/${dogId}/workload`);

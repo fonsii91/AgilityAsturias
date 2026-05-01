@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -10,7 +10,7 @@ import { Video } from '../models/video.model';
 export class VideoService {
     private apiUrl = `${environment.apiUrl}/videos`;
 
-    constructor(private http: HttpClient) { }
+    private http = inject(HttpClient);
 
     getVideos(page: number = 1, filters?: { search?: string, date?: string, category?: string, sort?: string, dateRange?: string, dog_id?: string, competition_id?: string, orientation?: string, per_page?: number }): Observable<any> {
         let params = new HttpParams().set('page', page.toString());
