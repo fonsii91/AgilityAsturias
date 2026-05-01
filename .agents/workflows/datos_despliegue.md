@@ -33,6 +33,7 @@ description: Datos para desplegar en producción el proyecto
 - **[Completado]** Despliegue v1.1.25 (01/05/2026): Despliegue en producción finalizado con éxito tras ejecutar todas las baterías de tests (130 backend, 244 frontend). Incluidas mejoras en Salud Deportiva y ajustes visuales.
 - **[Completado]** Despliegue v1.1.26 (01/05/2026): Despliegue en producción finalizado con éxito tras refactorizar el sistema de avatares a 5 niveles de fatiga y aplicar efectos de crossfade suaves. (130 backend tests, 244 frontend tests superados).
 - **[Completado]** Despliegue v1.1.27 (01/05/2026): Despliegue en producción finalizado con éxito (130 backend, 244 frontend tests superados). Mejoras UX/UI integrales en el módulo de Salud Deportiva: predicción inteligente de la exigencia física basada en contextos (clases/competiciones) e integración de documentación veterinaria referenciada para la usabilidad.
+- **[Completado]** Fase 9 (01/05/2026): Configurado servidor Nginx y Certbot SSL para que la aplicación multi-tenant soporte correctamente HTTPS en el nuevo subdominio `patitas.clubagility.com` y `www.patitas.clubagility.com`.
 
 
 ---

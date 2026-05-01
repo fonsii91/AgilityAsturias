@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.1.28",
+    "date": "2026-05-02",
+    "features": [
+      "¡El camino al Campeonato de España ahora es un juego! Hemos integrado un nuevo contador inteligente dentro de la Bitácora RSCE que calcula automáticamente tu progreso para clasificarte, encargándose de filtrar todas las pistas según las exigencias de velocidad de tu Grado y Categoría.",
+      "Para que no haya confusiones con el reglamento, hemos añadido unas cómodas pestañas que te permiten cambiar de año al instante. Así podrás ver de un solo vistazo qué pistas has logrado y para qué año del Campeonato te están sumando.",
+      "Se acabó la frustración: si logras hacer una pista 'Excelente a 0' pero no suma para el Campeonato, la plataforma te mostrará un pequeño aviso amarillo explicándote exactamente cuántas pistas han sido descartadas por no alcanzar la velocidad mínima exigida."
+    ]
+  },
+  {
     "version": "1.1.27",
     "date": "2026-05-01",
     "features": [

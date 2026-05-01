@@ -164,7 +164,7 @@ describe('CalendarioComponent Logic', () => {
         
         await component.confirmAttendance();
         
-        expect(mockCompetitionService.attendCompetition).toHaveBeenCalledWith(1, [10], ['2026-05-15']);
+        expect(mockCompetitionService.attendCompetition).toHaveBeenCalledWith(1, [10], ['2026-05-15'], [{dog_id: 10, dias_asistencia: ['2026-05-15']}]);
         expect(component.selectedCompetition.isAttending).toBe(true);
         expect(component.isConfirmingAttendance).toBe(false);
     });

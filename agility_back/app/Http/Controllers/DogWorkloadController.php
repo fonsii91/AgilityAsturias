@@ -70,14 +70,23 @@ class DogWorkloadController extends Controller
 
             if ($comp->attendingDogs->isNotEmpty()) {
                 $dogPivot = $comp->attendingDogs->first()->pivot;
-                $userId = $dogPivot->user_id;
-
-                if ($userId) {
-                    $userAttendance = $comp->attendees->where('id', $userId)->first();
-                    if ($userAttendance && $userAttendance->pivot->dias_asistencia) {
-                        $parsed = json_decode($userAttendance->pivot->dias_asistencia, true);
-                        if (!empty($parsed)) {
-                            $diasAsistencia = $parsed;
+                
+                // Prioritize dog-specific attendance days
+                if ($dogPivot->dias_asistencia) {
+                    $parsedDogDays = json_decode($dogPivot->dias_asistencia, true);
+                    if (!empty($parsedDogDays)) {
+                        $diasAsistencia = $parsedDogDays;
+                    }
+                } else {
+                    // Fallback to user attendance days (legacy)
+                    $userId = $dogPivot->user_id;
+                    if ($userId) {
+                        $userAttendance = $comp->attendees->where('id', $userId)->first();
+                        if ($userAttendance && $userAttendance->pivot->dias_asistencia) {
+                            $parsed = json_decode($userAttendance->pivot->dias_asistencia, true);
+                            if (!empty($parsed)) {
+                                $diasAsistencia = $parsed;
+                            }
                         }
                     }
                 }

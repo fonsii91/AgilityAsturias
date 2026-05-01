@@ -177,4 +177,59 @@ class DogWorkloadTest extends TestCase
         $response = $this->actingAs($user)->getJson('/api/admin/salud/monitor');
         $response->assertStatus(403);
     }
+
+    public function test_get_pending_reviews_respects_per_dog_attendance_days()
+    {
+        $user = $this->createUser();
+        
+        $dog1 = Dog::factory()->create(['user_id' => $user->id, 'club_id' => $this->club->id]);
+        $dog2 = Dog::factory()->create(['user_id' => $user->id, 'club_id' => $this->club->id]);
+        
+        $user->dogs()->attach([
+            $dog1->id => ['is_primary_owner' => true],
+            $dog2->id => ['is_primary_owner' => true]
+        ]);
+
+        $saturday = now()->subDays(3)->format('Y-m-d');
+        $sunday = now()->subDays(2)->format('Y-m-d');
+
+        $competition = \App\Models\Competition::factory()->create([
+            'club_id' => $this->club->id,
+            'fecha_evento' => $saturday,
+            'fecha_fin_evento' => $sunday,
+            'tipo' => 'competicion',
+            'attendance_verified' => false
+        ]);
+
+        // Attaching with different days for each dog
+        $competition->attendees()->attach($user->id, ['dias_asistencia' => json_encode([$saturday, $sunday])]);
+        
+        \Illuminate\Support\Facades\DB::table('competition_dog')->insert([
+            ['competition_id' => $competition->id, 'dog_id' => $dog1->id, 'user_id' => $user->id, 'dias_asistencia' => json_encode([$saturday])],
+            ['competition_id' => $competition->id, 'dog_id' => $dog2->id, 'user_id' => $user->id, 'dias_asistencia' => json_encode([$sunday])]
+        ]);
+
+        // The workloads are generated directly by the system when attendance is verified, 
+        // but since we bypassed the controller logic in this setup, let's just test the endpoint's pending generation mechanism.
+        // Wait, getPendingReviews actually GENERATES the pending reviews dynamically if they don't exist!
+        // Let's call the endpoint.
+
+        // Get pending reviews for Dog 1
+        $response1 = $this->actingAs($user)->getJson("/api/dogs/{$dog1->id}/pending-reviews");
+        $response1->assertStatus(200);
+        $data1 = $response1->json();
+        
+        // Dog 1 should only have Saturday
+        $this->assertCount(1, $data1);
+        $this->assertStringContainsString($saturday, $data1[0]['date']);
+
+        // Get pending reviews for Dog 2
+        $response2 = $this->actingAs($user)->getJson("/api/dogs/{$dog2->id}/pending-reviews");
+        $response2->assertStatus(200);
+        $data2 = $response2->json();
+        
+        // Dog 2 should only have Sunday
+        $this->assertCount(1, $data2);
+        $this->assertStringContainsString($sunday, $data2[0]['date']);
+    }
 }

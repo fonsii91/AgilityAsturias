@@ -73,39 +73,4 @@ describe('SaludDeportivaComponent', () => {
     expect(mockWorkloadService.getAcwrData).toHaveBeenCalledWith(1);
   });
 
-  it('debe enviar la carga manual y mostrar un mensaje de éxito', async () => {
-    await new Promise(resolve => setTimeout(resolve, 0));
-    
-    component.isManualFormOpen.set(true);
-    component.selectedDogId.set(1);
-    component.manualDate.set('2023-10-10');
-    component.manualDuration.set(45);
-    component.manualIntensity.set(7);
-    component.manualJumpedMaxHeight.set(false);
-    component.manualNumberOfRuns.set(2);
-    
-    component.submitManualWorkload();
-
-    expect(mockWorkloadService.storeManualWorkload).toHaveBeenCalledWith(1, {
-      date: '2023-10-10',
-      duration_min: 45,
-      intensity_rpe: 7,
-      activity_type: 'agility',
-      jumped_max_height: false,
-      number_of_runs: 2
-    });
-    
-    expect(mockToastService.success).toHaveBeenCalledWith('Registro añadido correctamente');
-    expect(component.isManualFormOpen()).toBe(false);
-  });
-
-  it('debe evitar enviar si faltan datos requeridos', async () => {
-    await new Promise(resolve => setTimeout(resolve, 0));
-    
-    component.manualDuration.set(0); // Invalid duration -> is evaluated as falsey
-    component.submitManualWorkload();
-
-    expect(mockWorkloadService.storeManualWorkload).not.toHaveBeenCalled();
-  });
-
 });

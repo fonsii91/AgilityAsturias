@@ -75,6 +75,7 @@ export class CalendarioComponent implements AfterViewInit {
     isConfirmingAttendance = false;
     selectedDogIds = new Set<number>();
     selectedAttendanceDays = new Set<string>();
+    selectedDogAttendanceDays = new Map<number, Set<string>>(); // dogId -> Set of ISO dates
     viewingAttendees = false;
     attendees = signal<any[]>([]);
     isLoadingAttendees = signal<boolean>(false);
@@ -130,11 +131,15 @@ export class CalendarioComponent implements AfterViewInit {
         const totalItems = this.selectedCompetitions.length + this.selectedDeadlines.length + this.selectedPersonalEvents.length;
 
         if (totalItems === 1 && this.selectedPersonalEvents.length === 0) {
-            this.selectedCompetition = this.selectedCompetitions.length === 1
-                ? this.selectedCompetitions[0]
-                : this.selectedDeadlines[0];
-            this.activeModalTab = 'info';
-            this.resetAttendanceState();
+            if (this.selectedCompetitions.length === 1) {
+                // Auto-expand only if it's a competition
+                this.selectedCompetition = this.selectedCompetitions[0];
+                this.activeModalTab = 'info';
+                this.resetAttendanceState();
+            } else {
+                // It's a deadline, do not auto-expand so they see the warning message first
+                this.selectedCompetition = null;
+            }
         } else if (totalItems === 1 && this.selectedPersonalEvents.length === 1) {
             // Si solo hay 1 evento personal, abrimos directamente el modal de evento personal y no el modal general
             this.openPersonalEventModal(day, this.selectedPersonalEvents[0]);
@@ -314,16 +319,43 @@ export class CalendarioComponent implements AfterViewInit {
     toggleDog(dogId: number) {
         if (this.selectedDogIds.has(dogId)) {
             this.selectedDogIds.delete(dogId);
+            this.selectedDogAttendanceDays.delete(dogId);
         } else {
             this.selectedDogIds.add(dogId);
+            // Si el usuario ya seleccionó días, le ponemos esos días por defecto
+            this.selectedDogAttendanceDays.set(dogId, new Set(this.selectedAttendanceDays));
         }
     }
 
-    toggleAttendanceDay(dayStr: string) {
-        if (this.selectedAttendanceDays.has(dayStr)) {
-            this.selectedAttendanceDays.delete(dayStr);
+    toggleAttendanceDay(dayIso: string) {
+        if (this.selectedAttendanceDays.has(dayIso)) {
+            this.selectedAttendanceDays.delete(dayIso);
+            // También lo quitamos de todos los perros
+            this.selectedDogIds.forEach(dogId => {
+                const dogDays = this.selectedDogAttendanceDays.get(dogId);
+                if (dogDays) dogDays.delete(dayIso);
+            });
         } else {
-            this.selectedAttendanceDays.add(dayStr);
+            this.selectedAttendanceDays.add(dayIso);
+            // También lo añadimos a todos los perros seleccionados
+            this.selectedDogIds.forEach(dogId => {
+                const dogDays = this.selectedDogAttendanceDays.get(dogId);
+                if (dogDays) dogDays.add(dayIso);
+            });
+        }
+    }
+
+    toggleDogAttendanceDay(dogId: number, dayIso: string) {
+        let dogDays = this.selectedDogAttendanceDays.get(dogId);
+        if (!dogDays) {
+            dogDays = new Set<string>();
+            this.selectedDogAttendanceDays.set(dogId, dogDays);
+        }
+
+        if (dogDays.has(dayIso)) {
+            dogDays.delete(dayIso);
+        } else {
+            dogDays.add(dayIso);
         }
     }
 
@@ -364,7 +396,16 @@ export class CalendarioComponent implements AfterViewInit {
                 daysArray.push(this.formatDateToIso(eventDays[0]));
             }
 
-            await this.competitionService.attendCompetition(this.selectedCompetition.id, dogIdsArray, daysArray);
+            // Construct payload with per-dog specific days
+            const dogsPayload = dogIdsArray.map(dogId => {
+                const dogDays = this.selectedDogAttendanceDays.get(dogId);
+                return {
+                    dog_id: dogId,
+                    dias_asistencia: dogDays ? Array.from(dogDays) : daysArray
+                };
+            });
+
+            await this.competitionService.attendCompetition(this.selectedCompetition.id, dogIdsArray, daysArray, dogsPayload);
 
             // Update local state temporarily, or rely on a fresh refetch
             this.selectedCompetition.isAttending = true;

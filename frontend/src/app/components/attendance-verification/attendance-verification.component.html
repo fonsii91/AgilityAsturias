@@ -96,7 +96,13 @@
                   </div>
                   <div class="attendee-info">
                     <span class="attendee-name">🐶 {{ dog.name || 'Perro Desconocido' }}</span>
-                    <!-- owner omitted from API attending_dogs simple struct unless we map it, but it's okay -->
+                    @if (comp.fecha_fin_evento && comp.fecha_fin_evento !== comp.fecha_evento && dog.dias_asistencia?.length > 0) {
+                      <div class="attendee-days" style="font-size: 0.8rem; color: #666; margin-top: 2px; display: flex; gap: 4px; flex-wrap: wrap;">
+                        @for (day of dog.dias_asistencia; track day) {
+                          <span class="day-chip" style="background: #e3f2fd; color: #1976d2; padding: 2px 6px; border-radius: 4px; font-weight: 500;">{{ day | date:'d MMM' : '' : 'es-ES' }}</span>
+                        }
+                      </div>
+                    }
                   </div>
                 </div>
                 <!-- Position Selection if checked -->

@@ -147,7 +147,7 @@ export const routes: Routes = [
     },
     {
         path: 'gestionar-perros',
-        canActivate: [authGuard],
+        canActivate: [memberGuard],
         children: [
             {
                 path: '',
@@ -211,19 +211,19 @@ export const routes: Routes = [
     {
         path: 'galeria-videos',
         loadComponent: () => import('./components/galeria-videos/video-list/video-list.component').then(m => m.VideoListComponent),
-        canActivate: [authGuard],
+        canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'galeria-videos/subir',
         loadComponent: () => import('./components/galeria-videos/upload-video/upload-video.component').then(m => m.UploadVideoComponent),
-        canActivate: [authGuard],
+        canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'recursos',
         loadComponent: () => import('./components/recursos/recursos-list/recursos-list.component').then(m => m.RecursosListComponent),
-        canActivate: [authGuard],
+        canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
@@ -247,7 +247,7 @@ export const routes: Routes = [
     {
         path: 'explorar/salud-deportiva',
         loadComponent: () => import('./components/explorar/salud-deportiva/salud-deportiva').then(m => m.SaludDeportivaComponent),
-        canActivate: [authGuard],
+        canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: 'Salud Deportiva' }
     },
     {

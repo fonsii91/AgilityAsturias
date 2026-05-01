@@ -24,9 +24,14 @@ class CompetitionController extends Controller
                 $comp->is_attending = $userAttendance ? true : false;
                 $comp->dias_asistencia = $userAttendance && $userAttendance->pivot->dias_asistencia ? json_decode($userAttendance->pivot->dias_asistencia, true) : [];
 
-                $comp->attending_dog_ids = $comp->attendingDogs()
-                    ->wherePivot('user_id', $user->id)
-                    ->pluck('dogs.id');
+                $attendingDogsPivot = $comp->attendingDogs()->wherePivot('user_id', $user->id)->get();
+                $comp->attending_dog_ids = $attendingDogsPivot->pluck('id');
+                $comp->attending_dogs_details = $attendingDogsPivot->map(function ($dog) {
+                    return [
+                        'id' => $dog->id,
+                        'dias_asistencia' => $dog->pivot->dias_asistencia ? json_decode($dog->pivot->dias_asistencia, true) : []
+                    ];
+                });
                 return $comp;
             });
         }
@@ -120,7 +125,11 @@ class CompetitionController extends Controller
             'dog_ids' => 'nullable|array',
             'dog_ids.*' => 'exists:dogs,id',
             'dias_asistencia' => 'nullable|array',
-            'dias_asistencia.*' => 'string'
+            'dias_asistencia.*' => 'string',
+            'dogs_attendance' => 'nullable|array',
+            'dogs_attendance.*.dog_id' => 'required_with:dogs_attendance|exists:dogs,id',
+            'dogs_attendance.*.dias_asistencia' => 'nullable|array',
+            'dogs_attendance.*.dias_asistencia.*' => 'string'
         ]);
 
         $competition = Competition::findOrFail($id);
@@ -136,25 +145,34 @@ class CompetitionController extends Controller
 
         // Attach dogs (verify they belong to user)
         $userDogs = $user->dogs()->pluck('dogs.id')->toArray();
-        if ($request->has('dog_ids')) {
-            $validDogIds = collect($request->dog_ids)->intersect($userDogs)->toArray();
+        
+        \Illuminate\Support\Facades\DB::table('competition_dog')
+            ->where('competition_id', $competition->id)
+            ->where('user_id', $user->id)
+            ->delete();
 
-            // Detach dog entries specifically tied to this user to refresh them
-            \Illuminate\Support\Facades\DB::table('competition_dog')
-                ->where('competition_id', $competition->id)
-                ->where('user_id', $user->id)
-                ->delete();
+        if ($request->has('dogs_attendance')) {
+            $dogsAttendance = collect($request->dogs_attendance)->filter(function ($item) use ($userDogs) {
+                return in_array($item['dog_id'], $userDogs);
+            });
 
-            // Re-attach selected dogs passing the user_id context
-            foreach ($validDogIds as $dogId) {
-                $competition->attendingDogs()->attach($dogId, ['user_id' => $user->id]);
+            foreach ($dogsAttendance as $att) {
+                $dogPivotData = ['user_id' => $user->id];
+                if (isset($att['dias_asistencia'])) {
+                    $dogPivotData['dias_asistencia'] = json_encode($att['dias_asistencia']);
+                }
+                $competition->attendingDogs()->attach($att['dog_id'], $dogPivotData);
             }
-        } else {
-            // Remove all user's dogs entries for this competition
-            \Illuminate\Support\Facades\DB::table('competition_dog')
-                ->where('competition_id', $competition->id)
-                ->where('user_id', $user->id)
-                ->delete();
+        } elseif ($request->has('dog_ids')) {
+            // Fallback for legacy format
+            $validDogIds = collect($request->dog_ids)->intersect($userDogs)->toArray();
+            foreach ($validDogIds as $dogId) {
+                $dogPivotData = ['user_id' => $user->id];
+                if ($request->has('dias_asistencia')) {
+                    $dogPivotData['dias_asistencia'] = json_encode($request->dias_asistencia);
+                }
+                $competition->attendingDogs()->attach($dogId, $dogPivotData);
+            }
         }
 
         return response()->json(['message' => 'Attendance recorded successfully']);
@@ -185,7 +203,11 @@ class CompetitionController extends Controller
             $user->attending_dogs = $competition->attendingDogs()
                 ->wherePivot('user_id', $user->id)
                 ->select('dogs.id', 'dogs.name', 'dogs.photo_url')
-                ->get();
+                ->get()
+                ->map(function ($dog) {
+                    $dog->dias_asistencia = $dog->pivot->dias_asistencia ? json_decode($dog->pivot->dias_asistencia, true) : [];
+                    return $dog;
+                });
             $user->dias_asistencia = $user->pivot->dias_asistencia ? json_decode($user->pivot->dias_asistencia, true) : [];
             return $user;
         });

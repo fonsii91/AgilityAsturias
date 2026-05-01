@@ -13,5 +13,6 @@ export interface Competition {
 
     isAttending?: boolean;
     attendingDogIds?: number[];
+    attendingDogsDetails?: {id: number, dias_asistencia: string[]}[];
     diasAsistencia?: string[];
 }

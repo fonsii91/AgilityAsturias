@@ -72,18 +72,22 @@
           }
         </div>
       </div>
-      <!-- Absolute positioned actions for staff -->
-      @if (canManage()) {
-      <div class="staff-actions">
-        <button class="action-btn edit-btn" [routerLink]="['/recursos/editar', resource.id]"
-          (click)="$event.stopPropagation()" title="Editar">
-          <span class="material-icons">edit</span>
+      <div class="resource-actions">
+        @if (resource.type === 'document') {
+        <button mat-icon-button color="primary" (click)="downloadResource(resource); $event.stopPropagation()" matTooltip="Descargar archivo">
+          <mat-icon>download</mat-icon>
         </button>
-        <button class="action-btn delete-btn" (click)="deleteResource($event, resource)" title="Eliminar">
-          <span class="material-icons">delete</span>
+        }
+        @if (canManage()) {
+        <button mat-icon-button color="accent" [routerLink]="['/recursos/editar', resource.id]"
+          (click)="$event.stopPropagation()" matTooltip="Editar">
+          <mat-icon>edit</mat-icon>
         </button>
+        <button mat-icon-button color="warn" (click)="deleteResource($event, resource)" matTooltip="Eliminar">
+          <mat-icon>delete</mat-icon>
+        </button>
+        }
       </div>
-      }
     </div>
     }
   </div>

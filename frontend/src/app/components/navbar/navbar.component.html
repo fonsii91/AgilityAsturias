@@ -205,19 +205,19 @@
       <div class="dropdown-divider"></div>
       <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item"><span
       class="material-icons">person</span> Mi Perfil</a>
-      <a routerLink="/gestionar-perros" (click)="closeMenu()" class="dropdown-item"><span
-      class="material-icons">pets</span> Mis Perros</a>
         @if (authService.isMember()) {
-        <a routerLink="/mis-reservas" (click)="closeMenu()"
-          class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
+          <a routerLink="/gestionar-perros" (click)="closeMenu()" class="dropdown-item"><span
+          class="material-icons">pets</span> Mis Perros</a>
+          <a routerLink="/mis-reservas" (click)="closeMenu()"
+            class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
+          <div class="dropdown-divider"></div>
+          <a routerLink="/novedades" (click)="closeMenu()" class="dropdown-item">
+            <span class="material-icons">new_releases</span> Novedades
+          </a>
+          <a (click)="openSugerenciaDialog()" class="dropdown-item" style="cursor: pointer;">
+            <span class="material-icons">bug_report</span> Sugerencias / Bugs
+          </a>
         }
-        <div class="dropdown-divider"></div>
-        <a routerLink="/novedades" (click)="closeMenu()" class="dropdown-item">
-          <span class="material-icons">new_releases</span> Novedades
-        </a>
-        <a (click)="openSugerenciaDialog()" class="dropdown-item" style="cursor: pointer;">
-          <span class="material-icons">bug_report</span> Sugerencias / Bugs
-        </a>
 
         <div class="dropdown-divider"></div>
 

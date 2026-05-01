@@ -144,6 +144,14 @@ class AttendanceController extends Controller
             ->orderBy('fecha_evento', 'desc')
             ->get();
 
+        $competitions->transform(function ($comp) {
+            $comp->attendingDogs->transform(function ($dog) {
+                $dog->dias_asistencia = $dog->pivot->dias_asistencia ? json_decode($dog->pivot->dias_asistencia, true) : [];
+                return $dog;
+            });
+            return $comp;
+        });
+
         return response()->json($competitions);
     }
 
@@ -186,7 +194,11 @@ class AttendanceController extends Controller
                 $pos = !empty($dogData['position']) ? $dogData['position'] : '4+';
                 
                 $oldUserId = isset($originalPivots[$dogData['id']]) ? $originalPivots[$dogData['id']]->user_id : null;
+                $oldDias = isset($originalPivots[$dogData['id']]) ? $originalPivots[$dogData['id']]->dias_asistencia : null;
                 $syncData[$dogData['id']] = ['position' => $pos, 'user_id' => $oldUserId];
+                if ($oldDias) {
+                    $syncData[$dogData['id']]['dias_asistencia'] = $oldDias;
+                }
             }
 
             // Sync new attendees
@@ -255,12 +267,21 @@ class AttendanceController extends Controller
                         if ($competition->tipo === 'competicion') {
                             $diasAsistencia = [$competition->fecha_evento]; // Default
 
-                            if (isset($data['user_id']) && $data['user_id']) {
-                                $userAttendance = $competition->attendees()->where('users.id', $data['user_id'])->first();
-                                if ($userAttendance && $userAttendance->pivot->dias_asistencia) {
-                                    $parsed = json_decode($userAttendance->pivot->dias_asistencia, true);
-                                    if (!empty($parsed)) {
-                                        $diasAsistencia = $parsed;
+                            // First, try dog-specific days
+                            if (isset($data['dias_asistencia']) && $data['dias_asistencia']) {
+                                $parsed = json_decode($data['dias_asistencia'], true);
+                                if (!empty($parsed)) {
+                                    $diasAsistencia = $parsed;
+                                }
+                            } else {
+                                // Fallback to user days
+                                if (isset($data['user_id']) && $data['user_id']) {
+                                    $userAttendance = $competition->attendees()->where('users.id', $data['user_id'])->first();
+                                    if ($userAttendance && $userAttendance->pivot->dias_asistencia) {
+                                        $parsed = json_decode($userAttendance->pivot->dias_asistencia, true);
+                                        if (!empty($parsed)) {
+                                            $diasAsistencia = $parsed;
+                                        }
                                     }
                                 }
                             }

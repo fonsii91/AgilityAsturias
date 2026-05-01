@@ -11,8 +11,8 @@ describe('AdminSugerencias', () => {
   let mockToastService: any;
 
   const mockSuggestions: Suggestion[] = [
-    { id: 1, type: 'bug', content: 'Bug 1', status: 'pending', created_at: '2024-01-01', user: { name: 'User 1' } },
-    { id: 2, type: 'suggestion', content: 'Sugg 1', status: 'resolved', created_at: '2024-01-02', user: { name: 'User 2' } }
+    { id: 1, type: 'bug', content: 'Bug 1', status: 'pending', created_at: '2024-01-01', user: { id: 1, name: 'User 1', email: 'user1@test.com' } } as Suggestion,
+    { id: 2, type: 'suggestion', content: 'Sugg 1', status: 'resolved', created_at: '2024-01-02', user: { id: 2, name: 'User 2', email: 'user2@test.com' } } as Suggestion
   ];
 
   beforeEach(() => {

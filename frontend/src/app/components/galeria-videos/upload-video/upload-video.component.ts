@@ -106,6 +106,17 @@ export class UploadVideoComponent implements OnInit {
         return dog.users.map((u: any) => u.name).join(', ');
     }
 
+    get pastAndCurrentCompetitions(): import('../../../models/competition.model').Competition[] {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return this.compService.getCompetitions()().filter(comp => {
+            if (!comp.fechaEvento) return true;
+            const compDate = new Date(comp.fechaEvento);
+            compDate.setHours(0, 0, 0, 0);
+            return compDate.getTime() <= today.getTime();
+        });
+    }
+
     async onFileSelected(event: any) {
         const file = event.target.files[0];
         if (file) {

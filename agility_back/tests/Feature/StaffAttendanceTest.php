@@ -302,4 +302,68 @@ class StaffAttendanceTest extends TestCase
             'position' => '3'
         ]);
     }
+
+    public function test_staff_can_confirm_competition_attendance_for_multiday_event_per_dog()
+    {
+        Sanctum::actingAs($this->staff);
+
+        $saturday = Carbon::now()->subDays(3)->format('Y-m-d');
+        $sunday = Carbon::now()->subDays(2)->format('Y-m-d');
+        
+        $competition = Competition::factory()->create([
+            'club_id' => $this->club->id,
+            'fecha_evento' => $saturday,
+            'fecha_fin_evento' => $sunday,
+            'tipo' => 'competicion',
+            'nombre' => 'MultiDay Test',
+            'attendance_verified' => false,
+        ]);
+
+        $dog2 = Dog::factory()->create(['user_id' => $this->member->id, 'club_id' => $this->club->id]);
+        $this->member->dogs()->attach($dog2->id);
+
+        // Dog 1: Saturday, Dog 2: Sunday
+        $competition->attendees()->attach($this->member->id, ['dias_asistencia' => json_encode([$saturday, $sunday])]);
+        
+        \Illuminate\Support\Facades\DB::table('competition_dog')->insert([
+            ['competition_id' => $competition->id, 'dog_id' => $this->dog->id, 'user_id' => $this->member->id, 'dias_asistencia' => json_encode([$saturday])],
+            ['competition_id' => $competition->id, 'dog_id' => $dog2->id, 'user_id' => $this->member->id, 'dias_asistencia' => json_encode([$sunday])]
+        ]);
+
+        $payload = [
+            'competition_id' => $competition->id,
+            'attended_dogs' => [
+                ['id' => $this->dog->id, 'position' => '4+'],
+                ['id' => $dog2->id, 'position' => '4+']
+            ],
+            'new_attendees' => []
+        ];
+
+        $response = $this->postJson('/api/admin/attendance/confirm-competition', $payload);
+        $response->assertStatus(200);
+
+        // Verify workload was created for dog 1 only on Saturday
+        $this->assertDatabaseHas('dog_workloads', [
+            'dog_id' => $this->dog->id,
+            'source_type' => 'auto_competition',
+            'date' => $saturday . ' 00:00:00',
+        ]);
+        $this->assertDatabaseMissing('dog_workloads', [
+            'dog_id' => $this->dog->id,
+            'source_type' => 'auto_competition',
+            'date' => $sunday . ' 00:00:00',
+        ]);
+
+        // Verify workload was created for dog 2 only on Sunday
+        $this->assertDatabaseHas('dog_workloads', [
+            'dog_id' => $dog2->id,
+            'source_type' => 'auto_competition',
+            'date' => $sunday . ' 00:00:00',
+        ]);
+        $this->assertDatabaseMissing('dog_workloads', [
+            'dog_id' => $dog2->id,
+            'source_type' => 'auto_competition',
+            'date' => $saturday . ' 00:00:00',
+        ]);
+    }
 }

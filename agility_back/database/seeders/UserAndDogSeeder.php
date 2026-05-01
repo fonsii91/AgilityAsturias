@@ -51,13 +51,14 @@ class UserAndDogSeeder extends Seeder
         foreach ($users as $user) {
             $numDogs = rand(1, 3);
             for ($i = 0; $i < $numDogs; $i++) {
-                \App\Models\Dog::create([
-                    'user_id' => $user->id,
+                $dog = \App\Models\Dog::create([
                     'name' => \Faker\Factory::create()->firstName . ' (Perro)',
                     'breed' => $breeds[array_rand($breeds)],
                     'age' => rand(1, 10),
-                    'points' => rand(0, 50) // seed with some points for testing
+                    'points' => rand(0, 50), // seed with some points for testing
+                    'club_id' => 1
                 ]);
+                $user->dogs()->syncWithoutDetaching([$dog->id => ['is_primary_owner' => true]]);
             }
         }
     }

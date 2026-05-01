@@ -8,6 +8,7 @@ import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@ang
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { CompetitionService } from './competition.service';
+import { Competition } from '../models/competition.model';
 import { environment } from '../../environments/environment';
 
 describe('CompetitionService', () => {
@@ -99,7 +100,7 @@ describe('CompetitionService', () => {
             lugar: 'Valencia',
             fechaEvento: '2026-08-15',
             tipo: 'competicion' as const
-        };
+        } as unknown as Omit<Competition, 'id'>;
 
         const mockResponse = {
             id: 3,
@@ -137,13 +138,13 @@ describe('CompetitionService', () => {
 
     it('should update a competition and update signals', async () => {
         // Initial setup to have a competition in the signal
-        service.getCompetitions().set([{ id: 1, nombre: 'Old Name', tipo: 'competicion' }]);
+        service.getCompetitions().set([{ id: 1, nombre: 'Old Name', tipo: 'competicion' } as unknown as Competition]);
 
         const updatedComp = {
             id: 1,
             nombre: 'Updated Name',
             tipo: 'competicion' as const
-        };
+        } as unknown as Competition;
 
         const mockResponse = {
             id: 1,
@@ -165,7 +166,7 @@ describe('CompetitionService', () => {
     });
 
     it('should delete a competition and update signals', async () => {
-        service.getCompetitions().set([{ id: 1, nombre: 'Comp 1', tipo: 'competicion' }]);
+        service.getCompetitions().set([{ id: 1, nombre: 'Comp 1', tipo: 'competicion' } as unknown as Competition]);
 
         const promise = service.deleteCompetition(1);
 

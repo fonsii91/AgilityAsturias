@@ -36,7 +36,7 @@
       <div class="input-wrapper">
         <select formControlName="competition_id">
           <option value="">Ninguna</option>
-          @for (comp of compService.getCompetitions()(); track comp) {
+          @for (comp of pastAndCurrentCompetitions; track comp) {
           <option [value]="comp.id">
             {{ comp.nombre }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : ''
             }}

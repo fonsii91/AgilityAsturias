@@ -144,4 +144,54 @@ describe('RsceTrackerComponent', () => {
     expect(component.progressTitleA()).toContain('Agility');
     expect(component.progressTitleB()).toContain('Jumping');
   });
+
+  it('should calculate Campeonato de España (CE) progress correctly for Grade 2', () => {
+    component.selectedDog.set({ id: 1, name: 'Fido', pivot: { rsce_grade: '2' }, rsce_category: 'M' } as any);
+    component.selectedDogId.set(1);
+    
+    const currentYear = new Date().getFullYear();
+    component.ceTargetYear.set(currentYear);
+    
+    const tracks = [
+      // Req: Agility 4.00, Jumping 4.20
+      { id: 1, dog_id: 1, date: `${currentYear}-05-01`, manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.10 }, // Speed Met
+      { id: 2, dog_id: 1, date: `${currentYear}-05-02`, manga_type: 'Agility', qualification: 'Excelente a 0', speed: 3.90 }, // Speed Not Met
+      { id: 3, dog_id: 1, date: `${currentYear}-05-03`, manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.30 }, // Speed Met
+      { id: 4, dog_id: 1, date: `${currentYear}-05-04`, manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.10 }, // Speed Not Met
+      { id: 5, dog_id: 1, date: `${currentYear}-05-05`, manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.10 }, // Speed Not Met
+      { id: 6, dog_id: 1, date: `${currentYear}-05-06`, manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.10 }, // Speed Not Met (3rd no-speed, 1 should be discarded)
+    ];
+    
+    component.filteredTracks.set(tracks as any);
+    component.calculateProgress();
+
+    expect(component.ceAgilityCount()).toBe(2);
+    expect(component.ceAgilitySpeedCount()).toBe(1);
+    expect(component.ceJumpingCount()).toBe(3); // Capped at speedTotal(1) + 2 = 3
+    expect(component.ceJumpingSpeedCount()).toBe(1);
+    expect(component.ceDiscardedBySpeedCount()).toBe(1); // The 3rd no-speed jumping track is discarded
+    expect(component.ceMet()).toBe(false);
+  });
+
+  it('should discard non-speed tracks for Campeonato de España in Grade 3', () => {
+    component.selectedDog.set({ id: 1, name: 'Fido', pivot: { rsce_grade: '3' }, rsce_category: 'M' } as any);
+    component.selectedDogId.set(1);
+    
+    const currentYear = new Date().getFullYear();
+    component.ceTargetYear.set(currentYear);
+    
+    const tracks = [
+      // Req: Agility 4.50
+      { id: 1, dog_id: 1, date: `${currentYear}-05-01`, manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.60 }, // Speed Met
+      { id: 2, dog_id: 1, date: `${currentYear}-05-02`, manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.40 }, // Speed Not Met
+    ];
+    
+    component.filteredTracks.set(tracks as any);
+    component.calculateProgress();
+
+    expect(component.ceAgilityCount()).toBe(1); // Only speed tracks count
+    expect(component.ceAgilitySpeedCount()).toBe(1);
+    expect(component.ceDiscardedBySpeedCount()).toBe(1); // The 4.40 track is discarded
+    expect(component.ceMet()).toBe(false);
+  });
 });

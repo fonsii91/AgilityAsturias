@@ -64,8 +64,8 @@ describe('InfoReservasComponent', () => {
         // Check user grouping
         const user1 = todaySlots[0].reservations.find((r: any) => r.userName === 'Juan Perez');
         expect(user1).toBeDefined();
-        expect(user1.selectedDogs.length).toBe(1);
-        expect(user1.selectedDogs[0].name).toBe('Rex');
+        expect(user1!.selectedDogs.length).toBe(1);
+        expect(user1!.selectedDogs[0].name).toBe('Rex');
     });
 
     it('should compute future reservations and group them by date and time', () => {

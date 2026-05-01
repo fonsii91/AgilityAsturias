@@ -39,6 +39,17 @@ export class RsceTrackerComponent implements OnInit {
   clubName = computed(() => this.tenantService.tenantInfo()?.name || environment.clubConfig.name);
   dogs = this.dogService.getDogs();
   competitions = this.competitionService.getCompetitions();
+
+  pastAndCurrentCompetitions = computed(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.competitions().filter(comp => {
+      if (!comp.fechaEvento) return true;
+      const compDate = new Date(comp.fechaEvento);
+      compDate.setHours(0, 0, 0, 0);
+      return compDate.getTime() <= today.getTime();
+    });
+  });
   
   selectedDogId = signal<number | null>(null);
   selectedDog = signal<Dog | null>(null);
@@ -66,6 +77,25 @@ export class RsceTrackerComponent implements OnInit {
   // Arrays for Medals
   slotArrayA = [1, 2, 3];
   slotArrayB = [1, 2, 3, 4];
+
+  // CE Progress state
+  ceMet = signal<boolean>(false);
+  ceTargetYear = signal<number>(new Date().getFullYear());
+  availableCEYears = [new Date().getFullYear(), new Date().getFullYear() - 1];
+  ceDiscardedBySpeedCount = signal<number>(0);
+  
+  ceAgilityCount = signal<number>(0);
+  ceAgilitySpeedCount = signal<number>(0);
+  ceAgilityRequired = signal<number>(6);
+  ceAgilitySpeedRequired = signal<number>(4);
+  
+  ceJumpingCount = signal<number>(0);
+  ceJumpingSpeedCount = signal<number>(0);
+  ceJumpingRequired = signal<number>(6);
+  ceJumpingSpeedRequired = signal<number>(4);
+  
+  slotArrayCE_A = [1, 2, 3, 4, 5, 6];
+  slotArrayCE_J = [1, 2, 3, 4, 5, 6];
 
   // Form
   isFormOpen = signal(false);
@@ -224,6 +254,13 @@ export class RsceTrackerComponent implements OnInit {
     this.progressValueA.set(0);
     this.progressValueB.set(0);
     this.progressMet.set(false);
+    
+    this.ceMet.set(false);
+    this.ceDiscardedBySpeedCount.set(0);
+    this.ceAgilityCount.set(0);
+    this.ceAgilitySpeedCount.set(0);
+    this.ceJumpingCount.set(0);
+    this.ceJumpingSpeedCount.set(0);
   }
 
   calculateProgress() {
@@ -303,6 +340,84 @@ export class RsceTrackerComponent implements OnInit {
         this.progressSubtitleA.set('El perro está compitiendo al más alto nivel.');
         this.progressValueA.set(100);
         this.progressMet.set(true);
+    }
+
+    // Campeonato de España (CE) Logic for Grades 2 and 3
+    if (grade === '2' || grade === '3') {
+        const targetYear = this.ceTargetYear();
+        
+        let seasonStartDate = new Date(`${targetYear}-01-01T00:00:00`);
+        let seasonEndDate = new Date(`${targetYear}-12-31T23:59:59`);
+        
+        const ceTracks = tracks.filter(t => {
+            const isExc = (t.qualification === 'Excelente a 0' || t.qualification === 'EXCELENTE' || t.qualification === 'Excelente');
+            if (!isExc || !t.date) return false;
+            const tDate = new Date(t.date as string);
+            return tDate >= seasonStartDate && tDate <= seasonEndDate;
+        });
+
+        const ceAgilityTracks = ceTracks.filter(t => t.manga_type.startsWith('Agility'));
+        const ceJumpingTracks = ceTracks.filter(t => t.manga_type.startsWith('Jumping'));
+
+        let aSpeedReq = 0;
+        let jSpeedReq = 0;
+        
+        if (grade === '2') {
+            aSpeedReq = (category === 'S' || category === 'M') ? 4.00 : 4.20;
+            jSpeedReq = (category === 'S' || category === 'M') ? 4.20 : 4.40;
+            
+            this.ceAgilityRequired.set(6);
+            this.ceAgilitySpeedRequired.set(4);
+            this.ceJumpingRequired.set(6);
+            this.ceJumpingSpeedRequired.set(4);
+        } else {
+            aSpeedReq = (category === 'S' || category === 'M') ? 4.50 : 4.70;
+            jSpeedReq = (category === 'S' || category === 'M') ? 4.70 : 4.90;
+            
+            this.ceAgilityRequired.set(4);
+            this.ceAgilitySpeedRequired.set(4);
+            this.ceJumpingRequired.set(4);
+            this.ceJumpingSpeedRequired.set(4);
+        }
+
+        let aTotal = ceAgilityTracks.length;
+        const aSpeedTotal = ceAgilityTracks.filter(t => t.speed && t.speed >= aSpeedReq).length;
+        
+        let jTotal = ceJumpingTracks.length;
+        const jSpeedTotal = ceJumpingTracks.filter(t => t.speed && t.speed >= jSpeedReq).length;
+
+        let discarded = 0;
+
+        if (grade === '3') {
+            // En Grado 3, TODAS deben ser de velocidad. Las que no tienen velocidad no sirven de nada.
+            discarded = (aTotal - aSpeedTotal) + (jTotal - jSpeedTotal);
+            aTotal = aSpeedTotal;
+            jTotal = jSpeedTotal;
+        } else {
+            // En Grado 2, se admiten hasta 2 sin velocidad por disciplina (6 total, 4 velocidad).
+            const aNoSpeed = aTotal - aSpeedTotal;
+            if (aNoSpeed > 2) {
+                discarded += (aNoSpeed - 2);
+                aTotal = aSpeedTotal + 2;
+            }
+            
+            const jNoSpeed = jTotal - jSpeedTotal;
+            if (jNoSpeed > 2) {
+                discarded += (jNoSpeed - 2);
+                jTotal = jSpeedTotal + 2;
+            }
+        }
+
+        this.ceDiscardedBySpeedCount.set(discarded);
+        this.ceAgilityCount.set(aTotal);
+        this.ceAgilitySpeedCount.set(aSpeedTotal);
+        this.ceJumpingCount.set(jTotal);
+        this.ceJumpingSpeedCount.set(jSpeedTotal);
+
+        const aMet = aTotal >= this.ceAgilityRequired() && aSpeedTotal >= this.ceAgilitySpeedRequired();
+        const jMet = jTotal >= this.ceJumpingRequired() && jSpeedTotal >= this.ceJumpingSpeedRequired();
+
+        this.ceMet.set(aMet && jMet);
     }
     
     // Confetti effect
@@ -463,6 +578,28 @@ export class RsceTrackerComponent implements OnInit {
 
   getFilledSlotsB(): number {
     return Math.round((this.progressValueB() / 100) * this.slotArrayB.length);
+  }
+
+  getCESlotArrayA(): number[] {
+    return this.slotArrayCE_A.slice(0, this.ceAgilityRequired());
+  }
+
+  getCESlotArrayJ(): number[] {
+    return this.slotArrayCE_J.slice(0, this.ceJumpingRequired());
+  }
+
+  getCESlotStatus(type: 'agility' | 'jumping', index: number): 'empty' | 'speed' | 'nospeed' {
+    const total = type === 'agility' ? this.ceAgilityCount() : this.ceJumpingCount();
+    const speedTotal = type === 'agility' ? this.ceAgilitySpeedCount() : this.ceJumpingSpeedCount();
+    
+    if (index >= total) return 'empty';
+    if (index < speedTotal) return 'speed';
+    return 'nospeed';
+  }
+
+  setCEYear(year: number) {
+    this.ceTargetYear.set(year);
+    this.calculateProgress();
   }
 
   printPassport() {
