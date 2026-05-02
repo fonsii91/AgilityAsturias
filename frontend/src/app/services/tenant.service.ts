@@ -125,36 +125,39 @@ export class TenantService {
       document.title = info.name;
     }
 
-    if (info.logo_url) {
-      const link: HTMLLinkElement = document.querySelector("link[rel~='icon']") || document.createElement('link');
+    const logoUrl = info.logo_url || '/ClubAgilityBlue.png';
+
+    let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+    if (!link) {
+      link = document.createElement('link');
       link.rel = 'icon';
-      link.href = info.logo_url;
-      if (!link.parentNode) {
-        document.head.appendChild(link);
-      }
+      document.head.appendChild(link);
     }
+    link.href = logoUrl;
+
+    let appleLink: HTMLLinkElement | null = document.querySelector("link[rel~='apple-touch-icon']");
+    if (!appleLink) {
+      appleLink = document.createElement('link');
+      appleLink.rel = 'apple-touch-icon';
+      document.head.appendChild(appleLink);
+    }
+    appleLink.href = logoUrl;
 
     // Actualizar dinámicamente el manifest de PWA desde el backend
-    const manifestLink: HTMLLinkElement | null = document.querySelector('link[rel="manifest"]');
-    if (manifestLink) {
-      let manifestUrl = `${environment.apiUrl}/manifest.json`;
-      if (this.tenantSlug()) {
-        manifestUrl += `?slug=${this.tenantSlug()}`;
-      } else if (this.getTenantDomain()) {
-        manifestUrl += `?domain=${this.getTenantDomain()}`;
-      }
-      manifestLink.href = manifestUrl;
+    let manifestLink: HTMLLinkElement | null = document.querySelector('link[rel="manifest"]');
+    if (!manifestLink) {
+      manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      document.head.appendChild(manifestLink);
     }
-
-    // Soporte para iOS (Apple Touch Icon)
-    if (info.logo_url) {
-      const appleLink: HTMLLinkElement = document.querySelector("link[rel~='apple-touch-icon']") || document.createElement('link');
-      appleLink.rel = 'apple-touch-icon';
-      appleLink.href = info.logo_url;
-      if (!appleLink.parentNode) {
-        document.head.appendChild(appleLink);
-      }
+    
+    let manifestUrl = `${environment.apiUrl}/manifest.json`;
+    if (this.tenantSlug()) {
+      manifestUrl += `?slug=${this.tenantSlug()}`;
+    } else if (this.getTenantDomain()) {
+      manifestUrl += `?domain=${this.getTenantDomain()}`;
     }
+    manifestLink.href = manifestUrl;
   }
 
   public getTenantSlug(): string | null {

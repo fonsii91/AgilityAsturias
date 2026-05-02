@@ -35,6 +35,7 @@ description: Datos para desplegar en producción el proyecto
 - **[Completado]** Despliegue v1.1.27 (01/05/2026): Despliegue en producción finalizado con éxito (130 backend, 244 frontend tests superados). Mejoras UX/UI integrales en el módulo de Salud Deportiva: predicción inteligente de la exigencia física basada en contextos (clases/competiciones) e integración de documentación veterinaria referenciada para la usabilidad.
 - **[Completado]** Fase 9 (01/05/2026): Configurado servidor Nginx y Certbot SSL para que la aplicación multi-tenant soporte correctamente HTTPS en el nuevo subdominio `patitas.clubagility.com` y `www.patitas.clubagility.com`.
 - **[Completado]** Despliegue v1.1.28 (02/05/2026): Despliegue en producción finalizado con éxito (132 backend tests, 8 frontend unit tests directos). Implementada gamificación inteligente para el Campeonato de España en la Bitácora RSCE, con cálculo automatizado de requisitos de velocidad y selector UX de pestañas anuales.
+- **[Completado]** Despliegue v1.1.29 (02/05/2026): Despliegue en producción finalizado con éxito (132 backend tests, 240 frontend tests). Implementado sistema dinámico de PWA y estandarización del branding genérico (ClubAgility) como soporte fallback global.
 
 
 ---

@@ -29,13 +29,35 @@ class ClubController extends Controller
 
     public function manifest(Request $request)
     {
+        $clubDomain = $request->header('X-Club-Domain') ?: $request->query('domain');
+        $clubSlug = $request->header('X-Club-Slug') ?: $request->query('slug');
+
         $club = null;
-        if (app()->bound('active_club_id')) {
+        if ($clubDomain) {
+            $club = Club::where('domain', $clubDomain)->first();
+        }
+        if (!$club && $clubSlug) {
+            $club = Club::where('slug', $clubSlug)->first();
+        }
+
+        if (!$club && app()->bound('active_club_id')) {
             $club = Club::find(app('active_club_id'));
         }
 
         if ($club) {
             $primaryColor = $club->settings['colors']['primary'] ?? ($club->settings['primary_color'] ?? '#0073CF');
+            
+            $iconType = 'image/png';
+            $logoUrl = $club->logo_url ?? '/ClubAgilityBlue.png';
+            $lowerUrl = strtolower($logoUrl);
+            if (str_ends_with($lowerUrl, '.jpg') || str_ends_with($lowerUrl, '.jpeg')) {
+                $iconType = 'image/jpeg';
+            } elseif (str_ends_with($lowerUrl, '.svg')) {
+                $iconType = 'image/svg+xml';
+            } elseif (str_ends_with($lowerUrl, '.webp')) {
+                $iconType = 'image/webp';
+            }
+
             return response()->json([
                 'name' => $club->name,
                 'short_name' => $club->name,
@@ -45,9 +67,15 @@ class ClubController extends Controller
                 'background_color' => '#f8fafc',
                 'icons' => [
                     [
-                        'src' => $club->logo_url ?? '/icons/icon-512x512.png',
-                        'sizes' => '192x192 512x512',
-                        'type' => 'image/png',
+                        'src' => $logoUrl,
+                        'sizes' => '192x192',
+                        'type' => $iconType,
+                        'purpose' => 'any maskable'
+                    ],
+                    [
+                        'src' => $logoUrl,
+                        'sizes' => '512x512',
+                        'type' => $iconType,
                         'purpose' => 'any maskable'
                     ]
                 ]
@@ -64,8 +92,14 @@ class ClubController extends Controller
             'background_color' => '#f8fafc',
             'icons' => [
                 [
-                    'src' => '/icons/icon-512x512.png',
-                    'sizes' => '192x192 512x512',
+                    'src' => '/ClubAgilityBlue.png',
+                    'sizes' => '192x192',
+                    'type' => 'image/png',
+                    'purpose' => 'any maskable'
+                ],
+                [
+                    'src' => '/ClubAgilityBlue.png',
+                    'sizes' => '512x512',
                     'type' => 'image/png',
                     'purpose' => 'any maskable'
                 ]

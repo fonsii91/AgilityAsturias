@@ -13,7 +13,7 @@ export const environment = {
     clubConfig: {
         name: "Agility Asturias",
         slogan: "Más que un deporte, una conexión única con tu perro.",
-        logoPath: "Images/Agility_Asturias_logo.jpg",
+        logoPath: "ClubAgilityBlue.png",
         colors: {
             primary: "#0073CF",
             accent: "#f6ae12ff",

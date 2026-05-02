@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.1.29",
+    "date": "2026-05-02",
+    "features": [
+      "¡Personalización al máximo nivel! Hemos actualizado la tecnología detrás de la instalación de la aplicación en el móvil. A partir de ahora, cuando guardes la app en tu pantalla de inicio, se descargará y mostrará automáticamente el logotipo exacto de tu club.",
+      "Hemos estandarizado los avatares por defecto: si una persona o un perrito aún no tienen foto de perfil, la aplicación mostrará elegantemente el logotipo oficial del club en su lugar, manteniendo la estética de la plataforma siempre impecable en todas las pantallas."
+    ]
+  },
+  {
     "version": "1.1.28",
     "date": "2026-05-02",
     "features": [
