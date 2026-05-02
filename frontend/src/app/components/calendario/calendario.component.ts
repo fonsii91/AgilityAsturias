@@ -180,6 +180,12 @@ export class CalendarioComponent implements AfterViewInit {
 
     switchTab(tab: 'info' | 'asistencia') {
         this.activeModalTab = tab;
+        if (tab === 'asistencia') {
+            this.viewingAttendees = true; // Auto-set this so it loads
+            if (this.selectedCompetition) {
+                this.loadAttendees();
+            }
+        }
     }
 
     backToList() {

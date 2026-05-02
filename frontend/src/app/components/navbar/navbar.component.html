@@ -194,7 +194,7 @@
           {{ user.name.charAt(0) || 'U' }}
         </div>
       }
-      <span class="dropdown-arrow">▼</span>
+      <span class="material-icons dropdown-arrow">expand_more</span>
     </button>
     <!-- Dropdown Menu -->
     <div class="user-dropdown-menu" [class.show]="isUserMenuOpen">
@@ -208,8 +208,6 @@
         @if (authService.isMember()) {
           <a routerLink="/gestionar-perros" (click)="closeMenu()" class="dropdown-item"><span
           class="material-icons">pets</span> Mis Perros</a>
-          <a routerLink="/mis-reservas" (click)="closeMenu()"
-            class="dropdown-item"><span class="material-icons">event_note</span> Mis Reservas</a>
           <div class="dropdown-divider"></div>
           <a routerLink="/novedades" (click)="closeMenu()" class="dropdown-item">
             <span class="material-icons">new_releases</span> Novedades

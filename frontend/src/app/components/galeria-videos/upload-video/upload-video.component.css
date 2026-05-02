@@ -6,7 +6,8 @@
 
 @media (max-width: 768px) {
     .form-container.auth-card {
-        margin: 1rem;
+        margin: 1rem auto;
+        width: calc(100% - 2rem);
         padding: 2rem 1.5rem;
     }
 }

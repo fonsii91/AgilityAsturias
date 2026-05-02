@@ -18,6 +18,7 @@ export class SugerenciaDialog {
   isSubmitting = false;
   tenantService = inject(TenantService);
   clubConfig = environment.clubConfig;
+  clubTheme = environment.clubConfig.colors;
   clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
   constructor(
     public dialogRef: MatDialogRef<SugerenciaDialog>,

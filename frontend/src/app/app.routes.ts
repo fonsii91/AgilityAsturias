@@ -46,12 +46,7 @@ export const routes: Routes = [
         canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: '' }
     },
-    {
-        path: 'mis-reservas',
-        loadComponent: () => import('./components/mis-reservas/mis-reservas.component').then(m => m.MisReservasComponent),
-        canActivate: [memberGuard],
-        title: titleResolver, data: { pageTitle: '' }
-    },
+
     {
         path: 'contacto',
         loadComponent: () => import('./components/contacto/contacto.component').then(m => m.ContactoComponent),

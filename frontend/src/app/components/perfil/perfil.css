@@ -723,16 +723,17 @@
 /* Mobile Responsive Breakpoint */
 @media (max-width: 600px) {
     .perfil-container {
-        margin: 1rem;
-        padding: 1.5rem;
+        margin: 0;
+        padding: 0;
+        border-radius: 0;
     }
 
     .profile-header {
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 15px;
-        padding: 2rem 1.5rem;
+        gap: 12px;
+        padding: 1.5rem 1rem;
     }
 
     .name-display {
@@ -740,12 +741,21 @@
     }
 
     .profile-avatar {
-        width: 90px;
-        height: 90px;
+        width: 80px;
+        height: 80px;
+        border-width: 3px;
     }
 
     .profile-info h2 {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
+    }
+
+    .rfec-section {
+        padding: 1.5rem;
+    }
+
+    .dogs-section {
+        padding: 1rem 1.5rem 2.5rem;
     }
 
     .rfec-card {
@@ -753,12 +763,13 @@
         width: 100%;
         box-sizing: border-box;
         text-align: left;
+        margin-top: 0.5rem;
     }
 
     .section-header {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
+        gap: 10px;
     }
 
     .section-header .btn-primary {
