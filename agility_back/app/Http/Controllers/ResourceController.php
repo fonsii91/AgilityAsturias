@@ -28,7 +28,7 @@ class ResourceController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
-        if (!in_array($user->role, ['staff', 'admin'])) {
+        if (!in_array($user->role, ['staff', 'admin', 'manager'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -67,7 +67,7 @@ class ResourceController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        if (!in_array($user->role, ['staff', 'admin'])) {
+        if (!in_array($user->role, ['staff', 'admin', 'manager'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
@@ -128,7 +128,7 @@ class ResourceController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        if (!in_array($user->role, ['staff', 'admin'])) {
+        if (!in_array($user->role, ['staff', 'admin', 'manager'])) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

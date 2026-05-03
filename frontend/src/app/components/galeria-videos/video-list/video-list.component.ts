@@ -44,7 +44,7 @@ export class VideoListComponent implements OnInit {
     isLoading = true;
     hasReachedEnd = false;
     isFiltersOpen = false;
-    activeTab: 'horizontal' | 'vertical' = 'vertical';
+    activeTab: 'horizontal' | 'vertical' | 'all' = 'all';
     tabCounts = { vertical: 0, horizontal: 0 };
 
     selectedDogForProfile: Dog | null = null;
@@ -86,7 +86,7 @@ export class VideoListComponent implements OnInit {
         });
     }
 
-    goToTab(tab: 'horizontal' | 'vertical') {
+    goToTab(tab: 'horizontal' | 'vertical' | 'all') {
         if (this.activeTab !== tab) {
             this.activeTab = tab;
             this.loadVideos(1);
@@ -96,9 +96,11 @@ export class VideoListComponent implements OnInit {
     loadVideos(page: number = 1) {
         this.isLoading = true;
         const filters: any = {
-            search: this.searchQuery,
-            orientation: this.activeTab
+            search: this.searchQuery
         };
+        if (this.activeTab !== 'all') {
+            filters.orientation = this.activeTab;
+        }
 
         if (this.filterDateRange) filters.dateRange = this.filterDateRange;
         if (this.filterDogId) filters.dog_id = this.filterDogId;
@@ -112,8 +114,8 @@ export class VideoListComponent implements OnInit {
             next: (res) => {
                 this.videos = res.data;
                 
-                this.currentPage = res.current_page;
-                this.totalPages = res.last_page;
+                this.currentPage = Number(res.current_page);
+                this.totalPages = Number(res.last_page);
                 this.hasReachedEnd = this.currentPage >= this.totalPages;
                 
                 if (res.counts) {
@@ -149,8 +151,9 @@ export class VideoListComponent implements OnInit {
     }
 
     goToPage(page: number | string) {
-        if (typeof page === 'number' && page >= 1 && page <= this.totalPages && page !== this.currentPage) {
-            this.loadVideos(page);
+        const pageNum = Number(page);
+        if (!isNaN(pageNum) && pageNum >= 1 && pageNum <= this.totalPages && pageNum !== this.currentPage) {
+            this.loadVideos(pageNum);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     }
@@ -165,6 +168,7 @@ export class VideoListComponent implements OnInit {
         this.filterDogId = '';
         this.filterCompetitionId = '';
         this.activeSort = 'latest';
+        this.activeTab = 'all';
         this.loadVideos(1);
     }
 

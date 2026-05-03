@@ -6,11 +6,12 @@ import { CompetitionService } from '../../services/competition.service';
 import { Competition } from '../../models/competition.model';
 import { ImageCompressorService } from '../../services/image-compressor.service';
 import { ToastService } from '../../services/toast.service';
+import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 
 @Component({
     selector: 'app-crud-competicion',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, MatIconModule],
+    imports: [CommonModule, ReactiveFormsModule, MatIconModule, InstruccionesComponent],
     templateUrl: './crud-competicion.component.html',
     styleUrl: './crud-competicion.component.css'
 })

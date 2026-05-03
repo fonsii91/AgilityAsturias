@@ -1,6 +1,39 @@
 <div class="crud-container">
   <div class="header">
-    <h2>Gestión de Eventos</h2>
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <h2 style="margin: 0;">Gestión de Eventos</h2>
+      <app-instrucciones titulo="Guía de Gestión de Eventos">
+        <h4 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Área de Administración</h4>
+        <p style="margin-bottom: 1.5rem; font-size: 0.95rem; color: #475569;">Esta es una sección exclusiva para el Staff. Los miembros no tienen acceso a este panel; ellos únicamente verán los eventos reflejados en su calendario.</p>
+
+        <ul style="padding-left: 0; list-style: none; margin-bottom: 0; display: flex; flex-direction: column; gap: 16px; color: #334155; font-size: 0.95rem;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">add_circle</span>
+            <span><strong>Crear Eventos:</strong> Añade competiciones oficiales o eventos internos del club. Configura fechas, plazos de inscripción y métodos de pago.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #06b6d4; flex-shrink: 0; margin-top: 2px;">calendar_month</span>
+            <span><strong>Visibilidad en Calendario:</strong> Todos los eventos que crees o modifiques aquí se mostrarán automáticamente en el apartado <strong>Calendario</strong> para que los miembros puedan verlos y apuntarse.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">person</span>
+            <span><strong>Nombre del Juez:</strong> Si seleccionas "Competición Agility", asegúrate de escribir el nombre del Juez. Esto es clave porque en el futuro se les autocompletará a los socios en su rastreador RSCE.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">image</span>
+            <span><strong>Cartel Promocional:</strong> Puedes subir imágenes oficiales de la prueba. El sistema las comprimirá automáticamente para no saturar los móviles de los usuarios.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #f59e0b; flex-shrink: 0; margin-top: 2px;">edit</span>
+            <span><strong>Editar:</strong> Utiliza el icono del lápiz en el listado para corregir información, actualizar fechas o subir el cartel si no lo tenías antes.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">delete</span>
+            <span><strong>Eliminar:</strong> El icono de papelera te permite borrar eventos cancelados. Siempre se te pedirá confirmación antes del borrado definitivo.</span>
+          </li>
+        </ul>
+      </app-instrucciones>
+    </div>
     @if (!showForm()) {
       <button class="btn btn-primary" (click)="initNewCompetition()">
         <span>+</span> Nuevo Evento

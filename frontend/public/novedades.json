@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.1.30",
+    "date": "2026-05-03",
+    "features": [
+      "¡Experiencia audiovisual cuidada al detalle! Hemos rediseñado por completo el aspecto de las tarjetas de la galería de vídeos para garantizar que tus vídeos luzcan siempre impecables, independientemente de si los grabaste en horizontal o en vertical. Además, ahora los botones de 'Me gusta' y opciones lucen mucho más elegantes e integrados.",
+      "¡Despídete de la confusión! Hemos seguido extendiendo nuestro sistema unificado de Ayuda Interactiva a nuevas áreas de la aplicación. Ahora contarás con guías paso a paso fáciles de entender (representadas con un icono de información) en los apartados de Eventos, Calendario y Vídeos, explicando cada detalle con total transparencia."
+    ],
+    "bugfixes": [
+      "Solucionado un obstáculo técnico que aparecía ocasionalmente en la sección de Material y Recursos, el cual impedía borrar documentos antiguos debido a bloqueos de permisos internos."
+    ]
+  },
+  {
     "version": "1.1.29",
     "date": "2026-05-02",
     "features": [

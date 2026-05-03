@@ -57,7 +57,8 @@
     }
 
     .video-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, 250px);
+        justify-content: center;
         gap: 1.5rem;
     }
 
@@ -151,7 +152,8 @@
 /* Rejilla de vídeos */
 .video-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, 300px);
+    justify-content: center;
     gap: 1.5rem;
 }
 
@@ -1391,9 +1393,9 @@ select.form-input {
     border-radius: 12px !important;
     box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
     overflow: hidden !important;
-    aspect-ratio: auto !important; /* override 9/16 rigidly */
-    height: auto !important;
-    border: 1px solid #e2e8f0 !important;
+    aspect-ratio: 9/16 !important; /* Igual que vertical */
+    border: none !important;
+    box-sizing: border-box !important;
 }
 
 /* Force horizontal video players to be 16:9 */
@@ -1416,6 +1418,9 @@ select.form-input {
     padding: 1rem 1.25rem;
     background: var(--surface-color, #fff);
     gap: 1rem;
+    flex-grow: 1;
+    justify-content: space-between;
+    overflow: hidden;
 }
 
 .footer-main-row {
@@ -1575,4 +1580,122 @@ select.form-input {
 .yt-action-btn.delete-btn:hover {
     background: #fee2e2;
     color: #dc2626;
+}
+
+.modern-video-footer.bento-layout {
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 1.25rem 0.8rem; /* Padding más equilibrado sin overlap */
+    background: #ffffff;
+    gap: 0.5rem;
+    flex-grow: 1;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    overflow: visible !important;
+}
+
+.bento-avatar-wrapper {
+    width: 68px;
+    height: 68px;
+    border-radius: 50%;
+    border: 3px solid #f1f5f9;
+    background: #f8fafc;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 0.2rem;
+}
+
+.bento-avatar-wrapper:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+}
+
+.bento-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.bento-avatar.placeholder .material-icons {
+    font-size: 30px;
+    color: #94a3b8;
+}
+
+.bento-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 0.7rem;
+    flex-grow: 1; /* Esto empuja la fila de botones hacia abajo y centra el contenido en el medio del lienzo */
+}
+
+.bento-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.bento-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.bento-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 0.3rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.78rem;
+    font-weight: 500;
+}
+
+.bento-tag .material-icons {
+    font-size: 15px;
+    color: var(--primary-color);
+}
+
+.bento-event-badge {
+    margin-top: 0.25rem;
+}
+
+.bento-actions-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-top: 1px solid #f1f5f9;
+    padding-top: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.bento-actions-grid {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap; /* Evita que el botón de borrar se descuelgue solo en una fila nueva */
+    gap: 0.4rem;
+    width: 100%;
+    overflow-x: auto; /* Por si las pantallas son extremadamente pequeñas */
+    scrollbar-width: none;
+}
+.bento-actions-grid::-webkit-scrollbar {
+    display: none;
 }

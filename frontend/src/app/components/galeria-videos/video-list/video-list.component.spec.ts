@@ -76,7 +76,7 @@ describe('VideoListComponent', () => {
 
     it('should load videos on init', () => {
         component.ngOnInit();
-        expect(videoServiceMock.getVideos).toHaveBeenCalledWith(1, { search: '', orientation: 'vertical' });
+        expect(videoServiceMock.getVideos).toHaveBeenCalledWith(1, { search: '' });
     });
 
     it('should toggle like optimistically and revert on error', () => {

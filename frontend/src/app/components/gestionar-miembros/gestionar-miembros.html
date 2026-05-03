@@ -30,6 +30,15 @@
               <p style="margin: 0;">Rol para entrenadores y equipo técnico. Tienen todo lo del miembro y además herramientas de gestión (menú Staff: pasar lista, crear competiciones, gestionar miembros, añadir puntos).</p>
             </div>
           </li>
+          @if (authService.isManager() || authService.isAdmin()) {
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-manager" style="color: #f59e0b; flex-shrink: 0; margin-top: 2px;">manage_accounts</span>
+            <div class="help-list-content">
+              <strong>Gestor (Nivel Superior de Club)</strong>
+              <p style="margin: 0;">Rol para los dueños o gerentes del club. Tienen control total sobre el Staff y los Miembros, pudiendo asignarles roles. También tienen la capacidad de realizar otras configuraciones críticas desde el apartado Configurar Club.</p>
+            </div>
+          </li>
+          }
         </ul>
 
         <h3 class="help-section-title" style="display: flex; align-items: center; gap: 8px; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Acciones Principales</h3>
@@ -136,13 +145,16 @@
                       <div class="action-buttons-wrapper">
                         <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
                           class="role-select" [disabled]="!canEditRole(user)">
-                          <option value="user">Inactivo</option>
-                          <option value="member">Miembro</option>
-                          @if (authService.isManager() || user.role === 'staff') {
-                            <option value="staff">Staff</option>
+                          <option value="user" [selected]="user.role === 'user'">Inactivo</option>
+                          <option value="member" [selected]="user.role === 'member'">Miembro</option>
+                          @if (authService.isAdmin() || authService.isManager() || user.role === 'staff') {
+                            <option value="staff" [selected]="user.role === 'staff'">Staff</option>
                           }
-                          @if (user.role === 'manager') {
-                            <option value="manager">Gestor</option>
+                          @if (authService.isAdmin() || user.role === 'manager') {
+                            <option value="manager" [selected]="user.role === 'manager'">Gestor</option>
+                          }
+                          @if (user.role === 'admin') {
+                            <option value="admin" [selected]="user.role === 'admin'">Administrador</option>
                           }
                         </select>
                         <button class="btn-icon reset-pwd-btn" (click)="generateResetLink(user)"

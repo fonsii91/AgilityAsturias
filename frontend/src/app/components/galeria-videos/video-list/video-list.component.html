@@ -84,7 +84,7 @@
         <li
           style="display: flex; gap: 10px; align-items: flex-start; background: #f0f7ff; padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary-color); margin-top: 8px;">
           <span class="material-icons" style="color: var(--primary-color); flex-shrink: 0; margin-top: 2px;">smartphone</span>
-          <div><strong>Clasificación Automática:</strong> El apartado en el que aparecerán los vídeos depende exclusivamente de cómo sostuvieses la cámara al grabarlos. Si grabas con el teléfono de pie (relación de aspecto vertical), tu vídeo se publicará automáticamente en la pestaña de <strong>Verticales</strong>. Si lo grabas apaisado, irá directamente a la <strong>Colección Horizontal</strong>.</div>
+          <div><strong>Clasificación Automática:</strong> El formato del vídeo depende exclusivamente de cómo sostuvieses la cámara al grabarlo. Todos los vídeos conviven en un mismo muro, pero puedes identificarlos rápidamente por su diseño y utilizar los filtros rápidos superiores para ver solo los <strong>Verticales</strong> o los <strong>Horizontales</strong>.</div>
         </li>
       </ul>
 
@@ -144,20 +144,17 @@
         }
       </select>
     </div>
+    <div class="filter-group">
+      <label>Formato de vídeo</label>
+      <select [(ngModel)]="activeTab" (change)="applyFilters()" class="filter-select">
+        <option value="all">Todos los formatos {{ tabCounts.horizontal + tabCounts.vertical > 0 ? '(' + (tabCounts.horizontal + tabCounts.vertical) + ')' : '' }}</option>
+        <option value="vertical">Verticales {{ tabCounts.vertical !== undefined ? '(' + tabCounts.vertical + ')' : '' }}</option>
+        <option value="horizontal">Horizontales {{ tabCounts.horizontal !== undefined ? '(' + tabCounts.horizontal + ')' : '' }}</option>
+      </select>
+    </div>
   </div>
   }
 
-  <!-- PESTAÑAS (TABS) -->
-  <div class="video-tabs-container">
-    <button class="video-tab-btn" [class.active]="activeTab === 'vertical'" (click)="goToTab('vertical')">
-      <span class="material-icons">phone_iphone</span> Verticales
-      @if (tabCounts.vertical !== undefined) { <span class="tab-badge">{{ tabCounts.vertical }}</span> }
-    </button>
-    <button class="video-tab-btn" [class.active]="activeTab === 'horizontal'" (click)="goToTab('horizontal')">
-      <span class="material-icons">desktop_windows</span> Horizontales
-      @if (tabCounts.horizontal !== undefined) { <span class="tab-badge">{{ tabCounts.horizontal }}</span> }
-    </button>
-  </div>
 
   <!-- Skeleton Inicial -->
   @if (isLoading && videos.length === 0) {
@@ -189,47 +186,42 @@
   }
 
   @if (!isLoading && videos.length > 0) {
-  <!-- RENDER DEL GRID ÚNICO SEGÚN EL TAB ACTIVO -->
-  <div class="active-tab-grid"
-    [ngClass]="{'shorts-carousel': activeTab === 'vertical', 'video-grid': activeTab === 'horizontal'}">
-    <ng-container *ngTemplateOutlet="videoListTpl; context: {$implicit: videos, type: activeTab}"></ng-container>
+  <!-- RENDER DEL GRID ÚNICO -->
+  <div class="active-tab-grid video-grid">
+    <ng-container *ngTemplateOutlet="videoListTpl; context: {$implicit: videos}"></ng-container>
   </div>
 
-  <ng-template #videoListTpl let-videoList let-type="type">
+  <ng-template #videoListTpl let-videoList>
     @for (video of videoList; track video) {
     <div class="video-card"
-      [ngClass]="{'is-horizontal': type === 'horizontal', 'is-vertical': type === 'vertical', 'is-youtube': !!video.youtube_id && player.isVideoActive}">
+      [ngClass]="{'is-horizontal': video.orientation === 'horizontal', 'is-vertical': video.orientation !== 'horizontal', 'is-youtube': !!video.youtube_id && player.isVideoActive}">
       <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path"
-        [coverImageUrl]="video.dog?.photo_url" [isHorizontal]="type === 'horizontal'">
+        [coverImageUrl]="video.dog?.photo_url" [isHorizontal]="video.orientation === 'horizontal'">
       </app-smart-video-player>
       <!-- HORIZONTAL YOUTUBE-STYLE FOOTER -->
-      @if (type === 'horizontal') {
-      <div class="modern-video-footer">
-        <div class="footer-main-row">
-          <div class="footer-avatar" (click)="openDogProfile($event, video.dog)"
-            title="Ver perfil de {{video.dog?.name}}">
-            @if (video.dog?.photo_url) {
-            <img [src]="video.dog?.photo_url" alt="{{ video.dog?.name }}">
-            } @else {
-            <span class="material-icons placeholder-icon">pets</span>
-            }
+      @if (video.orientation === 'horizontal') {
+      <div class="modern-video-footer bento-layout">
+        <div class="bento-avatar-wrapper" (click)="openDogProfile($event, video.dog)" title="Ver perfil de {{video.dog?.name}}">
+          @if (video.dog?.photo_url) {
+          <img [src]="video.dog?.photo_url" alt="{{ video.dog?.name }}" class="bento-avatar">
+          } @else {
+          <div class="bento-avatar placeholder">
+            <span class="material-icons">pets</span>
           </div>
-          <div class="footer-meta">
-            <h3 class="footer-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-              {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
-            </h3>
-            <div class="footer-subtitle">
-              <span class="sub-dog">{{ video.dog?.name }}</span>
-              <span class="sub-dot">•</span>
-              <span class="sub-uploader">{{ video.user?.name || 'Usuario' }}</span>
-              <span class="sub-dot">•</span>
-              <span class="sub-date">{{ video.date | date:'dd/MM/yyyy' }}</span>
-            </div>
-          </div>
+          }
         </div>
 
-        <div class="footer-actions-row">
-          <div class="footer-event-badge">
+        <div class="bento-content">
+          <h3 class="bento-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
+            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+          </h3>
+
+          <div class="bento-tags-row">
+            <span class="bento-tag"><span class="material-icons">person</span> {{ video.user?.name || 'Usuario' }}</span>
+            <span class="bento-tag"><span class="material-icons">calendar_month</span> {{ video.date | date:'dd/MM/yyyy' }}</span>
+          </div>
+
+          <div class="bento-event-badge">
             @if (video.competition) {
             <span class="yt-badge comp" [title]="video.competition.nombre">
               <span class="material-icons">emoji_events</span> {{ video.competition.nombre }}
@@ -240,8 +232,10 @@
             </span>
             }
           </div>
+        </div>
 
-          <div class="modern-actions">
+        <div class="bento-actions-row">
+          <div class="modern-actions bento-actions-grid">
             <button class="yt-action-btn" [class.liked]="video.is_liked_by_user" (click)="toggleLike(video)">
               <span class="material-icons">{{ video.is_liked_by_user ? 'favorite' : 'favorite_border' }}</span>
               @if (video.likes_count) { <span class="action-text">{{ video.likes_count }}</span> }
@@ -284,7 +278,7 @@
       }
 
       <!-- VERTICAL SHORTS ABSOLUTE OVERLAY -->
-      @if (type === 'vertical' && !player.isVideoActive) {
+      @if (video.orientation !== 'horizontal' && !player.isVideoActive) {
       <div class="video-cover-overlay">
         <!-- Stacked Actions on the Right -->
         <div class="floating-actions-right">

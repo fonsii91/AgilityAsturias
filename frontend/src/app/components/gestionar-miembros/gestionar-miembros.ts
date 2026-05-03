@@ -74,7 +74,7 @@ export class GestionarMiembrosComponent implements OnInit {
     if (user.role === newRole) return;
 
     try {
-      const role = newRole as 'user' | 'member' | 'staff';
+      const role = newRole as 'user' | 'member' | 'staff' | 'manager' | 'admin';
       await this.authService.updateUserRole(user.id, role);
 
       this.users.update(users =>
