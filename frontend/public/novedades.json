@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.1.33",
+    "date": "2026-05-03",
+    "bugfixes": [
+      "Hemos reforzado la descarga de vídeos para que tus archivos del club se entreguen de forma más segura y solo desde una sesión válida.",
+      "Hemos ajustado varias tareas internas de mantenimiento para que la plataforma siga funcionando cada madrugada de forma más fiable y sin interrupciones visibles para ti."
+    ]
+  },
+  {
     "version": "1.1.32",
     "date": "2026-05-03",
     "features": [

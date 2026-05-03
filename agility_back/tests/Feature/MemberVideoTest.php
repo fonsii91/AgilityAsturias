@@ -214,4 +214,23 @@ class MemberVideoTest extends TestCase
         $response->assertStatus(200);
         $response->assertHeader('Content-Disposition');
     }
+
+    public function test_no_permite_descargar_un_video_sin_autenticacion()
+    {
+        Storage::fake('public');
+        $file = UploadedFile::fake()->create('test_video.mp4', 100, 'video/mp4');
+        $path = $file->store('clubs/default/videos', 'public');
+
+        $video = Video::factory()->create([
+            'user_id' => $this->user->id,
+            'dog_id' => $this->dog->id,
+            'club_id' => $this->club->id,
+            'local_path' => $path,
+            'is_public' => true,
+        ]);
+
+        $response = $this->getJson("/api/videos/{$video->id}/download");
+
+        $response->assertStatus(401);
+    }
 }

@@ -10,7 +10,9 @@ Cuando un usuario sube un vídeo desde la plataforma (`upload-video`), ocurre lo
 
 ## 2. Proceso en Segundo Plano: Ahorro de espacio (YouTube CRON)
 Para evitar que el disco del servidor se llene, el sistema implementa una delegación de los recursos multimedia:
-- Existe un **Comando/CRON** diario en Laravel (`UploadVideosToYouTube`).
+- Existe un **comando diario de Laravel Scheduler** (`youtube:upload-videos`, implementado por `UploadVideosToYouTube`) configurado en `routes/console.php`.
+- En producción no debe existir ningún endpoint HTTP para disparar este proceso. El servidor debe ejecutar `php artisan schedule:run` cada minuto mediante crontab, y Laravel decide cuándo toca lanzar la tarea diaria.
+- La tarea de subida a YouTube se ejecuta todos los días a las **03:10** en la zona horaria `Europe/Madrid`.
 - Este proceso busca en la base de datos vídeos que tengan un **`status = 'local'`** o **`'in_queue'`** y que hayan sido subidos hace más de **3 días**.
 - Toma los vídeos por lotes (procesa un máximo de 5 a la vez para no sobrepasar la estricta cuota diaria de la API de YouTube).
 - **Proceso de subida:** Utilizando la API oficial de Google, se suben a YouTube como un vídeo _No listado_ ("unlisted"). Estos vídeos no aparecen en el canal público de YouTube.

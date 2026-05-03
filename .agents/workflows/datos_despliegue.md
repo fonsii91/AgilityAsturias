@@ -18,10 +18,15 @@ description: Datos para desplegar en producción el proyecto
   - **Comando principal (configurado localmente)**: `ssh agilityasturias` (Usando `~/.ssh/config` y `id_rsa`).
   - **Desde otros equipos (con certificado)**: `ssh -i <ruta_a_tu_clave> root@157.173.121.242`
   - **Desde otros equipos (solo contraseña)**: `ssh root@157.173.121.242`
-- **Contraseña**: z1jateU3PgSii3fB7
+- **Contraseña**: no documentar en el repositorio; usar gestor de secretos o variable de entorno local.
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado]** Scheduler Laravel: el servidor tiene una unica crontab general para ejecutar todas las tareas programadas:
+  ```bash
+  * * * * * cd /var/www/agilityasturias/agility_back && /usr/bin/php artisan schedule:run >> /dev/null 2>&1
+  ```
+  Esta crontab sustituye cualquier endpoint HTTP de scheduler. La subida diaria de videos a YouTube, el autocalibrado de cargas y los backups se definen en `agility_back/routes/console.php`.
 - El servidor está activo y accesible por SSH como root utilizando certificados SSH.
 - **[Completado]** Fase 1: Instalados Nginx, PHP 8.4, Node.js 20, MariaDB, Redis, FFmpeg y Supervisor.
 - **[Completado]** Fase 2 y 3: Base de datos configurada, repositorio clonado, dependencias instaladas y Angular compilado en producción en `/var/www/agilityasturias`.

@@ -230,7 +230,7 @@ export class VideoListComponent implements OnInit {
             const response = await fetch(url, {
                 headers: {
                     // Provide auth token if required by backend to fetch the file
-                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                    'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
                 }
             });
 
@@ -258,8 +258,7 @@ export class VideoListComponent implements OnInit {
 
         } catch (error) {
             console.error('Download error:', error);
-            // Fallback to opening the URL directly if fetch/blob fails
-            window.open(url, '_blank');
+            this.toastService.error('No se pudo descargar el vídeo');
         }
     }
 

@@ -67,6 +67,32 @@ class SuggestionTest extends TestCase
         );
     }
 
+    public function test_permite_enviar_sugerencias_a_miembro_staff_manager_y_admin()
+    {
+        Notification::fake();
+
+        foreach (['member', 'staff', 'manager', 'admin'] as $role) {
+            $user = User::factory()->create([
+                'club_id' => $this->club->id,
+                'role' => $role,
+            ]);
+
+            $response = $this->actingAs($user)->postJson('/api/suggestions', [
+                'type' => 'bug',
+                'content' => "Reporte enviado por {$role}",
+            ]);
+
+            $response->assertStatus(201);
+
+            $this->assertDatabaseHas('suggestions', [
+                'user_id' => $user->id,
+                'type' => 'bug',
+                'content' => "Reporte enviado por {$role}",
+                'club_id' => $this->club->id,
+            ]);
+        }
+    }
+
     public function test_valida_que_el_contenido_y_tipo_son_obligatorios()
     {
         $response = $this->actingAs($this->user)->postJson('/api/suggestions', [
@@ -82,6 +108,30 @@ class SuggestionTest extends TestCase
     {
         $response = $this->actingAs($this->user)->getJson('/api/admin/suggestions');
         $response->assertStatus(403);
+    }
+
+    public function test_no_permite_a_staff_ni_manager_ver_o_resolver_sugerencias()
+    {
+        $suggestion = Suggestion::factory()->create([
+            'user_id' => $this->user->id,
+            'club_id' => $this->club->id,
+            'status' => 'pending'
+        ]);
+
+        foreach (['staff', 'manager'] as $role) {
+            $user = User::factory()->create([
+                'club_id' => $this->club->id,
+                'role' => $role,
+            ]);
+
+            $this->actingAs($user)
+                ->getJson('/api/admin/suggestions')
+                ->assertStatus(403);
+
+            $this->actingAs($user)
+                ->postJson("/api/admin/suggestions/{$suggestion->id}/resolve")
+                ->assertStatus(403);
+        }
     }
 
     public function test_permite_a_un_administrador_ver_todas_las_sugerencias_de_su_club()

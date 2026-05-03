@@ -40,7 +40,7 @@ Schedule::call(function () {
 
     // 2. Ejecutar la subida
     Artisan::call('youtube:upload-videos');
-})->dailyAt('03:00')->timezone('Europe/Madrid');
+})->dailyAt('03:10')->timezone('Europe/Madrid');
 
 // Auto-calibrate pending workloads (after 7 days pending if staff verified)
 Schedule::call(function () {

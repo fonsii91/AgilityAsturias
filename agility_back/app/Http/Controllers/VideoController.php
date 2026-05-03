@@ -267,6 +267,11 @@ class VideoController extends Controller
     public function download($id)
     {
         $video = Video::findOrFail($id);
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
 
         if (!$video->local_path || !Storage::disk('public')->exists($video->local_path)) {
             return response()->json(['message' => 'Video not found or is not local'], 404);

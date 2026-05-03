@@ -15,7 +15,6 @@ use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RsceTrackController;
 use App\Http\Controllers\PersonalEventController;
-use Illuminate\Http\Request; // Added for the closure route
 
 /*
 |--------------------------------------------------------------------------
@@ -36,20 +35,6 @@ Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/public-videos', [VideoController::class, 'publicIndex']);
-Route::get('/videos/{id}/download', [VideoController::class, 'download']);
-
-// Backup endpoint to run scheduler from web via URL (bypassing CLI permission denied)
-Route::get('/run-scheduler-secret-1234', function () {
-    // Only run if the server thinks it's 02:10 (03:10 in Spain)
-    $currentTime = now()->copy()->format('H:i');
-    if ($currentTime == '02:10') {
-        $command = new \App\Console\Commands\UploadVideosToYouTube();
-        $command->handle();
-        return response()->json(['message' => 'Scheduler executed at 02:10, videos uploaded directly!']);
-    }
-    return response()->json(['message' => "Skipped. It is {$currentTime}, not 02:10 yet."]);
-});
-
 
 Route::get('/time-slots', [TimeSlotController::class, 'index']);
 
@@ -104,11 +89,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'store']);
         Route::post('/time-slot-exceptions/delete', [\App\Http\Controllers\TimeSlotExceptionController::class, 'destroy']);
         
-        // Suggestions (Admin)
-        Route::get('/admin/suggestions', [SuggestionController::class, 'index']);
-        Route::post('/admin/suggestions/{id}/resolve', [SuggestionController::class, 'resolve']);
-        Route::post('/admin/suggestions/{id}/unresolve', [SuggestionController::class, 'unresolve']);
-
         // Announcements (Admin/Staff)
         Route::post('/announcements', [AnnouncementController::class, 'store']);
         Route::delete('/announcements/{id}', [AnnouncementController::class, 'destroy']);
@@ -135,6 +115,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'index']);
         Route::post('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'store']);
         Route::delete('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'destroy']);
+
+        // Suggestions (Admin)
+        Route::get('/admin/suggestions', [SuggestionController::class, 'index']);
+        Route::post('/admin/suggestions/{id}/resolve', [SuggestionController::class, 'resolve']);
+        Route::post('/admin/suggestions/{id}/unresolve', [SuggestionController::class, 'unresolve']);
     });
 
     Route::middleware(['role:admin,manager'])->group(function () {
@@ -208,6 +193,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/videos/{id}', [VideoController::class, 'update']);
         Route::post('/videos/{id}/delete', [VideoController::class, 'destroy']);
         Route::post('/videos/{id}/toggle-like', [VideoController::class, 'toggleLike']);
+        Route::get('/videos/{id}/download', [VideoController::class, 'download']);
 
         // Event Attendance
         Route::post('/competitions/{id}/attend', [CompetitionController::class, 'attend']);
