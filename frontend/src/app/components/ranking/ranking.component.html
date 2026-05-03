@@ -2,10 +2,69 @@
 
   <div class="ranking-header-actions"
     style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-top: 10px;">
-    <button class="help-btn" (click)="openHelpModal()" title="Instrucciones"
-      style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s;">
-      <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
-    </button>
+    <app-instrucciones titulo="Clasificación y Puntos">
+      <div class="gamification-box" style="margin-bottom: 1.5rem;">
+        <p>
+          <strong>
+            <span class="material-icons box-icon" style="vertical-align: middle;">sports_esports</span> ¿Qué es la "Gamificación"?
+          </strong>
+          Nuestra clasificación aplica mecánicas de juego en el club. Gana puntos participando y esfuérzate para subir
+          de puesto. Una forma genial de premiar la constancia y mantener la motivación.
+        </p>
+      </div>
+
+      <h4 class="section-title" style="display: flex; align-items: center; gap: 8px; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+        <span class="material-icons">group</span> Reglas para Miembros
+      </h4>
+
+      <ul class="rules-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem;">
+        <li class="rule-card" style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons icon-green" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">check_circle</span>
+          <div class="rule-text"><strong>Asistencia:</strong> Gana puntos al confirmar tu asistencia a los
+            entrenamientos.</div>
+        </li>
+        <li class="rule-card" style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons icon-gold" style="color: #fbbf24; flex-shrink: 0; margin-top: 2px;">emoji_events</span>
+          <div class="rule-text"><strong>Competiciones:</strong> Consigue puntos asistiendo a competiciones y según el
+            puesto en el que quedes.</div>
+        </li>
+        <li class="rule-card" style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons icon-orange" style="color: #f97316; flex-shrink: 0; margin-top: 2px;">star</span>
+          <div class="rule-text"><strong>Logros Extra:</strong> El equipo del club puede regalar puntos extra por buenas
+            acciones o méritos.</div>
+        </li>
+        <li class="rule-card" style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons icon-blue" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">trending_up</span>
+          <div class="rule-text"><strong>Tu progreso:</strong> Visualiza a los 3 mejores con sus medallas, iconos de
+            tendencia, y emojis con vuestros últimos logros recientes.</div>
+        </li>
+        <li class="rule-card" style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons icon-purple" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">pets</span>
+          <div class="rule-text"><strong>Perfil:</strong> Pulsa sobre cualquier perro de la clasificación para
+            ver su "ficha" y conocerle mejor.</div>
+        </li>
+      </ul>
+
+      @if (authService.isStaff()) {
+      <div class="staff-section-box">
+        <h4 class="staff-title" style="display: flex; align-items: center; gap: 8px; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+          <span class="material-icons">admin_panel_settings</span> Herramientas Staff
+        </h4>
+        <ul class="staff-rules-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">groups</span>
+            <span><strong>Fidelización:</strong> Aprovecha el "Engagement". A los miembros les encanta ver subir de
+              puesto a sus perros.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">exposure</span>
+            <span><strong>Moderar Puntuación:</strong> Tienes el poder de sumar o restar puntos libremente. Úsalo con
+              sabiduría.</span>
+          </li>
+        </ul>
+      </div>
+      }
+    </app-instrucciones>
   </div>
 
   @if (isLoading()) {
@@ -115,82 +174,5 @@
 </app-ficha-perro>
 }
 
-<!-- Help Modal -->
-@if (isHelpModalOpen()) {
-<div class="modal-overlay" (click)="closeHelpModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
 
-    <div class="modal-header">
-      <h2 class="modal-title">
-        <span class="material-icons title-icon">military_tech</span> Clasificación y Puntos
-      </h2>
-      <button class="close-button" (click)="closeHelpModal()" title="Cerrar">&times;</button>
-    </div>
-
-    <div class="modal-body">
-      <div class="gamification-box">
-        <p>
-          <strong>
-            <span class="material-icons box-icon">sports_esports</span> ¿Qué es la "Gamificación"?
-          </strong>
-          Nuestra clasificación aplica mecánicas de juego en el club. Gana puntos participando y esfuérzate para subir
-          de puesto. Una forma genial de premiar la constancia y mantener la motivación.
-        </p>
-      </div>
-
-      <h4 class="section-title">
-        <span class="material-icons">group</span> Reglas para Miembros
-      </h4>
-
-      <ul class="rules-list">
-        <li class="rule-card">
-          <span class="material-icons icon-green">check_circle</span>
-          <div class="rule-text"><strong>Asistencia:</strong> Gana puntos al confirmar tu asistencia a los
-            entrenamientos.</div>
-        </li>
-        <li class="rule-card">
-          <span class="material-icons icon-gold">emoji_events</span>
-          <div class="rule-text"><strong>Competiciones:</strong> Consigue puntos asistiendo a competiciones y según el
-            puesto en el que quedes.</div>
-        </li>
-        <li class="rule-card">
-          <span class="material-icons icon-orange">star</span>
-          <div class="rule-text"><strong>Logros Extra:</strong> El equipo del club puede regalar puntos extra por buenas
-            acciones o méritos.</div>
-        </li>
-        <li class="rule-card">
-          <span class="material-icons icon-blue">trending_up</span>
-          <div class="rule-text"><strong>Tu progreso:</strong> Visualiza a los 3 mejores con sus medallas, iconos de
-            tendencia, y emojis con vuestros últimos logros recientes.</div>
-        </li>
-        <li class="rule-card">
-          <span class="material-icons icon-purple">pets</span>
-          <div class="rule-text"><strong>Perfil:</strong> Pulsa sobre cualquier perro de la clasificación para
-            ver su "ficha" y conocerle mejor.</div>
-        </li>
-      </ul>
-
-      @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
-      <div class="staff-section-box">
-        <h4 class="staff-title">
-          <span class="material-icons">admin_panel_settings</span> Herramientas Staff
-        </h4>
-        <ul class="staff-rules-list">
-          <li>
-            <span class="material-icons">groups</span>
-            <span><strong>Fidelización:</strong> Aprovecha el "Engagement". A los miembros les encanta ver subir de
-              puesto a sus perros.</span>
-          </li>
-          <li>
-            <span class="material-icons">exposure</span>
-            <span><strong>Moderar Puntuación:</strong> Tienes el poder de sumar o restar puntos libremente. Úsalo con
-              sabiduría.</span>
-          </li>
-        </ul>
-      </div>
-      }
-    </div>
-  </div>
-</div>
-}
 </div>

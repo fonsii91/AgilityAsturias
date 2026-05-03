@@ -8,7 +8,7 @@ export interface User {
     id: number;
     name: string;
     email: string;
-    role: 'user' | 'member' | 'staff' | 'admin';
+    role: 'user' | 'member' | 'staff' | 'manager' | 'admin';
     photo_url?: string;
     google_id?: string;
     email_verified_at?: string;
@@ -149,7 +149,7 @@ export class AuthService {
         this.currentUserSignal.set(mappedUser);
         this.isLoading.set(false);
         
-        if (['member', 'staff', 'admin'].includes(mappedUser.role)) {
+        if (['member', 'staff', 'manager', 'admin'].includes(mappedUser.role)) {
             this.router.navigate(['/calendario']);
         } else {
             this.router.navigate(['/perfil']);
@@ -230,16 +230,21 @@ export class AuthService {
 
     isMember = computed(() => {
         const user = this.currentUserSignal();
-        return ['member', 'staff', 'admin'].includes(user?.role || '');
+        return ['member', 'staff', 'manager', 'admin'].includes(user?.role || '');
     });
 
     isStaff = computed(() => {
         const user = this.currentUserSignal();
-        return ['staff', 'admin'].includes(user?.role || '');
+        return ['staff', 'manager', 'admin'].includes(user?.role || '');
     });
 
     isAdmin = computed(() => {
         const user = this.currentUserSignal();
         return user?.role === 'admin';
+    });
+
+    isManager = computed(() => {
+        const user = this.currentUserSignal();
+        return ['manager', 'admin'].includes(user?.role || '');
     });
 }

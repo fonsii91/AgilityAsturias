@@ -5,10 +5,62 @@
       <h1>Material y Recursos</h1>
       <p class="subtitle">Documentos, vídeos y enlaces de interés compartidos por el staff</p>
     </div>
-    <button class="help-btn" (click)="openHelpModal()" title="Instrucciones"
-      style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 8px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s;">
-      <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
-    </button>
+    <app-instrucciones titulo="Instrucciones: Material y Recursos">
+      <div style="color: var(--text-color); line-height: 1.6;">
+        <h4 style="color: var(--primary-dark); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <span class="material-icons-outlined" style="color: #64748b;">people</span> 1. Reglas para los Miembros
+        </h4>
+        <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">En esta sección encontrarás todo el material formativo y de interés. Haz clic en cualquier recuadro para abrir su contenido. Los iconos de cada tipo de contenido son:</p>
+
+        <ul style="padding-left: 0; margin-bottom: 2rem; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">play_circle</span>
+            <div><strong>Vídeos:</strong> Para visualizar contenido en vídeo.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">link</span>
+            <div><strong>Enlaces:</strong> Para redirigirte a otras páginas web de interés.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">description</span>
+            <div><strong>Documentos:</strong> Para abrir y leer archivos como PDFs.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">filter_list</span>
+            <div><strong>Filtrado:</strong> En la parte superior dispones de filtros para acotar los recursos por Categoría (ej. Dietas) y por Nivel (ej. Iniciación).</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start; background: #f8fafc; padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;">
+            <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">warning</span>
+            <div><strong>⚠️ Aviso de filtros:</strong> ¡Ojo con mezclar filtros! Si seleccionas a la vez una Categoría y un Nivel concreto, el sistema buscará cosas que cumplan ambas condiciones. Si la lista se queda vacía, es posible que no haya nada con esa combinación exacta. Puedes seleccionar "Todas" de nuevo para recuperarlos.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">refresh</span>
+            <div><strong>Refrescar:</strong> Si crees que hay material nuevo que no aparece, puedes usar el botón de <strong>Recargar</strong> en cualquier momento para actualizar la lista.</div>
+          </li>
+        </ul>
+
+        @if (canManage()) {
+        <h4 style="color: var(--primary-dark); margin-top: 2rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <span class="material-icons-outlined" style="color: #64748b;">admin_panel_settings</span> 2. Opciones de Staff
+        </h4>
+        <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Como personal del equipo tienes acceso a opciones exclusivas de gestión:</p>
+
+        <ul style="padding-left: 0; margin-bottom: 0; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">add_circle_outline</span>
+            <div><strong>Añadir Recurso:</strong> Este botón superior permite subir archivos nuevos o compartir enlaces, y asociarles el nivel mínimo y categoría correspondientes.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <div style="display: flex; gap: 4px; flex-shrink: 0;">
+              <span class="material-icons" style="color: #f59e0b; margin-top: 2px;">edit</span>
+              <span class="material-icons" style="color: #ef4444; margin-top: 2px;">delete</span>
+            </div>
+            <div><strong>Gestión de contenido:</strong> Dentro de cada recurso (al pasar el ratón por encima en ordenador o al mantener presionado con el móvil), aparecerán los botones para editar el material subido o borrarlo permanentemente.</div>
+          </li>
+        </ul>
+        }
+      </div>
+    </app-instrucciones>
   </div>
 
   <div class="controls-section">
@@ -93,93 +145,4 @@
   </div>
   }
 </div>
-
-@if (isHelpModalOpen()) {
-<div class="modal-overlay" (click)="closeHelpModal()">
-  <div class="modal-content glass-effect" style="max-height: 80vh; overflow-y: auto; text-align: left;"
-    (click)="$event.stopPropagation()">
-
-    <div class="modal-header header-light"
-      style="padding-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 1.5rem;">
-      <h3 style="margin: 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
-        <span class="material-icons" style="color: var(--accent-color);">help_outline</span> Instrucciones: Material y
-        Recursos
-      </h3>
-      <button class="close-btn" (click)="closeHelpModal()" title="Cerrar">&times;</button>
-    </div>
-
-    <div class="modal-body" style="color: var(--text-color); line-height: 1.6;">
-      <h4
-        style="color: var(--primary-dark); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-        <span class="material-icons-outlined" style="color: #64748b;">people</span> 1. Reglas para los Miembros
-      </h4>
-      <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">En esta sección encontrarás todo el material
-        formativo y de interés. Haz clic en cualquier recuadro para abrir su contenido. Los iconos de cada tipo de
-        contenido son:</p>
-
-      <ul
-        style="padding-left: 0; margin-bottom: 2rem; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">play_circle</span>
-          <div><strong>Vídeos:</strong> Para visualizar contenido en vídeo.</div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">link</span>
-          <div><strong>Enlaces:</strong> Para redirigirte a otras páginas web de interés.</div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">description</span>
-          <div><strong>Documentos:</strong> Para abrir y leer archivos como PDFs.</div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">filter_list</span>
-          <div><strong>Filtrado:</strong> En la parte superior dispones de filtros para acotar los recursos por
-            Categoría (ej. Dietas) y por Nivel (ej. Iniciación).</div>
-        </li>
-        <li
-          style="display: flex; gap: 10px; align-items: flex-start; background: #f8fafc; padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;">
-          <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">warning</span>
-          <div><strong>⚠️ Aviso de filtros:</strong> ¡Ojo con mezclar filtros! Si seleccionas a la vez una Categoría y
-            un Nivel concreto, el sistema buscará cosas que cumplan ambas condiciones. Si la lista se queda vacía, es
-            posible que no haya nada con esa combinación exacta. Puedes seleccionar "Todas" de nuevo para recuperarlos.
-          </div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">refresh</span>
-          <div><strong>Refrescar:</strong> Si crees que hay material nuevo que no aparece, puedes usar el botón de
-            <strong>Recargar</strong> en cualquier momento para actualizar la lista.
-          </div>
-        </li>
-      </ul>
-
-      @if (canManage()) {
-      <h4
-        style="color: var(--primary-dark); margin-top: 2rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-        <span class="material-icons-outlined" style="color: #64748b;">admin_panel_settings</span> 2. Opciones de Staff
-      </h4>
-      <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Como personal del equipo tienes acceso a
-        opciones exclusivas de gestión:</p>
-
-      <ul
-        style="padding-left: 0; margin-bottom: 0; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons"
-            style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">add_circle_outline</span>
-          <div><strong>Añadir Recurso:</strong> Este botón superior permite subir archivos nuevos o compartir enlaces, y
-            asociarles el nivel mínimo y categoría correspondientes.</div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <div style="display: flex; gap: 4px; flex-shrink: 0;">
-            <span class="material-icons" style="color: #f59e0b; margin-top: 2px;">edit</span>
-            <span class="material-icons" style="color: #ef4444; margin-top: 2px;">delete</span>
-          </div>
-          <div><strong>Gestión de contenido:</strong> Dentro de cada recurso (al pasar el ratón por encima en ordenador
-            o al mantener presionado con el móvil), aparecerán los botones
-            para editar el material subido o borrarlo permanentemente.</div>
-        </li>
-      </ul>
-      }
-    </div>
-  </div>
-</div>
-}
+

@@ -23,10 +23,8 @@ export class ClubAdminService {
         return this.http.get<Club[]>(`${this.apiUrl}/admin/clubs`);
     }
 
-    getClub(id: number): Observable<Club | undefined> {
-        return this.getClubs().pipe(
-            map(clubs => clubs.find(c => c.id === id))
-        );
+    getClub(id: number): Observable<Club> {
+        return this.http.get<Club>(`${this.apiUrl}/admin/clubs/${id}`);
     }
 
     createClub(club: Partial<Club>): Observable<Club> {

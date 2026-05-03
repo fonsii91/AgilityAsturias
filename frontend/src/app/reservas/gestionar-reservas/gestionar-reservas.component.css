@@ -51,6 +51,28 @@ h2 {
     box-shadow: var(--shadow-md);
 }
 
+/* Help Button */
+.help-btn {
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    border-radius: 40px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    color: #334155;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.help-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
 /* Week Selector */
 .week-selector {
     display: flex;
@@ -362,7 +384,7 @@ h2 {
 .attendee-avatar {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, var(--primary-blue) 0%, #005bb5 100%);
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -772,7 +794,7 @@ h2 {
 }
 
 .btn-primary-action:hover {
-    background: #005bb5;
+    background: var(--primary-blue-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 115, 207, 0.3);
 }

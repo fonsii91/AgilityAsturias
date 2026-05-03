@@ -1,0 +1,43 @@
+/* Help Button */
+.help-btn {
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    border-radius: 40px;
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-content: center;
+    color: #334155;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.help-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    border-color: #94a3b8;
+}
+
+.close-btn:hover {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    transform: rotate(90deg);
+}
+
+/* Scrollbar para el modal content */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+.modal-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 0 24px 24px 0;
+}
+.modal-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

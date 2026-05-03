@@ -14,8 +14,8 @@ import { environment } from '../../../../../environments/environment';
   template: `
     @if (dog()) {
       <div class="family-container fade-in">
-        <div class="info-note" [style.border-left-color]="clubTheme.primary">
-          <span class="material-icons-outlined" [style.color]="clubTheme.primary">info</span>
+        <div class="info-note" style="border-left-color: var(--primary-color);">
+          <span class="material-icons-outlined" style="color: var(--primary-color);">info</span>
           <p>
             Invita a otras personas introduciendo el email con el que se han registrado en la web.
             Podrán ver la ficha de tu perro y usarla para apuntarse a clases.
@@ -26,7 +26,7 @@ import { environment } from '../../../../../environments/environment';
           <h3><span class="material-icons-outlined">person_add</span> Vincular a un nuevo usuario</h3>
           <div class="input-group-action">
             <input type="email" [(ngModel)]="shareEmail" placeholder="Email del usuario dado de alta">
-            <button class="btn-primary" [style.background]="clubTheme.primary" (click)="shareDog()" [disabled]="!shareEmail().trim()">
+            <button class="btn-primary" style="background: var(--primary-color);" (click)="shareDog()" [disabled]="!shareEmail().trim()">
               Compartir
             </button>
           </div>
@@ -38,7 +38,7 @@ import { environment } from '../../../../../environments/environment';
           <div class="owners-list">
             @for(owner of dog()?.users; track owner.id) {
               <div class="user-chip">
-                <div class="user-chip-avatar" [style.background]="clubTheme.primary">
+                <div class="user-chip-avatar" style="background: var(--primary-color);">
                   {{ owner.name.substring(0,2).toUpperCase() }}
                 </div>
                 <div class="user-info">

@@ -60,8 +60,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/user/profile', [AuthController::class, 'updateProfile']);
 
-    // Rutas protegidas por rol (admin, staff)
-    Route::middleware(['role:admin,staff'])->group(function () {
+    // Rutas protegidas por rol (admin, gestor, staff)
+    Route::middleware(['role:admin,manager,staff'])->group(function () {
         Route::get('/users', [AuthController::class, 'index']);
         Route::post('/users/{id}/role', [AuthController::class, 'updateRole']);
         Route::post('/users/{id}/delete', [AuthController::class, 'destroy']);
@@ -134,11 +134,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Gestión de Clubes
         Route::get('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'index']);
         Route::post('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'store']);
-        Route::put('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']);
         Route::delete('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'destroy']);
     });
 
-    Route::middleware(['role:admin,staff,member'])->group(function () {
+    Route::middleware(['role:admin,manager'])->group(function () {
+        Route::get('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'show']);
+        Route::put('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']);
+        Route::post('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']); // Some forms might send POST with _method
+    });
+
+    Route::middleware(['role:admin,manager,staff,member'])->group(function () {
         // Ranking
         Route::get('/ranking', [RankingController::class, 'index']);
 

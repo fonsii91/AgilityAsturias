@@ -148,7 +148,7 @@ class ReservationController extends Controller
         ]);
 
         $user = $request->user();
-        $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
+        $isAdminOrStaff = in_array($user->role, ['admin', 'manager', 'staff']);
 
         if (!$isAdminOrStaff) {
             // SECURITY CHECK: Members can only book for themselves
@@ -241,7 +241,7 @@ class ReservationController extends Controller
 
         // Authorization check
         $isDogOwner = $reservation->dog_id ? $request->user()->dogs()->where('dogs.id', $reservation->dog_id)->exists() : false;
-        if ($request->user()->id !== $reservation->user_id && !$isDogOwner && !in_array($request->user()->role, ['admin', 'staff'])) {
+        if ($request->user()->id !== $reservation->user_id && !$isDogOwner && !in_array($request->user()->role, ['admin', 'manager', 'staff'])) {
             abort(403);
         }
 
@@ -257,7 +257,7 @@ class ReservationController extends Controller
 
         // Authorization: User can update own, or staff/admin, or explicitly co-owner
         $isDogOwner = $reservation->dog_id ? $request->user()->dogs()->where('dogs.id', $reservation->dog_id)->exists() : false;
-        if ($request->user()->id !== $reservation->user_id && !$isDogOwner && !in_array($request->user()->role, ['admin', 'staff'])) {
+        if ($request->user()->id !== $reservation->user_id && !$isDogOwner && !in_array($request->user()->role, ['admin', 'manager', 'staff'])) {
             abort(403);
         }
 
@@ -282,7 +282,7 @@ class ReservationController extends Controller
         $user = $request->user();
 
         // Authorization check
-        $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
+        $isAdminOrStaff = in_array($user->role, ['admin', 'manager', 'staff']);
         $isDogOwner = $reservation->dog_id ? $user->dogs()->where('dogs.id', $reservation->dog_id)->exists() : false;
 
         if ($user->id !== $reservation->user_id && !$isDogOwner && !$isAdminOrStaff) {
@@ -322,7 +322,7 @@ class ReservationController extends Controller
         ]);
 
         $user = $request->user();
-        $isAdminOrStaff = in_array($user->role, ['admin', 'staff']);
+        $isAdminOrStaff = in_array($user->role, ['admin', 'manager', 'staff']);
         
         $targetUserId = $user->id;
         $myDogs = $user->dogs()->pluck('dogs.id')->toArray();
@@ -383,3 +383,4 @@ class ReservationController extends Controller
         return response()->noContent();
     }
 }
+

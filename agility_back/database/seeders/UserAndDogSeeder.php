@@ -22,6 +22,17 @@ class UserAndDogSeeder extends Seeder
             ]
         );
 
+        // Manager
+        \App\Models\User::firstOrCreate(
+            ['email' => 'manager@agility.com'],
+            [
+                'name' => 'Manager User',
+                'password' => bcrypt('password'),
+                'role' => 'manager',
+                'club_id' => 1
+            ]
+        );
+
         // Staff
         \App\Models\User::firstOrCreate(
             ['email' => 'staff@agility.com'],
@@ -43,7 +54,7 @@ class UserAndDogSeeder extends Seeder
         );
 
         // Additional 5 Members
-        $users = \App\Models\User::factory(5)->create(['role' => 'member']);
+        $users = \App\Models\User::factory(5)->create(['role' => 'member', 'club_id' => 1]);
         $users->push($member);
 
         $breeds = ['Border Collie', 'Pastor Belga', 'Caniche', 'Mestizo', 'Jack Russell'];

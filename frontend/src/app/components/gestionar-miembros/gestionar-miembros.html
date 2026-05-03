@@ -2,9 +2,98 @@
   <div class="header">
     <div style="display: flex; align-items: center; gap: 1rem;">
       <h1>Gestión Miembros</h1>
-      <button class="help-btn" (click)="openHelpModal()" title="Instrucciones" style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 6px 12px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;">
-        <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
-      </button>
+      <app-instrucciones titulo="Instrucciones de Gestión y Roles">
+        <p class="help-intro" style="margin-bottom: 1.5rem; font-size: 0.95rem;">
+          Esta sección es el panel de control administrativo donde puedes administrar las cuentas de todas las personas registradas en la aplicación.
+        </p>
+
+        <h3 class="help-section-title" style="display: flex; align-items: center; gap: 8px; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Niveles de Acceso (Roles)</h3>
+        <ul class="help-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-inactive" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">person</span>
+            <div class="help-list-content">
+              <strong>Inactivo (Nivel Básico)</strong>
+              <p style="margin: 0;">Estado al registrarse o dar de baja. Carecen de acceso interno al club.</p>
+            </div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-member" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">star</span>
+            <div class="help-list-content">
+              <strong>Miembro (Nivel Activo)</strong>
+              <p style="margin: 0;">Rol normal para alumnos y socios. Funciones completas desbloqueadas: pueden realizar sus reservas, ver el calendario, acceder a los recursos privados y la galería de vídeos, y participar en el ranking.</p>
+            </div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-staff" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">admin_panel_settings</span>
+            <div class="help-list-content">
+              <strong>Staff (Nivel Administrativo)</strong>
+              <p style="margin: 0;">Rol para entrenadores y equipo técnico. Tienen todo lo del miembro y además herramientas de gestión (menú Staff: pasar lista, crear competiciones, gestionar miembros, añadir puntos).</p>
+            </div>
+          </li>
+        </ul>
+
+        <h3 class="help-section-title" style="display: flex; align-items: center; gap: 8px; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Acciones Principales</h3>
+        <ul class="help-list custom-actions-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-sync" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">sync_alt</span>
+            <span class="action-desc"><strong>Cambiar Rol:</strong> Usa el menú desplegable junto al nombre para ascender o cambiar el nivel de una persona inmediatamente (ej. de Inactivo a Miembro).</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-key" style="color: #fbbf24; flex-shrink: 0; margin-top: 2px;">key</span>
+            <span class="action-desc"><strong>Recuperar Contraseña:</strong> El botón de la llave genera un enlace de recuperación seguro y lo copia al portapapeles. Luego, pásaselo a esa persona.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-delete" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">delete</span>
+            <span class="action-desc"><strong>Eliminar (Papelera):</strong> Borra la cuenta permanentemente, junto con todos sus perros, reservas y asistencias. Acción irreversible.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-zoom" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">zoom_in</span>
+            <span class="action-desc"><strong>Ver Foto:</strong> Haz clic en la miniatura de cualquier persona para ver su foto de perfil ampliada.</span>
+          </li>
+        </ul>
+
+        <h3 class="help-section-title" style="display: flex; align-items: center; gap: 8px; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Visibilidad de Secciones</h3>
+        <ul class="help-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-public" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">public</span>
+            <div class="help-list-content">
+              <strong>Pública</strong>
+              <p style="margin: 0;">Es visible para todo el mundo (cualquiera sin necesidad de registrarse, usuarios inactivos, miembros y staff).</p>
+            </div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-explore" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">explore</span>
+            <div class="help-list-content">
+              <strong>Miembros y Explorar</strong>
+              <p style="margin: 0;">Accesibles para miembros y staff. En "Miembros" se encuentran las funcionalidades principales de uso asiduo, y en "Explorar" las funciones complementarias.</p>
+            </div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-staff" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">admin_panel_settings</span>
+            <div class="help-list-content">
+              <strong>Staff</strong>
+              <p style="margin: 0;">Exclusiva para los miembros del Staff. Contiene las herramientas y funciones de gestión general y deportiva.</p>
+            </div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons icon-personal" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">person</span>
+            <div class="help-list-content">
+              <strong>Funciones Personales</strong>
+              <p style="margin: 0;">Se despliegan al hacer clic en la foto de perfil en el menú y son accesibles para miembros y staff debidamente identificados.</p>
+            </div>
+          </li>
+        </ul>
+
+        <div class="help-alert" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 12px; margin-top: 24px; display: flex; gap: 12px; align-items: flex-start;">
+          <span class="material-icons" style="color: #16a34a; font-size: 24px; margin-top: 2px;">lightbulb</span>
+          <div>
+            <strong style="color: #166534; display: block; margin-bottom: 6px; font-size: 1.05rem;">Consejo: Conservar el historial de un ex-miembro</strong>
+            <p style="margin: 0; color: #15803d; font-size: 0.95rem; line-height: 1.5;">
+              Si alguien abandona el club temporalmente, <strong>NO lo elimines</strong> con la papelera, ya que perderás sus métricas y perros. En su lugar, simplemente bájale el rol a <strong>"Inactivo"</strong>. Esto bloqueará su acceso a la app, pero sus datos y reservas anteriores quedarán intactos para vuestras estadísticas (y listos para reactivarse si vuelve).
+            </p>
+          </div>
+        </div>
+      </app-instrucciones>
     </div>
     <div class="stats">
       <span>Usuarios: {{ displayUsers().length }}</span>
@@ -46,10 +135,15 @@
                     <td>
                       <div class="action-buttons-wrapper">
                         <select [value]="user.role" (change)="updateRole(user, $any($event.target).value)"
-                          class="role-select">
+                          class="role-select" [disabled]="!canEditRole(user)">
                           <option value="user">Inactivo</option>
                           <option value="member">Miembro</option>
-                          <option value="staff">Staff</option>
+                          @if (authService.isManager() || user.role === 'staff') {
+                            <option value="staff">Staff</option>
+                          }
+                          @if (user.role === 'manager') {
+                            <option value="manager">Gestor</option>
+                          }
                         </select>
                         <button class="btn-icon reset-pwd-btn" (click)="generateResetLink(user)"
                           title="Generar Enlace de Recuperación">
@@ -63,7 +157,7 @@
                     </td>
                     <td>
                       <span class="badge" [class]="user.role">
-                        {{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase) }}
+                        {{ user.role === 'user' ? 'Inactivo' : (user.role === 'manager' ? 'Gestor' : (user.role | titlecase)) }}
                       </span>
                     </td>
                     <td class="email-cell">{{ user.email }}</td>
@@ -126,114 +220,5 @@
         </div>
       }
 
-      <!-- Help Modal (Instrucciones) -->
-      @if (isHelpModalOpen) {
-        <div class="modal-overlay help-modal-overlay" (click)="closeHelpModal()">
-          <div class="modal-content help-modal-content" (click)="$event.stopPropagation()">
-            <button class="close-btn help-close-btn" (click)="closeHelpModal()">&times;</button>
-            
-            <div class="help-header">
-              <span class="material-icons help-header-icon">help_outline</span>
-              <h2>Instrucciones de Gestión y Roles</h2>
-            </div>
-            
-            <p class="help-intro">
-              Esta sección es el panel de control administrativo donde puedes administrar las cuentas de todas las personas registradas en la aplicación.
-            </p>
 
-            <h3 class="help-section-title">Niveles de Acceso (Roles)</h3>
-            <ul class="help-list">
-              <li>
-                <span class="material-icons icon-inactive">person</span>
-                <div class="help-list-content">
-                  <strong>Inactivo (Nivel Básico)</strong>
-                  <p>Estado al registrarse o dar de baja. Carecen de acceso interno al club.</p>
-                </div>
-              </li>
-              <li>
-                <span class="material-icons icon-member">star</span>
-                <div class="help-list-content">
-                  <strong>Miembro (Nivel Activo)</strong>
-                  <p>Rol normal para alumnos y socios. Funciones completas desbloqueadas: pueden realizar sus reservas, ver el calendario, acceder a los recursos privados y la galería de vídeos, y participar en el ranking.</p>
-                </div>
-              </li>
-              <li>
-                <span class="material-icons icon-staff">admin_panel_settings</span>
-                <div class="help-list-content">
-                  <strong>Staff (Nivel Administrativo)</strong>
-                  <p>Rol para entrenadores y equipo técnico. Tienen todo lo del miembro y además herramientas de gestión (menú Staff: pasar lista, crear competiciones, gestionar miembros, añadir puntos).</p>
-                </div>
-              </li>
-            </ul>
-
-            <h3 class="help-section-title">Acciones Principales</h3>
-            <ul class="help-list custom-actions-list">
-              <li>
-                <span class="material-icons icon-sync">sync_alt</span>
-                <span class="action-desc"><strong>Cambiar Rol:</strong> Usa el menú desplegable junto al nombre para ascender o cambiar el nivel de una persona inmediatamente (ej. de Inactivo a Miembro).</span>
-              </li>
-              <li>
-                <span class="material-icons icon-key">key</span>
-                <span class="action-desc"><strong>Recuperar Contraseña:</strong> El botón de la llave genera un enlace de recuperación seguro y lo copia al portapapeles. Luego, pásaselo a esa persona.</span>
-              </li>
-              <li>
-                <span class="material-icons icon-delete">delete</span>
-                <span class="action-desc"><strong>Eliminar (Papelera):</strong> Borra la cuenta permanentemente, junto con todos sus perros, reservas y asistencias. Acción irreversible.</span>
-              </li>
-              <li>
-                <span class="material-icons icon-zoom">zoom_in</span>
-                <span class="action-desc"><strong>Ver Foto:</strong> Haz clic en la miniatura de cualquier persona para ver su foto de perfil ampliada.</span>
-              </li>
-            </ul>
-
-            <h3 class="help-section-title">Visibilidad de Secciones</h3>
-            <ul class="help-list">
-              <li>
-                <span class="material-icons icon-public">public</span>
-                <div class="help-list-content">
-                  <strong>Pública</strong>
-                  <p>Es visible para todo el mundo (cualquiera sin necesidad de registrarse, usuarios inactivos, miembros y staff).</p>
-                </div>
-              </li>
-              <li>
-                <span class="material-icons icon-explore">explore</span>
-                <div class="help-list-content">
-                  <strong>Miembros y Explorar</strong>
-                  <p>Accesibles para miembros y staff. En "Miembros" se encuentran las funcionalidades principales de uso asiduo, y en "Explorar" las funciones complementarias.</p>
-                </div>
-              </li>
-              <li>
-                <span class="material-icons icon-staff">admin_panel_settings</span>
-                <div class="help-list-content">
-                  <strong>Staff</strong>
-                  <p>Exclusiva para los miembros del Staff. Contiene las herramientas y funciones de gestión general y deportiva.</p>
-                </div>
-              </li>
-              <li>
-                <span class="material-icons icon-personal">person</span>
-                <div class="help-list-content">
-                  <strong>Funciones Personales</strong>
-                  <p>Se despliegan al hacer clic en la foto de perfil en el menú y son accesibles para miembros y staff debidamente identificados.</p>
-                </div>
-              </li>
-            </ul>
-
-            <div class="help-alert" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 16px; border-radius: 12px; margin-top: 24px; display: flex; gap: 12px; align-items: flex-start;">
-              <span class="material-icons" style="color: #16a34a; font-size: 24px; margin-top: 2px;">lightbulb</span>
-              <div>
-                <strong style="color: #166534; display: block; margin-bottom: 6px; font-size: 1.05rem;">Consejo: Conservar el historial de un ex-miembro</strong>
-                <p style="margin: 0; color: #15803d; font-size: 0.95rem; line-height: 1.5;">
-                  Si alguien abandona el club temporalmente, <strong>NO lo elimines</strong> con la papelera, ya que perderás sus métricas y perros. En su lugar, simplemente bájale el rol a <strong>"Inactivo"</strong>. Esto bloqueará su acceso a la app, pero sus datos y reservas anteriores quedarán intactos para vuestras estadísticas (y listos para reactivarse si vuelve).
-                </p>
-              </div>
-            </div>
-
-            <div class="modal-actions help-actions">
-              <button class="btn-cancel" (click)="closeHelpModal()">
-                Entendido
-              </button>
-            </div>
-          </div>
-        </div>
-      }
     </div>

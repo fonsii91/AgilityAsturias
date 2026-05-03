@@ -14,8 +14,8 @@ import { environment } from '../../../../../environments/environment';
     @if (dog()) {
       <div class="summary-container">
         
-        <div class="info-note" [style.border-left-color]="clubTheme.primary">
-          <span class="material-icons-outlined" [style.color]="clubTheme.primary">info</span>
+        <div class="info-note" style="border-left-color: var(--primary-color);">
+          <span class="material-icons-outlined" style="color: var(--primary-color);">info</span>
           <p>Vista general básica. Puedes actualizar el nombre y la fecha de nacimiento aquí.</p>
         </div>
 
@@ -38,7 +38,7 @@ import { environment } from '../../../../../environments/environment';
             </div>
             
             <div class="form-group submit-group" style="grid-column: 1 / -1; margin-top: 1rem; text-align: right;">
-              <button class="btn-save" [style.background]="clubTheme.primary" (click)="saveChanges()" [disabled]="isSaving">
+              <button class="btn-save" style="background: var(--primary-color);" (click)="saveChanges()" [disabled]="isSaving">
                 <span class="material-icons">save</span> Guardar Cambios
               </button>
             </div>
@@ -50,7 +50,7 @@ import { environment } from '../../../../../environments/environment';
           <p class="text-muted">Completa los datos en las otras pestañas para llegar al 100%.</p>
           <div class="progress-bar-container" style="background:#e2e8f0; border-radius:8px; height:20px; overflow:hidden; position:relative; margin-top:1rem;">
             <div class="progress-bar-fill" [style.width.%]="calculateProgress()" 
-                 [style.background]="calculateProgress() === 100 ? '#22c55e' : clubTheme.primary"
+                 [style.background]="calculateProgress() === 100 ? '#22c55e' : 'var(--primary-color)'"
                  style="height: 100%; transition: width 0.5s ease; position:relative;">
                <span style="position:absolute; right:10px; top:50%; transform:translateY(-50%); color:white; font-size:0.75rem; font-weight:bold;">{{ calculateProgress() }}%</span>
             </div>

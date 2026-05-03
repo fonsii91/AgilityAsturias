@@ -76,11 +76,4 @@ describe('RecursosListComponent', () => {
     expect(resourceServiceSpy.getResources).toHaveBeenCalledTimes(2); // Once on init, once after delete
   });
 
-  it('should toggle help modal', () => {
-    expect(component.isHelpModalOpen()).toBe(false);
-    component.openHelpModal();
-    expect(component.isHelpModalOpen()).toBe(true);
-    component.closeHelpModal();
-    expect(component.isHelpModalOpen()).toBe(false);
-  });
 });

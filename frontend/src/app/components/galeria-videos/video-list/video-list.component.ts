@@ -13,11 +13,12 @@ import { environment } from '../../../../environments/environment';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { TenantService } from '../../../services/tenant.service';
+import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
 
 @Component({
     selector: 'app-video-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, SmartVideoPlayerComponent, RouterLink, FichaPerroComponent],
+    imports: [CommonModule, FormsModule, SmartVideoPlayerComponent, RouterLink, FichaPerroComponent, InstruccionesComponent],
     templateUrl: './video-list.component.html',
     styleUrl: './video-list.component.css'
 })
@@ -48,7 +49,7 @@ export class VideoListComponent implements OnInit {
 
     selectedDogForProfile: Dog | null = null;
     isDogProfileOpen = false;
-    isHelpModalOpen = false;
+
 
     searchQuery: string = '';
     filterDateRange: string = '';
@@ -67,19 +68,7 @@ export class VideoListComponent implements OnInit {
         this.isFiltersOpen = !this.isFiltersOpen;
     }
 
-    openHelpModal() {
-        this.isHelpModalOpen = true;
-    }
 
-    closeHelpModal(event?: Event) {
-        if (event) {
-            if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
-                this.isHelpModalOpen = false;
-            }
-        } else {
-            this.isHelpModalOpen = false;
-        }
-    }
 
     get sortedDogs(): Dog[] {
         const dogs = this.dogService.getAllDogs()() || [];

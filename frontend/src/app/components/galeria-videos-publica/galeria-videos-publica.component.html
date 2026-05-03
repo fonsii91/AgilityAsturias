@@ -1,9 +1,22 @@
 <div class="public-video-gallery-container container">
   <div class="gallery-header" style="position: relative;">
     @if (authService.isStaff() || authService.isAdmin()) {
-    <button class="help-btn" (click)="openHelpModal()" title="Instrucciones para el Staff">
-      <span class="material-icons">help_outline</span> Instrucciones
-    </button>
+    <app-instrucciones titulo="Gestión de la Videoteca Pública">
+      <div class="staff-instructions">
+        <p style="margin-bottom: 1rem;"><strong>Estos vídeos son públicos y cualquiera puede verlos (aunque no esté
+            registrado en la aplicación) y sirven como escaparate del club en internet.</strong></p>
+        <ul>
+          <li><strong>Para añadir un vídeo:</strong> Ve a la pestaña privada de <em>Vídeos</em> (la galería interna).
+            Allí encontrarás un botón con el icono del mundo (<span class="material-icons"
+              style="font-size: 16px; vertical-align: bottom;">public</span>) en cada vídeo para hacer que se muestre
+            en esta vitrina.</li>
+          <li><strong>Para quitar un vídeo:</strong> Puedes hacerlo desde la galería general de <em>Vídeos</em>, o
+            directamente desde aquí, pulsando el botón flotante rojo (<span class="material-icons"
+              style="font-size: 16px; vertical-align: bottom; color: #e74c3c;">public_off</span>) que aparece sobre
+            cada vídeo en la esquina superior derecha.</li>
+        </ul>
+      </div>
+    </app-instrucciones>
     }
     <h2 class="section-title">Videoteca Pública</h2>
     <p class="section-subtitle">Disfruta de los vídeos de nuestros entrenamientos y competiciones.</p>
@@ -109,31 +122,5 @@
   </div>
   }
 
-  @if (isHelpModalOpen) {
-  <div class="modal-overlay" (click)="closeHelpModal($event)">
-    <div class="modal-content help-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>¿Cómo funciona la Videoteca?</h3>
-        <button class="close-btn" (click)="closeHelpModal()">&times;</button>
-      </div>
-      <div class="modal-body text-left">
-        <div class="staff-instructions">
-          <h4>🎓 Gestión de la Videoteca Pública:</h4>
-          <p style="margin-bottom: 1rem;"><strong>Estos vídeos son públicos y cualquiera puede verlos (aunque no esté
-              registrado en la aplicación) y sirven como escaparate del club en internet.</strong></p>
-          <ul>
-            <li><strong>Para añadir un vídeo:</strong> Ve a la pestaña privada de <em>Vídeos</em> (la galería interna).
-              Allí encontrarás un botón con el icono del mundo (<span class="material-icons"
-                style="font-size: 16px; vertical-align: bottom;">public</span>) en cada vídeo para hacer que se muestre
-              en esta vitrina.</li>
-            <li><strong>Para quitar un vídeo:</strong> Puedes hacerlo desde la galería general de <em>Vídeos</em>, o
-              directamente desde aquí, pulsando el botón flotante rojo (<span class="material-icons"
-                style="font-size: 16px; vertical-align: bottom; color: #e74c3c;">public_off</span>) que aparece sobre
-              cada vídeo en la esquina superior derecha.</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  }
+
 </div>

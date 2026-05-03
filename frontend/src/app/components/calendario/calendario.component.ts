@@ -6,7 +6,7 @@ import { DogService } from '../../services/dog.service';
 import { PersonalEventService } from '../../services/personal-event.service';
 import { PersonalEvent } from '../../models/personal-event.model';
 import { FormsModule } from '@angular/forms';
-
+import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 interface CalendarDay {
     date: Date;
     isCompetition: boolean;
@@ -24,7 +24,7 @@ interface CalendarDay {
 @Component({
     selector: 'app-calendario',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, InstruccionesComponent],
     templateUrl: './calendario.component.html',
     styleUrls: ['./calendario.component.css']
 })
@@ -282,19 +282,6 @@ export class CalendarioComponent implements AfterViewInit {
         document.body.style.overflow = 'auto';
     }
 
-    openHelpModal() {
-        this.isHelpModalOpen = true;
-    }
-
-    closeHelpModal(event?: Event) {
-        if (event) {
-            if ((event.target as HTMLElement).classList.contains('modal-overlay')) {
-                this.isHelpModalOpen = false;
-            }
-        } else {
-            this.isHelpModalOpen = false;
-        }
-    }
 
     // Attendance Methods
     startAttendance() {

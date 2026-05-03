@@ -14,13 +14,14 @@ import { RsceTrack } from '../../models/rsce-track.model';
 import { Video } from '../../models/video.model';
 import confetti from 'canvas-confetti';
 import { SmartVideoPlayerComponent } from '../galeria-videos/smart-video-player/smart-video-player.component';
+import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-rsce-tracker',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, SmartVideoPlayerComponent, MatIconModule],
+  imports: [CommonModule, RouterModule, FormsModule, SmartVideoPlayerComponent, MatIconModule, InstruccionesComponent],
   templateUrl: './rsce-tracker.component.html',
   styleUrls: ['./rsce-tracker.component.css'],
   providers: [DatePipe]

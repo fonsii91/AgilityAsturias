@@ -14,7 +14,7 @@ import { ImageCompressorService } from '../../../services/image-compressor.servi
   template: `
     @if (isLoading()) {
       <div class="loading-state">
-        <span class="material-icons-outlined spinner" [style.color]="clubTheme.primary">pets</span>
+        <span class="material-icons-outlined spinner" style="color: var(--primary-color);">pets</span>
         <p>Cargando perfil...</p>
       </div>
     } @else if (dog()) {
@@ -38,7 +38,7 @@ import { ImageCompressorService } from '../../../services/image-compressor.servi
               } @else {
                 <span class="material-icons placeholder">pets</span>
               }
-              <label class="camera-floating-btn" title="Cambiar foto" [style.background]="clubTheme.primary">
+              <label class="camera-floating-btn" title="Cambiar foto" style="background: var(--primary-color);">
                 <span class="material-icons">camera_alt</span>
                 <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
               </label>
@@ -54,7 +54,7 @@ import { ImageCompressorService } from '../../../services/image-compressor.servi
               </p>
             </div>
             
-            <div class="dog-points-badge" [style.background]="clubTheme.accent">
+            <div class="dog-points-badge" style="background: var(--accent-orange, #EAB308);">
               <span class="pts">{{ dog()!.points || 0 }}</span>
               <span class="lbl">PUNTOS</span>
             </div>
@@ -63,19 +63,19 @@ import { ImageCompressorService } from '../../../services/image-compressor.servi
         
         <!-- Navigation Tabs -->
         <div class="dashboard-nav">
-          <a routerLink="resumen" routerLinkActive="active" class="nav-tab" [style.--active-color]="clubTheme.primary">
+          <a routerLink="resumen" routerLinkActive="active" class="nav-tab" style="--active-color: var(--primary-color);">
             <span class="material-icons-outlined">dashboard</span> Resumen
           </a>
-          <a routerLink="entrenamiento" routerLinkActive="active" class="nav-tab" [style.--active-color]="clubTheme.primary">
+          <a routerLink="entrenamiento" routerLinkActive="active" class="nav-tab" style="--active-color: var(--primary-color);">
             <span class="material-icons-outlined">fitness_center</span> Entrenamiento
           </a>
-          <a routerLink="salud" routerLinkActive="active" class="nav-tab" [style.--active-color]="clubTheme.primary">
+          <a routerLink="salud" routerLinkActive="active" class="nav-tab" style="--active-color: var(--primary-color);">
             <span class="material-icons-outlined">medical_services</span> Salud
           </a>
-          <a routerLink="documentacion" routerLinkActive="active" class="nav-tab" [style.--active-color]="clubTheme.primary">
+          <a routerLink="documentacion" routerLinkActive="active" class="nav-tab" style="--active-color: var(--primary-color);">
             <span class="material-icons-outlined">folder_shared</span> Documentos
           </a>
-          <a routerLink="familia" routerLinkActive="active" class="nav-tab" [style.--active-color]="clubTheme.primary">
+          <a routerLink="familia" routerLinkActive="active" class="nav-tab" style="--active-color: var(--primary-color);">
             <span class="material-icons-outlined">family_restroom</span> Familia
           </a>
           <a routerLink="ajustes" routerLinkActive="active" class="nav-tab danger-tab">
@@ -92,7 +92,7 @@ import { ImageCompressorService } from '../../../services/image-compressor.servi
       <div class="empty-state">
         <span class="material-icons-outlined empty-icon">error_outline</span>
         <p>No pudimos encontrar a este perro.</p>
-        <button class="btn-primary" routerLink="/gestionar-perros" [style.background-color]="clubTheme.primary">
+        <button class="btn-primary" routerLink="/gestionar-perros" style="background-color: var(--primary-color);">
           Volver a Mis Perros
         </button>
       </div>

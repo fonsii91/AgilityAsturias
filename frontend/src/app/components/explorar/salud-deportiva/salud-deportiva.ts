@@ -13,11 +13,21 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
 import { PendingReviewsDialogComponent } from './pending-reviews-dialog/pending-reviews-dialog.component';
 import { HistoryDialogComponent } from './history-dialog/history-dialog.component';
+import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
 
 @Component({
   selector: 'app-salud-deportiva',
   standalone: true,
-  imports: [CommonModule, FormsModule, AthleticProfileCardComponent, MatDialogModule, MatButtonModule, MatIconModule, MatRippleModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    AthleticProfileCardComponent, 
+    MatDialogModule, 
+    MatButtonModule, 
+    MatIconModule, 
+    MatRippleModule,
+    InstruccionesComponent
+  ],
   templateUrl: './salud-deportiva.html',
   styleUrls: ['./salud-deportiva.css']
 })
@@ -52,8 +62,6 @@ export class SaludDeportivaComponent implements OnInit {
   });
 
   // Formularios manuales
-  isHelpModalOpen = signal<boolean>(false);
-
   visibleHistory = computed(() => {
     const data = this.acwrData();
     if (!data || !data.recent_history) return [];
@@ -156,23 +164,6 @@ export class SaludDeportivaComponent implements OnInit {
     this.openManualModal(w);
   }
 
-  openHelpModal() {
-    this.isHelpModalOpen.set(true);
-  }
-
-  showInfo(type: 'time' | 'jump' | 'studies') {
-    if (type === 'time') {
-      this.toast.info('Se cuenta ÚNICAMENTE el tiempo de máxima intensidad. 1 h de clase suele suponer entre 4 y 6 min reales en pista.', 8000);
-    } else if (type === 'jump') {
-      this.toast.info('Cruzar el umbral de altura a la cruz aumenta el impacto articular exponencialmente.', 5000);
-    } else if (type === 'studies') {
-      this.toast.info('Basado en consensos veterinarios (CPT Training, VetBloom): Las micro-sesiones (3-5m) son óptimas. Más de 12 min puramente activos elevan drásticamente el riesgo de lesión.', 10000);
-    }
-  }
-
-  closeHelpModal() {
-    this.isHelpModalOpen.set(false);
-  }
 
   openPendingModal() {
     const dialogRef = this.dialog.open(PendingReviewsDialogComponent, {
@@ -233,18 +224,12 @@ export class SaludDeportivaComponent implements OnInit {
   }
 
   translateSourceType(type: string): string {
-    const translations: Record<string, string> = {
-      'attendance': 'Clase',
+    const map: any = {
+      'class': 'Clase',
       'competition': 'Competición',
-      'manual': 'Agility'
+      'manual': 'Manual'
     };
-
-    for (const key in translations) {
-      if (type.toLowerCase().includes(key)) {
-        return translations[key];
-      }
-    }
-    return 'Entrenamiento';
+    return map[type] || type;
   }
 
   promptDeleteWorkload(id: number) {

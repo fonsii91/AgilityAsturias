@@ -13,8 +13,8 @@ import { environment } from '../../../../../environments/environment';
   template: `
     @if (dog()) {
       <div class="docs-container fade-in">
-        <div class="info-note" [style.border-left-color]="clubTheme.primary">
-          <span class="material-icons-outlined" [style.color]="clubTheme.primary">lock</span>
+        <div class="info-note" style="border-left-color: var(--primary-color);">
+          <span class="material-icons-outlined" style="color: var(--primary-color);">lock</span>
           <p>
             Tus números de Microchip, LOE y Licencias jamás se muestran al público. Se guardan encriptados y son confidenciales.
             Añade caducidades para recibir alertas antes de que expiren.
@@ -71,7 +71,7 @@ import { environment } from '../../../../../environments/environment';
         </div>
         
         <div class="form-actions" style="margin-top: 1.5rem; text-align: right;">
-          <button class="btn-save" [style.background]="clubTheme.primary" (click)="saveChanges()" [disabled]="isSaving">
+          <button class="btn-save" style="background: var(--primary-color);" (click)="saveChanges()" [disabled]="isSaving">
             <span class="material-icons">save</span> Guardar Documentos
           </button>
         </div>
@@ -90,7 +90,7 @@ import { environment } from '../../../../../environments/environment';
     .docs-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
     
     .doc-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-top: 4px solid #cbd5e1; }
-    .doc-card.rsce-card { border-top-color: #3b82f6; }
+    .doc-card.rsce-card { border-top-color: var(--primary-color, #3b82f6); }
     .doc-card.rfec-card { border-top-color: #10b981; }
     
     .doc-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; color: #1e293b; }

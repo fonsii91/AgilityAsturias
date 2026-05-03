@@ -23,31 +23,43 @@ Cuando el usuario (USER) invoque esta skill y pase por parámetro una sección (
 ---
 
 ## FASE 2: Programar la Interfaz (El Modal)
-Una vez hayas comprendido bien las reglas gracias al paso anterior, procede a programar la ayuda en la interfaz web de la sección.
+Una vez hayas comprendido bien las reglas gracias al paso anterior, procede a programar la ayuda en la interfaz web usando el componente reutilizable `<app-instrucciones>`.
 
-### 1. El Botón
-Añade cerca del título o en el área de cabecera de la sección un botón identificativo idéntico al estándar de la app. Utiliza un estilo en forma de píldora (o similar si se adapta mejor a esa cabecera específica), que incluya el texto **Instrucciones** junto al icono Material Icon de la interrogación (`help_outline`).
+### 1. Importar el Componente (.ts)
+Asegúrate de importar `InstruccionesComponent` en el archivo `.ts` del componente de la sección.
+```typescript
+import { InstruccionesComponent } from '../../components/shared/instrucciones/instrucciones.component';
 
-Ejemplo de estructura de botón base:
-```html
-<button class="help-btn" (click)="openHelpModal()" title="Instrucciones" style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s;">
-  <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
-</button>
+@Component({
+  ...
+  imports: [..., InstruccionesComponent],
+})
 ```
 
-### 2. El Modal de Instrucciones (UX/UI Meticulosa)
-Crea una estructura de modal reactivo (`@if (isHelpModalOpen) { ... }`) al fondo del archivo `.html` de la sección.
-Debes prestar vital atención a cargar y respetar la UX/UI de la siguiente manera:
-*   Emplea cabeceras de modal claras y botones de cierre (`&times;`) en la esquina superior derecha.
-*   **Alineación y legibilidad:** El texto del modal NUNCA debe estar centrado; fórcebo a la alineación izquierda (`text-align: left;`) para asegurar una lectura fluida. Deja "aire" usando `gap` o un buen espaciado.
-*   **Listas e Iconografía cruzada:** Si vas a listar normas o botones que estén en la UI, no uses los típicos 'puntos negros'. Usa la etiqueta `<ul>` y convierte cada `<li>` en un bloque *flex* (`display: flex; gap: 10px; align-items: flex-start;`). A la izquierda de cada ítem, incrusta el **Mismo Icono Exacto** (Material Icon) coloreado que usa la aplicación original. Así el usuario asociará el icono con la acción de inmediato.
-*   **Condicional de Roles (Importante):**
-    *   Cualquier rol debe poder ver la primera mitad del Modal, es decir, el bloque principal de "Reglas para Miembros".
-    *   En la segunda mitad, bajo un nuevo título y separados, debes usar `@if (['admin', 'staff'].includes(rol_actual)) { ... }` para ocultar opciones confidenciales o atajos administrativos.
+### 2. Insertar en la Interfaz (.html)
+Añade el componente `<app-instrucciones>` cerca del título o en el área de cabecera de la sección. Deberás inyectar dentro todo el contenido del modal utilizando las mismas reglas de listados e iconos.
 
-### 3. Código Lógico (.ts)
-Reconoce la forma en que se maneja el estado actual (usando *Signals* de Angular 17+) e implementa el estado `isHelpModalOpen = false`.
-Proporciona la apertura y el cerrado mediante click en el botón de cerrar (`x`) y en el `backdrop` gris oscuro de fondo.
+Ejemplo de estructura:
+```html
+<app-instrucciones titulo="Guía de Sección">
+  <h4 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Reglas para los Socios</h4>
+  <ul style="padding-left: 0; list-style: none; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 16px;">
+    <li style="display: flex; gap: 10px; align-items: flex-start;">
+      <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">info</span>
+      <span><strong>Explicación:</strong> ...</span>
+    </li>
+  </ul>
+
+  @if (authService.isStaff()) {
+    <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Staff</h4>
+    ...
+  }
+</app-instrucciones>
+```
+
+### 3. UX/UI Meticulosa del Contenido Inyectado
+*   **Listas e Iconografía cruzada:** Usa la etiqueta `<ul>` y convierte cada `<li>` en un bloque *flex* (`display: flex; gap: 10px; align-items: flex-start;`). A la izquierda de cada ítem, incrusta el **Mismo Icono Exacto** (Material Icon) coloreado que usa la aplicación original.
+*   **Condicional de Roles:** Usa `@if (authService.isStaff()) { ... }` (o similar) en la segunda mitad del contenido para ocultar opciones confidenciales o atajos administrativos a los miembros normales.
 
 ---
-**Nota para la IA:** No es necesario mostrar este texto de la skill al usuario, simplemente asúmelo e inicia la Fase 1 inmediatamente al ser llamado.
+**Nota para la IA:** No es necesario mostrar este texto de la skill al usuario, simplemente asúmelo e inicia la Fase 1 inmediatamente al ser llamado. No hace falta que programes los estados de apertura del modal, ya que el componente `<app-instrucciones>` lo gestiona todo internamente.

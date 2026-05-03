@@ -5,11 +5,12 @@ import { AuthService, UserProfile } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
 import { TenantService } from '../../services/tenant.service';
+import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 
 @Component({
   selector: 'app-gestionar-miembros',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, InstruccionesComponent],
   templateUrl: './gestionar-miembros.html',
   styleUrls: ['./gestionar-miembros.css']
 })
@@ -84,7 +85,8 @@ export class GestionarMiembrosComponent implements OnInit {
       const roleMap: any = {
         'user': 'Inactivo',
         'member': 'Miembro',
-        'staff': 'Staff'
+        'staff': 'Staff',
+        'manager': 'Gestor'
       };
 
       this.toastService.success(`Rol de ${user.displayName} actualizado a ${roleMap[role]}`);
@@ -96,6 +98,22 @@ export class GestionarMiembrosComponent implements OnInit {
       }
       this.toastService.error(errorMsg);
     }
+  }
+
+  canEditRole(targetUser: UserProfile): boolean {
+    const isManager = this.authService.isManager();
+    const isAdmin = this.authService.isAdmin();
+    
+    if (isAdmin) return true; // Admin can edit anyone shown here (which is everyone except other admins)
+    
+    if (isManager) {
+      // Managers cannot edit admins or other managers
+      return targetUser.role !== 'admin' && targetUser.role !== 'manager';
+    }
+    
+    // Regular Staff
+    // Cannot edit admins, managers, or other staff
+    return targetUser.role !== 'admin' && targetUser.role !== 'manager' && targetUser.role !== 'staff';
   }
 
   // Delete User Logic
@@ -150,19 +168,6 @@ export class GestionarMiembrosComponent implements OnInit {
   closeImageZoom() {
     this.isZoomModalOpen = false;
     this.zoomedImageURL = null;
-    document.body.style.overflow = 'auto';
-  }
-
-  // Help Modal State
-  isHelpModalOpen = false;
-
-  openHelpModal() {
-    this.isHelpModalOpen = true;
-    document.body.style.overflow = 'hidden';
-  }
-
-  closeHelpModal() {
-    this.isHelpModalOpen = false;
     document.body.style.overflow = 'auto';
   }
 }

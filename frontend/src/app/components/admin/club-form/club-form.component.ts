@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ClubAdminService, Club } from '../../../services/club-admin.service';
 import { ToastService } from '../../../services/toast.service';
+import { AuthService } from '../../../services/auth.service';
 import { ImageCompressorService } from '../../../services/image-compressor.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 
@@ -27,7 +28,6 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
   template: `
     <div class="form-container">
       
-      <!-- Sticky Header -->
       <div class="sticky-header">
         <div>
           <div class="breadcrumb">
@@ -41,18 +41,6 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
           <p class="subtitle">
             @if (isEditMode()) { Gestiona la identidad y accesos de tu espacio. } @else { Configura los datos principales para el nuevo espacio. }
           </p>
-        </div>
-        
-        <div class="header-actions">
-          <button mat-stroked-button color="basic" routerLink="/admin/clubs">Cancelar</button>
-          <button mat-flat-button color="primary" class="save-btn"
-                  [disabled]="form.invalid || isSaving() || isLoading()" (click)="save()">
-            <div class="btn-content">
-              @if (!isSaving()) { <mat-icon>save</mat-icon> }
-              @if (isSaving()) { <mat-spinner diameter="20"></mat-spinner> }
-              <span>@if (isSaving()) { Guardando... } @else { Guardar Cambios }</span>
-            </div>
-          </button>
         </div>
       </div>
 
@@ -205,38 +193,40 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
           <div class="grid-col-right">
             
             <!-- Card: Access -->
-            <div class="bento-card">
-              <div class="card-header orange-header">
-                <div class="icon-box orange-icon"><mat-icon>link</mat-icon></div>
-                <h2>Enlaces y Acceso</h2>
-              </div>
-              <div class="card-body stack-gap">
-                
-                <div class="input-group">
-                  <label>Subdominio de la Plataforma *</label>
-                  <div class="addon-input">
-                    <div class="addon">https://</div>
-                    <input type="text" formControlName="slug" class="main-input" placeholder="tu-club">
-                    <div class="addon">.clubagility.com</div>
-                  </div>
-                  <p class="help-text">Este será el enlace principal de acceso a tu panel.</p>
+            @if (isAdmin()) {
+              <div class="bento-card">
+                <div class="card-header orange-header">
+                  <div class="icon-box orange-icon"><mat-icon>link</mat-icon></div>
+                  <h2>Enlaces y Acceso</h2>
                 </div>
-
-                <hr class="divider">
-
-                <div class="input-group">
-                  <label>Dominio Personalizado (Avanzado)</label>
-                  <div class="info-box">
-                    <p>Opcional. Apunta tu dominio hacia nuestro servidor usando un registro A o CNAME para que el club sea accesible desde tu propia web.</p>
+                <div class="card-body stack-gap">
+                  
+                  <div class="input-group">
+                    <label>Subdominio de la Plataforma *</label>
+                    <div class="addon-input">
+                      <div class="addon">https://</div>
+                      <input type="text" formControlName="slug" class="main-input" placeholder="tu-club">
+                      <div class="addon">.clubagility.com</div>
+                    </div>
+                    <p class="help-text">Este será el enlace principal de acceso a tu panel.</p>
                   </div>
-                  <mat-form-field appearance="outline" class="w-full">
-                    <mat-icon matPrefix class="form-icon">language</mat-icon>
-                    <input matInput formControlName="domain" placeholder="Ej: agilityasturias.com">
-                  </mat-form-field>
-                </div>
 
+                  <hr class="divider">
+
+                  <div class="input-group">
+                    <label>Dominio Personalizado (Avanzado)</label>
+                    <div class="info-box">
+                      <p>Opcional. Apunta tu dominio hacia nuestro servidor usando un registro A o CNAME para que el club sea accesible desde tu propia web.</p>
+                    </div>
+                    <mat-form-field appearance="outline" class="w-full">
+                      <mat-icon matPrefix class="form-icon">language</mat-icon>
+                      <input matInput formControlName="domain" placeholder="Ej: agilityasturias.com">
+                    </mat-form-field>
+                  </div>
+
+                </div>
               </div>
-            </div>
+            }
 
             <!-- Card: Theme Colors -->
             <div class="bento-card">
@@ -246,8 +236,28 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
               </div>
               <div class="card-body stack-gap">
                 
+                <div class="preset-palettes">
+                  <label>Combinaciones Recomendadas</label>
+                  <p class="help-text" style="margin-top: 2px; margin-bottom: 12px;">Selecciona una paleta diseñada para garantizar legibilidad y una buena experiencia.</p>
+                  <div class="palettes-grid">
+                    @for (palette of suggestedPalettes; track palette.name) {
+                      <div class="palette-option" 
+                           [class.active]="form.get('primary_color')?.value === palette.primary && form.get('accent_color')?.value === palette.accent"
+                           (click)="applyPalette(palette)">
+                        <div class="palette-colors">
+                          <div class="color-swatch" [style.background-color]="palette.primary" title="Color Principal"></div>
+                          <div class="color-swatch" [style.background-color]="palette.accent" title="Color Secundario"></div>
+                        </div>
+                        <span class="palette-name">{{ palette.name }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <hr class="divider">
+
                 <div class="input-group">
-                  <label>Color Principal</label>
+                  <label>Color Principal (Personalizado)</label>
                   <div class="color-input-wrapper">
                     <input type="color" class="color-picker" [value]="form.get('primary_color')?.value" (input)="updateColor('primary_color', $event)">
                     <input type="text" formControlName="primary_color" class="hex-input">
@@ -255,7 +265,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
                 </div>
 
                 <div class="input-group">
-                  <label>Color Secundario / Botones</label>
+                  <label>Color Secundario / Botones (Personalizado)</label>
                   <div class="color-input-wrapper">
                     <input type="color" class="color-picker" [value]="form.get('accent_color')?.value" (input)="updateColor('accent_color', $event)">
                     <input type="text" formControlName="accent_color" class="hex-input">
@@ -268,6 +278,27 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
           </div>
 
         </form>
+
+        <!-- Floating Sticky Save Bar -->
+        @if (form.dirty) {
+          <div class="floating-save-bar pop-in">
+            <div class="save-bar-content">
+              <div class="save-text">
+                <span class="warning-text">Tienes cambios sin guardar</span>
+              </div>
+              <div class="save-actions">
+                <button mat-button class="reset-btn" (click)="resetForm()">Descartar</button>
+                <button mat-flat-button class="save-btn" [disabled]="form.invalid || isSaving()" (click)="save()">
+                  <div class="btn-content">
+                    @if (!isSaving()) { <mat-icon>save</mat-icon> }
+                    @if (isSaving()) { <mat-spinner diameter="20" color="accent"></mat-spinner> }
+                    <span>@if (isSaving()) { Guardando... } @else { Guardar Cambios }</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        }
       }
     </div>
   `,
@@ -286,19 +317,36 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
       padding-bottom: 6rem;
     }
     
+    /* Fix: Añadir oxígeno a los campos de texto (padding) */
+    ::ng-deep .form-container .mat-mdc-text-field-wrapper {
+      padding: 0 !important;
+    }
+    ::ng-deep .form-container .mat-mdc-form-field-flex {
+      padding: 0 16px !important;
+    }
+    ::ng-deep .form-container .mdc-notched-outline__notch {
+      padding-left: 12px !important;
+      padding-right: 12px !important;
+    }
+    ::ng-deep .form-container input.mat-mdc-input-element {
+      padding-left: 4px !important;
+    }
+    
     .sticky-header {
       position: sticky;
       top: 0;
-      z-index: 10;
-      background-color: rgba(255,255,255,0.9);
-      backdrop-filter: blur(8px);
+      z-index: 50;
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
-      padding-top: 1rem;
+      padding: 1.25rem 1.5rem;
+      margin: -1.5rem -1.5rem 2rem -1.5rem;
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+      border-radius: 0 0 1rem 1rem;
     }
     
     @media (min-width: 768px) {
@@ -338,11 +386,83 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
       align-items: center;
       gap: 0.75rem;
     }
-    .save-btn {
-      padding: 0 2rem;
-      border-radius: 0.75rem;
-      font-weight: 600;
+
+    .cancel-btn {
+      border-radius: 0.75rem !important;
+      font-weight: 500 !important;
+      height: 44px;
+      color: #475569 !important;
+      border-color: #cbd5e1 !important;
     }
+    .cancel-btn:hover {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    /* Floating Save Bar */
+    .floating-save-bar {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #1e293b;
+      color: white;
+      padding: 0.75rem 1rem 0.75rem 1.5rem;
+      border-radius: 9999px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      width: 90%;
+      max-width: 600px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .pop-in {
+      animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes popIn {
+      0% { opacity: 0; transform: translate(-50%, 20px) scale(0.95); }
+      100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+    }
+    .save-bar-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .save-text {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #cbd5e1;
+    }
+    .save-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .reset-btn {
+      color: #cbd5e1 !important;
+      border-radius: 9999px !important;
+    }
+    .reset-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      color: white !important;
+    }
+    .save-btn {
+      border-radius: 9999px !important;
+      font-weight: 600 !important;
+      background: var(--primary-color, #2563eb) !important;
+      color: white !important;
+      height: 40px;
+      padding: 0 1.5rem !important;
+    }
+    .save-btn:hover:not(:disabled) {
+      filter: brightness(1.1);
+    }
+    .save-btn:disabled {
+      background: rgba(255, 255, 255, 0.1) !important;
+      color: rgba(255, 255, 255, 0.5) !important;
+      cursor: not-allowed;
+    }
+
     .btn-content {
       display: flex;
       align-items: center;
@@ -573,6 +693,16 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
       border-color: #3b82f6;
       box-shadow: 0 0 0 1px #3b82f6;
     }
+
+    .disabled-addon .addon {
+      background-color: #f8fafc;
+      color: #cbd5e1;
+    }
+    .disabled-addon .main-input {
+      background-color: #f1f5f9;
+      color: #64748b;
+      cursor: not-allowed;
+    }
     
     .divider {
       height: 1px;
@@ -631,11 +761,66 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
       flex: 1;
       color: #334155;
     }
+    
+    .preset-palettes label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+    .palettes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+    @media (min-width: 640px) {
+      .palettes-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .palette-option {
+      border: 2px solid #e2e8f0;
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+      background: white;
+    }
+    .palette-option:hover {
+      border-color: #cbd5e1;
+      background: #f8fafc;
+    }
+    .palette-option.active {
+      border-color: #ec4899;
+      background: #fdf2f8;
+      box-shadow: 0 0 0 1px #ec4899;
+    }
+    .palette-colors {
+      display: flex;
+      width: 100%;
+      height: 28px;
+      border-radius: 0.375rem;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+    .color-swatch {
+      flex: 1;
+      height: 100%;
+    }
+    .palette-name {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #475569;
+      text-align: center;
+    }
   `]
 })
 export class ClubFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private clubService = inject(ClubAdminService);
+  private authService = inject(AuthService);
   private toast = inject(ToastService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
@@ -647,6 +832,7 @@ export class ClubFormComponent implements OnInit {
   isSaving = signal<boolean>(false);
   isLoading = signal<boolean>(true);
   isEditMode = signal<boolean>(false);
+  isAdmin = this.authService.isAdmin;
   
   logoPreviewUrl = signal<string | null>(null);
   heroPreviewUrl = signal<string | null>(null);
@@ -658,6 +844,24 @@ export class ClubFormComponent implements OnInit {
   logoFile: File | null = null;
   heroFile: File | null = null;
   ctaFile: File | null = null;
+
+  suggestedPalettes = [
+    { name: 'Agility Classic', primary: '#0073CF', accent: '#EAB308' },
+    { name: 'Emerald Forest', primary: '#047857', accent: '#D97706' },
+    { name: 'Midnight Purple', primary: '#4C1D95', accent: '#DB2777' },
+    { name: 'Ocean Deep', primary: '#0F766E', accent: '#F43F5E' },
+    { name: 'Slate & Amber', primary: '#334155', accent: '#F59E0B' },
+    { name: 'Crimson Red', primary: '#BE123C', accent: '#1E3A8A' }
+  ];
+
+  applyPalette(palette: { primary: string, accent: string }) {
+    this.form.patchValue({
+      primary_color: palette.primary,
+      accent_color: palette.accent
+    });
+    this.form.get('primary_color')?.markAsDirty();
+    this.form.get('accent_color')?.markAsDirty();
+  }
 
   ngOnInit() {
     this.initForm();
@@ -678,8 +882,8 @@ export class ClubFormComponent implements OnInit {
   initForm() {
     this.form = this.fb.group({
       name: ['', Validators.required],
-      slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]],
-      domain: [''],
+      slug: [{value: '', disabled: !this.isAdmin()}, [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]],
+      domain: [{value: '', disabled: !this.isAdmin()}],
       logo_url: [''],
       slogan: [''],
       primary_color: ['#0073CF'],
@@ -776,6 +980,26 @@ export class ClubFormComponent implements OnInit {
       
       reader.readAsDataURL(file);
     }
+  }
+
+  resetForm() {
+    if (this.clubId) {
+      this.loadClub(this.clubId);
+    } else {
+      this.form.reset();
+      this.initForm();
+    }
+    
+    // Reset file previews
+    this.logoPreviewUrl.set(null);
+    this.heroPreviewUrl.set(null);
+    this.ctaPreviewUrl.set(null);
+    this.logoFile = null;
+    this.heroFile = null;
+    this.ctaFile = null;
+    
+    this.form.markAsPristine();
+    this.form.markAsUntouched();
   }
 
   save() {

@@ -1,9 +1,13 @@
 /* Global Styles & Theming */
 :root {
-    /* Asturias Identity Palette */
+    /* Asturias Identity Palette (Default) */
     --primary-blue: #0073CF;
-    --primary-blue-dark: #005bb5;
-    --primary-blue-light: #4da3ff;
+    --primary-color: var(--primary-blue);
+    
+    /* Dynamic computed variants based on primary-color */
+    --primary-blue-dark: color-mix(in srgb, var(--primary-color) 80%, black);
+    --primary-blue-light: color-mix(in srgb, var(--primary-color) 60%, white);
+    
     --secondary-yellow: #F6D312;
     --secondary-yellow-dark: #e0be00;
     --white: #ffffff;
@@ -11,7 +15,6 @@
     --surface-background: #f0f4f8;
 
     /* Semantic Colors */
-    --primary-color: var(--primary-blue);
     --accent-color: var(--secondary-yellow);
     --background-color: var(--surface-background);
     --text-main: #1a1a1a;

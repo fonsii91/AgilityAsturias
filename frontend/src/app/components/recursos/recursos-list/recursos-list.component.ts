@@ -8,11 +8,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ResourceService, Resource, RESOURCE_CATEGORIES, RESOURCE_LEVELS } from '../../../services/resource.service';
 import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
+import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
 
 @Component({
   selector: 'app-recursos-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatButtonModule, MatIconModule, MatTooltipModule],
+  imports: [CommonModule, RouterModule, FormsModule, MatButtonModule, MatIconModule, MatTooltipModule, InstruccionesComponent],
   templateUrl: './recursos-list.component.html',
   styleUrls: ['./recursos-list.component.scss']
 })
@@ -24,7 +25,6 @@ export class RecursosListComponent implements OnInit {
   selectedCategory = signal<string>('');
   selectedLevel = signal<string>('all');
   isLoading = signal(true);
-  isHelpModalOpen = signal(false);
 
   constructor(
     private resourceService: ResourceService,
@@ -120,20 +120,18 @@ export class RecursosListComponent implements OnInit {
       }
   }
 
-  deleteResource(event: Event, res: Resource): void {
+  deleteResource(event: Event, resource: Resource): void {
     event.stopPropagation();
-    if (confirm(`¿Confirmas que deseas eliminar "${res.title}"?`)) {
-      this.resourceService.deleteResource(res.id).subscribe(() => {
-        this.loadResources();
+    if (confirm(`¿Estás seguro de que quieres eliminar "${resource.title}"?`)) {
+      this.resourceService.deleteResource(resource.id!).subscribe({
+        next: () => {
+          this.loadResources();
+        },
+        error: (error) => {
+          console.error('Error eliminando recurso:', error);
+          alert('Hubo un error al eliminar el recurso.');
+        }
       });
     }
-  }
-
-  openHelpModal(): void {
-    this.isHelpModalOpen.set(true);
-  }
-
-  closeHelpModal(): void {
-    this.isHelpModalOpen.set(false);
   }
 }

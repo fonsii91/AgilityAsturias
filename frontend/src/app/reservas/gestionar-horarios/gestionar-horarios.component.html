@@ -1,4 +1,4 @@
-<div class="management-container"
+﻿<div class="management-container"
   [style.--club-primary]="clubConfig.colors.primary"
   [style.--club-accent]="clubConfig.colors.accent"
   [style.--club-warn]="clubConfig.colors.warn">
@@ -46,7 +46,7 @@
         @for (group of filteredAndGroupedSlots(); track group.day) {
           <div class="day-group">
             <h3 class="day-group-header" style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-              <span class="material-icons" style="color: var(--club-primary, #0073cf)">today</span> 
+              <span class="material-icons" style="color: var(--primary-color)">today</span> 
               {{ group.day }} <span style="font-size: 0.9rem; color: #64748b; font-weight: 500;">({{ group.slots.length }})</span>
             </h3>
             <div class="slots-list-container">

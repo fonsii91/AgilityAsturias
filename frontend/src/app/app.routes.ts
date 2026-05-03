@@ -15,6 +15,7 @@ import { authGuard } from './guards/auth.guard';
 import { staffGuard } from './guards/staff.guard';
 import { adminGuard } from './guards/admin.guard';
 import { memberGuard } from './guards/member.guard';
+import { managerGuard } from './guards/manager.guard';
 
 export const routes: Routes = [
     {
@@ -32,7 +33,7 @@ export const routes: Routes = [
     {
         path: 'admin/clubs/edit/:id',
         loadComponent: () => import('./components/admin/club-form/club-form.component').then(m => m.ClubFormComponent),
-        canActivate: [adminGuard],
+        canActivate: [managerGuard],
         title: titleResolver, data: { pageTitle: 'Editar Club' }
     },
     {

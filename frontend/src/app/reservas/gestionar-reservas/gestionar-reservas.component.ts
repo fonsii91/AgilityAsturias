@@ -14,13 +14,14 @@ import { ToastService } from '../../services/toast.service';
 import { RouterModule } from '@angular/router';
 import { AthleticProfileCardComponent } from '../../components/ui/athletic-profile-card/athletic-profile-card.component';
 import { FichaPerroComponent } from '../../components/ficha-perro/ficha-perro.component';
+import { InstruccionesComponent } from '../../components/shared/instrucciones/instrucciones.component';
 import { DogWorkloadService } from '../../services/dog-workload.service';
 import { AcwrData } from '../../models/dog-workload.model';
 
 @Component({
     selector: 'app-gestionar-reservas',
     standalone: true,
-    imports: [CommonModule, FormsModule, MatIconModule, RouterModule, AthleticProfileCardComponent, FichaPerroComponent],
+    imports: [CommonModule, FormsModule, MatIconModule, RouterModule, AthleticProfileCardComponent, FichaPerroComponent, InstruccionesComponent],
     templateUrl: './gestionar-reservas.component.html',
     styleUrl: './gestionar-reservas.component.css'
 })
@@ -34,7 +35,6 @@ export class GestionarReservasComponent {
 
     // Modal state
     isModalOpen = false;
-    isHelpModalOpen = false;
     isSubmitting = signal(false);
     selectedSlotForBooking = signal<(TimeSlot & { date: string }) | null>(null);
     myDogs = this.dogService.getDogs();
@@ -48,7 +48,7 @@ export class GestionarReservasComponent {
         if (!currentUser) return [];
         
         let dogsArray = [];
-        if (['admin', 'staff'].includes(currentUser.role) && this.selectedUserId()) {
+        if (this.authService.isStaff() && this.selectedUserId()) {
             const all = this.dogService.getAllDogs()();
             dogsArray = all.filter(d => (d as any).users?.some((u: any) => u.id === Number(this.selectedUserId())));
         } else {
@@ -104,7 +104,7 @@ export class GestionarReservasComponent {
             const user = this.authService.currentUserSignal();
             if (user) {
                 this.dogService.loadUserDogs();
-                if (['admin', 'staff'].includes(user.role)) {
+                if (this.authService.isStaff()) {
                     this.authService.getMinimalUsers().then(users => this.adminUsers.set(users));
                     this.dogService.loadAllDogs();
                 }
@@ -310,7 +310,7 @@ export class GestionarReservasComponent {
         const user = this.authService.currentUserSignal();
         if (!user) return;
         
-        const isAdminOrStaff = ['admin', 'staff'].includes(user.role || '');
+        const isAdminOrStaff = this.authService.isStaff();
         const isOwner = this.myDogs().some(d => d.id === dogId);
 
         if (isAdminOrStaff || isOwner) {
@@ -367,7 +367,7 @@ export class GestionarReservasComponent {
             return;
         }
 
-        const isAdminOrStaff = ['admin', 'staff'].includes(user.role || '');
+        const isAdminOrStaff = this.authService.isStaff();
 
         if (!isAdminOrStaff) {
             if (slot.currentBookings! >= slot.max_bookings) {
@@ -445,21 +445,6 @@ export class GestionarReservasComponent {
         this.isSubmitting.set(false);
     }
 
-    openHelpModal() {
-        this.isHelpModalOpen = true;
-    }
-
-    closeHelpModal(event?: Event) {
-        if (event) {
-            // Solo cerramos si hacen clic en el fondo oscuro
-            if ((event.target as HTMLElement).classList.contains('modal-backdrop')) {
-                this.isHelpModalOpen = false;
-            }
-        } else {
-            this.isHelpModalOpen = false;
-        }
-    }
-
     async confirmBooking() {
         if (!this.selectedSlotForBooking() || this.isSubmitting()) return;
 
@@ -473,7 +458,7 @@ export class GestionarReservasComponent {
 
         const userName = user.name || 'Usuario';
 
-        const isAdminOrStaff = ['admin', 'staff'].includes(user.role || '');
+        const isAdminOrStaff = this.authService.isStaff();
 
         // 1. Find the current slot state in the computed "slots()"
         const currentSlotState = this.slots().find(s => s.id === this.selectedSlotForBooking()!.id);
@@ -523,7 +508,7 @@ export class GestionarReservasComponent {
         const user = this.authService.currentUserSignal();
         if (!user) return;
 
-        const isAdminOrStaff = ['admin', 'staff'].includes(user.role || '');
+        const isAdminOrStaff = this.authService.isStaff();
 
         if (!isAdminOrStaff) {
             // Check 24 hour rule

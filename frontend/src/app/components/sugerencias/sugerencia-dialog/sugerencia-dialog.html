@@ -1,6 +1,6 @@
 <div mat-dialog-title style="padding-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eef2f6; margin-bottom: 0;">
-  <h3 style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 1.25rem; font-weight: 800;" [style.color]="clubTheme.primary">
-    <span class="material-icons" [style.color]="clubTheme.accent">campaign</span> Sugerencias y Reportes
+  <h3 style="margin: 0; display: flex; align-items: center; gap: 8px; font-size: 1.25rem; font-weight: 800; color: var(--primary-color);">
+    <span class="material-icons" style="color: var(--accent-orange);">campaign</span> Sugerencias y Reportes
   </h3>
   <button mat-dialog-close title="Cerrar" style="background: transparent; border: none; font-size: 24px; cursor: pointer; color: #94a3b8; padding: 0; line-height: 1;">&times;</button>
 </div>
@@ -13,11 +13,11 @@
   <div class="form-group" style="margin-bottom: 20px;">
     <label for="type" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main); font-size: 0.9rem; margin-left: 4px;">Tipo de reporte</label>
     <div class="input-wrapper">
-      <select id="type" [(ngModel)]="type" class="custom-select" [style.border-color]="clubTheme.primary">
+      <select id="type" [(ngModel)]="type" class="custom-select" style="border-color: var(--primary-color);">
         <option value="suggestion">Sugerencia de mejora</option>
         <option value="bug">Reportar un error (Bug)</option>
       </select>
-      <span class="material-icons" [style.color]="clubTheme.primary">{{ type === 'bug' ? 'bug_report' : 'lightbulb' }}</span>
+      <span class="material-icons" style="color: var(--primary-color);">{{ type === 'bug' ? 'bug_report' : 'lightbulb' }}</span>
     </div>
   </div>
 
@@ -25,10 +25,10 @@
     <label for="content" style="display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-main); font-size: 0.9rem; margin-left: 4px;">Descripción</label>
     <div class="input-wrapper" style="align-items: flex-start;">
       <textarea id="content" [(ngModel)]="content" rows="4" class="custom-textarea" 
-        [style.border-color]="content ? clubTheme.primary : '#eef2f6'"
+        [style.border-color]="content ? 'var(--primary-color)' : '#eef2f6'"
         placeholder="Describe con detalle tu sugerencia o el error que has encontrado..."
         maxlength="1000"></textarea>
-      <span class="material-icons" [style.color]="clubTheme.primary" style="top: 14px;">description</span>
+      <span class="material-icons" style="color: var(--primary-color); top: 14px;">description</span>
     </div>
     <div class="char-count" style="text-align: right; font-size: 0.8rem; margin-top: 6px; margin-right: 4px;"
          [style.color]="content.length > 900 ? 'var(--error-color)' : 'var(--text-light)'"
@@ -42,7 +42,7 @@
   <button mat-button (click)="cancel()" class="btn-cancel">
     <span class="material-icons">close</span> Cancelar
   </button>
-  <button mat-button (click)="submit()" class="btn-primary" [style.background-color]="clubTheme.primary" [disabled]="!content || isSubmitting" style="margin-left: 12px;">
+  <button mat-button (click)="submit()" class="btn-primary" style="background-color: var(--primary-color); margin-left: 12px;" [disabled]="!content || isSubmitting">
     <span class="material-icons spinning" *ngIf="isSubmitting" style="font-size: 20px;">autorenew</span>
     <span class="material-icons" *ngIf="!isSubmitting" style="font-size: 20px;">send</span>
     {{ isSubmitting ? 'Enviando...' : 'Enviar Reporte' }}

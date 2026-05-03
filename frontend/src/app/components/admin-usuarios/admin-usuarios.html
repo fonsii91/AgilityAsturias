@@ -37,6 +37,7 @@
                         <option value="user">Inactivo</option>
                         <option value="member">Miembro</option>
                         <option value="staff">Staff</option>
+                        <option value="manager">Gestor</option>
                         <option value="admin">Admin</option>
                       </select>
                       <button class="btn-icon reset-pwd-btn" (click)="generateResetLink(user)"
@@ -47,7 +48,7 @@
                   </td>
                   <td>{{ user.email }}</td>
                   <td>
-                    <span class="badge" [class]="user.role">{{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase) }}</span>
+                    <span class="badge" [class]="user.role">{{ user.role === 'user' ? 'Inactivo' : (user.role === 'manager' ? 'Gestor' : (user.role | titlecase)) }}</span>
                   </td>
                 </tr>
               }

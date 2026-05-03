@@ -47,6 +47,12 @@
             <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">calendar_month</span> Gestión Horarios</a></li>
           }
 
+          <!-- Gestor Section -->
+          @if (authService.isManager() && !authService.isAdmin()) {
+            <li class="mobile-nav-divider">Gestor</li>
+            <li><a routerLink="/admin/clubs/edit/{{ tenantService.tenantInfo()?.id }}" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">settings</span> Configurar Club</a></li>
+          }
+
           <!-- Administrar Section -->
           @if (authService.isAdmin()) {
             <li class="mobile-nav-divider">Administrar</li>

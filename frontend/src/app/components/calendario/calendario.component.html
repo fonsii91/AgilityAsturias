@@ -15,10 +15,48 @@
 
       <div class="header-right-actions" style="display: flex; align-items: center; gap: 1rem;">
 
-        <button class="help-btn" (click)="openHelpModal()" title="Instrucciones sobre Calendario"
-          style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s; background-color: white;">
-          <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
-        </button>
+        <app-instrucciones titulo="Guía del Calendario">
+          <h4 style="color: var(--primary-dark); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px;">1.
+            Reglas para los Miembros</h4>
+          <p style="margin-bottom: 0.5rem;">El calendario es tu agenda oficial y pública. Aquí puedes consultar todos los
+            eventos e informar a los compañeros de que vas a presentarte en ellos:</p>
+          <ul style="padding-left: 20px; margin-bottom: 1.5rem;">
+            <li><strong>Pistas de colores:</strong>
+              <ul>
+                <li><strong style="color: #00509e;">Azul oscuro:</strong> Designa una <i>Competición</i> oficial.</li>
+                <li><strong style="color: #2e7d32;">Verde oscuro:</strong> Designa <i>Otros tipos de evento</i> (cenas,
+                  seminarios, reuniones).</li>
+                <li><strong style="color: #10b981;">Verde esmeralda:</strong> Son tus <i>Eventos Personales</i> privados (veterinario, fisio).</li>
+                <li><strong style="color: #e65100;">Naranja o dorado:</strong> Eventos a los que tú has confirmado tu
+                  asistencia.</li>
+                <li><strong style="color: #d32f2f;">Alerta Roja y !:</strong> Indica el límite (cierre) de inscripciones
+                  para una competición próxima.</li>
+              </ul>
+            </li>
+            <li><strong>Avisar de tu Asistencia:</strong> Al seleccionar cualquier evento pulsa en el botón naranja
+              <strong>'¡Asistiré!'</strong> y dinos qué perretes vendrán contigo. <br /> ⚠️ Si la competición abarca un fin
+              de semana entero (o varios días) será obligatorio hacer click expresamente en cada cuadradito de día para
+              decirnos exactamente qué fecha asistirás.</li>
+            <li><strong>Perros ya apuntados:</strong> Si administras un perro en conjunto con tu pareja/familiar, y esa
+              persona ya indicó que el perro asiste al evento... ¡Tú no hace falta que repitas! El aviso <i>"Apuntado por
+                co-guía"</i> significa que puedes limitarte tranquilamente a apuntarte y decir a todo el mundo que vas a ir
+              sin tener que preocuparte del perro.</li>
+            <li><strong>Conocer a la plantilla:</strong> Abre la pestaña 'Asistencia' e inspecciona en 'Asistentes al
+              evento'. Verás la lista de los guías del club que acudirán (ideal para compartir transporte o quedar antes).
+            </li>
+          </ul>
+
+          @if (authService.isStaff()) {
+          <h4
+            style="color: var(--primary-dark); margin-top: 1.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px;">
+            2. Opciones de Equipo Operativo</h4>
+          <ul style="padding-left: 20px; margin-bottom: 0;">
+            <li><strong>Creación o Modificación de Eventos:</strong> Este calendario es solo para la visualización. Para
+              añadir una nueva competición o evento debéis hacerlo desde el panel especializado: <strong>"Eventos"</strong>
+              que se encuentra dentro del menú principal.</li>
+          </ul>
+          }
+        </app-instrucciones>
       </div>
     </div>
 
@@ -603,61 +641,4 @@
 </div>
 }
 
-<!-- Help Modal -->
-@if (isHelpModalOpen) {
-<div class="modal-overlay" (click)="closeHelpModal($event)">
-  <div class="modal-content glass-effect" style="max-height: 80vh; overflow-y: auto;"
-    (click)="$event.stopPropagation()">
-    <div class="modal-header header-light"
-      style="padding-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 1.5rem;">
-      <h3 style="margin: 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
-        <span class="material-icons" style="color: var(--accent-color);">help_outline</span> Guía del Calendario
-      </h3>
-      <button class="close-btn" (click)="closeHelpModal()" title="Cerrar">&times;</button>
-    </div>
-    <div class="modal-body" style="color: var(--text-color); line-height: 1.6;">
 
-      <h4 style="color: var(--primary-dark); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px;">1.
-        Reglas para los Miembros</h4>
-      <p style="margin-bottom: 0.5rem;">El calendario es tu agenda oficial y pública. Aquí puedes consultar todos los
-        eventos e informar a los compañeros de que vas a presentarte en ellos:</p>
-      <ul style="padding-left: 20px; margin-bottom: 1.5rem;">
-        <li><strong>Pistas de colores:</strong>
-          <ul>
-            <li><strong style="color: #00509e;">Azul oscuro:</strong> Designa una <i>Competición</i> oficial.</li>
-            <li><strong style="color: #2e7d32;">Verde oscuro:</strong> Designa <i>Otros tipos de evento</i> (cenas,
-              seminarios, reuniones).</li>
-            <li><strong style="color: #10b981;">Verde esmeralda:</strong> Son tus <i>Eventos Personales</i> privados (veterinario, fisio).</li>
-            <li><strong style="color: #e65100;">Naranja o dorado:</strong> Eventos a los que tú has confirmado tu
-              asistencia.</li>
-            <li><strong style="color: #d32f2f;">Alerta Roja y !:</strong> Indica el límite (cierre) de inscripciones
-              para una competición próxima.</li>
-          </ul>
-        </li>
-        <li><strong>Avisar de tu Asistencia:</strong> Al seleccionar cualquier evento pulsa en el botón naranja
-          <strong>'¡Asistiré!'</strong> y dinos qué perretes vendrán contigo. <br /> ⚠️ Si la competición abarca un fin
-          de semana entero (o varios días) será obligatorio hacer click expresamente en cada cuadradito de día para
-          decirnos exactamente qué fecha asistirás.</li>
-        <li><strong>Perros ya apuntados:</strong> Si administras un perro en conjunto con tu pareja/familiar, y esa
-          persona ya indicó que el perro asiste al evento... ¡Tú no hace falta que repitas! El aviso <i>"Apuntado por
-            co-guía"</i> significa que puedes limitarte tranquilamente a apuntarte y decir a todo el mundo que vas a ir
-          sin tener que preocuparte del perro.</li>
-        <li><strong>Conocer a la plantilla:</strong> Abre la pestaña 'Asistencia' e inspecciona en 'Asistentes al
-          evento'. Verás la lista de los guías del club que acudirán (ideal para compartir transporte o quedar antes).
-        </li>
-      </ul>
-
-      @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
-      <h4
-        style="color: var(--primary-dark); margin-top: 1.5rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px;">
-        2. Opciones de Equipo Operativo</h4>
-      <ul style="padding-left: 20px; margin-bottom: 0;">
-        <li><strong>Creación o Modificación de Eventos:</strong> Este calendario es solo para la visualización. Para
-          añadir una nueva competición o evento debéis hacerlo desde el panel especializado: <strong>"Eventos"</strong>
-          que se encuentra dentro del menú principal.</li>
-      </ul>
-      }
-    </div>
-  </div>
-</div>
-}

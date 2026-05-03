@@ -8,9 +8,9 @@
       </div>
       }
       <img [src]="previewUrl || user.photoURL || 'assets/default-user.png'" alt="Avatar"
-        class="profile-avatar clickable-image" referrerpolicy="no-referrer" [style.border-color]="clubTheme.accent"
+        class="profile-avatar clickable-image" referrerpolicy="no-referrer" style="border-color: var(--accent-orange, #f59e0b);"
         (click)="openImageModal(previewUrl || user.photoURL || 'assets/default-user.png')">
-      <label class="camera-btn" title="Cambiar foto" [style.background-color]="clubTheme.primary">
+      <label class="camera-btn" title="Cambiar foto" style="background-color: var(--primary-color, #3b82f6);">
         <span class="material-icons-outlined camera-icon">photo_camera</span>
         <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>
       </label>
@@ -19,7 +19,7 @@
       <div class="name-edit-container">
         @if (!isEditingName()) {
         <div class="name-display">
-          <h2 [style.color]="clubTheme.primary">{{ user.displayName }}</h2>
+          <h2 style="color: var(--primary-color, #1d4ed8);">{{ user.displayName }}</h2>
           <button class="btn-icon-edit" (click)="toggleEditName()" title="Editar nombre">
             <span class="material-icons-outlined">edit</span>
           </button>
@@ -28,12 +28,12 @@
         @if (isEditingName()) {
         <div class="name-input-group">
           <input type="text" [(ngModel)]="editedName" (keyup.enter)="saveName()" class="edit-name-input"
-            [style.border-color]="clubTheme.primary">
+            style="border-color: var(--primary-color, #3b82f6);">
           <div class="edit-actions">
             <button class="btn-check" (click)="saveName()" [style.color]="'#22c55e'">
               <span class="material-icons">check_circle</span>
             </button>
-            <button class="btn-cancel-edit" (click)="toggleEditName()" [style.color]="clubTheme.warn">
+            <button class="btn-cancel-edit" (click)="toggleEditName()" style="color: #ef4444;">
               <span class="material-icons">cancel</span>
             </button>
           </div>
@@ -48,10 +48,10 @@
   </div>
 
   <div class="rfec-section slide-up">
-    <div class="rfec-card" [style.border-left-color]="clubTheme.primary" style="display: block; width: 100%; max-width: 450px;">
+    <div class="rfec-card" style="border-left-color: var(--primary-color, #3b82f6); display: block; width: 100%; max-width: 450px;">
       <div class="rfec-header" style="justify-content: space-between; align-items: center; display: flex; margin-bottom: 1rem;">
         <div style="display: flex; align-items: center; gap: 8px;">
-          <span class="material-icons-outlined" [style.color]="clubTheme.primary">badge</span>
+          <span class="material-icons-outlined" style="color: var(--primary-color, #3b82f6);">badge</span>
           <span>Licencia RFEC (Caza)</span>
         </div>
         @if (!isEditingRfec()) {
@@ -79,15 +79,15 @@
         <div class="rfec-input-row">
           <span class="material-icons-outlined input-icon">badge</span>
           <input type="text" [(ngModel)]="rfecData.license" placeholder="Obligatorio si compites" class="rfec-input"
-            [style.border-color]="clubTheme.primary">
+            style="border-color: var(--primary-color, #3b82f6);">
         </div>
         <div class="rfec-input-row">
           <span class="material-icons-outlined input-icon">event</span>
           <input type="date" [(ngModel)]="rfecData.expiration" class="rfec-input"
-            [style.border-color]="clubTheme.primary">
+            style="border-color: var(--primary-color, #3b82f6);">
         </div>
         <div class="rfec-actions">
-          <button class="rfec-btn-save" (click)="saveRfec()" [style.background-color]="clubTheme.primary">Guardar</button>
+          <button class="rfec-btn-save" (click)="saveRfec()" style="background-color: var(--primary-color, #3b82f6);">Guardar</button>
           <button class="rfec-btn-cancel" (click)="toggleEditRfec()">Cancelar</button>
         </div>
       </div>
@@ -97,7 +97,7 @@
   <div class="dogs-section slide-up">
     <div class="section-header">
       <h3 class="section-title"><span class="material-icons-outlined">pets</span> Mi Familia Canina</h3>
-      <button class="btn-primary" [routerLink]="['/gestionar-perros']" [style.background-color]="clubTheme.primary">
+      <button class="btn-primary" [routerLink]="['/gestionar-perros']" style="background-color: var(--primary-color, #3b82f6);">
         Gestionar Perros
       </button>
     </div>
@@ -115,11 +115,11 @@
           <div class="dog-icon-container">
             @if (dog.photo_url) {
             <img [src]="dog.photo_url" alt="{{ dog.name }}" class="dog-avatar clickable-image"
-              referrerpolicy="no-referrer" [style.border-color]="clubTheme.accent"
+              referrerpolicy="no-referrer" style="border-color: var(--accent-orange, #f59e0b);"
               (click)="openImageModal(dog.photo_url); $event.stopPropagation()">
             }
             @if (!dog.photo_url) {
-            <div class="dog-icon-placeholder" [style.color]="clubTheme.primary">
+            <div class="dog-icon-placeholder" style="color: var(--primary-color, #3b82f6);">
               <span class="material-icons">pets</span>
             </div>
             }
@@ -131,7 +131,7 @@
             }
           </div>
           <div class="dog-action-icon">
-            <span class="material-icons-outlined" [style.color]="clubTheme.primary">arrow_forward</span>
+            <span class="material-icons-outlined" style="color: var(--primary-color, #3b82f6);">arrow_forward</span>
           </div>
         </div>
       </div>

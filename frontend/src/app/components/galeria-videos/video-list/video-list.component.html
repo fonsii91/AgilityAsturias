@@ -41,10 +41,77 @@
       <span class="material-icons">add_circle_outline</span>
       <span>Subir Vídeo</span>
     </a>
-    <button class="help-btn" (click)="openHelpModal()" title="Instrucciones"
-      style="background: transparent; border: 1px solid var(--border-color, #e2e8f0); border-radius: 40px; padding: 10px 16px; display: flex; align-items: center; gap: 6px; justify-content: center; color: var(--text-color, #64748b); font-weight: 600; cursor: pointer; transition: all 0.2s; background-color: white;">
-      <span class="material-icons" style="font-size: 18px;">help_outline</span> Instrucciones
-    </button>
+    <app-instrucciones titulo="Guía de Cine Agility">
+      <h4
+        style="color: var(--primary-dark); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+        <span class="material-icons-outlined" style="color: #64748b;">people</span> 1. Reglas para los Miembros
+      </h4>
+      <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Esta es la videoteca oficial del club, tu
+        lugar de referencia para revivir las competiciones o enseñar a tus perretes. Aquí tienes las acciones permitidas
+        (disponibles a la derecha de los vídeos):</p>
+      <ul
+        style="padding-left: 0; margin-bottom: 2rem; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
+        <li style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons" style="color: #e53935; flex-shrink: 0; margin-top: 2px;">favorite</span>
+          <div><strong>Corazón:</strong> Al pulsar el corazón le das o le quitas tu "Me Gusta" a la carrera de ese
+            compañero.</div>
+        </li>
+        <li style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons" style="color: #8d6e63; flex-shrink: 0; margin-top: 2px;">pets</span>
+          <div><strong>Foto o Huella:</strong> Es la foto redonda con la cara del perrete. Si la pulsas, automáticamente
+            verás desplegarse la ficha completa oficial de la perrita o perro.</div>
+        </li>
+        <li style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons" style="color: #1976d2; flex-shrink: 0; margin-top: 2px;">download</span>
+          <div><strong>Descarga:</strong> Te permitirá bajarte el vídeo `mp4` original a la memoria de tu teléfono sin
+            perder calidad.</div>
+        </li>
+        <li style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons" style="color: #607d8b; flex-shrink: 0; margin-top: 2px;">edit</span>
+          <div><strong>Edición y Borrado:</strong> Solo verás los iconos de Lápiz y Papelera en los vídeos vinculados a
+            ti. Es decir: en aquellos donde tú has subido el vídeo, o en aquellos cuyo perro es de tu propiedad/gestión.
+          </div>
+        </li>
+        <li
+          style="display: flex; gap: 10px; align-items: flex-start; background: #f8fafc; padding: 12px; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+          <span class="material-icons" style="color: #f57c00; flex-shrink: 0; margin-top: 2px;">cloud_sync</span>
+          <div><strong>Ciclo de vida inteligente:</strong> Cuando subes un vídeo nuevo, se guarda directamente en
+            nuestro servidor privado de alta velocidad. Pasados <strong>3 días</strong>, nuestro robot interno lo
+            traslada automáticamente a nuestro canal de YouTube. Esto significa que <strong>ni tu móvil ni nuestro club
+              se quedan sin memoria libre</strong>. ¡Tú no notarás nada, seguirás viéndolo en la App igual de rápido y
+            fluido! (Pero ya no podrá descargarse y el icono cambiará al logo de YouTube).</div>
+        </li>
+        <li
+          style="display: flex; gap: 10px; align-items: flex-start; background: #f0f7ff; padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary-color); margin-top: 8px;">
+          <span class="material-icons" style="color: var(--primary-color); flex-shrink: 0; margin-top: 2px;">smartphone</span>
+          <div><strong>Clasificación Automática:</strong> El apartado en el que aparecerán los vídeos depende exclusivamente de cómo sostuvieses la cámara al grabarlos. Si grabas con el teléfono de pie (relación de aspecto vertical), tu vídeo se publicará automáticamente en la pestaña de <strong>Verticales</strong>. Si lo grabas apaisado, irá directamente a la <strong>Colección Horizontal</strong>.</div>
+        </li>
+      </ul>
+
+      @if (authService.isStaff()) {
+      <h4
+        style="color: var(--primary-dark); margin-top: 2rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+        <span class="material-icons-outlined" style="color: #64748b;">admin_panel_settings</span> 2. Opciones de Equipo
+        Operativo
+      </h4>
+      <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Como administradores, siempre veréis
+        opciones reservadas aplicables a todos los vídeos en línea:</p>
+      <ul
+        style="padding-left: 0; margin-bottom: 0; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
+        <li style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons" style="color: #d32f2f; flex-shrink: 0; margin-top: 2px;">gavel</span>
+          <div><strong>Moderación Total:</strong> Veréis siempre los botones de editar y borrar activos en toda la
+            plataforma por motivos de moderación.</div>
+        </li>
+        <li style="display: flex; gap: 10px; align-items: flex-start;">
+          <span class="material-icons" style="color: #1abc9c; flex-shrink: 0; margin-top: 2px;">public</span>
+          <div><strong>Galería Pública:</strong> El Globo Terráqueo envía o quita directamente cualquier vídeo al
+            aparador comercial (página principal accesible sin iniciar sesión). Al hacer click, el icono se vuelve
+            turquesa indicando que es público y usable para marketing comercial de {{ clubName() }}.</div>
+        </li>
+      </ul>
+      }
+    </app-instrucciones>
   </div>
 
   @if (isFiltersOpen) {
@@ -410,90 +477,4 @@
 </app-ficha-perro>
 }
 
-<!-- Help Modal -->
-@if (isHelpModalOpen) {
-<div class="modal-overlay" (click)="closeHelpModal($event)">
-  <div class="modal-content glass-effect" style="max-height: 80vh; overflow-y: auto;"
-    (click)="$event.stopPropagation()">
-    <div class="modal-header header-light"
-      style="padding-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; margin-bottom: 1.5rem;">
-      <h3 style="margin: 0; color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
-        <span class="material-icons" style="color: var(--accent-color);">help_outline</span> Guía de Cine Agility
-      </h3>
-      <button class="close-btn" (click)="closeHelpModal()" title="Cerrar">&times;</button>
-    </div>
-    <div class="modal-body" style="color: var(--text-color); line-height: 1.6;">
 
-      <h4
-        style="color: var(--primary-dark); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-        <span class="material-icons-outlined" style="color: #64748b;">people</span> 1. Reglas para los Miembros
-      </h4>
-      <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Esta es la videoteca oficial del club, tu
-        lugar de referencia para revivir las competiciones o enseñar a tus perretes. Aquí tienes las acciones permitidas
-        (disponibles a la derecha de los vídeos):</p>
-      <ul
-        style="padding-left: 0; margin-bottom: 2rem; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #e53935; flex-shrink: 0; margin-top: 2px;">favorite</span>
-          <div><strong>Corazón:</strong> Al pulsar el corazón le das o le quitas tu "Me Gusta" a la carrera de ese
-            compañero.</div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #8d6e63; flex-shrink: 0; margin-top: 2px;">pets</span>
-          <div><strong>Foto o Huella:</strong> Es la foto redonda con la cara del perrete. Si la pulsas, automáticamente
-            verás desplegarse la ficha completa oficial de la perrita o perro.</div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #1976d2; flex-shrink: 0; margin-top: 2px;">download</span>
-          <div><strong>Descarga:</strong> Te permitirá bajarte el vídeo `mp4` original a la memoria de tu teléfono sin
-            perder calidad.</div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #607d8b; flex-shrink: 0; margin-top: 2px;">edit</span>
-          <div><strong>Edición y Borrado:</strong> Solo verás los iconos de Lápiz y Papelera en los vídeos vinculados a
-            ti. Es decir: en aquellos donde tú has subido el vídeo, o en aquellos cuyo perro es de tu propiedad/gestión.
-          </div>
-        </li>
-        <li
-          style="display: flex; gap: 10px; align-items: flex-start; background: #f8fafc; padding: 12px; border-radius: 8px; border-left: 4px solid var(--accent-color);">
-          <span class="material-icons" style="color: #f57c00; flex-shrink: 0; margin-top: 2px;">cloud_sync</span>
-          <div><strong>Ciclo de vida inteligente:</strong> Cuando subes un vídeo nuevo, se guarda directamente en
-            nuestro servidor privado de alta velocidad. Pasados <strong>3 días</strong>, nuestro robot interno lo
-            traslada automáticamente a nuestro canal de YouTube. Esto significa que <strong>ni tu móvil ni nuestro club
-              se quedan sin memoria libre</strong>. ¡Tú no notarás nada, seguirás viéndolo en la App igual de rápido y
-            fluido! (Pero ya no podrá descargarse y el icono cambiará al logo de YouTube).</div>
-        </li>
-        <li
-          style="display: flex; gap: 10px; align-items: flex-start; background: #f0f7ff; padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary-color); margin-top: 8px;">
-          <span class="material-icons" style="color: var(--primary-color); flex-shrink: 0; margin-top: 2px;">smartphone</span>
-          <div><strong>Clasificación Automática:</strong> El apartado en el que aparecerán los vídeos depende exclusivamente de cómo sostuvieses la cámara al grabarlos. Si grabas con el teléfono de pie (relación de aspecto vertical), tu vídeo se publicará automáticamente en la pestaña de <strong>Verticales</strong>. Si lo grabas apaisado, irá directamente a la <strong>Colección Horizontal</strong>.</div>
-        </li>
-      </ul>
-
-      @if (['admin', 'staff'].includes(authService.currentUserSignal()?.role || '')) {
-      <h4
-        style="color: var(--primary-dark); margin-top: 2rem; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
-        <span class="material-icons-outlined" style="color: #64748b;">admin_panel_settings</span> 2. Opciones de Equipo
-        Operativo
-      </h4>
-      <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Como administradores, siempre veréis
-        opciones reservadas aplicables a todos los vídeos en línea:</p>
-      <ul
-        style="padding-left: 0; margin-bottom: 0; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #d32f2f; flex-shrink: 0; margin-top: 2px;">gavel</span>
-          <div><strong>Moderación Total:</strong> Veréis siempre los botones de editar y borrar activos en toda la
-            plataforma por motivos de moderación.</div>
-        </li>
-        <li style="display: flex; gap: 10px; align-items: flex-start;">
-          <span class="material-icons" style="color: #1abc9c; flex-shrink: 0; margin-top: 2px;">public</span>
-          <div><strong>Galería Pública:</strong> El Globo Terráqueo envía o quita directamente cualquier vídeo al
-            aparador comercial (página principal accesible sin iniciar sesión). Al hacer click, el icono se vuelve
-            turquesa indicando que es público y usable para marketing comercial de {{ clubName() }}.</div>
-        </li>
-      </ul>
-      }
-    </div>
-  </div>
-</div>
-}

@@ -33,7 +33,7 @@
 .header h2 {
     margin: 0;
     font-size: 1.8rem;
-    color: var(--primary-blue, #003366);
+    color: var(--primary-color);
     font-weight: 700;
 }
 
@@ -56,7 +56,7 @@
 }
 
 .btn-primary {
-    background: var(--primary-color, #003366);
+    background: var(--primary-color);
     color: white;
     box-shadow: 0 4px 6px rgba(0, 51, 102, 0.2);
 }
@@ -177,12 +177,12 @@
 }
 
 .btn-icon.edit {
-    color: var(--primary-blue, #003366);
+    color: var(--primary-color);
     background-color: #e3f2fd;
 }
 
 .btn-icon.edit:hover {
-    background-color: var(--primary-blue, #003366);
+    background-color: var(--primary-color);
     color: white;
 }
 
@@ -220,7 +220,7 @@
 .form-header {
     margin-top: 0;
     margin-bottom: 1.5rem;
-    color: var(--primary-blue, #003366);
+    color: var(--primary-color);
     font-size: 1.4rem;
 }
 
@@ -464,7 +464,7 @@ textarea.form-control {
 
 /* Event Type Indicators in Table */
 .border-comp {
-    border-left: 5px solid var(--primary-blue, #003366) !important;
+    border-left: 5px solid var(--primary-color) !important;
     padding-left: 15px !important;
 }
 

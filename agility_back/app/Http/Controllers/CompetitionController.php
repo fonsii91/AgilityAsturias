@@ -44,7 +44,7 @@ class CompetitionController extends Controller
      */
     public function store(Request $request)
     {
-        if (!in_array($request->user()->role, ['admin', 'staff'])) {
+        if (!in_array($request->user()->role, ['admin', 'manager', 'staff'])) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -81,7 +81,7 @@ class CompetitionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        if (!in_array($request->user()->role, ['admin', 'staff'])) {
+        if (!in_array($request->user()->role, ['admin', 'manager', 'staff'])) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -110,7 +110,7 @@ class CompetitionController extends Controller
      */
     public function destroy(Request $request, string $id)
     {
-        if (!in_array($request->user()->role, ['admin', 'staff'])) {
+        if (!in_array($request->user()->role, ['admin', 'manager', 'staff'])) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -215,3 +215,4 @@ class CompetitionController extends Controller
         return response()->json($attendees);
     }
 }
+

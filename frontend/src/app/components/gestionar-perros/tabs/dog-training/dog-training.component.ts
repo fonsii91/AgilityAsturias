@@ -13,7 +13,7 @@ import { environment } from '../../../../../environments/environment';
   template: `
     <div class="health-container">
       <div class="form-header">
-        <h3 [style.color]="clubTheme.primary">Rendimiento y Prevención (ACWR)</h3>
+        <h3 style="color: var(--primary-color);">Rendimiento y Prevención (ACWR)</h3>
         <p>Estos datos biométricos y médicos configuran la sensibilidad de la brújula de fatiga del entorno deportivo para proteger a {{ dog()?.name }} contra lesiones.</p>
       </div>
 
@@ -86,7 +86,7 @@ import { environment } from '../../../../../environments/environment';
         </div>
 
         <div class="form-actions mt-4">
-          <button class="btn-save" [style.background]="clubTheme.primary" (click)="saveHealthData()" [disabled]="isSaving()">
+          <button class="btn-save" style="background: var(--primary-color);" (click)="saveHealthData()" [disabled]="isSaving()">
             <span class="material-icons">fitness_center</span> {{ isSaving() ? 'Guardando...' : 'Guardar Datos Deportivos' }}
           </button>
         </div>

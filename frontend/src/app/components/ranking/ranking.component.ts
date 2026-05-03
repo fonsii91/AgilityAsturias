@@ -1,17 +1,19 @@
 import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 import { ReservationService } from '../../services/reservation.service';
 import { AuthService } from '../../services/auth.service';
 import { DogService } from '../../services/dog.service';
 import { ToastService } from '../../services/toast.service';
 import { FichaPerroComponent } from '../ficha-perro/ficha-perro.component';
+import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 import { getEmojiForCategory } from '../../utils/point-categories';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-ranking',
     standalone: true,
-    imports: [FichaPerroComponent, MatTooltipModule],
+    imports: [CommonModule, FichaPerroComponent, MatTooltipModule, InstruccionesComponent],
     templateUrl: './ranking.component.html',
     styleUrls: ['./ranking.component.css']
 })
@@ -26,7 +28,6 @@ export class RankingComponent {
     
     selectedDogModal = signal<any | null>(null);
     fichaModalOpen = signal(false);
-    isHelpModalOpen = signal(false);
 
     constructor() {
         this.loadRanking();
@@ -104,16 +105,6 @@ export class RankingComponent {
         this.fichaModalOpen.set(false);
         this.selectedDogModal.set(null);
         document.body.style.overflow = 'auto'; // Restore scrolling
-    }
-
-    openHelpModal() {
-        this.isHelpModalOpen.set(true);
-        document.body.style.overflow = 'hidden';
-    }
-
-    closeHelpModal() {
-        this.isHelpModalOpen.set(false);
-        document.body.style.overflow = 'auto';
     }
 
     async saveDogFicha(updatedData: any) {

@@ -9,8 +9,8 @@ import { environment } from '../../../../../environments/environment';
   imports: [CommonModule],
   template: `
     <div class="health-container">
-      <div class="coming-soon glass-effect" [style.border-top]="'4px solid ' + clubTheme.primary">
-        <span class="material-icons-outlined huge-icon" [style.color]="clubTheme.primary">medical_services</span>
+      <div class="coming-soon glass-effect" style="border-top: 4px solid var(--primary-color);">
+        <span class="material-icons-outlined huge-icon" style="color: var(--primary-color);">medical_services</span>
         <h3>Cartilla Sanitaria Digital</h3>
         <p>Pronto podrás gestionar el historial veterinario de {{ dog()?.name || 'tu perro' }}:</p>
         <ul class="feature-list">

@@ -5,11 +5,12 @@ import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { Video } from '../../models/video.model';
 import { SmartVideoPlayerComponent } from '../galeria-videos/smart-video-player/smart-video-player.component';
+import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 
 @Component({
   selector: 'app-galeria-videos-publica',
   standalone: true,
-  imports: [CommonModule, SmartVideoPlayerComponent],
+  imports: [CommonModule, SmartVideoPlayerComponent, InstruccionesComponent],
   templateUrl: './galeria-videos-publica.component.html',
   styleUrl: './galeria-videos-publica.component.css'
 })
@@ -64,22 +65,13 @@ export class GaleriaVideosPublicaComponent implements OnInit {
     return pages;
   }
 
-  isHelpModalOpen = false;
+
 
   goToPage(page: number | string) {
       if (typeof page === 'number' && page >= 1 && page <= this.totalPages && page !== this.currentPage) {
           this.loadVideos(page);
           window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-  }
-
-  openHelpModal() {
-    this.isHelpModalOpen = true;
-  }
-
-  closeHelpModal(event?: Event) {
-    if (event) event.stopPropagation();
-    this.isHelpModalOpen = false;
   }
 
   removeFromPublic(event: Event, video: Video) {

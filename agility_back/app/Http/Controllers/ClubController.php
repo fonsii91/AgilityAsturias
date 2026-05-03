@@ -112,6 +112,15 @@ class ClubController extends Controller
         return response()->json(Club::all());
     }
 
+    public function show(Request $request, Club $club)
+    {
+        $user = $request->user();
+        if ($user->role === 'manager' && $user->club_id !== $club->id) {
+            return response()->json(['message' => 'Unauthorized. Managers can only view their own club.'], 403);
+        }
+        return response()->json($club);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -144,6 +153,10 @@ class ClubController extends Controller
 
     public function update(Request $request, Club $club)
     {
+        $user = $request->user();
+        if ($user->role === 'manager' && $user->club_id !== $club->id) {
+            return response()->json(['message' => 'Unauthorized. Managers can only update their own club.'], 403);
+        }
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
@@ -164,13 +177,22 @@ class ClubController extends Controller
             $settings = json_decode($settings, true);
         }
 
-        $club->update([
+        $updateData = [
             'name' => $validated['name'],
-            'slug' => $validated['slug'],
-            'domain' => $validated['domain'] ?? null,
             'logo_url' => $request->has('logo_url') ? $validated['logo_url'] : $club->logo_url,
             'settings' => $settings,
-        ]);
+        ];
+
+        if ($user->role === 'admin') {
+            if (array_key_exists('slug', $validated)) {
+                $updateData['slug'] = $validated['slug'];
+            }
+            if (array_key_exists('domain', $validated)) {
+                $updateData['domain'] = $validated['domain'] ?? null;
+            }
+        }
+
+        $club->update($updateData);
 
         $this->handleClubFiles($request, $club);
 

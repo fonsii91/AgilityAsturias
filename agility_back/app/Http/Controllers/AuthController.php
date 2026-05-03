@@ -114,7 +114,7 @@ class AuthController extends Controller
 
     public function index(Request $request)
     {
-        if (!in_array($request->user()->role, ['admin', 'staff'])) {
+        if (!in_array($request->user()->role, ['admin', 'manager', 'staff'])) {
             return response()->json(['message' => 'No tienes permisos para ver la lista de usuarios.'], 403);
         }
         return User::all();
@@ -129,14 +129,14 @@ class AuthController extends Controller
     {
         $currentUser = $request->user();
 
-        // Allow admin or staff
-        if (!in_array($currentUser->role, ['admin', 'staff'])) {
+        // Allow admin, manager, or staff
+        if (!in_array($currentUser->role, ['admin', 'manager', 'staff'])) {
             return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
         }
 
         try {
             $request->validate([
-                'role' => 'required|in:user,member,staff,admin',
+                'role' => 'required|in:user,member,staff,manager,admin',
             ], [
                 'role.required' => 'El rol es obligatorio.',
                 'role.in' => 'El rol proporcionado no es válido.',
@@ -149,14 +149,27 @@ class AuthController extends Controller
 
             // Staff restrictions
             if ($currentUser->role === 'staff') {
-                // Cannot change role OF an admin or another staff
-                if (in_array($targetUser->role, ['admin', 'staff'])) {
-                    return response()->json(['message' => 'El personal no puede modificar a administradores u otro personal.'], 403);
+                // Cannot change role OF an admin, manager, or another staff
+                if (in_array($targetUser->role, ['admin', 'manager', 'staff'])) {
+                    return response()->json(['message' => 'El personal no puede modificar a administradores, gestores u otro personal.'], 403);
                 }
 
-                // Cannot assign admin or staff role
-                if (in_array($request->role, ['admin', 'staff'])) {
+                // Cannot assign admin, manager, or staff role
+                if (in_array($request->role, ['admin', 'manager', 'staff'])) {
                     return response()->json(['message' => 'El personal solo puede asignar roles de usuario o socio.'], 403);
+                }
+            }
+
+            // Manager restrictions
+            if ($currentUser->role === 'manager') {
+                // Cannot change role OF an admin or manager
+                if (in_array($targetUser->role, ['admin', 'manager'])) {
+                    return response()->json(['message' => 'Los gestores no pueden modificar a administradores u otros gestores.'], 403);
+                }
+
+                // Cannot assign admin or manager role
+                if (in_array($request->role, ['admin', 'manager'])) {
+                    return response()->json(['message' => 'Los gestores solo pueden asignar roles de usuario, socio o staff.'], 403);
                 }
             }
 
@@ -184,8 +197,8 @@ class AuthController extends Controller
     {
         $currentUser = $request->user();
 
-        // Allow admin or staff
-        if (!in_array($currentUser->role, ['admin', 'staff'])) {
+        // Allow admin, manager, or staff
+        if (!in_array($currentUser->role, ['admin', 'manager', 'staff'])) {
             return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
         }
 
@@ -202,9 +215,17 @@ class AuthController extends Controller
 
             // Staff restrictions
             if ($currentUser->role === 'staff') {
-                // Cannot delete an admin or another staff
-                if (in_array($targetUser->role, ['admin', 'staff'])) {
-                    return response()->json(['message' => 'El personal no puede eliminar a administradores u otro personal.'], 403);
+                // Cannot delete an admin, manager, or another staff
+                if (in_array($targetUser->role, ['admin', 'manager', 'staff'])) {
+                    return response()->json(['message' => 'El personal no puede eliminar a administradores, gestores u otro personal.'], 403);
+                }
+            }
+
+            // Manager restrictions
+            if ($currentUser->role === 'manager') {
+                // Cannot delete an admin or another manager
+                if (in_array($targetUser->role, ['admin', 'manager'])) {
+                    return response()->json(['message' => 'Los gestores no pueden eliminar a administradores u otros gestores.'], 403);
                 }
             }
 
@@ -316,7 +337,7 @@ class AuthController extends Controller
     {
         $currentUser = $request->user();
 
-        if (!in_array($currentUser->role, ['admin', 'staff'])) {
+        if (!in_array($currentUser->role, ['admin', 'manager', 'staff'])) {
             return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
         }
 

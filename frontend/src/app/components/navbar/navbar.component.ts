@@ -104,5 +104,13 @@ export class NavbarComponent {
             maxWidth: '90vw'
         });
     }
+
+    goToMyClub() {
+        this.closeMenu();
+        const clubId = this.tenantService.tenantInfo()?.id;
+        if (clubId) {
+            this.router.navigate(['/admin/clubs/edit', clubId]);
+        }
+    }
 }
 

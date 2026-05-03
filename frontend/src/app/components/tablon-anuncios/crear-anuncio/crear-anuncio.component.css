@@ -28,7 +28,7 @@
 .header h2 {
     margin: 0;
     font-size: 1.8rem;
-    color: var(--primary-blue, #003366);
+    color: var(--primary-color);
     font-weight: 700;
 }
 
@@ -42,7 +42,7 @@
 .form-header {
     margin-top: 0;
     margin-bottom: 1.5rem;
-    color: var(--primary-blue, #003366);
+    color: var(--primary-color);
     font-size: 1.4rem;
 }
 
@@ -136,7 +136,7 @@ textarea.form-control {
 
 .segment-btn.active {
     background: #ffffff;
-    color: var(--primary-blue, #003366);
+    color: var(--primary-color);
     box-shadow: 0 2px 5px rgba(0,0,0,0.08);
 }
 

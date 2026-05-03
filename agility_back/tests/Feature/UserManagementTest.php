@@ -76,10 +76,11 @@ class UserManagementTest extends TestCase
         ]);
     }
 
-    public function test_prevents_staff_from_updating_admin_or_other_staff_roles()
+    public function test_prevents_staff_from_updating_admin_manager_or_other_staff_roles()
     {
         $staff = $this->createUser(['role' => 'staff']);
         $admin = $this->createUser(['role' => 'admin']);
+        $manager = $this->createUser(['role' => 'manager']);
         $otherStaff = $this->createUser(['role' => 'staff']);
 
         Sanctum::actingAs($staff);
@@ -89,16 +90,22 @@ class UserManagementTest extends TestCase
             'role' => 'user'
         ]);
         $response1->assertStatus(403)
-            ->assertJsonPath('message', 'El personal no puede modificar a administradores u otro personal.');
+            ->assertJsonPath('message', 'El personal no puede modificar a administradores, gestores u otro personal.');
 
-        // Staff tries to modify another staff
-        $response2 = $this->postJson("/api/users/{$otherStaff->id}/role", [
+        // Staff tries to modify manager
+        $response2 = $this->postJson("/api/users/{$manager->id}/role", [
             'role' => 'user'
         ]);
         $response2->assertStatus(403);
+
+        // Staff tries to modify another staff
+        $response3 = $this->postJson("/api/users/{$otherStaff->id}/role", [
+            'role' => 'user'
+        ]);
+        $response3->assertStatus(403);
     }
 
-    public function test_prevents_staff_from_assigning_admin_or_staff_roles()
+    public function test_prevents_staff_from_assigning_admin_manager_or_staff_roles()
     {
         $staff = $this->createUser(['role' => 'staff']);
         $user = $this->createUser(['role' => 'user']);
@@ -112,9 +119,58 @@ class UserManagementTest extends TestCase
         $response1->assertStatus(403)
             ->assertJsonPath('message', 'El personal solo puede asignar roles de usuario o socio.');
 
-        // Staff tries to make someone staff
+        // Staff tries to make someone manager
         $response2 = $this->postJson("/api/users/{$user->id}/role", [
+            'role' => 'manager'
+        ]);
+        $response2->assertStatus(403);
+
+        // Staff tries to make someone staff
+        $response3 = $this->postJson("/api/users/{$user->id}/role", [
             'role' => 'staff'
+        ]);
+        $response3->assertStatus(403);
+    }
+
+    public function test_prevents_manager_from_updating_admin_or_other_manager_roles()
+    {
+        $manager = $this->createUser(['role' => 'manager']);
+        $admin = $this->createUser(['role' => 'admin']);
+        $otherManager = $this->createUser(['role' => 'manager']);
+
+        Sanctum::actingAs($manager);
+
+        // Manager tries to modify admin
+        $response1 = $this->postJson("/api/users/{$admin->id}/role", [
+            'role' => 'user'
+        ]);
+        $response1->assertStatus(403)
+            ->assertJsonPath('message', 'Los gestores no pueden modificar a administradores u otros gestores.');
+
+        // Manager tries to modify another manager
+        $response2 = $this->postJson("/api/users/{$otherManager->id}/role", [
+            'role' => 'user'
+        ]);
+        $response2->assertStatus(403);
+    }
+
+    public function test_prevents_manager_from_assigning_admin_or_manager_roles()
+    {
+        $manager = $this->createUser(['role' => 'manager']);
+        $user = $this->createUser(['role' => 'user']);
+
+        Sanctum::actingAs($manager);
+
+        // Manager tries to make someone admin
+        $response1 = $this->postJson("/api/users/{$user->id}/role", [
+            'role' => 'admin'
+        ]);
+        $response1->assertStatus(403)
+            ->assertJsonPath('message', 'Los gestores solo pueden asignar roles de usuario, socio o staff.');
+
+        // Manager tries to make someone manager
+        $response2 = $this->postJson("/api/users/{$user->id}/role", [
+            'role' => 'manager'
         ]);
         $response2->assertStatus(403);
     }
@@ -197,10 +253,11 @@ class UserManagementTest extends TestCase
             ->assertJsonPath('message', 'No puedes eliminarte a ti mismo desde esta vista.');
     }
 
-    public function test_prevents_staff_from_deleting_admin_or_other_staff()
+    public function test_prevents_staff_from_deleting_admin_manager_or_other_staff()
     {
         $staff = $this->createUser(['role' => 'staff']);
         $admin = $this->createUser(['role' => 'admin']);
+        $manager = $this->createUser(['role' => 'manager']);
         $otherStaff = $this->createUser(['role' => 'staff']);
 
         Sanctum::actingAs($staff);
@@ -208,7 +265,47 @@ class UserManagementTest extends TestCase
         $response1 = $this->postJson("/api/users/{$admin->id}/delete");
         $response1->assertStatus(403);
 
-        $response2 = $this->postJson("/api/users/{$otherStaff->id}/delete");
+        $response2 = $this->postJson("/api/users/{$manager->id}/delete");
+        $response2->assertStatus(403);
+
+        $response3 = $this->postJson("/api/users/{$otherStaff->id}/delete");
+        $response3->assertStatus(403);
+    }
+
+    public function test_allows_manager_to_assign_staff_member_or_user_roles()
+    {
+        $manager = $this->createUser(['role' => 'manager']);
+        $user = $this->createUser(['role' => 'user']);
+
+        Sanctum::actingAs($manager);
+
+        // Make staff
+        $response1 = $this->postJson("/api/users/{$user->id}/role", [
+            'role' => 'staff'
+        ]);
+        $response1->assertStatus(200);
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'role' => 'staff']);
+
+        // Make member
+        $response2 = $this->postJson("/api/users/{$user->id}/role", [
+            'role' => 'member'
+        ]);
+        $response2->assertStatus(200);
+        $this->assertDatabaseHas('users', ['id' => $user->id, 'role' => 'member']);
+    }
+
+    public function test_prevents_manager_from_deleting_admin_or_other_manager()
+    {
+        $manager = $this->createUser(['role' => 'manager']);
+        $admin = $this->createUser(['role' => 'admin']);
+        $otherManager = $this->createUser(['role' => 'manager']);
+
+        Sanctum::actingAs($manager);
+
+        $response1 = $this->postJson("/api/users/{$admin->id}/delete");
+        $response1->assertStatus(403);
+
+        $response2 = $this->postJson("/api/users/{$otherManager->id}/delete");
         $response2->assertStatus(403);
     }
 }
