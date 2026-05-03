@@ -265,12 +265,15 @@
 
 .top-rank .points-badge {
     background: #eff6ff;
-    color: #2563eb;
     border-color: #dbeafe;
 }
 
-.points-badge .points {
+.top-rank .points-badge .points {
     font-weight: 800;
+}
+
+.points-badge .points {
+    font-weight: 700;
     font-size: 1.4rem;
     line-height: 1;
 }
@@ -501,33 +504,7 @@
     padding: 1.75rem;
 }
 
-.gamification-box {
-    background: #f8fafc; 
-    border-radius: 12px; 
-    padding: 16px; 
-    margin-bottom: 24px; 
-    border: 1px solid #e2e8f0;
-}
 
-.gamification-box p {
-    margin: 0; 
-    line-height: 1.6; 
-    color: #475569; 
-    font-size: 0.95rem;
-}
-
-.gamification-box strong {
-    color: #1e293b; 
-    display: flex; 
-    align-items: center; 
-    gap: 6px; 
-    margin-bottom: 8px;
-}
-
-.box-icon {
-    font-size: 18px; 
-    color: #3b82f6;
-}
 
 .section-title {
     margin: 0 0 16px 0; 
