@@ -22,6 +22,7 @@ description: Datos para desplegar en producción el proyecto
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado 2026-05-03]** Desplegado el acceso seguro de administracion entre clubes mediante codigos temporales de un solo uso. El servidor quedo en el commit `b2bb075` y las rutas `api/club-handoff` y `api/admin/clubs/{club}/handoff` estan registradas en produccion.
 - **[Completado]** Scheduler Laravel: el servidor tiene una unica crontab general para ejecutar todas las tareas programadas:
   ```bash
   * * * * * cd /var/www/agilityasturias/agility_back && /usr/bin/php artisan schedule:run >> /dev/null 2>&1
