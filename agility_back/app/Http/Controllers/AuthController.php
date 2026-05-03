@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Club;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -105,6 +108,66 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'Sesión cerrada correctamente']);
+    }
+
+    public function createClubHandoff(Request $request, Club $club)
+    {
+        $user = $request->user();
+
+        if (!$user || $user->role !== 'admin') {
+            return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
+        }
+
+        $handoff = Str::random(64);
+        Cache::put($this->clubHandoffCacheKey($handoff), [
+            'admin_id' => $user->id,
+            'club_id' => $club->id,
+        ], now()->addMinute());
+
+        return response()->json([
+            'handoff' => $handoff,
+            'expires_in' => 60,
+        ]);
+    }
+
+    public function exchangeClubHandoff(Request $request)
+    {
+        $validated = $request->validate([
+            'handoff' => 'required|string',
+        ]);
+
+        $cacheKey = $this->clubHandoffCacheKey($validated['handoff']);
+        $payload = Cache::get($cacheKey);
+
+        if (!$payload) {
+            return response()->json(['message' => 'El acceso temporal no es válido o ha caducado.'], 401);
+        }
+
+        $activeClubId = app()->bound('active_club_id') ? app('active_club_id') : null;
+        if (!$activeClubId || (int) $payload['club_id'] !== (int) $activeClubId) {
+            return response()->json(['message' => 'Este acceso temporal no pertenece a este club.'], 403);
+        }
+
+        $admin = User::withoutGlobalScopes()->find($payload['admin_id']);
+        if (!$admin || $admin->role !== 'admin') {
+            Cache::forget($cacheKey);
+            return response()->json(['message' => 'El administrador ya no tiene permisos.'], 403);
+        }
+
+        Cache::forget($cacheKey);
+        $token = $admin->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'message' => 'Acceso temporal aceptado',
+            'access_token' => $token,
+            'token_type' => 'Bearer',
+            'user' => $admin,
+        ]);
+    }
+
+    private function clubHandoffCacheKey(string $handoff): string
+    {
+        return 'club_handoff:' . hash('sha256', $handoff);
     }
 
     public function user(Request $request)

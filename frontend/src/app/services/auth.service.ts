@@ -46,18 +46,42 @@ export class AuthService {
     userProfileSignal = computed(() => this.currentUserSignal());
 
     constructor() {
-        // Detect SSO token from URL for admin cross-subdomain login
         const urlParams = new URLSearchParams(window.location.search);
-        const ssoToken = urlParams.get('sso_token');
-        if (ssoToken) {
-            localStorage.setItem('access_token', ssoToken);
-            urlParams.delete('sso_token');
-            const newSearch = urlParams.toString();
-            const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
-            window.history.replaceState({}, document.title, newUrl);
+        const handoff = urlParams.get('handoff');
+        if (handoff) {
+            this.consumeClubHandoff(handoff);
+            return;
         }
 
         this.checkAuth();
+    }
+
+    private consumeClubHandoff(handoff: string) {
+        this.checkAuthLoading.set(true);
+
+        this.http.post<AuthResponse>(`${this.apiUrl}/club-handoff`, { handoff }).subscribe({
+            next: (response) => {
+                localStorage.setItem('access_token', response.access_token);
+                this.currentUserSignal.set(this.mapUser(response.user));
+                this.isLoading.set(false);
+                this.removeUrlParam('handoff');
+                this.checkAuthLoading.set(false);
+            },
+            error: () => {
+                this.handleAuthLogout();
+                this.isLoading.set(false);
+                this.removeUrlParam('handoff');
+                this.checkAuthLoading.set(false);
+            }
+        });
+    }
+
+    private removeUrlParam(param: string) {
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.delete(param);
+        const newSearch = urlParams.toString();
+        const newUrl = window.location.pathname + (newSearch ? '?' + newSearch : '') + window.location.hash;
+        window.history.replaceState({}, document.title, newUrl);
     }
 
     private checkAuth() {

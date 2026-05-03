@@ -37,7 +37,7 @@ import { ToastService } from '../../services/toast.service';
         <ng-container matColumnDef="slug">
           <th mat-header-cell *matHeaderCellDef> Slug / Subdominio </th>
           <td mat-cell *matCellDef="let club"> 
-            <a [href]="getClubUrl(club)" target="_blank" class="text-blue-600 hover:underline">
+            <a [href]="getClubBaseUrl(club)" (click)="openClub($event, club, getClubBaseUrl(club))" class="text-blue-600 hover:underline">
               {{club.slug}}
             </a>
           </td>
@@ -47,7 +47,7 @@ import { ToastService } from '../../services/toast.service';
         <ng-container matColumnDef="domain">
           <th mat-header-cell *matHeaderCellDef> Dominio Propio </th>
           <td mat-cell *matCellDef="let club">
-            <a *ngIf="club.domain" [href]="getSsoUrl('http://' + club.domain)" target="_blank" class="text-blue-600 hover:underline">
+            <a *ngIf="club.domain" [href]="'http://' + club.domain" (click)="openClub($event, club, 'http://' + club.domain)" class="text-blue-600 hover:underline">
               {{club.domain}}
             </a>
             <span *ngIf="!club.domain" class="text-gray-400 italic">No asignado</span>
@@ -96,21 +96,26 @@ export class ClubsListComponent implements OnInit {
     this.loadClubs();
   }
 
-  getSsoUrl(baseUrl: string): string {
-    const token = localStorage.getItem('access_token');
-    return token ? `${baseUrl}?sso_token=${token}` : baseUrl;
-  }
-
-  getClubUrl(club: Club): string {
+  getClubBaseUrl(club: Club): string {
     const hostname = window.location.hostname;
     const isLocalhost = hostname.includes('localhost');
     const port = window.location.port ? `:${window.location.port}` : '';
     
-    const baseUrl = isLocalhost 
+    return isLocalhost
       ? `http://${club.slug}.localhost${port}`
       : `https://${club.slug}.clubagility.com`;
-      
-    return this.getSsoUrl(baseUrl);
+  }
+
+  openClub(event: MouseEvent, club: Club, baseUrl: string): void {
+    event.preventDefault();
+
+    this.clubService.createClubHandoff(club.id).subscribe({
+      next: ({ handoff }) => {
+        const separator = baseUrl.includes('?') ? '&' : '?';
+        window.open(`${baseUrl}${separator}handoff=${encodeURIComponent(handoff)}`, '_blank', 'noopener');
+      },
+      error: () => this.toast.error('No se pudo abrir el acceso temporal al club')
+    });
   }
 
   loadClubs() {

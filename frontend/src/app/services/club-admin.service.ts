@@ -12,6 +12,11 @@ export interface Club {
     settings: any;
 }
 
+export interface ClubHandoff {
+    handoff: string;
+    expires_in: number;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -46,5 +51,9 @@ export class ClubAdminService {
 
     deleteClub(id: number): Observable<any> {
         return this.http.delete(`${this.apiUrl}/admin/clubs/${id}`);
+    }
+
+    createClubHandoff(id: number): Observable<ClubHandoff> {
+        return this.http.post<ClubHandoff>(`${this.apiUrl}/admin/clubs/${id}/handoff`, {});
     }
 }

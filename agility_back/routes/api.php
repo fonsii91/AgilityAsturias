@@ -26,6 +26,7 @@ use App\Http\Controllers\PersonalEventController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset-password', [AuthController::class, 'resetPasswordWithToken']);
+Route::post('/club-handoff', [AuthController::class, 'exchangeClubHandoff']);
 
 Route::get('/tenant/info', [\App\Http\Controllers\ClubController::class, 'current']);
 Route::get('/manifest.json', [\App\Http\Controllers\ClubController::class, 'manifest']);
@@ -114,6 +115,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Gestión de Clubes
         Route::get('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'index']);
         Route::post('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'store']);
+        Route::post('/admin/clubs/{club}/handoff', [AuthController::class, 'createClubHandoff']);
         Route::delete('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'destroy']);
 
         // Suggestions (Admin)
