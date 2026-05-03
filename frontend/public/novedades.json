@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.1.31",
+    "date": "2026-05-03",
+    "features": [
+      "¡Reservas mucho más pulidas! Hemos dado un lavado de cara a la ventana de confirmación de reservas para que la información se lea mucho mejor, ajustando los espacios y la alineación para un aspecto más limpio y profesional."
+    ],
+    "bugfixes": [
+      "Hemos reparado las pequeñas burbujas de ayuda (los iconos de información) en tu perfil de entrenamiento. Ahora, al pulsarlos, te mostrarán correctamente los consejos y explicaciones que necesitabas leer sin quedarse atascados."
+    ]
+  },
+  {
     "version": "1.1.30",
     "date": "2026-05-03",
     "features": [

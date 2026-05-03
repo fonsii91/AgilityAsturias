@@ -48,7 +48,7 @@
           }
 
           <!-- Gestor Section -->
-          @if (authService.isManager() && !authService.isAdmin()) {
+          @if (authService.isManager()) {
             <li class="mobile-nav-divider">Gestor</li>
             <li><a routerLink="/admin/clubs/edit/{{ tenantService.tenantInfo()?.id }}" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">settings</span> Configurar Club</a></li>
           }
@@ -70,9 +70,9 @@
           @if (authService.isMember()) {
             <li class="mobile-nav-divider">Explorar</li>
             <li><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">favorite</span> Salud Deportiva</a></li>
+            <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">analytics</span> Seguimiento RSCE</a></li>
             <li><a routerLink="/tablon-anuncios" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">campaign</span> Tablón de Anuncios</a></li>
             <li><a routerLink="/recursos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">folder_shared</span> Recursos</a></li>
-            <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">analytics</span> Seguimiento RSCE</a></li>
 
             <li class="mobile-nav-divider">Público</li>
             <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}" (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenida</a></li>

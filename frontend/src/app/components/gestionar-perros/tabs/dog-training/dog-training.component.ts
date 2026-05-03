@@ -23,7 +23,7 @@ import { environment } from '../../../../../environments/environment';
           <div class="form-group">
             <label>
               Historial Relevante de Lesiones 
-              <span class="trust-marker" title="Tener lesiones musculoesqueléticas previas incrementa el riesgo estadístico (OR=11.36) de sufrir una recaída por sobreutilización. Estudio: Inkilä et al. (2022). Univ. Helsinki.">
+              <span class="trust-marker" (click)="showInfo('Tener lesiones musculoesqueléticas previas incrementa el riesgo estadístico (OR=11.36) de sufrir una recaída por sobreutilización. Estudio: Inkilä et al. (2022). Univ. Helsinki.')" title="Tener lesiones musculoesqueléticas previas incrementa el riesgo estadístico (OR=11.36) de sufrir una recaída por sobreutilización. Estudio: Inkilä et al. (2022). Univ. Helsinki.">
                 <span class="material-icons-outlined">info</span>
               </span>
             </label>
@@ -39,7 +39,7 @@ import { environment } from '../../../../../environments/environment';
           <div class="form-group">
             <label>
               Esterilizado/a antes del cierre de placas
-              <span class="trust-marker" title="La castración temprana está asociada a alteraciones del ángulo de la meseta tibial anterior, multiplicando la predisposición a rotura de cruzado anterior. Estudio: Pechette Markley et al.">
+              <span class="trust-marker" (click)="showInfo('La castración temprana está asociada a alteraciones del ángulo de la meseta tibial anterior, multiplicando la predisposición a rotura de cruzado anterior. Estudio: Pechette Markley et al.')" title="La castración temprana está asociada a alteraciones del ángulo de la meseta tibial anterior, multiplicando la predisposición a rotura de cruzado anterior. Estudio: Pechette Markley et al.">
                 <span class="material-icons-outlined">info</span>
               </span>
             </label>
@@ -73,7 +73,7 @@ import { environment } from '../../../../../environments/environment';
           <div class="form-group">
             <label>
               Altura a la cruz (cm)
-              <span class="trust-marker" title="El Ratio Altura/Peso es crucial. Perros especialmente pesados para su estatura corta tienden a multiplicar la carga articular en virajes.">
+              <span class="trust-marker" (click)="showInfo('El Ratio Altura/Peso es crucial. Perros especialmente pesados para su estatura corta tienden a multiplicar la carga articular en virajes.')" title="El Ratio Altura/Peso es crucial. Perros especialmente pesados para su estatura corta tienden a multiplicar la carga articular en virajes.">
                 <span class="material-icons-outlined">info</span>
               </span>
             </label>
@@ -109,7 +109,7 @@ import { environment } from '../../../../../environments/environment';
     .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
     .form-group label { font-size: 0.9rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 5px;}
     
-    .trust-marker { color: #60a5fa; cursor: pointer; display: flex; align-items: center; }
+    .trust-marker { color: var(--primary-color); cursor: pointer; display: flex; align-items: center; }
     .trust-marker .material-icons-outlined { font-size: 16px; }
     
     .input-with-icon { position: relative; }
@@ -214,6 +214,10 @@ export class DogTrainingComponent {
     } finally {
       this.isSaving.set(false);
     }
+  }
+
+  showInfo(msg: string) {
+    this.toast.info(msg, 6000);
   }
 
   calculateSterilizedDate(birthDateStr: string | undefined, years: number | null, months: number | null): string | null {

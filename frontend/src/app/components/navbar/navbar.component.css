@@ -396,11 +396,12 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s;
+    transition: transform 0.2s, color 0.2s;
 }
 
 .notification-btn:hover {
     transform: scale(1.1);
+    color: var(--accent-orange, #ffd700);
 }
 
 .badge {

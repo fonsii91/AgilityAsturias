@@ -257,12 +257,12 @@
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <h3><span class="material-icons" style="vertical-align: text-bottom; margin-right: 8px;">event_available</span> Confirmar Reserva</h3>
-      <p>¿Estás seguro de que quieres reservar plaza el <strong>{{ selectedSlotForBooking()?.day }} {{ selectedSlotForBooking()?.date | date:'dd/MM' }}</strong> a las <strong>{{ selectedSlotForBooking()?.start_time | slice:0:5 }}</strong>?</p>
-    <div class="dog-selection">
+      <div class="dog-selection" style="padding-top: 1.5rem;">
+        <p class="confirm-message" style="margin-top: 0; margin-bottom: 1.5rem;">¿Estás seguro de que quieres reservar plaza el <strong>{{ selectedSlotForBooking()?.day }} {{ selectedSlotForBooking()?.date | date:'dd/MM' }}</strong> a las <strong>{{ selectedSlotForBooking()?.start_time | slice:0:5 }}</strong>?</p>
       @if (authService.isStaff()) {
         <div class="admin-user-selector" style="margin-bottom: 1.5rem; padding: 1rem; background: #f0f4f8; border-radius: 8px; border-left: 4px solid #1976d2;">
           <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #1976d2;">
-            <span class="material-icons" style="vertical-align: text-bottom; margin-right: 4px;">admin_panel_settings</span> Reservar para miembro (Staff)
+            <span class="material-icons" style="vertical-align: text-bottom; margin-right: 4px;">person</span> Reservar para miembro (Staff)
           </p>
           <div class="select-wrapper" style="background: white;">
             <select [ngModel]="selectedUserId()" (ngModelChange)="onUserChange($event)" class="modern-input">
@@ -276,7 +276,7 @@
         </div>
       }
 
-      <p style="margin: 0 0 1rem 0; font-weight: 600; color: #555;">Selecciona los perretes que vendrán:</p>
+      <p style="margin: 1.5rem 0 1rem 0; font-weight: 600; color: #555;">Selecciona los perretes que vendrán:</p>
       @if (availableDogsForBooking().length === 0) {
         <div class="no-dogs-warning">
           <p><span class="material-icons" style="vertical-align: text-bottom; color: #ff9800; margin-right: 4px;">warning</span> No hay perros registrados.</p>

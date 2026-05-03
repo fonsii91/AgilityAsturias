@@ -36,6 +36,8 @@ description: Datos para desplegar en producción el proyecto
 - **[Completado]** Fase 9 (01/05/2026): Configurado servidor Nginx y Certbot SSL para que la aplicación multi-tenant soporte correctamente HTTPS en el nuevo subdominio `patitas.clubagility.com` y `www.patitas.clubagility.com`.
 - **[Completado]** Despliegue v1.1.28 (02/05/2026): Despliegue en producción finalizado con éxito (132 backend tests, 8 frontend unit tests directos). Implementada gamificación inteligente para el Campeonato de España en la Bitácora RSCE, con cálculo automatizado de requisitos de velocidad y selector UX de pestañas anuales.
 - **[Completado]** Despliegue v1.1.29 (02/05/2026): Despliegue en producción finalizado con éxito (132 backend tests, 240 frontend tests). Implementado sistema dinámico de PWA y estandarización del branding genérico (ClubAgility) como soporte fallback global.
+- **[Completado]** Despliegue v1.1.30 (03/05/2026): Despliegue en producción finalizado con éxito (142 backend tests, 239 frontend tests superados). Mejoras visuales en la galería de vídeos, estandarización de los modales de instrucciones/ayuda y solventados bloqueos de permisos en borrado de recursos.
+- **[Completado]** Despliegue v1.1.31 (03/05/2026): Despliegue en producción finalizado con éxito (142 backend tests, 239 frontend tests superados). Mejoras UX/UI en la ventana de reservas, solución de errores en tooltips de ayuda y extendidos permisos de gestión para perfiles de administrador.
 
 
 ---

@@ -506,8 +506,8 @@ h2 {
 }
 
 .btn-secondary {
-    background: #f0f0f0;
-    color: #666;
+    background: #e2e8f0;
+    color: #475569;
     border: none;
     padding: 0.8rem 1.5rem;
     border-radius: 8px;
@@ -517,7 +517,7 @@ h2 {
 }
 
 .btn-secondary:hover {
-    background: #e0e0e0;
+    background: #cbd5e1;
 }
 
 .btn-delete-action {
@@ -713,6 +713,9 @@ h2 {
     font-weight: 500;
     color: var(--text-main);
     transition: all 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
 }
 
 .modern-input.with-icon {
@@ -1022,13 +1025,14 @@ h2 {
 
 .dog-checkboxes {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
 }
 
 .dog-checkbox {
     position: relative;
     cursor: pointer;
+    display: flex;
 }
 
 .dog-checkbox input {
@@ -1038,6 +1042,7 @@ h2 {
 
 .dog-label {
     display: flex;
+    flex: 1;
     align-items: center;
     justify-content: center;
     gap: 8px;
@@ -1147,13 +1152,7 @@ h2 {
 }
 
 
-/* Checked styling via pseudo-class assuming browser support or simplistic indication */
-.dog-checkbox:has(input:checked) {
-    background-color: var(--primary-blue);
-    color: white;
-}
 
-/* Fallback for older browsers if needed, but :has is widely supported now on latest Chrome/Edge which user likely has */
 
 .modal-actions {
     display: flex;
