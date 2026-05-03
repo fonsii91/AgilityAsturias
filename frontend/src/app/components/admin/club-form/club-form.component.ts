@@ -32,9 +32,11 @@ import { TenantService } from '../../../services/tenant.service';
       <div class="sticky-header">
         <div>
           <div class="breadcrumb">
-            <a routerLink="/admin/clubs">
-              <mat-icon>arrow_back</mat-icon> Gestión de Clubes
-            </a>
+            @if (isAdmin()) {
+              <a routerLink="/admin/clubs">
+                <mat-icon>arrow_back</mat-icon> Gestión de Clubes
+              </a>
+            }
           </div>
           <h1>
             @if (isEditMode()) { Configuración del Club } @else { Nuevo Club }
@@ -962,6 +964,7 @@ export class ClubFormComponent implements OnInit {
           this.ctaPreviewUrl.set(e.target.result);
           this.form.get('jumpImage')?.disable();
         }
+        this.form.markAsDirty();
       };
       
       reader.readAsDataURL(file);
