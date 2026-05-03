@@ -37,7 +37,7 @@ import { environment } from '../../../../../environments/environment';
               <input type="date" [(ngModel)]="formData.birth_date">
             </div>
             
-            <div class="form-group submit-group" style="grid-column: 1 / -1; margin-top: 1rem; text-align: right;">
+            <div class="form-actions" style="grid-column: 1 / -1; margin-top: 1rem; display: flex; justify-content: flex-end;">
               <button class="btn-save" style="background: var(--primary-color);" (click)="saveChanges()" [disabled]="isSaving">
                 <span class="material-icons">save</span> Guardar Cambios
               </button>
@@ -77,9 +77,9 @@ import { environment } from '../../../../../environments/environment';
     input { width: 100%; padding: 10px 15px; border: 2px solid transparent; border-radius: 8px; background: #f1f5f9; color: #1e293b; font-size: 0.95rem; font-family: inherit; transition: all 0.2s; box-sizing: border-box;}
     input:focus { outline: none; border-color: var(--primary-color, #0f172a); background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     
-    .btn-save { color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 8px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: transform 0.2s; }
-    .btn-save:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; }
+    .btn-save { color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: max-content; }
+    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
+    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
   `]
 })
 export class DogSummaryComponent {
@@ -102,7 +102,7 @@ export class DogSummaryComponent {
     const currentDog = this.dog();
     if (!currentDog) return 0;
     let completed = 0;
-    const directFields = ['name', 'photo_url', 'breed', 'birth_date', 'microchip', 'pedigree'];
+    const directFields = ['name', 'photo_url', 'breed', 'birth_date', 'microchip'];
     const pivotFields = ['rsce_license', 'rsce_expiration_date'];
     
     directFields.forEach(field => {

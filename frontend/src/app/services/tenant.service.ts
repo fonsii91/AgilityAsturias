@@ -172,4 +172,9 @@ export class TenantService {
     }
     return domain;
   }
+
+  public async reload() {
+    this.isTenantLoading.set(true);
+    await this.loadTenantInfo();
+  }
 }

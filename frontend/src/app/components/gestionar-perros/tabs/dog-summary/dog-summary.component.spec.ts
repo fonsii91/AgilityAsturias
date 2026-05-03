@@ -65,9 +65,9 @@ describe('DogSummaryComponent', () => {
   it('debe calcular correctamente el progreso del perfil', () => {
     // mockDog has name, breed, birth_date, photo_url -> 4 direct fields
     // pivot fields -> 0
-    // total fields -> 6 direct + 2 pivot = 8
-    // progress = (4 / 8) * 100 = 50%
-    expect(component.calculateProgress()).toBe(50);
+    // total fields -> 5 direct + 2 pivot = 7
+    // progress = (4 / 7) * 100 = 57%
+    expect(component.calculateProgress()).toBe(57);
   });
 
   it('debe guardar los cambios correctamente', async () => {

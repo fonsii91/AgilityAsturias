@@ -24,7 +24,7 @@ import { environment } from '../../../../../environments/environment';
             <label>
               Historial Relevante de Lesiones 
               <span class="trust-marker" (click)="showInfo('Tener lesiones musculoesqueléticas previas incrementa el riesgo estadístico (OR=11.36) de sufrir una recaída por sobreutilización. Estudio: Inkilä et al. (2022). Univ. Helsinki.')" title="Tener lesiones musculoesqueléticas previas incrementa el riesgo estadístico (OR=11.36) de sufrir una recaída por sobreutilización. Estudio: Inkilä et al. (2022). Univ. Helsinki.">
-                <span class="material-icons-outlined">info</span>
+                <span class="material-icons-outlined" style="color: var(--primary-color);">info</span>
               </span>
             </label>
             <div class="toggle-switch-wrapper">
@@ -40,7 +40,7 @@ import { environment } from '../../../../../environments/environment';
             <label>
               Esterilizado/a antes del cierre de placas
               <span class="trust-marker" (click)="showInfo('La castración temprana está asociada a alteraciones del ángulo de la meseta tibial anterior, multiplicando la predisposición a rotura de cruzado anterior. Estudio: Pechette Markley et al.')" title="La castración temprana está asociada a alteraciones del ángulo de la meseta tibial anterior, multiplicando la predisposición a rotura de cruzado anterior. Estudio: Pechette Markley et al.">
-                <span class="material-icons-outlined">info</span>
+                <span class="material-icons-outlined" style="color: var(--primary-color);">info</span>
               </span>
             </label>
             @if (!dog()?.birth_date || dog()?.birth_date === '') {
@@ -74,7 +74,7 @@ import { environment } from '../../../../../environments/environment';
             <label>
               Altura a la cruz (cm)
               <span class="trust-marker" (click)="showInfo('El Ratio Altura/Peso es crucial. Perros especialmente pesados para su estatura corta tienden a multiplicar la carga articular en virajes.')" title="El Ratio Altura/Peso es crucial. Perros especialmente pesados para su estatura corta tienden a multiplicar la carga articular en virajes.">
-                <span class="material-icons-outlined">info</span>
+                <span class="material-icons-outlined" style="color: var(--primary-color);">info</span>
               </span>
             </label>
             <div class="input-with-icon">
@@ -87,7 +87,7 @@ import { environment } from '../../../../../environments/environment';
 
         <div class="form-actions mt-4">
           <button class="btn-save" style="background: var(--primary-color);" (click)="saveHealthData()" [disabled]="isSaving()">
-            <span class="material-icons">fitness_center</span> {{ isSaving() ? 'Guardando...' : 'Guardar Datos Deportivos' }}
+            <span class="material-icons">save</span> {{ isSaving() ? 'Guardando...' : 'Guardar Datos Deportivos' }}
           </button>
         </div>
       </div>
@@ -109,7 +109,7 @@ import { environment } from '../../../../../environments/environment';
     .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
     .form-group label { font-size: 0.9rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 5px;}
     
-    .trust-marker { color: var(--primary-color); cursor: pointer; display: flex; align-items: center; }
+    .trust-marker { cursor: pointer; display: flex; align-items: center; }
     .trust-marker .material-icons-outlined { font-size: 16px; }
     
     .input-with-icon { position: relative; }
@@ -132,7 +132,7 @@ import { environment } from '../../../../../environments/environment';
     
     .mt-4 { margin-top: 1.5rem; }
     .form-actions { display: flex; justify-content: flex-end; }
-    .btn-save { color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .btn-save { color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: max-content; }
     .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
     .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
   `]

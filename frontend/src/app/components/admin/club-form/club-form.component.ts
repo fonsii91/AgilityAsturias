@@ -11,6 +11,7 @@ import { ToastService } from '../../../services/toast.service';
 import { AuthService } from '../../../services/auth.service';
 import { ImageCompressorService } from '../../../services/image-compressor.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { TenantService } from '../../../services/tenant.service';
 
 @Component({
   selector: 'app-club-form',
@@ -283,19 +284,14 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
         @if (form.dirty) {
           <div class="floating-save-bar pop-in">
             <div class="save-bar-content">
-              <div class="save-text">
-                <span class="warning-text">Tienes cambios sin guardar</span>
-              </div>
-              <div class="save-actions">
-                <button mat-button class="reset-btn" (click)="resetForm()">Descartar</button>
-                <button mat-flat-button class="save-btn" [disabled]="form.invalid || isSaving()" (click)="save()">
-                  <div class="btn-content">
-                    @if (!isSaving()) { <mat-icon>save</mat-icon> }
-                    @if (isSaving()) { <mat-spinner diameter="20" color="accent"></mat-spinner> }
-                    <span>@if (isSaving()) { Guardando... } @else { Guardar Cambios }</span>
-                  </div>
-                </button>
-              </div>
+              <button mat-button class="reset-btn" (click)="resetForm()">Descartar</button>
+              <button mat-flat-button class="save-btn" [disabled]="form.invalid || isSaving()" (click)="save()">
+                <div class="btn-content">
+                  @if (!isSaving()) { <mat-icon>save</mat-icon> }
+                  @if (isSaving()) { <mat-spinner diameter="20" color="accent"></mat-spinner> }
+                  <span>@if (isSaving()) { Guardando... } @else { Guardar Cambios }</span>
+                </div>
+              </button>
             </div>
           </div>
         }
@@ -399,7 +395,6 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
       color: #0f172a !important;
     }
 
-    /* Floating Save Bar */
     .floating-save-bar {
       position: fixed;
       bottom: 2rem;
@@ -407,12 +402,12 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
       transform: translateX(-50%);
       background-color: #1e293b;
       color: white;
-      padding: 0.75rem 1rem 0.75rem 1.5rem;
+      padding: 0.75rem 1rem;
       border-radius: 9999px;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
       z-index: 100;
-      width: 90%;
-      max-width: 600px;
+      width: max-content;
+      max-width: 90%;
       border: 1px solid rgba(255, 255, 255, 0.1);
     }
     .pop-in {
@@ -425,18 +420,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
     .save-bar-content {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       gap: 1rem;
-    }
-    .save-text {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: #cbd5e1;
-    }
-    .save-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
     }
     .reset-btn {
       color: #cbd5e1 !important;
@@ -825,6 +810,7 @@ export class ClubFormComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private imageCompressor = inject(ImageCompressorService);
+  private tenantService = inject(TenantService);
   
   form!: FormGroup;
   
@@ -1052,8 +1038,14 @@ export class ClubFormComponent implements OnInit {
       : this.clubService.createClubWithFormData(formData);
 
     request$.subscribe({
-      next: () => {
+      next: async () => {
         this.toast.success(this.isEditMode() ? 'Club actualizado correctamente' : 'Club creado con éxito');
+        
+        // Recargar la información del club en el estado global para que el cambio de colores y slogan sea inmediato
+        if (this.isEditMode()) {
+          await this.tenantService.reload();
+        }
+        
         this.router.navigate(['/admin/clubs']);
       },
       error: (err) => {
