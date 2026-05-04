@@ -4,6 +4,9 @@
     "date": "2026-05-04",
     "features": [
       "¡Una página de bienvenida más limpia! Hemos simplificado el diseño de la página principal del club, eliminando apartados redundantes para ofrecer un aspecto mucho más directo, moderno y sin distracciones."
+    ],
+    "bugfixes": [
+      "Resolución de incidencias generales y optimización de permisos de gestión para garantizar una experiencia más fluida y segura."
     ]
   },
   {

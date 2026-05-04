@@ -15,7 +15,7 @@ class ReservationController extends Controller
     {
         // Admin/Staff sees all
         $user = $request->user();
-        if ($user->role === 'admin' || $user->role === 'staff') {
+        if (in_array($user->role, ['admin', 'manager', 'staff'])) {
             $reservations = Reservation::with([
                 'user', 
                 'timeSlot', 

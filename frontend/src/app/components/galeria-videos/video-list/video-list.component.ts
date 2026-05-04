@@ -267,7 +267,7 @@ export class VideoListComponent implements OnInit {
         if (!userId) return false;
         
         const role = this.authService.currentUserSignal()?.role;
-        if (role === 'admin' || role === 'staff') return true;
+        if (role === 'admin' || role === 'staff' || role === 'manager') return true;
 
         if (video.user_id == userId) return true;
         if (video.dog?.users && video.dog.users.some(u => u.id == userId)) return true;
