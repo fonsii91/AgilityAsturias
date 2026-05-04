@@ -5,6 +5,7 @@
       <button class="filter-btn" [class.active]="filter() === 'pending'" (click)="setFilter('pending')">Pendientes</button>
       <button class="filter-btn" [class.active]="filter() === 'unresolved'" (click)="setFilter('unresolved')">No Resueltos</button>
       <button class="filter-btn" [class.active]="filter() === 'resolved'" (click)="setFilter('resolved')">Resueltos</button>
+      <button class="filter-btn" [class.active]="filter() === 'landing_pages'" (click)="setFilter('landing_pages')">Landing Pages</button>
       <button class="filter-btn" [class.active]="filter() === 'all'" (click)="setFilter('all')">Todos</button>
     </div>
   </div>
@@ -18,7 +19,7 @@
   @if (!isLoading() && filteredSuggestions().length === 0) {
     <div class="empty-state">
       <span class="material-icons">sentiment_satisfied_alt</span>
-      <p>No hay reportes {{ filter() === 'pending' ? 'pendientes' : filter() === 'resolved' ? 'resueltos' : filter() === 'unresolved' ? 'no resueltos' : '' }} en este momento.</p>
+      <p>No hay reportes {{ filter() === 'pending' ? 'pendientes' : filter() === 'resolved' ? 'resueltos' : filter() === 'unresolved' ? 'no resueltos' : filter() === 'landing_pages' ? 'de landing pages' : '' }} en este momento.</p>
     </div>
   }
 
@@ -28,8 +29,8 @@
         <div class="suggestion-card" [ngClass]="suggestion.type">
           <div class="card-header">
             <div class="badge" [ngClass]="suggestion.type">
-              <span class="material-icons">{{ suggestion.type === 'bug' ? 'bug_report' : 'lightbulb' }}</span>
-              {{ suggestion.type === 'bug' ? 'Bug' : 'Sugerencia' }}
+              <span class="material-icons">{{ suggestion.type === 'bug' ? 'bug_report' : (suggestion.type === 'landing_page' ? 'web' : 'lightbulb') }}</span>
+              {{ suggestion.type === 'bug' ? 'Bug' : (suggestion.type === 'landing_page' ? 'Landing Page' : 'Sugerencia') }}
             </div>
             <div class="status-badge" [ngClass]="suggestion.status">
               {{ suggestion.status === 'pending' ? 'Pendiente' : suggestion.status === 'resolved' ? 'Resuelto' : 'No Resuelto' }}

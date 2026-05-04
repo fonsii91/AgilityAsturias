@@ -38,13 +38,17 @@ class NewSuggestionNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $tipoStr = $this->suggestion->type === 'bug' ? 'incidencia' : 'sugerencia';
+        $tipoStr = 'sugerencia';
+        if ($this->suggestion->type === 'bug') $tipoStr = 'incidencia';
+        if ($this->suggestion->type === 'landing_page') $tipoStr = 'petición de landing page';
+
+        $clubName = $this->suggestion->club ? $this->suggestion->club->name : 'un usuario';
 
         return [
             'type' => 'new_suggestion',
             'suggestion_id' => $this->suggestion->id,
             'action_url' => '/admin/sugerencias',
-            'message' => 'Nueva ' . $tipoStr . ' ha sido reportada por un usuario.',
+            'message' => 'Nueva ' . $tipoStr . ' reportada por ' . $clubName . '.',
         ];
     }
 }

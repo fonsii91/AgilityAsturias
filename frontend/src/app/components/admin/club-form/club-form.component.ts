@@ -12,6 +12,7 @@ import { AuthService } from '../../../services/auth.service';
 import { ImageCompressorService } from '../../../services/image-compressor.service';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TenantService } from '../../../services/tenant.service';
+import { SuggestionService } from '../../../services/suggestion.service';
 
 @Component({
   selector: 'app-club-form',
@@ -521,6 +522,7 @@ import { TenantService } from '../../../services/tenant.service';
     .teal-icon { background-color: #ccfbf1; color: #0d9488; }
     .orange-icon { background-color: #ffedd5; color: #ea580c; }
     .pink-icon { background-color: #fce7f3; color: #db2777; }
+    .purple-icon { background-color: #f3e8ff; color: #9333ea; }
     
     .card-body {
       padding: 1.25rem 1.5rem;
@@ -712,6 +714,15 @@ import { TenantService } from '../../../services/tenant.service';
       line-height: 1.5;
     }
     
+    .info-box.warning {
+      background-color: rgba(255, 251, 235, 0.5);
+      border-color: #fde68a;
+    }
+    .info-box.warning p {
+      color: #92400e;
+      font-size: 0.85rem;
+    }
+    
     .color-input-wrapper {
       display: flex;
       align-items: center;
@@ -813,6 +824,7 @@ export class ClubFormComponent implements OnInit {
   private router = inject(Router);
   private imageCompressor = inject(ImageCompressorService);
   private tenantService = inject(TenantService);
+  private suggestionService = inject(SuggestionService);
   
   form!: FormGroup;
   
@@ -821,6 +833,7 @@ export class ClubFormComponent implements OnInit {
   isLoading = signal<boolean>(true);
   isEditMode = signal<boolean>(false);
   isAdmin = this.authService.isAdmin;
+  isSendingRequest = signal<boolean>(false);
   
   logoPreviewUrl = signal<string | null>(null);
   heroPreviewUrl = signal<string | null>(null);
@@ -914,6 +927,7 @@ export class ClubFormComponent implements OnInit {
             addressLine2: settings.contact?.addressLine2 || '',
             mapUrl: settings.contact?.mapUrl || ''
           });
+
         } else {
           this.toast.error('Club no encontrado');
           this.router.navigate(['/admin/clubs']);
@@ -1012,6 +1026,8 @@ export class ClubFormComponent implements OnInit {
         heroImage: formValue.heroImage,
         ctaImage: formValue.jumpImage
       },
+      customizationRequest: this.clubData?.settings?.customizationRequest || '',
+      landing_page_requested: this.clubData?.settings?.landing_page_requested || false,
       contact: {
         phone: formValue.phone,
         email: formValue.email,

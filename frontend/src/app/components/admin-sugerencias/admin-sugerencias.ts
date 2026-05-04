@@ -14,13 +14,15 @@ import { ToastService } from '../../services/toast.service';
 export class AdminSugerencias implements OnInit {
   suggestions = signal<Suggestion[]>([]);
   isLoading = signal(true);
-  filter = signal<'all' | 'pending' | 'resolved' | 'unresolved'>('pending');
+  filter = signal<'all' | 'pending' | 'resolved' | 'unresolved' | 'landing_pages'>('pending');
 
   filteredSuggestions = computed(() => {
     const f = this.filter();
     const s = this.suggestions();
     if (f === 'all') return s;
-    return s.filter(item => item.status === f);
+    if (f === 'landing_pages') return s.filter(item => item.type === 'landing_page');
+    // Exclude landing pages from the other status tabs
+    return s.filter(item => item.status === f && item.type !== 'landing_page');
   });
 
   constructor(
@@ -47,7 +49,7 @@ export class AdminSugerencias implements OnInit {
     });
   }
 
-  setFilter(newFilter: 'all' | 'pending' | 'resolved' | 'unresolved') {
+  setFilter(newFilter: 'all' | 'pending' | 'resolved' | 'unresolved' | 'landing_pages') {
       this.filter.set(newFilter);
   }
 

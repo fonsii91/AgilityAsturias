@@ -32,8 +32,8 @@ class SuggestionController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'type' => 'required|in:bug,suggestion',
-            'content' => 'required|string|max:1000',
+            'type' => 'required|in:bug,suggestion,landing_page',
+            'content' => 'required|string|max:10000',
         ]);
 
         try {

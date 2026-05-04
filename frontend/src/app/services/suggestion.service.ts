@@ -25,7 +25,7 @@ export class SuggestionService {
   /**
    * Crear nueva sugerencia/bug
    */
-  createSuggestion(data: { type: 'bug' | 'suggestion', content: string }): Observable<any> {
+  createSuggestion(data: { type: 'bug' | 'suggestion' | 'landing_page', content: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/suggestions`, data);
   }
 

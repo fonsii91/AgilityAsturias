@@ -54,10 +54,5 @@ describe('HomeComponent', () => {
     expect(compiled.querySelector('.subtitle')?.textContent).toContain('Slogan de prueba');
   });
 
-  it('should render services properly', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const services = compiled.querySelectorAll('.service-panel');
-    expect(services.length).toBeGreaterThan(0);
-    expect(services[0].textContent).toContain('Service 1');
-  });
+
 });

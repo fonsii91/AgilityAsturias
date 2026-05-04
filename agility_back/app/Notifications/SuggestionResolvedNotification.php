@@ -38,7 +38,9 @@ class SuggestionResolvedNotification extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $tipoStr = $this->suggestion->type === 'bug' ? 'incidencia' : 'sugerencia';
+        $tipoStr = 'sugerencia';
+        if ($this->suggestion->type === 'bug') $tipoStr = 'incidencia';
+        if ($this->suggestion->type === 'landing_page') $tipoStr = 'petición de landing page';
 
         return [
             'type' => 'suggestion_resolved',

@@ -45,39 +45,6 @@
 </section>
 
 
-
-<!-- Services Section -->
-<section class="services-section">
-    <div class="container">
-        <h3 class="section-title">{{ services.title || 'Nuestros Servicios' }}</h3>
-        <p class="section-intro">{{ services.subtitle || 'Descubre todo lo que ofrecemos para ti y
-            tu perro.' }}</p>
-
-        <div class="services-grid">
-            @for (service of services.items; track service.title; let i = $index) {
-            <div class="service-panel slide-up delay-{{ i }}">
-                <div class="service-icon"><mat-icon>{{ service.icon }}</mat-icon></div>
-                <h4>{{ service.title }}</h4>
-                <p>{{ service.description }}</p>
-            </div>
-            }
-        </div>
-    </div>
-</section>
-
-<!-- Features / Values Section -->
-<section class="features-section">
-    <div class="container">
-        @for (feature of features; track feature.title; let i = $index) {
-        <div class="feature-card fade-in delay-{{ i }}">
-            <div class="icon-wrapper"><mat-icon>{{ feature.icon }}</mat-icon></div>
-            <h3>{{ feature.title }}</h3>
-            <p>{{ feature.description }}</p>
-        </div>
-        }
-    </div>
-</section>
-
 <!-- CTA Section -->
 <section class="cta-section">
     <div class="cta-text-col fade-in">

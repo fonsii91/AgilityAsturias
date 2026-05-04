@@ -1,7 +1,7 @@
 export interface Suggestion {
   id: number;
   user_id: number;
-  type: 'bug' | 'suggestion';
+  type: 'bug' | 'suggestion' | 'landing_page';
   content: string;
   status: 'pending' | 'resolved' | 'unresolved';
   created_at: string;

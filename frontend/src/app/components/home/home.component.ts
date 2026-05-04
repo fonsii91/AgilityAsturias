@@ -50,13 +50,6 @@ export class HomeComponent {
         return url && !url.startsWith('http') ? `https://facebook.com/${url}` : url;
     }
 
-    get services() {
-        return this.tenantService.tenantInfo()?.settings?.homeConfig?.services || this.clubConfig.homeConfig.services;
-    }
-
-    get features() {
-        return this.tenantService.tenantInfo()?.settings?.homeConfig?.features || this.clubConfig.homeConfig.features;
-    }
 
     get cta() {
         return this.tenantService.tenantInfo()?.settings?.homeConfig?.cta || this.clubConfig.homeConfig.cta;

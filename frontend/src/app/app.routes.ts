@@ -37,6 +37,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Editar Club' }
     },
     {
+        path: 'gestor/landing-page',
+        loadComponent: () => import('./components/gestor/landing-page-request/landing-page-request.component').then(m => m.LandingPageRequestComponent),
+        canActivate: [managerGuard],
+        title: titleResolver, data: { pageTitle: 'Diseño Página Bienvenida' }
+    },
+    {
         path: '',
         component: HomeComponent,
         title: titleResolver, data: { pageTitle: '' }

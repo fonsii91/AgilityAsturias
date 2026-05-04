@@ -1,0 +1,179 @@
+.landing-page-container {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #666;
+  background: #f9f9f9;
+  border-radius: 12px;
+  gap: 16px;
+}
+
+/* Bento Card Styles (reused from club-form) */
+.bento-card {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-box mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Purple Theme */
+.purple-header { background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); }
+.purple-icon { background: #d8b4fe; color: #7e22ce; }
+
+.card-body {
+  padding: 24px;
+  flex: 1;
+}
+
+.stack-gap {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-box {
+  padding: 16px;
+  border-radius: 12px;
+  border-left: 4px solid transparent;
+}
+
+.info-box p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.info-box.warning {
+  background-color: #fffbeb;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+
+.w-full {
+  width: 100%;
+}
+
+/* Custom Textarea Styling */
+.textarea-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.premium-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  margin-left: 0.25rem;
+}
+
+.premium-textarea {
+  width: 100%;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background-color: #f8fafc;
+  padding: 1.25rem;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #1e293b;
+  resize: vertical;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) inset;
+}
+
+.premium-textarea:focus {
+  outline: none;
+  border-color: var(--primary-color, #6d28d9);
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.1);
+}
+
+.premium-textarea:disabled {
+  background-color: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.textarea-footer {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 0.25rem;
+}
+
+.char-count {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+/* Btn Save Style */
+.btn-save { 
+  background: var(--primary-color, #0f766e);
+  color: white; 
+  border: none; 
+  padding: 0.8rem 1.5rem; 
+  border-radius: 30px; 
+  font-weight: 600; 
+  font-size: 1.1rem; 
+  cursor: pointer; 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  gap: 0.5rem; 
+  transition: all 0.2s; 
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+  width: max-content; 
+}
+
+.btn-save:hover:not(:disabled) { 
+  transform: translateY(-2px); 
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15); 
+}
+
+.btn-save:disabled { 
+  opacity: 0.7; 
+  cursor: not-allowed; 
+  transform: none; 
+  box-shadow: none; 
+}
