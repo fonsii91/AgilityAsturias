@@ -94,6 +94,37 @@ describe('CompetitionService', () => {
         expect(competitions[1].isAttending).toBe(false);
     });
 
+    it('should correctly sort competitions even if fechaEvento has a time component', () => {
+        const mockBackendData = [
+            {
+                id: 1,
+                nombre: 'Past Competition',
+                lugar: 'Madrid',
+                fecha_evento: '2025-01-01T00:00:00.000000Z', // With timestamp
+                tipo: 'competicion'
+            },
+            {
+                id: 2,
+                nombre: 'Future Competition',
+                lugar: 'Barcelona',
+                fecha_evento: '2026-10-10T23:59:59.000000Z', // With timestamp
+                tipo: 'competicion'
+            }
+        ];
+
+        service.fetchCompetitions();
+        const req = httpMock.expectOne(apiUrl);
+        req.flush(mockBackendData);
+
+        const competitions = service.getCompetitions()();
+        
+        expect(competitions.length).toBe(2);
+        // Descending order: Future first, Past second
+        expect(competitions[0].nombre).toBe('Future Competition');
+        // It maps it directly as it comes from backend, but the sorting should be correct based on substring
+        expect(competitions[1].nombre).toBe('Past Competition');
+    });
+
     it('should add a competition and update signals', async () => {
         const newCompData = {
             nombre: 'New Competition',

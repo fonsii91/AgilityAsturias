@@ -226,8 +226,8 @@ export class CalendarioComponent implements AfterViewInit {
 
             // Find ALL competitions for this day
             const dailyCompetitions = competitions.filter((c: any) => {
-                const start = c.fechaEvento;
-                const end = c.fechaFinEvento || c.fechaEvento; // Fallback to single day
+                const start = c.fechaEvento ? c.fechaEvento.substring(0, 10) : '';
+                const end = c.fechaFinEvento ? c.fechaFinEvento.substring(0, 10) : start;
                 return dateString >= start && dateString <= end;
             });
 

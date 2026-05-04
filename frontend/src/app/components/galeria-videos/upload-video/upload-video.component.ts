@@ -111,7 +111,7 @@ export class UploadVideoComponent implements OnInit {
         today.setHours(0, 0, 0, 0);
         return this.compService.getCompetitions()().filter(comp => {
             if (!comp.fechaEvento) return true;
-            const compDate = new Date(comp.fechaEvento);
+            const compDate = new Date(comp.fechaEvento.substring(0, 10));
             compDate.setHours(0, 0, 0, 0);
             return compDate.getTime() <= today.getTime();
         });

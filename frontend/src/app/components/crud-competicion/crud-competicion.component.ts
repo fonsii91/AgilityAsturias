@@ -40,7 +40,9 @@ export class CrudCompeticionComponent {
         const rawCompetitions = this.competitionService.getCompetitions();
         this.competitions = computed(() => {
             return [...rawCompetitions()].sort((a, b) => {
-                return new Date(a.fechaEvento).getTime() - new Date(b.fechaEvento).getTime();
+                const dateA = a.fechaEvento ? new Date(a.fechaEvento.substring(0, 10)).getTime() : 0;
+                const dateB = b.fechaEvento ? new Date(b.fechaEvento.substring(0, 10)).getTime() : 0;
+                return dateA - dateB;
             });
         });
 

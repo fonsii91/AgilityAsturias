@@ -106,6 +106,25 @@ describe('CalendarioComponent Logic', () => {
         expect(day15?.competitions[0].nombre).toBe('Comp 1');
     });
 
+    it('should calculate months and days correctly when fechaEvento contains a time component', () => {
+        // Change the signal mock to simulate a date with time component from the backend
+        competitionsSignal.set([
+            { id: 2, nombre: 'Comp Timestamp', fechaEvento: '2026-05-18T23:59:59.000000Z', tipo: 'competicion', isAttending: false }
+        ]);
+        
+        // Force the component to recalculate months based on the new signal
+        const months = component.months();
+        const may = months[4]; // Mayo (0-indexed)
+        
+        // Find day 18 for competition
+        const day18 = may.days.find(d => !d.isOtherMonth && d.date.getDate() === 18);
+        expect(day18).toBeDefined();
+        // The comparison logic (c.fechaEvento.substring(0, 10)) should correctly match '2026-05-18'
+        expect(day18?.isCompetition).toBe(true);
+        expect(day18?.competitions.length).toBe(1);
+        expect(day18?.competitions[0].nombre).toBe('Comp Timestamp');
+    });
+
     it('should open modal with proper data when clicking a day with events', () => {
         const mockDay = {
             date: new Date(2026, 4, 15),

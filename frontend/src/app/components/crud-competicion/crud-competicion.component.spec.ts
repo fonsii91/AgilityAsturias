@@ -71,9 +71,16 @@ describe('CrudCompeticionComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should sort competitions by date', () => {
+    it('should sort competitions by date robustly, ignoring timestamps', () => {
+        // Change the mock to inject a timestamp
+        mockCompetitions.set([
+            { id: 1, nombre: 'Comp 1', fechaEvento: '2026-08-15T23:00:00.000000Z' },
+            { id: 2, nombre: 'Comp 2', fechaEvento: '2026-08-10' }
+        ]);
+
         const sorted = component.competitions();
-        expect(sorted[0].id).toBe(2); // 2026-08-10 is earlier than 2026-08-15
+        // Since we changed it to dateA - dateB (ascending), 2026-08-10 should come before 2026-08-15
+        expect(sorted[0].id).toBe(2); 
         expect(sorted[1].id).toBe(1);
     });
 

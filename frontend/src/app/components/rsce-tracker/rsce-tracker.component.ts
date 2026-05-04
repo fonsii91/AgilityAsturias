@@ -46,7 +46,7 @@ export class RsceTrackerComponent implements OnInit {
     today.setHours(0, 0, 0, 0);
     return this.competitions().filter(comp => {
       if (!comp.fechaEvento) return true;
-      const compDate = new Date(comp.fechaEvento);
+      const compDate = new Date(comp.fechaEvento.substring(0, 10));
       compDate.setHours(0, 0, 0, 0);
       return compDate.getTime() <= today.getTime();
     });
@@ -167,7 +167,9 @@ export class RsceTrackerComponent implements OnInit {
     }
     
     const filtered = this.tracks().filter(t => t.dog_id === dogId).sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
+      const dateA = a.date ? new Date((a.date as string).substring(0, 10)).getTime() : 0;
+      const dateB = b.date ? new Date((b.date as string).substring(0, 10)).getTime() : 0;
+      return dateB - dateA;
     });
     
     this.filteredTracks.set(filtered);
@@ -353,7 +355,7 @@ export class RsceTrackerComponent implements OnInit {
         const ceTracks = tracks.filter(t => {
             const isExc = (t.qualification === 'Excelente a 0' || t.qualification === 'EXCELENTE' || t.qualification === 'Excelente');
             if (!isExc || !t.date) return false;
-            const tDate = new Date(t.date as string);
+            const tDate = new Date((t.date as string).substring(0, 10));
             return tDate >= seasonStartDate && tDate <= seasonEndDate;
         });
 
@@ -614,8 +616,8 @@ export class RsceTrackerComponent implements OnInit {
         
         // Misma fecha robusta
         try {
-            const vDate = new Date(video.date as string).toISOString().split('T')[0];
-            const tDate = new Date(track.date as string).toISOString().split('T')[0];
+            const vDate = (video.date as string).substring(0, 10);
+            const tDate = (track.date as string).substring(0, 10);
             if (vDate !== tDate) return false;
         } catch(e) {
             return false; // Si falla la conversión de fecha, descartamos

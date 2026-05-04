@@ -194,4 +194,30 @@ describe('RsceTrackerComponent', () => {
     expect(component.ceDiscardedBySpeedCount()).toBe(1); // The 4.40 track is discarded
     expect(component.ceMet()).toBe(false);
   });
+
+  it('should robustly parse dates with timestamps for video matching and past competitions', () => {
+    // Inject a track with timestamp
+    const track = { id: 1, dog_id: 1, date: '2026-05-20T23:59:59.000000Z', manga_type: 'Agility 1', qualification: 'EXCELENTE' } as any;
+    component.userVideos.set([
+      // Inject a video with a timestamp but slightly different time, same day
+      { id: 10, dog_id: 1, date: '2026-05-20T12:00:00.000000Z', manga_type: 'Agility 1' } as any
+    ]);
+    
+    // Test getMatchingVideo
+    const match = component.getMatchingVideo(track);
+    expect(match).toBeTruthy();
+    expect(match?.id).toBe(10);
+    
+    // Verify that competitions are correctly filtered in pastAndCurrentCompetitions
+    // using a custom test array
+    const competitionsSignal = component['competitions'] as any; // Using internal reference for test
+    const today = new Date();
+    const pastDateStr = new Date(today.getTime() - 86400000).toISOString().replace('Z', '.000000Z');
+    competitionsSignal.set([
+      { id: 1, fechaEvento: pastDateStr }
+    ]);
+    
+    expect(component.pastAndCurrentCompetitions().length).toBe(1);
+    expect(component.pastAndCurrentCompetitions()[0].id).toBe(1);
+  });
 });

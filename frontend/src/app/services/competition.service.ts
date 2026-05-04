@@ -21,8 +21,8 @@ export class CompetitionService {
                 const mapped = comps.map((c: any) => this.mapFromBackend(c));
                 // Ordenar de más recientes a más antiguos (fechaEvento puede ser null/vacio)
                 mapped.sort((a, b) => {
-                    const dateA = a.fechaEvento ? new Date(a.fechaEvento).getTime() : 0;
-                    const dateB = b.fechaEvento ? new Date(b.fechaEvento).getTime() : 0;
+                    const dateA = a.fechaEvento ? new Date(a.fechaEvento.substring(0, 10)).getTime() : 0;
+                    const dateB = b.fechaEvento ? new Date(b.fechaEvento.substring(0, 10)).getTime() : 0;
                     return dateB - dateA;
                 });
                 this.competitionsSignal.set(mapped);

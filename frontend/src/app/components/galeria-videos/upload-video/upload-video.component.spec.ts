@@ -98,4 +98,30 @@ describe('UploadVideoComponent', () => {
         expect(videoServiceMock.uploadVideo).toHaveBeenCalled();
         expect(toastServiceMock.success).toHaveBeenCalledWith('Vídeo subido exitosamente.');
     });
+
+    it('should correctly filter pastAndCurrentCompetitions when dates have timestamps', () => {
+        // Today is dynamically evaluated in the component, so we mock dates relative to today
+        const today = new Date();
+        
+        const pastDate = new Date(today);
+        pastDate.setDate(today.getDate() - 5);
+        
+        const futureDate = new Date(today);
+        futureDate.setDate(today.getDate() + 5);
+
+        // Format dates as strings with timestamps similar to backend
+        const pastDateString = pastDate.toISOString().replace('Z', '.000000Z');
+        const futureDateString = futureDate.toISOString().replace('Z', '.000000Z');
+
+        compServiceMock.getCompetitions.mockReturnValue(signal([
+            { id: 1, nombre: 'Past Comp', fechaEvento: pastDateString },
+            { id: 2, nombre: 'Future Comp', fechaEvento: futureDateString }
+        ]));
+
+        const filtered = component.pastAndCurrentCompetitions;
+        
+        expect(filtered.length).toBe(1);
+        expect(filtered[0].id).toBe(1);
+        expect(filtered[0].nombre).toBe('Past Comp');
+    });
 });
