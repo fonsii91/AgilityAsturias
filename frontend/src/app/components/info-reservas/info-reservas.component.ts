@@ -16,7 +16,14 @@ export class InfoReservasComponent {
     // Get all reservations from service
     allReservations = this.reservationService.getReservations();
 
-    todayStr = new Date().toISOString().split('T')[0];
+    // Calculate local today string to avoid UTC offset bugs at midnight
+    todayStr = (() => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    })();
 
     // Raw today reservations for stats
     todayReservationsRaw = computed(() => {

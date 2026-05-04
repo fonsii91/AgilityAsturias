@@ -69,7 +69,10 @@ export class PendingReviewsDialogComponent {
     if (this.isManual()) {
       const w = data.manualWorkload || {
         id: 0,
-        date: new Date().toISOString().split('T')[0],
+        date: (() => {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        })(),
         duration_min: 5,
         intensity_rpe: 6,
         jumped_max_height: false,

@@ -46,8 +46,8 @@ export class RsceTrackerComponent implements OnInit {
     today.setHours(0, 0, 0, 0);
     return this.competitions().filter(comp => {
       if (!comp.fechaEvento) return true;
-      const compDate = new Date(comp.fechaEvento.substring(0, 10));
-      compDate.setHours(0, 0, 0, 0);
+      const parts = comp.fechaEvento.substring(0, 10).split('-');
+      const compDate = parts.length === 3 ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])) : new Date(0);
       return compDate.getTime() <= today.getTime();
     });
   });
@@ -468,7 +468,10 @@ export class RsceTrackerComponent implements OnInit {
     this.isEditing.set(false);
     this.formData.set({
       dog_id: this.selectedDogId()!,
-      date: new Date().toISOString().split('T')[0],
+      date: (() => {
+        const now = new Date();
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      })(),
       manga_type: 'Agility 1',
       qualification: 'Excelente',
       speed: null,

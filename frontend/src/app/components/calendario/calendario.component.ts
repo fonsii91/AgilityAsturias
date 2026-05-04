@@ -355,8 +355,15 @@ export class CalendarioComponent implements AfterViewInit {
     getEventDays(comp: any): Date[] {
         if (!comp) return [];
         const days: Date[] = [];
-        const start = new Date(comp.fechaEvento);
-        const end = comp.fechaFinEvento ? new Date(comp.fechaFinEvento) : new Date(comp.fechaEvento);
+        const parseLocal = (dateStr: string) => {
+             const parts = dateStr.substring(0, 10).split('-');
+             if (parts.length === 3) {
+                return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+             }
+             return new Date(dateStr);
+        };
+        const start = parseLocal(comp.fechaEvento);
+        const end = comp.fechaFinEvento ? parseLocal(comp.fechaFinEvento) : parseLocal(comp.fechaEvento);
         
         const current = new Date(start);
         while (current <= end) {

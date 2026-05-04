@@ -21,8 +21,16 @@ export class CompetitionService {
                 const mapped = comps.map((c: any) => this.mapFromBackend(c));
                 // Ordenar de más recientes a más antiguos (fechaEvento puede ser null/vacio)
                 mapped.sort((a, b) => {
-                    const dateA = a.fechaEvento ? new Date(a.fechaEvento.substring(0, 10)).getTime() : 0;
-                    const dateB = b.fechaEvento ? new Date(b.fechaEvento.substring(0, 10)).getTime() : 0;
+                    const parseDateStr = (dateStr: string) => {
+                        if (!dateStr) return 0;
+                        const parts = dateStr.substring(0, 10).split('-');
+                        if (parts.length === 3) {
+                           return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])).getTime();
+                        }
+                        return 0;
+                    };
+                    const dateA = parseDateStr(a.fechaEvento);
+                    const dateB = parseDateStr(b.fechaEvento);
                     return dateB - dateA;
                 });
                 this.competitionsSignal.set(mapped);

@@ -51,7 +51,8 @@ export class UploadVideoComponent implements OnInit {
 
         effect(() => {
             const comps = this.compService.getCompetitions()();
-            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
             const currentCompId = this.uploadForm.get('competition_id')?.value;
             if (!currentCompId) {
@@ -72,7 +73,8 @@ export class UploadVideoComponent implements OnInit {
     ngOnInit() {
         this.dogService.loadAllDogs();
 
-        const today = new Date().toISOString().split('T')[0];
+        const now = new Date();
+        const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
         this.uploadForm.patchValue({ date: today });
     }
 
@@ -111,8 +113,8 @@ export class UploadVideoComponent implements OnInit {
         today.setHours(0, 0, 0, 0);
         return this.compService.getCompetitions()().filter(comp => {
             if (!comp.fechaEvento) return true;
-            const compDate = new Date(comp.fechaEvento.substring(0, 10));
-            compDate.setHours(0, 0, 0, 0);
+            const parts = comp.fechaEvento.substring(0, 10).split('-');
+            const compDate = parts.length === 3 ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])) : new Date(0);
             return compDate.getTime() <= today.getTime();
         });
     }

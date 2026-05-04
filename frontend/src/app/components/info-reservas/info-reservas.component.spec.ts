@@ -8,13 +8,18 @@ describe('InfoReservasComponent', () => {
     let mockInjector: Injector;
 
     beforeEach(() => {
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        const tomorrow = new Date(now.getTime() + 86400000);
+        const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+
         // Mock data
         const mockReservations = [
             {
                 id: 1,
                 userId: 1,
                 userName: 'Juan Perez',
-                date: new Date().toISOString().split('T')[0], // Today
+                date: todayStr, // Today
                 startTime: '10:00:00',
                 dog: { name: 'Rex', acwr_color: 'green' }
             },
@@ -22,7 +27,7 @@ describe('InfoReservasComponent', () => {
                 id: 2,
                 userId: 2,
                 userName: 'Maria Lopez',
-                date: new Date().toISOString().split('T')[0], // Today
+                date: todayStr, // Today
                 startTime: '10:00:00',
                 dog: { name: 'Luna', acwr_color: 'yellow' }
             },
@@ -30,7 +35,7 @@ describe('InfoReservasComponent', () => {
                 id: 3,
                 userId: 1,
                 userName: 'Juan Perez',
-                date: new Date(new Date().getTime() + 86400000).toISOString().split('T')[0], // Tomorrow
+                date: tomorrowStr, // Tomorrow
                 startTime: '18:00:00',
                 dog: { name: 'Rex', acwr_color: 'green' }
             }
@@ -72,7 +77,8 @@ describe('InfoReservasComponent', () => {
         const futureSlots = component.futureReservationsGrouped();
         expect(futureSlots.length).toBe(1); // One future date
         
-        const tomorrowDate = new Date(new Date().getTime() + 86400000).toISOString().split('T')[0];
+        const tomorrow = new Date(new Date().getTime() + 86400000);
+        const tomorrowDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
         expect(futureSlots[0].date).toBe(tomorrowDate);
         expect(futureSlots[0].totalCount).toBe(1);
         

@@ -1,13 +1,13 @@
 [
   {
-    "version": "1.1.35",
+    "version": "1.1.36",
     "date": "2026-05-04",
     "features": [
       "¡Una página de bienvenida más limpia! Hemos simplificado el diseño de la página principal del club, eliminando apartados redundantes para ofrecer un aspecto mucho más directo, moderno y sin distracciones."
     ],
     "bugfixes": [
       "Resolución de incidencias generales y optimización de permisos de gestión para garantizar una experiencia más fluida y segura.",
-      "Resuelto un problema técnico que ocultaba erróneamente eventos pasados, impidiendo que pudieras visualizarlos en el calendario o seleccionarlos al subir nuevos vídeos de competiciones antiguas."
+      "Corrección definitiva del problema técnico (especialmente en dispositivos Apple/Safari o aplicaciones instaladas) que ocultaba erróneamente eventos pasados o desordenaba las competiciones en el calendario y la subida de vídeos."
     ]
   },
   {
