@@ -145,7 +145,8 @@ describe('CrudCompeticionComponent', () => {
         component.competitionForm.patchValue({
             nombre: 'Nueva Comp',
             fechaEvento: '2026-10-10',
-            tipo: 'competicion'
+            tipo: 'competicion',
+            federacion: 'RSCE'
         });
 
         await component.onSubmit();
@@ -155,12 +156,28 @@ describe('CrudCompeticionComponent', () => {
         expect(component.showForm()).toBe(false);
     });
 
+    it('should block submission if tipo is competicion and no federacion is provided', async () => {
+        component.initNewCompetition();
+        component.competitionForm.patchValue({
+            nombre: 'Nueva Comp',
+            fechaEvento: '2026-10-10',
+            tipo: 'competicion',
+            federacion: ''
+        });
+
+        await component.onSubmit();
+
+        expect(toastServiceMock.error).toHaveBeenCalledWith('Debes seleccionar una federación para las competiciones.');
+        expect(competitionServiceMock.addCompetition).not.toHaveBeenCalled();
+    });
+
     it('should call updateCompetition on submit if editing', async () => {
         const compToEdit = { id: 1, nombre: 'Comp 1', fechaEvento: '2026-08-15' };
         component.editCompetition(compToEdit as any);
         
         component.competitionForm.patchValue({
-            nombre: 'Comp 1 Modificada'
+            nombre: 'Comp 1 Modificada',
+            federacion: 'RSCE'
         });
 
         await component.onSubmit();

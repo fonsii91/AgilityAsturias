@@ -43,6 +43,7 @@ class CompetitionCrudTest extends TestCase
             'fecha_limite' => '2026-08-01',
             'forma_pago' => 'Transferencia',
             'tipo' => 'competicion',
+            'federacion' => 'RSCE',
             'judge_name' => 'Juez Internacional'
         ];
 
@@ -52,6 +53,7 @@ class CompetitionCrudTest extends TestCase
         $this->assertDatabaseHas('competitions', [
             'nombre' => 'Trofeo Agility Asturias',
             'tipo' => 'competicion',
+            'federacion' => 'RSCE',
             'club_id' => $this->club->id,
         ]);
     }
@@ -99,6 +101,7 @@ class CompetitionCrudTest extends TestCase
             'lugar' => 'Siero',
             'fecha_evento' => '2026-08-15',
             'tipo' => 'competicion',
+            'federacion' => 'RSCE',
         ];
 
         $response = $this->actingAs($this->admin)->postJson("/api/competitions/{$competition->id}", $payload);
@@ -108,6 +111,20 @@ class CompetitionCrudTest extends TestCase
             'id' => $competition->id,
             'nombre' => 'Nombre Nuevo',
         ]);
+    }
+
+    public function test_requiere_federacion_si_tipo_es_competicion()
+    {
+        $payload = [
+            'nombre' => 'Trofeo Sin Federacion',
+            'fecha_evento' => '2026-08-15',
+            'tipo' => 'competicion',
+        ];
+
+        $response = $this->actingAs($this->admin)->postJson('/api/competitions', $payload);
+
+        $response->assertStatus(422)
+                 ->assertJsonValidationErrors(['federacion']);
     }
 
     public function test_permite_a_un_administrador_cancelar_o_eliminar_una_competicion()

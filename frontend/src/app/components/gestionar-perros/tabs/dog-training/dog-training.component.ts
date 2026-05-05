@@ -29,7 +29,7 @@ import { environment } from '../../../../../environments/environment';
             </label>
             <div class="toggle-switch-wrapper">
               <label class="switch">
-                <input type="checkbox" [(ngModel)]="formData.has_previous_injuries">
+                <input type="checkbox" [(ngModel)]="formData.has_previous_injuries" (ngModelChange)="checkChanges()">
                 <span class="slider round"></span>
               </label>
               <span class="toggle-label">{{ formData.has_previous_injuries ? 'Sí, tiene historial' : 'Perro sin lesiones graves' }}</span>
@@ -51,11 +51,11 @@ import { environment } from '../../../../../environments/environment';
             }
             <div style="display: flex; gap: 10px;">
               <div class="input-with-icon" style="flex: 1;">
-                <input type="number" class="custom-input" [(ngModel)]="formData.sterilized_years" placeholder="Años (ej. 1)" min="0" max="20" [disabled]="!dog()?.birth_date">
+                <input type="number" class="custom-input" [(ngModel)]="formData.sterilized_years" (ngModelChange)="checkChanges()" placeholder="Años (ej. 1)" min="0" max="20" [disabled]="!dog()?.birth_date">
                 <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9em; pointer-events: none;">años</span>
               </div>
               <div class="input-with-icon" style="flex: 1;">
-                <input type="number" class="custom-input" [(ngModel)]="formData.sterilized_months" placeholder="Meses (ej. 4)" min="0" max="11" [disabled]="!dog()?.birth_date">
+                <input type="number" class="custom-input" [(ngModel)]="formData.sterilized_months" (ngModelChange)="checkChanges()" placeholder="Meses (ej. 4)" min="0" max="11" [disabled]="!dog()?.birth_date">
                 <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9em; pointer-events: none;">meses</span>
               </div>
             </div>
@@ -66,7 +66,7 @@ import { environment } from '../../../../../environments/environment';
             <label>Peso (Kg)</label>
             <div class="input-with-icon">
               <span class="material-icons-outlined input-icon">monitor_weight</span>
-              <input type="number" step="0.1" [(ngModel)]="formData.weight_kg" placeholder="Ej. 16.5">
+              <input type="number" step="0.1" [(ngModel)]="formData.weight_kg" (ngModelChange)="checkChanges()" placeholder="Ej. 16.5">
             </div>
           </div>
 
@@ -79,18 +79,27 @@ import { environment } from '../../../../../environments/environment';
             </label>
             <div class="input-with-icon">
               <span class="material-icons-outlined input-icon">height</span>
-              <input type="number" step="0.5" [(ngModel)]="formData.height_cm" placeholder="Ej. 52">
+              <input type="number" step="0.5" [(ngModel)]="formData.height_cm" (ngModelChange)="checkChanges()" placeholder="Ej. 52">
             </div>
           </div>
 
         </div>
-
-        <div class="form-actions mt-4">
-          <button class="btn-save" style="background: var(--primary-color);" (click)="saveHealthData()" [disabled]="isSaving()">
-            <span class="material-icons">save</span> {{ isSaving() ? 'Guardando...' : 'Guardar Datos Deportivos' }}
-          </button>
-        </div>
       </div>
+      
+      @if (hasChanges) {
+        <div class="floating-save-bar pop-in">
+          <div class="save-bar-content">
+            <button class="reset-btn" (click)="resetForm()">Descartar</button>
+            <button class="save-btn" [disabled]="isSaving()" (click)="saveHealthData()" [style.background]="'var(--primary-color)'">
+              <div class="btn-content">
+                @if (!isSaving()) { <span class="material-icons">save</span> }
+                @if (isSaving()) { <span class="material-icons spinner-small">sync</span> }
+                <span>@if (isSaving()) { Guardando... } @else { Guardar Cambios }</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      }
     </div>
   `,
   styles: [`
@@ -131,10 +140,19 @@ import { environment } from '../../../../../environments/environment';
     .toggle-label { font-size: 0.95rem; color: #334155; font-weight: 500;}
     
     .mt-4 { margin-top: 1.5rem; }
-    .form-actions { display: flex; justify-content: flex-end; }
-    .btn-save { color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: max-content; }
-    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+    
+    .floating-save-bar { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background-color: #1e293b; color: white; padding: 0.75rem 1rem; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1); z-index: 100; width: max-content; max-width: 90%; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .pop-in { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes popIn { 0% { opacity: 0; transform: translate(-50%, 20px) scale(0.95); } 100% { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+    .save-bar-content { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+    .reset-btn { background: transparent; border: none; color: #cbd5e1; font-weight: 600; padding: 0.5rem 1rem; border-radius: 9999px; cursor: pointer; transition: all 0.2s; }
+    .reset-btn:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+    .save-btn { border: none; border-radius: 9999px; font-weight: 600; color: white; height: 40px; padding: 0 1.5rem; cursor: pointer; transition: filter 0.2s; }
+    .save-btn:hover:not(:disabled) { filter: brightness(1.1); }
+    .save-btn:disabled { background: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.5) !important; cursor: not-allowed; }
+    .btn-content { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .btn-content .material-icons { font-size: 18px; }
+    .spinner-small { animation: spin 1s linear infinite; }
   `]
 })
 export class DogTrainingComponent {
@@ -154,6 +172,17 @@ export class DogTrainingComponent {
     weight_kg: null as number | null,
     height_cm: null as number | null
   };
+  initialData: any = {};
+  hasChanges = false;
+  
+  checkChanges() {
+    this.hasChanges = JSON.stringify(this.formData) !== JSON.stringify(this.initialData);
+  }
+  
+  resetForm() {
+    this.formData = { ...this.initialData };
+    this.hasChanges = false;
+  }
 
   constructor() {
     effect(() => {
@@ -175,6 +204,12 @@ export class DogTrainingComponent {
             let rm = diffMonths % 12;
             this.formData.sterilized_months = rm === 0 && this.formData.sterilized_years > 0 ? null : rm;
         }
+        
+        // Timeout to avoid ExpressionChangedAfterItHasBeenCheckedError if hasChanges is bound
+        setTimeout(() => {
+          this.initialData = { ...this.formData };
+          this.hasChanges = false;
+        });
       }
     });
   }
@@ -207,6 +242,10 @@ export class DogTrainingComponent {
 
       const updatedDog = await this.dogService.updateDog(currentDog.id, payload as any);
       this.dogState.setDog(updatedDog);
+      
+      this.initialData = { ...this.formData };
+      this.hasChanges = false;
+      
       this.toast.success('Perfil deportivo actualizado');
     } catch(err) {
       console.error(err);

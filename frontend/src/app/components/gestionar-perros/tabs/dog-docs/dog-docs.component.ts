@@ -30,11 +30,11 @@ import { environment } from '../../../../../environments/environment';
             </div>
             <div class="form-group">
               <label>Microchip</label>
-              <input type="text" [(ngModel)]="formData.microchip" placeholder="Número de 15 dígitos">
+              <input type="text" [(ngModel)]="formData.microchip" (ngModelChange)="checkChanges()" placeholder="Número de 15 dígitos">
             </div>
             <div class="form-group">
               <label>Pedigree / LOE</label>
-              <input type="text" [(ngModel)]="formData.pedigree" placeholder="Ej. LOE-0000000">
+              <input type="text" [(ngModel)]="formData.pedigree" (ngModelChange)="checkChanges()" placeholder="Ej. LOE-0000000">
             </div>
           </div>
 
@@ -42,19 +42,19 @@ import { environment } from '../../../../../environments/environment';
           <div class="doc-card rsce-card">
             <div class="doc-header">
               <span class="material-icons-outlined">military_tech</span>
-              <h3>Licencia RSCE</h3>
+              <h3>RSCE</h3>
             </div>
             <div class="form-group">
               <label>Nº Licencia</label>
-              <input type="text" [(ngModel)]="formData.rsce_license">
+              <input type="text" [(ngModel)]="formData.rsce_license" (ngModelChange)="checkChanges()">
             </div>
             <div class="form-group">
               <label>Caducidad</label>
-              <input type="date" [(ngModel)]="formData.rsce_expiration_date" class="date-input">
+              <input type="date" [(ngModel)]="formData.rsce_expiration_date" (ngModelChange)="checkChanges()" class="date-input">
             </div>
             <div class="form-group">
               <label>Grado Actual</label>
-              <select [(ngModel)]="formData.rsce_grade">
+              <select [(ngModel)]="formData.rsce_grade" (ngModelChange)="checkChanges()">
                 <option value="">-- No definido --</option>
                 <option value="0">Grado 0</option>
                 <option value="1">Grado I</option>
@@ -64,18 +64,62 @@ import { environment } from '../../../../../environments/environment';
             </div>
             <div class="form-group">
               <label>Categoría</label>
-              <input type="text" [value]="calculatedCategory" disabled style="background-color: #e2e8f0; color: #64748b; font-weight: 600; border: 1px solid #cbd5e1;">
-              <small class="help-text" style="color: #64748b;">Métrica autocálculada por la FCI en base a la altura introducida en la pestaña de Entrenamiento.</small>
+              <select [(ngModel)]="formData.rsce_category" (ngModelChange)="checkChanges()">
+                <option value="">-- No definido --</option>
+                <option value="S">Mini / Small (S) - &lt;35cm</option>
+                <option value="M">Midi / Medium (M) - 35cm a 42.99cm</option>
+                <option value="I">Intermediate (I) - 43cm a 47.99cm</option>
+                <option value="L">Standard / Large (L) - &ge;48cm</option>
+              </select>
+              <small class="help-text" style="color: #64748b;">Métrica autocálculada por la FCI en base a la altura introducida en la pestaña de Entrenamiento. Puedes modificarla si es necesario.</small>
+            </div>
+          </div>
+
+          <!-- Licencia RFEC -->
+          <div class="doc-card rfec-card">
+            <div class="doc-header">
+              <span class="material-icons-outlined">pets</span>
+              <h3>RFEC</h3>
+            </div>
+            <div class="form-group">
+              <label>Grado Actual</label>
+              <select [(ngModel)]="formData.rfec_grade" (ngModelChange)="checkChanges()">
+                <option value="">-- No definido --</option>
+                <option value="Iniciación">Iniciación</option>
+                <option value="Promoción">Promoción</option>
+                <option value="Competición">Competición</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Clase (Categoría de Altura)</label>
+              <select [(ngModel)]="formData.rfec_category" (ngModelChange)="checkChanges()">
+                <option value="">-- No definido --</option>
+                <option value="20">Clase 20 (&lt;28cm)</option>
+                <option value="30">Clase 30 (28cm - 34.99cm)</option>
+                <option value="40">Clase 40 (35cm - 42.99cm)</option>
+                <option value="50">Clase 50 (43cm - 50.99cm)</option>
+                <option value="60">Clase 60 (&ge;51cm)</option>
+              </select>
+              <small class="help-text" style="color: #64748b;">Sugerida por altura, puedes modificarla.</small>
             </div>
           </div>
         </div>
-        
-        <div class="form-actions" style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
-          <button class="btn-save" style="background: var(--primary-color);" (click)="saveChanges()" [disabled]="isSaving">
-            <span class="material-icons">save</span> Guardar Documentos
-          </button>
-        </div>
       </div>
+      
+      @if (hasChanges) {
+        <div class="floating-save-bar pop-in">
+          <div class="save-bar-content">
+            <button class="reset-btn" (click)="resetForm()">Descartar</button>
+            <button class="save-btn" [disabled]="isSaving" (click)="saveChanges()" [style.background]="'var(--primary-color)'">
+              <div class="btn-content">
+                @if (!isSaving) { <span class="material-icons">save</span> }
+                @if (isSaving) { <span class="material-icons spinner-small">sync</span> }
+                <span>@if (isSaving) { Guardando... } @else { Guardar Cambios }</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      }
     }
   `,
   styles: [`
@@ -101,9 +145,18 @@ import { environment } from '../../../../../environments/environment';
     input, select { width: 100%; padding: 10px 12px; border: 2px solid transparent; border-radius: 8px; background: #f1f5f9; color: #1e293b; font-size: 0.95rem; font-family: inherit; transition: all 0.2s; box-sizing: border-box;}
     input:focus, select:focus { outline: none; border-color: var(--primary-color, #0f172a); background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     
-    .btn-save { color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: max-content; }
-    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+    .floating-save-bar { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background-color: #1e293b; color: white; padding: 0.75rem 1rem; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1); z-index: 100; width: max-content; max-width: 90%; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .pop-in { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes popIn { 0% { opacity: 0; transform: translate(-50%, 20px) scale(0.95); } 100% { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+    .save-bar-content { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+    .reset-btn { background: transparent; border: none; color: #cbd5e1; font-weight: 600; padding: 0.5rem 1rem; border-radius: 9999px; cursor: pointer; transition: all 0.2s; }
+    .reset-btn:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+    .save-btn { border: none; border-radius: 9999px; font-weight: 600; color: white; height: 40px; padding: 0 1.5rem; cursor: pointer; transition: filter 0.2s; }
+    .save-btn:hover:not(:disabled) { filter: brightness(1.1); }
+    .save-btn:disabled { background: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.5) !important; cursor: not-allowed; }
+    .btn-content { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .btn-content .material-icons { font-size: 18px; }
+    .spinner-small { animation: spin 1s linear infinite; }
   `]
 })
 export class DogDocsComponent {
@@ -119,18 +172,42 @@ export class DogDocsComponent {
     pedigree: this.dog()?.pedigree || '',
     rsce_license: this.dog()?.pivot?.rsce_license || '',
     rsce_expiration_date: this.dog()?.pivot?.rsce_expiration_date ? this.dog()!.pivot!.rsce_expiration_date!.split('T')[0] : '',
-    rsce_grade: this.dog()?.pivot?.rsce_grade || ''
+    rsce_grade: this.dog()?.pivot?.rsce_grade || '',
+    rsce_category: this.dog()?.rsce_category || this.getAutoRsceCategory(),
+    rfec_grade: this.dog()?.rfec_grade || '',
+    rfec_category: this.dog()?.rfec_category || this.getAutoRfecCategory()
   };
+  initialData = { ...this.formData };
   
   isSaving = false;
+  hasChanges = false;
+  
+  checkChanges() {
+    this.hasChanges = JSON.stringify(this.formData) !== JSON.stringify(this.initialData);
+  }
+  
+  resetForm() {
+    this.formData = { ...this.initialData };
+    this.hasChanges = false;
+  }
 
-  get calculatedCategory(): string {
+  getAutoRsceCategory(): string {
     const dog = this.dog();
-    if (!dog?.height_cm) return 'Falta altura (Ir a Entrenamiento)';
-    if (dog.height_cm < 35) return 'Mini / Small (S) - ' + dog.height_cm + 'cm';
-    if (dog.height_cm < 43) return 'Midi / Medium (M) - ' + dog.height_cm + 'cm';
-    if (dog.height_cm < 48) return 'Intermediate (I) - ' + dog.height_cm + 'cm';
-    return 'Standard / Large (L) - ' + dog.height_cm + 'cm';
+    if (!dog?.height_cm) return '';
+    if (dog.height_cm < 35) return 'S';
+    if (dog.height_cm < 43) return 'M';
+    if (dog.height_cm < 48) return 'I';
+    return 'L';
+  }
+
+  getAutoRfecCategory(): string {
+    const dog = this.dog();
+    if (!dog?.height_cm) return '';
+    if (dog.height_cm < 28) return '20';
+    if (dog.height_cm < 35) return '30';
+    if (dog.height_cm < 43) return '40';
+    if (dog.height_cm < 51) return '50';
+    return '60';
   }
 
   async saveChanges() {
@@ -145,11 +222,16 @@ export class DogDocsComponent {
         pedigree: this.formData.pedigree || null,
         rsce_license: this.formData.rsce_license || null,
         rsce_expiration_date: this.formData.rsce_expiration_date || null,
-        rsce_grade: this.formData.rsce_grade || null
+        rsce_grade: this.formData.rsce_grade || null,
+        rsce_category: this.formData.rsce_category || null,
+        rfec_grade: this.formData.rfec_grade || null,
+        rfec_category: this.formData.rfec_category || null
       };
 
       const updated = await this.dogService.updateDog(currentDog.id, payload as any);
       this.dogState.setDog(updated);
+      this.initialData = { ...this.formData };
+      this.hasChanges = false;
       this.toast.success('Documentos actualizados');
     } catch(e) {
       this.toast.error('Error al guardar documentos');

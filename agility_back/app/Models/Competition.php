@@ -21,6 +21,7 @@ class Competition extends Model
         'cartel',
         'enlace',
         'tipo',
+        'federacion',
         'nombre',
         'judge_name',
     ];

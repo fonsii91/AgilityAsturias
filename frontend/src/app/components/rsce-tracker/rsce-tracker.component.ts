@@ -45,6 +45,8 @@ export class RsceTrackerComponent implements OnInit {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return this.competitions().filter(comp => {
+      if (comp.federacion !== 'RSCE') return false;
+      
       if (!comp.fechaEvento) return true;
       const parts = comp.fechaEvento.substring(0, 10).split('-');
       const compDate = parts.length === 3 ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])) : new Date(0);

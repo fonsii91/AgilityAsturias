@@ -8,6 +8,7 @@ export interface Competition {
     cartel: string | null;
     enlace: string;
     tipo: 'competicion' | 'otros';
+    federacion?: 'RSCE' | 'RFEC' | 'Otro';
     nombre?: string; // Optional for backward compatibility with existing records
     judge_name?: string;
 

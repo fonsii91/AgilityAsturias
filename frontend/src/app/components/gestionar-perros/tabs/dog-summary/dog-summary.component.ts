@@ -24,24 +24,19 @@ import { environment } from '../../../../../environments/environment';
           <div class="two-col-grid">
             <div class="form-group">
               <label>Nombre</label>
-              <input type="text" [(ngModel)]="formData.name" placeholder="P. ej. Toby">
+              <input type="text" [(ngModel)]="formData.name" (ngModelChange)="checkChanges()" placeholder="P. ej. Toby">
             </div>
             
             <div class="form-group">
               <label>Raza</label>
-              <input type="text" [(ngModel)]="formData.breed" placeholder="Si es mestizo, indícalo">
+              <input type="text" [(ngModel)]="formData.breed" (ngModelChange)="checkChanges()" placeholder="Si es mestizo, indícalo">
             </div>
 
             <div class="form-group">
               <label>Fecha de Nacimiento</label>
-              <input type="date" [(ngModel)]="formData.birth_date">
+              <input type="date" [(ngModel)]="formData.birth_date" (ngModelChange)="checkChanges()">
             </div>
             
-            <div class="form-actions" style="grid-column: 1 / -1; margin-top: 1rem; display: flex; justify-content: flex-end;">
-              <button class="btn-save" style="background: var(--primary-color);" (click)="saveChanges()" [disabled]="isSaving">
-                <span class="material-icons">save</span> Guardar Cambios
-              </button>
-            </div>
           </div>
         </div>
         
@@ -58,6 +53,21 @@ import { environment } from '../../../../../environments/environment';
         </div>
 
       </div>
+      
+      @if (hasChanges) {
+        <div class="floating-save-bar pop-in">
+          <div class="save-bar-content">
+            <button class="reset-btn" (click)="resetForm()">Descartar</button>
+            <button class="save-btn" [disabled]="isSaving" (click)="saveChanges()" [style.background]="'var(--primary-color)'">
+              <div class="btn-content">
+                @if (!isSaving) { <span class="material-icons">save</span> }
+                @if (isSaving) { <span class="material-icons spinner-small">sync</span> }
+                <span>@if (isSaving) { Guardando... } @else { Guardar Cambios }</span>
+              </div>
+            </button>
+          </div>
+        </div>
+      }
     }
   `,
   styles: [`
@@ -77,9 +87,18 @@ import { environment } from '../../../../../environments/environment';
     input { width: 100%; padding: 10px 15px; border: 2px solid transparent; border-radius: 8px; background: #f1f5f9; color: #1e293b; font-size: 0.95rem; font-family: inherit; transition: all 0.2s; box-sizing: border-box;}
     input:focus { outline: none; border-color: var(--primary-color, #0f172a); background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
     
-    .btn-save { color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: max-content; }
-    .btn-save:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(0,0,0,0.15); }
-    .btn-save:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
+    .floating-save-bar { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background-color: #1e293b; color: white; padding: 0.75rem 1rem; border-radius: 9999px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1); z-index: 100; width: max-content; max-width: 90%; border: 1px solid rgba(255, 255, 255, 0.1); }
+    .pop-in { animation: popIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes popIn { 0% { opacity: 0; transform: translate(-50%, 20px) scale(0.95); } 100% { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+    .save-bar-content { display: flex; align-items: center; justify-content: center; gap: 1rem; }
+    .reset-btn { background: transparent; border: none; color: #cbd5e1; font-weight: 600; padding: 0.5rem 1rem; border-radius: 9999px; cursor: pointer; transition: all 0.2s; }
+    .reset-btn:hover { background-color: rgba(255, 255, 255, 0.1); color: white; }
+    .save-btn { border: none; border-radius: 9999px; font-weight: 600; color: white; height: 40px; padding: 0 1.5rem; cursor: pointer; transition: filter 0.2s; }
+    .save-btn:hover:not(:disabled) { filter: brightness(1.1); }
+    .save-btn:disabled { background: rgba(255, 255, 255, 0.1) !important; color: rgba(255, 255, 255, 0.5) !important; cursor: not-allowed; }
+    .btn-content { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .btn-content .material-icons { font-size: 18px; }
+    .spinner-small { animation: spin 1s linear infinite; }
   `]
 })
 export class DogSummaryComponent {
@@ -95,8 +114,19 @@ export class DogSummaryComponent {
     breed: this.dog()?.breed || '',
     birth_date: this.dog()?.birth_date ? this.dog()!.birth_date!.split('T')[0] : ''
   };
+  initialData = { ...this.formData };
   
   isSaving = false;
+  hasChanges = false;
+  
+  checkChanges() {
+    this.hasChanges = JSON.stringify(this.formData) !== JSON.stringify(this.initialData);
+  }
+  
+  resetForm() {
+    this.formData = { ...this.initialData };
+    this.hasChanges = false;
+  }
 
   calculateProgress(): number {
     const currentDog = this.dog();
@@ -137,6 +167,8 @@ export class DogSummaryComponent {
 
       const updated = await this.dogService.updateDog(currentDog.id, payload as any);
       this.dogState.setDog(updated);
+      this.initialData = { ...this.formData };
+      this.hasChanges = false;
       this.toast.success('Datos actualizados');
     } catch(e) {
       this.toast.error('Error al actualizar');

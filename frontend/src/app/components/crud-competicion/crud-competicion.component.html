@@ -160,6 +160,21 @@
         </div>
         @if (competitionForm.get('tipo')?.value === 'competicion') {
           <div class="form-group" style="background-color: #f8fafc; padding: 12px; border-radius: 6px; border: 1px dashed #cbd5e1; margin-bottom: 1rem;">
+            <label for="federacion">Federación <span style="color: red;">*</span></label>
+            <select id="federacion" formControlName="federacion" class="form-control"
+              [ngClass]="{ 'is-invalid': submitted && competitionForm.get('tipo')?.value === 'competicion' && !f['federacion'].value }">
+              <option value="" disabled selected>Selecciona una federación</option>
+              <option value="RSCE">RSCE (Real Sociedad Canina Española)</option>
+              <option value="RFEC">RFEC (Real Federación Española de Caza)</option>
+              <option value="Otro">Otro</option>
+            </select>
+            @if (submitted && competitionForm.get('tipo')?.value === 'competicion' && !f['federacion'].value) {
+              <div class="invalid-feedback">
+                La federación es obligatoria para las competiciones.
+              </div>
+            }
+          </div>
+          <div class="form-group" style="background-color: #f8fafc; padding: 12px; border-radius: 6px; border: 1px dashed #cbd5e1; margin-bottom: 1rem;">
             <label for="judge_name">Nombre del Juez <span style="font-size: 0.8em; font-weight: normal; color: #64748b;">(Importante, se autocompletará en el Rastreador RSCE)</span></label>
             <input type="text" id="judge_name" formControlName="judge_name" class="form-control"
               placeholder="Ej: José López">

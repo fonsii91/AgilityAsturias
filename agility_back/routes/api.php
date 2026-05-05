@@ -14,6 +14,7 @@ use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RsceTrackController;
+use App\Http\Controllers\RfecTrackController;
 use App\Http\Controllers\PersonalEventController;
 
 /*
@@ -109,8 +110,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // AI Avatars (Admin)
         Route::post('/admin/dogs/{id}/avatars', [DogController::class, 'updateAvatarsAdmin']);
         Route::post('/admin/dogs/{id}/generate-avatars', [DogController::class, 'generateAvatarsAdmin']);
-        // RSCE Monitor
+        // RSCE / RFEC Monitor
         Route::get('/admin/rsce/monitor', [RsceTrackController::class, 'adminMonitorData']);
+        Route::get('/admin/rfec/monitor', [RfecTrackController::class, 'adminMonitorData']);
         
         // Gestión de Clubes
         Route::get('/admin/clubs', [\App\Http\Controllers\ClubController::class, 'index']);
@@ -176,6 +178,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/rsce-tracks', [RsceTrackController::class, 'store']);
         Route::post('/rsce-tracks/{rsceTrack}', [RsceTrackController::class, 'update']);
         Route::post('/rsce-tracks/{rsceTrack}/delete', [RsceTrackController::class, 'destroy']);
+
+        // RFEC Tracks
+        Route::get('/rfec-tracks', [RfecTrackController::class, 'index']);
+        Route::post('/rfec-tracks', [RfecTrackController::class, 'store']);
+        Route::post('/rfec-tracks/{rfecTrack}', [RfecTrackController::class, 'update']);
+        Route::post('/rfec-tracks/{rfecTrack}/delete', [RfecTrackController::class, 'destroy']);
 
         Route::get('/availability', [ReservationController::class, 'availability']); // ???
         Route::get('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'index']);

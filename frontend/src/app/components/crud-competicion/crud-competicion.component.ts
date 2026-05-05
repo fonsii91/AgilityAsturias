@@ -103,6 +103,7 @@ export class CrudCompeticionComponent {
             formaPago: [''],
             enlace: ['', [Validators.pattern('https?://.+')]],
             tipo: ['competicion', Validators.required],
+            federacion: [''],
             cartel: [null],
             judge_name: [''] // Optional judge name
         });
@@ -156,6 +157,7 @@ export class CrudCompeticionComponent {
             formaPago: comp.formaPago,
             enlace: comp.enlace,
             tipo: comp.tipo || 'competicion',
+            federacion: comp.federacion || '',
             judge_name: comp.judge_name || ''
             // Don't patch cartel with the file object/string directly as file input is read-only
             // We handle preservation via existingCartel
@@ -234,6 +236,11 @@ export class CrudCompeticionComponent {
         }
 
         const formValue = this.competitionForm.value;
+
+        if (formValue.tipo === 'competicion' && !formValue.federacion) {
+            this.toastService.error('Debes seleccionar una federación para las competiciones.');
+            return;
+        }
 
         // If no new cartel selected (null in form) but we have existing one in edit mode, use it
         // Note: formValue.cartel will be the base64 string if a new file was selected

@@ -16,6 +16,8 @@ export interface Dog {
     sterilized_at?: string;
     weight_kg?: number;
     height_cm?: number;
+    rfec_grade?: string;
+    rfec_category?: string;
     pivot?: {
         is_primary_owner: boolean;
         rsce_license?: string;

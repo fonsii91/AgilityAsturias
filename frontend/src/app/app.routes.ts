@@ -263,5 +263,11 @@ export const routes: Routes = [
         loadComponent: () => import('./components/rsce-tracker/rsce-tracker.component').then(m => m.RsceTrackerComponent),
         canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: 'Seguimiento RSCE' }
+    },
+    {
+        path: 'bitacora-rfec',
+        loadComponent: () => import('./components/rfec-tracker/rfec-tracker.component').then(m => m.RfecTrackerComponent),
+        canActivate: [memberGuard],
+        title: titleResolver, data: { pageTitle: 'Seguimiento RFEC' }
     }
 ];

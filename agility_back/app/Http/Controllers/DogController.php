@@ -52,6 +52,8 @@ class DogController extends Controller
             'sterilized_at' => 'nullable|date',
             'weight_kg' => 'nullable|numeric|min:1',
             'height_cm' => 'nullable|numeric|min:10',
+            'rfec_grade' => 'nullable|string|max:20',
+            'rfec_category' => 'nullable|string|max:20',
         ]);
 
         $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade'])->toArray();
@@ -110,6 +112,8 @@ class DogController extends Controller
             'avatar_cansancio_3_url' => 'nullable|url',
             'avatar_cansancio_4_url' => 'nullable|url',
             'avatar_cansancio_5_url' => 'nullable|url',
+            'rfec_grade' => 'nullable|string|max:20',
+            'rfec_category' => 'nullable|string|max:20',
         ]);
 
         $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade'])->toArray();

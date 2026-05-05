@@ -238,9 +238,12 @@
                     font-size: 1.05rem;
                     color: #2d3436;
                     font-weight: 600;
-                    white-space: nowrap;
+                    line-height: 1.4;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 3;
+                    -webkit-box-orient: vertical;
                     overflow: hidden;
-                    text-overflow: ellipsis;
+                    word-break: break-word;
                 }
 
                 .resource-badges {

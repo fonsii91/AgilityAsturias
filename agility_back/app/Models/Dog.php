@@ -34,6 +34,8 @@ class Dog extends Model
         'height_cm',
         'user_id',
         'club_id',
+        'rfec_grade',
+        'rfec_category'
     ];
 
     protected $casts = [
@@ -72,6 +74,11 @@ class Dog extends Model
     public function rsceTracks()
     {
         return $this->hasMany(RsceTrack::class);
+    }
+
+    public function rfecTracks()
+    {
+        return $this->hasMany(RfecTrack::class);
     }
 
     public function workloads()
@@ -122,6 +129,8 @@ class Dog extends Model
         $workloads = $this->workloads()
             ->whereIn('status', ['confirmed', 'auto_confirmed', 'pending_review'])
             ->where('date', '>=', $twentyEightDaysAgo)
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
             ->get();
 
         $acuteLoad = 0;

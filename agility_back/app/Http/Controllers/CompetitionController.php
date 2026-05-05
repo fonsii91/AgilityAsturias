@@ -60,6 +60,7 @@ class CompetitionController extends Controller
             'cartel' => 'nullable|string',
             'enlace' => 'nullable|string',
             'tipo' => 'required|in:competicion,otros',
+            'federacion' => 'required_if:tipo,competicion|in:RSCE,RFEC,Otro|nullable',
             'nombre' => 'nullable|string',
             'judge_name' => 'nullable|string',
         ]);
@@ -99,6 +100,7 @@ class CompetitionController extends Controller
             'cartel' => 'nullable|string',
             'enlace' => 'nullable|string',
             'tipo' => 'required|in:competicion,otros',
+            'federacion' => 'required_if:tipo,competicion|in:RSCE,RFEC,Otro|nullable',
             'nombre' => 'nullable|string',
             'judge_name' => 'nullable|string',
         ]);

@@ -1,0 +1,358 @@
+<div class="tracker-container">
+    <div class="tracker-header no-print">
+      <div class="header-titles" style="display: flex; justify-content: space-between; align-items: flex-start;">
+        <div>
+          <h2><span class="material-icons-outlined" style="color: var(--primary-color);">analytics</span> Seguimiento RFEC</h2>
+          <p>Registra tus mangas y controla los puntos para tus ascensos o para el Campeonato de España.</p>
+        </div>
+        <app-instrucciones titulo="Normativa RFEC">
+          <div style="font-size: 14px; display: flex; flex-direction: column; gap: 12px;">
+            <p><strong>Puntuación Directa:</strong> Las mangas calificadas como <strong>Excelente</strong> pueden sumar puntos. Si tienes 0 penalizaciones sumas <strong>10 pts</strong>. Si tienes entre 0 y 5.99 penalizaciones sumas <strong>5 pts</strong>.</p>
+            <p><strong>De Iniciación a Promoción:</strong> No competitivo. Solo necesitas que el perro tenga 18 meses y el Test de Sociabilidad.</p>
+            <p><strong>De Promoción a Competición:</strong> Necesitas 30 puntos en total. De ellos, mínimo 15 en Agility. Deben otorgártelos al menos 2 jueces distintos.</p>
+            <p><strong>Campeonato de España Absoluto (Vía Directa):</strong> En grado Competición, necesitas 80 puntos totales, mínimo 40 en Agility.</p>
+          </div>
+        </app-instrucciones>
+      </div>
+    </div>
+  
+    <div class="tracker-content">
+      <div class="dog-selector no-print">
+        <label>Selecciona tu perro:</label>
+        <div class="pill-group">
+          @for (dog of dogs(); track dog.id) {
+          <button class="pill-btn" [class.active]="selectedDogId() === dog.id" (click)="onDogSelectId(dog.id!)"
+            [style.background-color]="selectedDogId() === dog.id ? 'var(--primary-color)' : ''">
+            <span class="material-icons-outlined">pets</span> {{ dog.name }}
+          </button>
+          }
+        </div>
+      </div>
+  
+      @if (!selectedDogId()) {
+      <div class="empty-state no-print">
+        <span class="material-icons-outlined empty-icon">pets</span>
+        <p>Selecciona un perro de la lista superior para ver sus registros RFEC.</p>
+      </div>
+      } @else {
+  
+        <div class="progress-dashboard no-print" style="margin-bottom: 2rem;">
+          <div class="grade-progression-widget" style="display: flex; align-items: center; justify-content: center; gap: 1rem; background: white; padding: 1.5rem; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 1.5rem;">
+            <div class="grade-card current" style="border: 1px solid var(--primary-color); padding: 1rem 1.5rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem; background: #f8fafc;">
+              <div class="grade-icon" style="background-color: color-mix(in srgb, var(--primary-color) 20%, transparent); color: var(--primary-color); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                <span class="material-icons">military_tech</span>
+              </div>
+              <div class="grade-text">
+                <span class="label" style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700;">Grado Actual</span>
+                <span class="value" style="display: block; font-size: 1.25rem; font-weight: 800; color: #0f172a;">{{ selectedDog()?.rfec_grade || 'Iniciación' }}</span>
+              </div>
+            </div>
+
+            @if (selectedDog()?.rfec_grade === 'Iniciación' || !selectedDog()?.rfec_grade || selectedDog()?.rfec_grade === 'Promoción') {
+              <div class="progression-arrow" style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-icons" style="color: var(--primary-color); font-size: 2rem;">arrow_forward</span>
+              </div>
+
+              <div class="grade-card target" style="border: 1px dashed #cbd5e1; padding: 1rem 1.5rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem; background: #f8fafc; opacity: 0.7;">
+                <div class="grade-icon" style="background-color: #e2e8f0; color: #64748b; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                  <span class="material-icons">emoji_events</span>
+                </div>
+                <div class="grade-text">
+                  <span class="label" style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700;">Próximo Objetivo</span>
+                  <span class="value" style="display: block; font-size: 1.25rem; font-weight: 800; color: #334155;">{{ (selectedDog()?.rfec_grade === 'Iniciación' || !selectedDog()?.rfec_grade) ? 'Promoción' : 'Competición' }}</span>
+                </div>
+              </div>
+            } @else {
+              <div class="progression-arrow" style="display: flex; align-items: center; gap: 0.5rem;">
+                <span class="material-icons" style="color: #10b981; font-size: 2rem;">check_circle</span>
+              </div>
+              <div class="grade-card target achieved" style="border: 1px solid #10b981; background-color: #f0fdf4; padding: 1rem 1.5rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem;">
+                <div class="grade-icon" style="background-color: #dcfce7; color: #10b981; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                  <span class="material-icons">workspace_premium</span>
+                </div>
+                <div class="grade-text">
+                  <span class="label" style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700;">Pico de Progreso</span>
+                  <span class="value" style="display: block; font-size: 1.25rem; font-weight: 800; color: #15803d;">Grado Máximo</span>
+                </div>
+              </div>
+            }
+          </div>
+
+        @if (selectedDog()?.rfec_grade === 'Iniciación' || !selectedDog()?.rfec_grade) {
+          <div class="grade-zero-checklist">
+            <div class="info-note" style="border-left-color: var(--primary-color); margin-bottom: 1.5rem; background: #fff; padding: 1rem; border-left: 4px solid var(--primary-color); border-radius: 4px;">
+              <span class="material-icons" style="color: var(--primary-color); vertical-align: middle;">info</span>
+              <span><strong>El nivel de Iniciación es no competitivo.</strong> <br>No es necesario acumular puntos. Para pasar a Promoción necesitas que el perro tenga 18 meses y haya superado el Certificado de Aptitud.</span>
+            </div>
+            
+            <div class="checklist-grid" style="display: grid; grid-template-columns: 1fr; gap: 0.75rem; margin-bottom: 1.5rem;">
+              <label class="checklist-item" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" [class.checked]="chkEdad()">
+                <input type="checkbox" [ngModel]="chkEdad()" (ngModelChange)="chkEdad.set($event)" style="width: 20px; height: 20px; margin-top: 2px; accent-color: var(--primary-color);">
+                <div style="flex: 1;">
+                  <strong style="display: block; font-size: 1rem; color: #1e293b; margin-bottom: 2px;">Edad Reglamentaria (18 meses)</strong>
+                  <span style="color: #64748b; font-size: 0.85rem;">Certifico que el perro ha cumplido los 18 meses de edad requeridos.</span>
+                </div>
+              </label>
+
+              <label class="checklist-item" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" [class.checked]="chkSociabilidad()">
+                <input type="checkbox" [ngModel]="chkSociabilidad()" (ngModelChange)="chkSociabilidad.set($event)" style="width: 20px; height: 20px; margin-top: 2px; accent-color: var(--primary-color);">
+                <div style="flex: 1;">
+                  <strong style="display: block; font-size: 1rem; color: #1e293b; margin-bottom: 2px;">Test de Sociabilidad</strong>
+                  <span style="color: #64748b; font-size: 0.85rem;">Ha obtenido el Certificado de Aptitud / Test de Sociabilidad.</span>
+                </div>
+              </label>
+
+              <label class="checklist-item" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" [class.checked]="chkMedicion()">
+                <input type="checkbox" [ngModel]="chkMedicion()" (ngModelChange)="chkMedicion.set($event)" style="width: 20px; height: 20px; margin-top: 2px; accent-color: var(--primary-color);">
+                <div style="flex: 1;">
+                  <strong style="display: block; font-size: 1rem; color: #1e293b; margin-bottom: 2px;">Medición Obligatoria</strong>
+                  <span style="color: #64748b; font-size: 0.85rem;">Cuenta con la medición (provisional o definitiva) registrada por el juez.</span>
+                </div>
+              </label>
+
+              <label class="checklist-item" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" [class.checked]="chkLicencia()">
+                <input type="checkbox" [ngModel]="chkLicencia()" (ngModelChange)="chkLicencia.set($event)" style="width: 20px; height: 20px; margin-top: 2px; accent-color: var(--primary-color);">
+                <div style="flex: 1;">
+                  <strong style="display: block; font-size: 1rem; color: #1e293b; margin-bottom: 2px;">Licencia y Club RFEC</strong>
+                  <span style="color: #64748b; font-size: 0.85rem;">Dispone de licencia federativa en vigor y pertenece a un club afiliado.</span>
+                </div>
+              </label>
+            </div>
+
+            <div style="text-align: center;">
+              <button class="add-btn" 
+                      [style.background-color]="allIniciacionMet() ? 'var(--primary-color)' : '#cbd5e1'" 
+                      [style.cursor]="allIniciacionMet() && !isUpgrading() ? 'pointer' : 'not-allowed'"
+                      [disabled]="!allIniciacionMet() || isUpgrading()" 
+                      (click)="upgradeToPromocion()" 
+                      style="padding: 1rem 2rem; font-size: 1.1rem; border: none; color: white; border-radius: 8px;">
+                <span class="material-icons" style="vertical-align: middle; margin-right: 8px;">{{ isUpgrading() ? 'sync' : 'upgrade' }}</span> 
+                {{ isUpgrading() ? 'Ascendiendo...' : '¡Ascender a Promoción y habilitar Bitácora!' }}
+              </button>
+            </div>
+          </div>
+        } @else if (selectedDog()?.rfec_grade === 'Promoción') {
+          <div class="progress-card no-print">
+            <div class="progress-header">
+              <h3>Progreso hacia Grado Competición</h3>
+              <p>Requisitos: 30 puntos totales, 15 en Agility, 2 jueces diferentes.</p>
+            </div>
+            <div class="progress-grid">
+              <div class="progress-item">
+                <span class="progress-label">Puntos Totales ({{ calculatedStats().totalPoints }}/30)</span>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" [style.width]="(calculatedStats().totalPoints / 30 * 100) + '%'"></div>
+                </div>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Puntos Agility ({{ calculatedStats().agilityPoints }}/15)</span>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" [style.background]="'#3b82f6'" [style.width]="(calculatedStats().agilityPoints / 15 * 100) + '%'"></div>
+                </div>
+              </div>
+              <div class="progress-item" style="display: flex; align-items: center; padding-left: 2rem;">
+                <div class="check-item">
+                  <span class="material-icons check-icon" [class.success]="calculatedStats().uniqueJudges >= 2">
+                    {{ calculatedStats().uniqueJudges >= 2 ? 'check_circle' : 'radio_button_unchecked' }}
+                  </span>
+                  <span>Jueces Diferentes ({{ calculatedStats().uniqueJudges }}/2)</span>
+                </div>
+              </div>
+            </div>
+            
+            @if (calculatedStats().totalPoints >= 30 && calculatedStats().agilityPoints >= 15 && calculatedStats().uniqueJudges >= 2) {
+              <div class="success-alert" style="display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; padding: 1.5rem; margin-top: 1.5rem; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="material-icons" style="font-size: 28px; color: #15803d;">emoji_events</span> 
+                  <strong style="font-size: 1.1em; color: #15803d;">¡Enhorabuena! Cumples todos los requisitos.</strong>
+                </div>
+                
+                <button class="add-btn" 
+                        [disabled]="isUpgrading()" 
+                        (click)="upgradeToCompeticion()" 
+                        style="background-color: white; color: #15803d; border: 2px solid #16a34a; font-weight: bold; padding: 0.8rem 1.5rem; display: inline-flex; align-items: center; gap: 6px; border-radius: 30px; font-size: 1.05rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(22, 163, 74, 0.1);">
+                  <span class="material-icons">{{ isUpgrading() ? 'sync' : 'upgrade' }}</span> 
+                  {{ isUpgrading() ? 'Ascendiendo...' : 'Ascender a Competición' }}
+                </button>
+              </div>
+            }
+          </div>
+        } @else if (selectedDog()?.rfec_grade === 'Competición') {
+          <div class="progress-card no-print">
+            <div class="progress-header">
+              <h3>Rumbo al Campeonato de España Absoluto (Vía Directa)</h3>
+              <p>Requisitos: 80 puntos totales, mínimo 40 en Agility.</p>
+            </div>
+            <div class="progress-grid">
+              <div class="progress-item">
+                <span class="progress-label">Puntos Totales ({{ calculatedStats().totalPoints }}/80)</span>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" [style.width]="(calculatedStats().totalPoints / 80 * 100) + '%'"></div>
+                </div>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Puntos Agility ({{ calculatedStats().agilityPoints }}/40)</span>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" [style.background]="'#3b82f6'" [style.width]="(calculatedStats().agilityPoints / 40 * 100) + '%'"></div>
+                </div>
+              </div>
+            </div>
+            
+            @if (calculatedStats().totalPoints >= 80 && calculatedStats().agilityPoints >= 40) {
+              <div class="success-alert" style="display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; padding: 1.5rem; margin-top: 1.5rem; background: linear-gradient(135deg, #fef08a 0%, #fde047 100%); border: 2px solid #eab308; border-radius: 12px; box-shadow: 0 4px 6px rgba(234, 179, 8, 0.2);">
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <span class="material-icons" style="font-size: 32px; color: #a16207;">emoji_events</span> 
+                  <strong style="font-size: 1.25em; color: #854d0e; text-transform: uppercase; letter-spacing: 0.5px;">¡Clasificado para el Campeonato de España!</strong>
+                  <span class="material-icons" style="font-size: 32px; color: #a16207;">emoji_events</span>
+                </div>
+                <p style="color: #713f12; margin: 0; font-weight: 500;">Has conseguido los 80 puntos y 40 en Agility necesarios para la Vía Directa.</p>
+              </div>
+            }
+          </div>
+        }
+        </div>
+        
+        <div class="tracks-section">
+          <div class="section-header">
+            <h3>Historial de Mangas</h3>
+            <button class="btn-add no-print" (click)="openAddForm()">
+              <span class="material-icons">add</span> Añadir Manga
+            </button>
+          </div>
+  
+          @if (dogTracks().length === 0) {
+            <p style="color: #64748b; text-align: center; padding: 2rem 0;">No hay mangas registradas todavía.</p>
+          } @else {
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Evento / Lugar</th>
+                    <th>Manga</th>
+                    <th>Juez</th>
+                    <th>Calificación</th>
+                    <th>Velocidad</th>
+                    <th class="no-print">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (track of dogTracks(); track track.id) {
+                    <tr>
+                      <td>{{ track.date | date:'dd/MM/yyyy' }}</td>
+                      <td>{{ track.location || '-' }}</td>
+                      <td>{{ track.manga_type }}</td>
+                      <td>{{ track.judge_name || '-' }}</td>
+                      <td>
+                        <span class="badge" [ngClass]="track.qualification.toLowerCase().replace(' ', '')">
+                          {{ track.qualification }}
+                        </span>
+                      </td>
+                      <td>{{ track.speed }}</td>
+                      <td class="no-print">
+                        <div class="actions-cell">
+                          <button class="icon-btn edit" (click)="editTrack(track)" title="Editar">
+                            <span class="material-icons">edit</span>
+                          </button>
+                          <button class="icon-btn delete" (click)="deleteTrack(track.id!)" title="Eliminar">
+                            <span class="material-icons">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+  
+  <!-- Formulario Modal -->
+  @if (isFormOpen) {
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>{{ isEditing ? 'Editar Manga' : 'Registrar Manga RFEC' }}</h3>
+          <button class="close-btn" (click)="closeForm()">&times;</button>
+        </div>
+        
+        <form (submit)="submitForm(); $event.preventDefault();">
+          <div class="form-group">
+            <label>Competición (Opcional)</label>
+            <select [(ngModel)]="formData.competition_id" (ngModelChange)="onCompetitionChange($event)" name="comp_id">
+              <option [ngValue]="null">-- Registro Manual --</option>
+              @for (comp of pastAndCurrentCompetitions(); track comp.id) {
+                <option [value]="comp.id">{{ comp.nombre }} ({{ comp.fechaEvento | date:'dd/MM' }})</option>
+              }
+            </select>
+            <small style="color: #64748b; font-size: 0.8rem;">Solo se muestran competiciones RFEC pasadas/actuales.</small>
+          </div>
+  
+          @if (!formData.competition_id) {
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div class="form-group">
+                <label>Fecha</label>
+                <input type="date" [(ngModel)]="formData.manual_date" name="m_date" required>
+              </div>
+              <div class="form-group">
+                <label>Lugar</label>
+                <input type="text" [(ngModel)]="formData.manual_location" name="m_loc" placeholder="Ej. Club Agility...">
+              </div>
+            </div>
+          }
+  
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label>Tipo de Manga</label>
+              <select [(ngModel)]="formData.manga_type" name="m_type" required>
+                <option value="Agility 1">Agility 1</option>
+                <option value="Agility 2">Agility 2</option>
+                <option value="Jumping 1">Jumping 1</option>
+                <option value="Jumping 2">Jumping 2</option>
+                <option value="Otra">Otra</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Juez</label>
+              <input type="text" [(ngModel)]="formData.judge_name" name="j_name" required>
+            </div>
+          </div>
+  
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label>Calificación</label>
+              <select [(ngModel)]="formData.qualification" name="qual" required>
+                <option value="Excelente a 0">EXCELENTE a 0</option>
+                <option value="Excelente">EXCELENTE (hasta 5.99 ptos)</option>
+                <option value="Muy Bueno">MUY BUENO (hasta 15.99 ptos)</option>
+                <option value="Bueno">BUENO (hasta 25.99 ptos)</option>
+                <option value="No Clasificado">NO CLASIFICADO (+26 ptos)</option>
+                <option value="Eliminado">Eliminado</option>
+                <option value="No Presentado">No Presentado</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Velocidad (m/s)</label>
+              <div style="position: relative;">
+                <input type="number" step="0.1" min="0" [(ngModel)]="formData.speed" name="speed" class="form-control" placeholder="Ej. 4.56" style="padding-right: 3rem;">
+                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9em; pointer-events: none;">m/s</span>
+              </div>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label>Notas (Opcional)</label>
+            <textarea [(ngModel)]="formData.notes" name="notes" rows="2" placeholder="Sensaciones, errores, etc."></textarea>
+          </div>
+  
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="closeForm()">Cancelar</button>
+            <button type="submit" class="btn-add" style="background: var(--primary-color);">Guardar Manga</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
