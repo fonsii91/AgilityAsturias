@@ -13,6 +13,8 @@ export interface Resource {
   url: string | null;
   file_path: string | null;
   is_global?: boolean;
+  is_hidden_for_club?: boolean;
+  club_id?: number;
   user_id: number;
   created_at: string;
   updated_at: string;
@@ -87,5 +89,10 @@ export class ResourceService {
   toggleGlobal(id: number): Observable<Resource> {
     this.clearCache();
     return this.http.put<Resource>(`${this.apiUrl}/${id}/toggle-global`, {});
+  }
+
+  toggleHideForClub(id: number): Observable<Resource> {
+    this.clearCache();
+    return this.http.put<Resource>(`${this.apiUrl}/${id}/toggle-hide-for-club`, {});
   }
 }

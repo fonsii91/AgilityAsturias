@@ -22,6 +22,26 @@ class ResourceController extends Controller
         }
         
         $resources = $query->orderBy('created_at', 'desc')->get();
+
+        $user = $request->user();
+        if ($user && in_array($user->role, ['staff', 'manager', 'admin'])) {
+            $clubId = $user->club_id;
+            if ($user->role === 'admin' && app()->bound('active_club_id')) {
+                $clubId = app('active_club_id');
+            }
+
+            if ($clubId) {
+                $resources->load(['hiddenByClubs' => function($q) use ($clubId) {
+                    $q->where('club_hidden_resources.club_id', $clubId);
+                }]);
+
+                $resources->each(function($resource) {
+                    $resource->is_hidden_for_club = $resource->hiddenByClubs->isNotEmpty();
+                    unset($resource->hiddenByClubs);
+                });
+            }
+        }
+
         return response()->json($resources);
     }
 
@@ -72,6 +92,14 @@ class ResourceController extends Controller
         }
 
         $resource = Resource::findOrFail($id);
+
+        if ($resource->is_global && $user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized. Solo los administradores pueden modificar recursos globales.'], 403);
+        }
+
+        if (!$resource->is_global && $user->role !== 'admin' && $resource->club_id !== $user->club_id) {
+            return response()->json(['message' => 'Unauthorized. No puedes modificar recursos de otros clubes.'], 403);
+        }
 
         $validated = $request->validate([
             'title' => 'sometimes|required|string|max:255',
@@ -134,6 +162,14 @@ class ResourceController extends Controller
 
         $resource = Resource::findOrFail($id);
 
+        if ($resource->is_global && $user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized. Solo los administradores pueden eliminar recursos globales.'], 403);
+        }
+
+        if (!$resource->is_global && $user->role !== 'admin' && $resource->club_id !== $user->club_id) {
+            return response()->json(['message' => 'Unauthorized. No puedes eliminar recursos de otros clubes.'], 403);
+        }
+
         if ($resource->file_path) {
             Storage::disk('public')->delete($resource->file_path);
         }
@@ -154,5 +190,41 @@ class ResourceController extends Controller
         $resource->save();
 
         return response()->json($resource->load('uploader:id,name,role'));
+    }
+
+    public function toggleHideForClub(Request $request, $id)
+    {
+        $user = $request->user();
+        if (!in_array($user->role, ['staff', 'admin', 'manager'])) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $resource = Resource::findOrFail($id);
+
+        if (!$resource->is_global) {
+            return response()->json(['message' => 'Solo se pueden ocultar recursos globales.'], 400);
+        }
+
+        $clubId = $user->club_id;
+        if ($user->role === 'admin' && app()->bound('active_club_id')) {
+            $clubId = app('active_club_id');
+        }
+
+        if (!$clubId) {
+            return response()->json(['message' => 'No estás asociado a ningún club.'], 400);
+        }
+
+        if ($resource->hiddenByClubs()->where('club_hidden_resources.club_id', $clubId)->exists()) {
+            $resource->hiddenByClubs()->detach($clubId);
+            $isHidden = false;
+        } else {
+            $resource->hiddenByClubs()->attach($clubId);
+            $isHidden = true;
+        }
+
+        $resource->load('uploader:id,name,role');
+        $resource->is_hidden_for_club = $isHidden;
+
+        return response()->json($resource);
     }
 }

@@ -131,12 +131,17 @@
             <mat-icon>download</mat-icon>
           </button>
           }
-          @if (canManage()) {
           @if (isAdmin()) {
           <button mat-icon-button class="action-btn global-btn" [ngClass]="{'is-global': resource.is_global}" (click)="toggleGlobal($event, resource)" [matTooltip]="resource.is_global ? 'Quitar Global' : 'Hacer Global'">
             <mat-icon>{{ resource.is_global ? 'public' : 'public_off' }}</mat-icon>
           </button>
           }
+          @if (canManage() && resource.is_global) {
+          <button mat-icon-button class="action-btn visibility-btn" [ngClass]="{'is-hidden': resource.is_hidden_for_club}" (click)="toggleHideForClub($event, resource)" [matTooltip]="resource.is_hidden_for_club ? 'Mostrar para mi club' : 'Ocultar para mi club'" [style.color]="resource.is_hidden_for_club ? '#94a3b8' : 'inherit'">
+            <mat-icon>{{ resource.is_hidden_for_club ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+          }
+          @if (canEditOrDeleteResource(resource)) {
           <button mat-icon-button class="action-btn edit-btn" [routerLink]="['/recursos/editar', resource.id]"
             (click)="$event.stopPropagation()" matTooltip="Editar">
             <mat-icon>edit</mat-icon>

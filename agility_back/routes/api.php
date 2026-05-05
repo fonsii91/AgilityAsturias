@@ -66,6 +66,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/resources', [ResourceController::class, 'store']);
         Route::post('/resources/{id}', [ResourceController::class, 'update']);
         Route::post('/resources/{id}/delete', [ResourceController::class, 'destroy']);
+        Route::put('/resources/{id}/toggle-hide-for-club', [ResourceController::class, 'toggleHideForClub']);
 
         // Videos (Admin/Staff)
         Route::post('/videos/{id}/toggle-public-gallery', [VideoController::class, 'togglePublicGallery']);

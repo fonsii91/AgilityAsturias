@@ -125,6 +125,7 @@ export class CompetitionService {
             forma_pago: comp.formaPago,
             enlace: comp.enlace,
             tipo: comp.tipo,
+            federacion: comp.federacion,
             cartel: comp.cartel,
             judge_name: comp.judge_name
         };
@@ -141,6 +142,7 @@ export class CompetitionService {
             formaPago: data.forma_pago,
             enlace: data.enlace,
             tipo: data.tipo,
+            federacion: data.federacion,
             cartel: data.cartel,
             judge_name: data.judge_name,
             isAttending: !!data.is_attending,

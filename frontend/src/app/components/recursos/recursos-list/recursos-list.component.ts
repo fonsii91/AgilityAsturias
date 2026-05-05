@@ -61,6 +61,16 @@ export class RecursosListComponent implements OnInit {
     return this.authService.isStaff();
   }
 
+  canEditOrDeleteResource(resource: Resource): boolean {
+    if (!this.canManage()) return false;
+    if (this.isAdmin()) return true;
+    
+    if (resource.is_global) return false;
+
+    const user = this.authService.currentUserSignal();
+    return user?.club_id === resource.club_id;
+  }
+
   getCategoryLabel(val: string): string {
     return this.categories.find((c: any) => c.value === val)?.label || val;
   }
@@ -157,6 +167,27 @@ export class RecursosListComponent implements OnInit {
       error: (error) => {
         console.error('Error toggling global state:', error);
         alert('Hubo un error al cambiar el estado global.');
+      }
+    });
+  }
+
+  toggleHideForClub(event: Event, resource: Resource): void {
+    event.stopPropagation();
+    if (!this.canManage() || !resource.is_global) return;
+
+    this.resourceService.toggleHideForClub(resource.id).subscribe({
+      next: (updatedResource) => {
+        const currentResources = this.resources();
+        const index = currentResources.findIndex(r => r.id === updatedResource.id);
+        if (index !== -1) {
+          const newResources = [...currentResources];
+          newResources[index] = updatedResource;
+          this.resources.set(newResources);
+        }
+      },
+      error: (error) => {
+        console.error('Error toggling hide state:', error);
+        alert('Hubo un error al ocultar/mostrar el recurso para este club.');
       }
     });
   }

@@ -223,4 +223,245 @@ class ResourceControllerTest extends TestCase
                  ->assertJsonFragment(['title' => 'Global Rules'])
                  ->assertJsonMissing(['title' => 'Local Rules']);
     }
+
+    public function test_staff_cannot_modify_global_resource()
+    {
+        $staff = User::factory()->create([
+            'role' => 'staff',
+            'club_id' => $this->club->id,
+        ]);
+
+        $resource = Resource::create([
+            'title' => 'Global Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://global.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => true,
+        ]);
+
+        $response = $this->actingAs($staff)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->postJson("/api/resources/{$resource->id}", [
+                             'title' => 'Modified Global Resource',
+                             'type' => 'link',
+                             'category' => 'General',
+                             'level' => 'all',
+                             'url' => 'https://global.com',
+                         ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_modify_global_resource()
+    {
+        $resource = Resource::create([
+            'title' => 'Global Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://global.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => true,
+        ]);
+
+        $response = $this->actingAs($this->admin)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->postJson("/api/resources/{$resource->id}", [
+                             'title' => 'Modified Global Resource',
+                             'type' => 'link',
+                             'category' => 'General',
+                             'level' => 'all',
+                             'url' => 'https://global.com',
+                         ]);
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('title', 'Modified Global Resource');
+    }
+
+    public function test_staff_cannot_modify_other_club_resource()
+    {
+        $otherClub = Club::create([
+            'name' => 'Other Club',
+            'subdomain' => 'otherclub',
+            'slug' => 'otherclub',
+            'db_connection' => 'sqlite'
+        ]);
+
+        $staff = User::factory()->create([
+            'role' => 'staff',
+            'club_id' => $this->club->id,
+        ]);
+
+        $otherResource = Resource::create([
+            'title' => 'Other Club Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://other.com',
+            'uploaded_by' => User::factory()->create(['role' => 'admin', 'club_id' => $otherClub->id])->id,
+            'club_id' => $otherClub->id,
+            'is_global' => false,
+        ]);
+
+        $response = $this->actingAs($staff)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->postJson("/api/resources/{$otherResource->id}", [
+                             'title' => 'Trying to modify',
+                             'type' => 'link',
+                             'category' => 'General',
+                             'level' => 'all',
+                             'url' => 'https://other.com',
+                         ]);
+
+        $response->assertStatus(404); // Or 403, but typically 404 because of global scope if it's not global
+    }
+
+    public function test_staff_can_toggle_hide_global_resource_for_club()
+    {
+        $staff = User::factory()->create([
+            'role' => 'staff',
+            'club_id' => $this->club->id,
+        ]);
+
+        $resource = Resource::create([
+            'title' => 'Global Resource to Hide',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://global.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id, // Created by this club, but it's global
+            'is_global' => true,
+        ]);
+
+        $response = $this->actingAs($staff)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->putJson("/api/resources/{$resource->id}/toggle-hide-for-club");
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('is_hidden_for_club', true);
+
+        $this->assertDatabaseHas('club_hidden_resources', [
+            'club_id' => $this->club->id,
+            'resource_id' => $resource->id,
+        ]);
+    }
+
+    public function test_hidden_global_resource_is_not_visible_to_member()
+    {
+        $resource = Resource::create([
+            'title' => 'Hidden Global Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://global.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => true,
+        ]);
+
+        $resource->hiddenByClubs()->attach($this->club->id);
+
+        $response = $this->actingAs($this->member)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->getJson('/api/resources');
+
+        $response->assertStatus(200)
+                 ->assertJsonMissing(['title' => 'Hidden Global Resource']);
+    }
+
+    public function test_hidden_global_resource_is_visible_to_staff()
+    {
+        $staff = User::factory()->create([
+            'role' => 'staff',
+            'club_id' => $this->club->id,
+        ]);
+
+        $resource = Resource::create([
+            'title' => 'Hidden Global Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://global.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => true,
+        ]);
+
+        $resource->hiddenByClubs()->attach($this->club->id);
+
+        $response = $this->actingAs($staff)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->getJson('/api/resources');
+
+        $response->assertStatus(200)
+                 ->assertJsonFragment(['title' => 'Hidden Global Resource'])
+                 ->assertJsonFragment(['is_hidden_for_club' => true]);
+    }
+
+    public function test_member_cannot_modify_any_resource()
+    {
+        $resource = Resource::create([
+            'title' => 'Local Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://local.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => false,
+        ]);
+
+        $response = $this->actingAs($this->member)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->postJson("/api/resources/{$resource->id}", [
+                             'title' => 'Trying to modify',
+                         ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_member_cannot_delete_any_resource()
+    {
+        $resource = Resource::create([
+            'title' => 'Local Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://local.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => false,
+        ]);
+
+        $response = $this->actingAs($this->member)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->postJson("/api/resources/{$resource->id}/delete");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_member_cannot_toggle_hide_global_resource()
+    {
+        $resource = Resource::create([
+            'title' => 'Global Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://global.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => true,
+        ]);
+
+        $response = $this->actingAs($this->member)
+                         ->withHeader('X-Tenant-Club', 'test-club')
+                         ->putJson("/api/resources/{$resource->id}/toggle-hide-for-club");
+
+        $response->assertStatus(403);
+    }
 }

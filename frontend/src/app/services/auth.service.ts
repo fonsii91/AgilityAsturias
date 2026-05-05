@@ -9,6 +9,7 @@ export interface User {
     name: string;
     email: string;
     role: 'user' | 'member' | 'staff' | 'manager' | 'admin';
+    club_id?: number;
     photo_url?: string;
     google_id?: string;
     email_verified_at?: string;

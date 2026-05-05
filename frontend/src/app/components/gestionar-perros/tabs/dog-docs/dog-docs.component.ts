@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DogStateService } from '../../services/dog-state.service';
@@ -123,15 +123,15 @@ import { AuthService } from '../../../../services/auth.service';
         </div>
       </div>
       
-      @if (hasChanges) {
+      @if (hasChanges()) {
         <div class="floating-save-bar pop-in">
           <div class="save-bar-content">
             <button class="reset-btn" (click)="resetForm()">Descartar</button>
-            <button class="save-btn" [disabled]="isSaving" (click)="saveChanges()" [style.background]="'var(--primary-color)'">
+            <button class="save-btn" [disabled]="isSaving()" (click)="saveChanges()" [style.background]="'var(--primary-color)'">
               <div class="btn-content">
-                @if (!isSaving) { <span class="material-icons">save</span> }
-                @if (isSaving) { <span class="material-icons spinner-small">sync</span> }
-                <span>@if (isSaving) { Guardando... } @else { Guardar Cambios }</span>
+                @if (!isSaving()) { <span class="material-icons">save</span> }
+                @if (isSaving()) { <span class="material-icons spinner-small">sync</span> }
+                <span>@if (isSaving()) { Guardando... } @else { Guardar Cambios }</span>
               </div>
             </button>
           </div>
@@ -198,16 +198,16 @@ export class DogDocsComponent {
   };
   initialData = { ...this.formData };
   
-  isSaving = false;
-  hasChanges = false;
+  isSaving = signal(false);
+  hasChanges = signal(false);
   
   checkChanges() {
-    this.hasChanges = JSON.stringify(this.formData) !== JSON.stringify(this.initialData);
+    this.hasChanges.set(JSON.stringify(this.formData) !== JSON.stringify(this.initialData));
   }
   
   resetForm() {
     this.formData = { ...this.initialData };
-    this.hasChanges = false;
+    this.hasChanges.set(false);
   }
 
   getAutoRsceCategory(): string {
@@ -253,10 +253,16 @@ export class DogDocsComponent {
     const currentDog = this.dog();
     if (!currentDog) return;
     
-    this.isSaving = true;
+    this.isSaving.set(true);
     try {
       const payload = {
-        ...currentDog,
+        name: currentDog.name,
+        breed: currentDog.breed,
+        birth_date: currentDog.birth_date ? currentDog.birth_date.split('T')[0] : null,
+        has_previous_injuries: currentDog.has_previous_injuries,
+        sterilized_at: currentDog.sterilized_at ? currentDog.sterilized_at.split('T')[0] : null,
+        weight_kg: currentDog.weight_kg,
+        height_cm: currentDog.height_cm,
         microchip: this.formData.microchip || null,
         pedigree: this.formData.pedigree || null,
         rsce_license: this.formData.rsce_license || null,
@@ -271,12 +277,12 @@ export class DogDocsComponent {
       const updated = await this.dogService.updateDog(currentDog.id, payload as any);
       this.dogState.setDog(updated);
       this.initialData = { ...this.formData };
-      this.hasChanges = false;
+      this.hasChanges.set(false);
       this.toast.success('Documentos actualizados');
     } catch(e) {
       this.toast.error('Error al guardar documentos');
     } finally {
-      this.isSaving = false;
+      this.isSaving.set(false);
     }
   }
 }

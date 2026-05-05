@@ -11,21 +11,30 @@
     <nav class="desktop-nav" style="margin-left: 2rem;">
       <ul>
         @if (!authService.isMember()) {
-          <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
-          <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
-          <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
-          <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
+        <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span
+              class="material-icons">home</span> Bienvenida</a></li>
+        <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
+            Galería</a></li>
+        <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
+              class="material-icons">videocam</span> Videoteca</a></li>
+        <li><a routerLink="/contacto" routerLinkActive="active-route"><span
+              class="material-icons">contact_support</span> Contacto</a></li>
         }
         @if (authService.isMember()) {
-          <li class="nav-dropdown">
-            <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Público <span class="material-icons arrow">expand_more</span></a>
-            <ul class="dropdown-menu-list">
-              <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span class="material-icons">home</span> Bienvenida</a></li>
-              <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span> Galería</a></li>
-              <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span class="material-icons">videocam</span> Videoteca</a></li>
-              <li><a routerLink="/contacto" routerLinkActive="active-route"><span class="material-icons">contact_support</span> Contacto</a></li>
-            </ul>
-          </li>
+        <li class="nav-dropdown">
+          <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Público <span
+              class="material-icons arrow">expand_more</span></a>
+          <ul class="dropdown-menu-list">
+            <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span
+                  class="material-icons">home</span> Bienvenida</a></li>
+            <li><a routerLink="/galeria" routerLinkActive="active-route"><span
+                  class="material-icons">photo_library</span> Galería</a></li>
+            <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
+                  class="material-icons">videocam</span> Videoteca</a></li>
+            <li><a routerLink="/contacto" routerLinkActive="active-route"><span
+                  class="material-icons">contact_support</span> Contacto</a></li>
+          </ul>
+        </li>
         }
       </ul>
     </nav>
@@ -36,115 +45,143 @@
 
   <nav class="desktop-nav">
     <ul>
-<!-- Miembros Dropdown for Logged In Members -->
-@if (authService.isMember()) {
-  <li class="nav-dropdown">
-    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">apps</span> Miembros <span class="material-icons arrow">expand_more</span></a>
-    <ul class="dropdown-menu-list">
-      <li><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span> Reservas</a></li>
-      <li><a routerLink="/calendario" routerLinkActive="active-route"><span class="material-icons">calendar_month</span> Calendario</a></li>
-      <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span> Clasificación</a></li>
-      <li><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span> Vídeos</a></li>
-    </ul>
-  </li>
-}
+      <!-- Miembros Dropdown for Logged In Members -->
+      @if (authService.isMember()) {
+      <li class="nav-dropdown">
+        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">apps</span> Miembros <span
+            class="material-icons arrow">expand_more</span></a>
+        <ul class="dropdown-menu-list">
+          <li><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span>
+              Reservas</a></li>
+          <li><a routerLink="/calendario" routerLinkActive="active-route"><span
+                class="material-icons">calendar_month</span> Calendario</a></li>
+          <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
+              Clasificación</a></li>
+          <li><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
+              Vídeos</a></li>
+        </ul>
+      </li>
+      }
 
-<!-- Staff Dropdown for Staff Users -->
-@if (authService.isStaff()) {
-  <li class="nav-dropdown">
-    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">badge</span> Staff <span class="material-icons arrow">expand_more</span></a>
-    <ul class="dropdown-menu-list">
-      <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span class="material-icons">sports_score</span> Eventos</a></li>
-      <li><a routerLink="/info-reservas" routerLinkActive="active-route"><span class="material-icons">visibility</span> Monitor Reservas</a></li>
-      <li><a routerLink="/admin/asistencia" routerLinkActive="active-route"><span class="material-icons">fact_check</span> Verificar Asistencia</a></li>
-      <li><a routerLink="/admin/puntos-extra" routerLinkActive="active-route" (click)="closeMenu()"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
-      <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route"><span class="material-icons">people</span> Gestión Miembros</a></li>
-      <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route"><span class="material-icons">calendar_month</span> Gestión Horarios</a></li>
-    </ul>
-  </li>
-}
+      <!-- Staff Dropdown for Staff Users -->
+      @if (authService.isStaff()) {
+      <li class="nav-dropdown">
+        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">badge</span> Staff <span
+            class="material-icons arrow">expand_more</span></a>
+        <ul class="dropdown-menu-list">
+          <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span
+                class="material-icons">sports_score</span> Eventos</a></li>
+          <li><a routerLink="/info-reservas" routerLinkActive="active-route"><span
+                class="material-icons">visibility</span> Monitor Reservas</a></li>
+          <li><a routerLink="/admin/asistencia" routerLinkActive="active-route"><span
+                class="material-icons">fact_check</span> Verificar Asistencia</a></li>
+          <li><a routerLink="/admin/puntos-extra" routerLinkActive="active-route" (click)="closeMenu()"><span
+                class="material-icons">military_tech</span> Puntos Extra</a></li>
+          <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route"><span
+                class="material-icons">people</span> Gestión Miembros</a></li>
+          <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route"><span
+                class="material-icons">calendar_month</span> Gestión Horarios</a></li>
+        </ul>
+      </li>
+      }
 
-<!-- Gestor Dropdown for Manager Users -->
-@if (authService.isManager()) {
-  <li class="nav-dropdown">
-    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">business</span> Gestor <span class="material-icons arrow">expand_more</span></a>
-    <ul class="dropdown-menu-list">
-      <li><a (click)="goToMyClub()" style="cursor: pointer;"><span class="material-icons">settings</span> Configurar Club</a></li>
-      <li><a routerLink="/gestor/landing-page" routerLinkActive="active-route"><span class="material-icons">design_services</span> Diseño P. Bienvenida</a></li>
-    </ul>
-  </li>
-}
+      <!-- Gestor Dropdown for Manager Users -->
+      @if (authService.isManager()) {
+      <li class="nav-dropdown">
+        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">business</span> Gestor <span
+            class="material-icons arrow">expand_more</span></a>
+        <ul class="dropdown-menu-list">
+          <li><a (click)="goToMyClub()" style="cursor: pointer;"><span class="material-icons">settings</span> Configurar
+              Club</a></li>
+          <li><a routerLink="/gestor/landing-page" routerLinkActive="active-route"><span
+                class="material-icons">design_services</span> P. Bienvenida</a></li>
+        </ul>
+      </li>
+      }
 
-<!-- Administrar Dropdown for Admin Users -->
-@if (authService.isAdmin()) {
-  <li class="nav-dropdown">
-    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">admin_panel_settings</span> Administrar <span class="material-icons arrow">expand_more</span></a>
-    <ul class="dropdown-menu-list">
-      <li><a routerLink="/admin/usuarios" routerLinkActive="active-route"><span class="material-icons">admin_panel_settings</span> Roles</a></li>
-      <li><a routerLink="/admin/clubs" routerLinkActive="active-route"><span class="material-icons">domain</span> Gestión de Clubes</a></li>
-      <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route"><span class="material-icons">report_problem</span> Ver sugerencias</a></li>
-      <li class="dropdown-divider"></li>
-      <li style="padding: 4px 20px; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Revisar</li>
-      <li><a routerLink="/admin/videos" routerLinkActive="active-route"><span class="material-icons">video_library</span> Revisar vídeos</a></li>
-      <li><a routerLink="/admin/salud-monitor" routerLinkActive="active-route"><span class="material-icons">monitor_heart</span> Monitor ACWR</a></li>
-      <li><a routerLink="/admin/rsce-monitor" routerLinkActive="active-route"><span class="material-icons">query_stats</span> Monitor Canina</a></li>
-      <li><a routerLink="/admin/avatares" routerLinkActive="active-route"><span class="material-icons">auto_awesome</span> Avatares IA</a></li>
-    </ul>
-  </li>
-}
+      <!-- Administrar Dropdown for Admin Users -->
+      @if (authService.isAdmin()) {
+      <li class="nav-dropdown">
+        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">admin_panel_settings</span>
+          Administrar <span class="material-icons arrow">expand_more</span></a>
+        <ul class="dropdown-menu-list">
+          <li><a routerLink="/admin/usuarios" routerLinkActive="active-route"><span
+                class="material-icons">admin_panel_settings</span> Roles</a></li>
+          <li><a routerLink="/admin/clubs" routerLinkActive="active-route"><span class="material-icons">domain</span>
+              Gestión de Clubes</a></li>
+          <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route"><span
+                class="material-icons">report_problem</span> Ver sugerencias</a></li>
+          <li class="dropdown-divider"></li>
+          <li
+            style="padding: 4px 20px; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">
+            Revisar</li>
+          <li><a routerLink="/admin/videos" routerLinkActive="active-route"><span
+                class="material-icons">video_library</span> Revisar vídeos</a></li>
+          <li><a routerLink="/admin/salud-monitor" routerLinkActive="active-route"><span
+                class="material-icons">monitor_heart</span> Monitor ACWR</a></li>
+          <li><a routerLink="/admin/rsce-monitor" routerLinkActive="active-route"><span
+                class="material-icons">query_stats</span> Canina (RSCE)</a></li>
+          <li><a routerLink="/admin/avatares" routerLinkActive="active-route"><span
+                class="material-icons">auto_awesome</span> Avatares IA</a></li>
+        </ul>
+      </li>
+      }
 
-<!-- Explorar Dropdown for Logged In Users -->
-@if (authService.isMember()) {
-  <li class="nav-dropdown">
-    <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span class="material-icons arrow">expand_more</span></a>
-    <ul class="dropdown-menu-list">
-      <li><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route"><span class="material-icons">favorite</span> Salud Deportiva</a></li>
-      <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route"><span class="material-icons">analytics</span> Monitor Canina</a></li>
-      <li><a routerLink="/bitacora-rfec" routerLinkActive="active-route"><span class="material-icons">pets</span> Monitor Caza</a></li>
-      <li><a routerLink="/tablon-anuncios" routerLinkActive="active-route"><span class="material-icons">campaign</span> Tablón de Anuncios</a></li>
-      <li><a routerLink="/recursos" routerLinkActive="active-route"><span class="material-icons">folder_shared</span> Recursos</a></li>
+      <!-- Explorar Dropdown for Logged In Users -->
+      @if (authService.isMember()) {
+      <li class="nav-dropdown">
+        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span
+            class="material-icons arrow">expand_more</span></a>
+        <ul class="dropdown-menu-list">
+          <li><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route"><span
+                class="material-icons">favorite</span> Salud Deportiva</a></li>
+          <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route"><span
+                class="material-icons">analytics</span> Canina (RSCE)</a></li>
+          <li><a routerLink="/bitacora-rfec" routerLinkActive="active-route"><span class="material-icons">pets</span>
+              Caza (RFEC)</a></li>
+          <li><a routerLink="/tablon-anuncios" routerLinkActive="active-route"><span
+                class="material-icons">campaign</span> Tablón de Anuncios</a></li>
+          <li><a routerLink="/recursos" routerLinkActive="active-route"><span
+                class="material-icons">folder_shared</span> Recursos</a></li>
+        </ul>
+      </li>
+      }
     </ul>
-  </li>
-}
-</ul>
-</nav>
+  </nav>
 
-<!-- User Section -->
-<div class="auth-section">
-  <!-- Login Button -->
-  @if (!authService.userProfileSignal()) {
+  <!-- User Section -->
+  <div class="auth-section">
+    <!-- Login Button -->
+    @if (!authService.userProfileSignal()) {
     <a routerLink="/login" (click)="closeMenu()" class="login-btn">
       Iniciar Sesión
     </a>
-  }
+    }
 
-  <!-- Notifications Dropdown -->
-  @if (authService.userProfileSignal()) {
+    <!-- Notifications Dropdown -->
+    @if (authService.userProfileSignal()) {
     <div class="notification-container">
       <button class="notification-btn" (click)="toggleNotifications($event)">
         <span class="material-icons">notifications</span>
         @if (notificationService.unreadCountSignal() > 0) {
-          <span class="badge">
-            {{notificationService.unreadCountSignal()}}
-          </span>
+        <span class="badge">
+          {{notificationService.unreadCountSignal()}}
+        </span>
         }
       </button>
       <div class="notification-menu" [class.show]="isNotificationsOpen">
         <div class="notification-header">
           <p>Notificaciones</p>
           @if (notificationService.unreadCountSignal() > 0) {
-            <button class="mark-all-btn" (click)="markAllAsRead()"
-              >
-              Marcar todas leídas
-            </button>
+          <button class="mark-all-btn" (click)="markAllAsRead()">
+            Marcar todas leídas
+          </button>
           }
         </div>
         <div class="notification-list">
           @for (notif of notificationService.notificationsSignal(); track notif) {
-            <div class="notification-item"
-              [class.read]="notif.read_at"
-              (click)="handleNotificationClick(notif)">
-                        <div class="notif-icon-container" [ngClass]="{
+          <div class="notification-item" [class.read]="notif.read_at" (click)="handleNotificationClick(notif)">
+            <div class="notif-icon-container" [ngClass]="{
                                 'event-icon': notif.type.includes('NewEventNotification') || notif.data.type === 'new_event', 
                                 'point-icon': notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point',
                                 'cancel-icon': notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled',
@@ -152,92 +189,91 @@
                                 'video-icon': notif.type.includes('NewVideoNotification') || notif.data.type === 'new_video',
                                 'default-icon': !notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' && !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion' && !notif.type.includes('NewVideoNotification') && notif.data.type !== 'new_video'
                             }">
-                @if (notif.type.includes('NewEventNotification') || notif.data.type === 'new_event') {
-                  <span class="material-icons"
-                  >event_available</span>
-                }
-                @if (notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') || notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point') {
-                  <span class="material-icons"
-                  >emoji_events</span>
-                }
-                @if (notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled') {
-                  <span class="material-icons"
-                  >event_busy</span>
-                }
-                @if (notif.type.includes('NewSuggestionNotification') || notif.data.type === 'new_suggestion') {
-                  <span class="material-icons"
-                  >bug_report</span>
-                }
-                @if (notif.type.includes('NewVideoNotification') || notif.data.type === 'new_video') {
-                  <span class="material-icons"
-                  >videocam</span>
-                }
-                @if (!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' && !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') && notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' && !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' && !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion' && !notif.type.includes('NewVideoNotification') && notif.data.type !== 'new_video') {
-                  <span class="material-icons"
-                  >notifications</span>
-                }
-              </div>
-              <div class="notif-content">
-                <p class="notif-message">{{ notif.data.message }}</p>
-                <span class="notif-time"><span class="material-icons time-icon">schedule</span> {{
-              notif.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
+              @if (notif.type.includes('NewEventNotification') || notif.data.type === 'new_event') {
+              <span class="material-icons">event_available</span>
+              }
+              @if (notif.type.includes('DogPointNotification') || notif.type.includes('DogExtraPointNotification') ||
+              notif.data.type === 'dog_point' || notif.data.type === 'dog_extra_point') {
+              <span class="material-icons">emoji_events</span>
+              }
+              @if (notif.type.includes('ClassCancelledNotification') || notif.data.type === 'class_cancelled') {
+              <span class="material-icons">event_busy</span>
+              }
+              @if (notif.type.includes('NewSuggestionNotification') || notif.data.type === 'new_suggestion') {
+              <span class="material-icons">bug_report</span>
+              }
+              @if (notif.type.includes('NewVideoNotification') || notif.data.type === 'new_video') {
+              <span class="material-icons">videocam</span>
+              }
+              @if (!notif.type.includes('NewEventNotification') && notif.data.type !== 'new_event' &&
+              !notif.type.includes('DogPointNotification') && !notif.type.includes('DogExtraPointNotification') &&
+              notif.data.type !== 'dog_point' && notif.data.type !== 'dog_extra_point' &&
+              !notif.type.includes('ClassCancelledNotification') && notif.data.type !== 'class_cancelled' &&
+              !notif.type.includes('NewSuggestionNotification') && notif.data.type !== 'new_suggestion' &&
+              !notif.type.includes('NewVideoNotification') && notif.data.type !== 'new_video') {
+              <span class="material-icons">notifications</span>
+              }
+            </div>
+            <div class="notif-content">
+              <p class="notif-message">{{ notif.data.message }}</p>
+              <span class="notif-time"><span class="material-icons time-icon">schedule</span> {{
+                notif.created_at | date:'dd MMM yyyy, HH:mm' }}</span>
             </div>
           </div>
-        }
-        @if (notificationService.notificationsSignal().length === 0) {
+          }
+          @if (notificationService.notificationsSignal().length === 0) {
           <div class="notification-empty">
             No tienes notificaciones nuevas
           </div>
-        }
+          }
+        </div>
       </div>
     </div>
-  </div>
-}
+    }
 
-<!-- Logged In User Dropdown -->
-@if (authService.userProfileSignal(); as user) {
-  <div class="user-dropdown-container">
-    <button class="user-avatar-btn" (click)="toggleUserMenu($event)">
-      @if (user.photoURL) {
-        <img [src]="user.photoURL" alt="User" class="nav-user-img"
-          referrerpolicy="no-referrer">
-      } @else {
+    <!-- Logged In User Dropdown -->
+    @if (authService.userProfileSignal(); as user) {
+    <div class="user-dropdown-container">
+      <button class="user-avatar-btn" (click)="toggleUserMenu($event)">
+        @if (user.photoURL) {
+        <img [src]="user.photoURL" alt="User" class="nav-user-img" referrerpolicy="no-referrer">
+        } @else {
         <div class="nav-user-img default-avatar-placeholder">
           {{ user.name.charAt(0) || 'U' }}
         </div>
-      }
-      <span class="material-icons dropdown-arrow">expand_more</span>
-    </button>
-    <!-- Dropdown Menu -->
-    <div class="user-dropdown-menu" [class.show]="isUserMenuOpen">
-      <div class="user-header">
-        <p class="name">{{ user.displayName }}</p>
-        <p class="email">{{ user.email }}</p>
-      </div>
-      <div class="dropdown-divider"></div>
-      <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item"><span
-      class="material-icons">person</span> Mi Perfil</a>
+        }
+        <span class="material-icons dropdown-arrow">expand_more</span>
+      </button>
+      <!-- Dropdown Menu -->
+      <div class="user-dropdown-menu" [class.show]="isUserMenuOpen">
+        <div class="user-header">
+          <p class="name">{{ user.displayName }}</p>
+          <p class="email">{{ user.email }}</p>
+        </div>
+        <div class="dropdown-divider"></div>
+        <a routerLink="/perfil" (click)="closeMenu()" class="dropdown-item"><span class="material-icons">person</span>
+          Mi Perfil</a>
         @if (authService.isMember()) {
-          <a routerLink="/gestionar-perros" (click)="closeMenu()" class="dropdown-item"><span
-          class="material-icons">pets</span> Mis Perros</a>
-          <div class="dropdown-divider"></div>
-          <a routerLink="/novedades" (click)="closeMenu()" class="dropdown-item">
-            <span class="material-icons">new_releases</span> Novedades
-          </a>
-          <a (click)="openSugerenciaDialog()" class="dropdown-item" style="cursor: pointer;">
-            <span class="material-icons">bug_report</span> Sugerencias / Bugs
-          </a>
+        <a routerLink="/gestionar-perros" (click)="closeMenu()" class="dropdown-item"><span
+            class="material-icons">pets</span> Mis Perros</a>
+        <div class="dropdown-divider"></div>
+        <a routerLink="/novedades" (click)="closeMenu()" class="dropdown-item">
+          <span class="material-icons">new_releases</span> Novedades
+        </a>
+        <a (click)="openSugerenciaDialog()" class="dropdown-item" style="cursor: pointer;">
+          <span class="material-icons">bug_report</span> Sugerencias / Bugs
+        </a>
         }
 
         <div class="dropdown-divider"></div>
 
         <button (click)="logout()" class="dropdown-item logout-item"><span class="material-icons">logout</span>
-      Cerrar Sesión</button>
-    </div>
-    @if (isUserMenuOpen || isNotificationsOpen) {
+          Cerrar Sesión</button>
+      </div>
+      @if (isUserMenuOpen || isNotificationsOpen) {
       <div class="dropdown-backdrop" (click)="closeMenu()"></div>
+      }
+    </div>
     }
   </div>
-}
-</div>
 </mat-toolbar>

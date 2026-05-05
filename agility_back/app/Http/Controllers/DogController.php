@@ -18,9 +18,10 @@ class DogController extends Controller
      */
     public function index(Request $request)
     {
-        return $request->user()->dogs()->with(['users:id,name,email', 'pointHistories' => function ($query) {
+        $dogs = $request->user()->dogs()->with(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->orderBy('dogs.name', 'asc')->get();
+        return response(json_encode($dogs, JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -28,9 +29,10 @@ class DogController extends Controller
      */
     public function all()
     {
-        return Dog::with(['users:id,name,email', 'pointHistories' => function ($query) {
+        $dogs = Dog::with(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->orderBy('dogs.name', 'asc')->get();
+        return response(json_encode($dogs, JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -75,7 +77,7 @@ class DogController extends Controller
         $request->user()->dogs()->attach($dog->id, $pivotData);
         $dog->load('users:id,name,email');
 
-        return response()->json($dog, 201);
+        return response(json_encode($dog, JSON_INVALID_UTF8_SUBSTITUTE), 201, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -83,9 +85,10 @@ class DogController extends Controller
      */
     public function show(string $id)
     {
-        return Auth::user()->dogs()->with(['users:id,name,email', 'pointHistories' => function ($query) {
+        $dog = Auth::user()->dogs()->with(['users:id,name,email', 'pointHistories' => function ($query) {
             $query->orderBy('created_at', 'desc');
         }])->findOrFail($id);
+        return response(json_encode($dog, JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -148,7 +151,7 @@ class DogController extends Controller
             $query->orderBy('created_at', 'desc');
         }]);
 
-        return response()->json($dog);
+        return response(json_encode($dog, JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -199,7 +202,7 @@ class DogController extends Controller
             $query->orderBy('created_at', 'desc');
         }]);
 
-        return response()->json($dog);
+        return response(json_encode($dog, JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -230,10 +233,10 @@ class DogController extends Controller
             $query->orderBy('created_at', 'desc');
         }]);
 
-        return response()->json([
+        return response(json_encode([
             'message' => 'Puntos modificados exitosamente',
             'dog' => $dog
-        ]);
+        ], JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -260,12 +263,12 @@ class DogController extends Controller
 
         $dog->users()->attach($userToShareWith->id, ['is_primary_owner' => false]);
 
-        return response()->json([
+        return response(json_encode([
             'message' => 'Perro compartido exitosamente con ' . $userToShareWith->name,
             'dog' => $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             }])
-        ]);
+        ], JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -293,12 +296,12 @@ class DogController extends Controller
 
         $dog->users()->detach($userIdToRemove);
 
-        return response()->json([
+        return response(json_encode([
             'message' => 'Acceso revocado exitosamente',
             'dog' => $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {
                 $query->orderBy('created_at', 'desc');
             }])
-        ]);
+        ], JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
 
     /**
@@ -347,10 +350,10 @@ class DogController extends Controller
 
         $dog->save();
 
-        return response()->json([
+        return response(json_encode([
             'message' => 'Avatares actualizados exitosamente',
             'dog' => $dog
-        ]);
+        ], JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
     }
     /**
      * Generate AI avatars via Cloudflare.
@@ -434,10 +437,10 @@ class DogController extends Controller
             
             RateLimiter::hit($key, 86400); // 24 hours
 
-            return response()->json([
+            return response(json_encode([
                 'message' => 'Avatares generados y guardados exitosamente',
                 'dog' => $dog
-            ]);
+            ], JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
 
         } catch (\Exception $e) {
             return response()->json([

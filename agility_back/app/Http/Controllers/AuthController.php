@@ -342,7 +342,7 @@ class AuthController extends Controller
         try {
             $request->validate([
                 'name' => 'nullable|string|max:255',
-                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
                 'rfec_license' => 'nullable|string|max:255',
                 'rfec_expiration_date' => 'nullable|date',
                 'rfec_category' => 'nullable|string|max:50',
@@ -413,10 +413,10 @@ class AuthController extends Controller
 
             $user->save();
 
-            return response()->json([
+            return response(json_encode([
                 'message' => 'Perfil actualizado correctamente',
                 'user' => $user
-            ]);
+            ], JSON_INVALID_UTF8_SUBSTITUTE), 200, ['Content-Type' => 'application/json']);
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Error en los datos del perfil.',
