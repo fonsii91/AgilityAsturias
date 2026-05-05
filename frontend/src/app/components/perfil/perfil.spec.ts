@@ -95,7 +95,7 @@ describe('Perfil Component', () => {
         component.toggleEditRfec();
         fixture.detectChanges();
 
-        component.rfecData = { license: 'LIC-999', expiration: '2026-01-01' };
+        component.rfecData = { license: 'LIC-999', expiration: '2026-01-01', category: '' };
         await component.saveRfec();
 
         expect(mockAuthService.updateProfileCalledWith[0]).toBe('Test User');

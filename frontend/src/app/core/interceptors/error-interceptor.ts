@@ -9,6 +9,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       let errorMessage = 'Ha ocurrido un error inesperado.';
+      let showErrorToast = true;
 
       if (error.error instanceof ErrorEvent) {
         // Client-side error
@@ -19,8 +20,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           errorMessage = 'No hay conexión con el servidor. Verifica tu internet.';
         } else if (error.status === 401) {
           errorMessage = 'No tienes permiso para realizar esta acción.';
+          if (req.method === 'GET') showErrorToast = false;
         } else if (error.status === 403) {
           errorMessage = 'Acceso denegado.';
+          if (req.method === 'GET') showErrorToast = false;
         } else if (error.status === 404) {
           errorMessage = 'El recurso solicitado no existe.';
         } else if (error.status >= 500) {
@@ -28,7 +31,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         }
       }
 
-      toastService.error(errorMessage);
+      if (showErrorToast) {
+        toastService.error(errorMessage);
+      }
       return throwError(() => error);
     })
   );

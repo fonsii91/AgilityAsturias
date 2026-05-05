@@ -179,7 +179,7 @@ export class AuthService {
         if (['member', 'staff', 'manager', 'admin'].includes(mappedUser.role)) {
             this.router.navigate(['/calendario']);
         } else {
-            this.router.navigate(['/perfil']);
+            this.router.navigate(['/']);
         }
     }
 

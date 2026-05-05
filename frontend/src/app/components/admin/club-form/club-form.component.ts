@@ -948,6 +948,7 @@ export class ClubFormComponent implements OnInit {
   updateColor(controlName: string, event: Event) {
     const input = event.target as HTMLInputElement;
     this.form.get(controlName)?.setValue(input.value.toUpperCase());
+    this.form.get(controlName)?.markAsDirty();
   }
 
   async onFileSelected(field: 'logo' | 'hero' | 'cta', event: Event) {

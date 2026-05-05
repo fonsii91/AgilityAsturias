@@ -22,7 +22,9 @@ description: Datos para desplegar en producción el proyecto
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado 2026-05-06]** Configurado servidor Nginx y Certbot SSL para soportar HTTPS en el nuevo subdominio `leonidogs.clubagility.com` y `www.leonidogs.clubagility.com`. Se expandió el certificado existente y se verificó el enrutamiento.
 - **[Completado 2026-05-06]** Solucionado error 404 en el subdominio `xanastur.clubagility.com`. Se ha corregido la configuración de Nginx restaurando `sites-enabled/agilityasturias` como un enlace simbólico (symlink) hacia `sites-available/agilityasturias`. Previamente había una desincronización entre ambos archivos que causaba que Nginx devolviera un error 404 en el acceso raíz y favicon.
+- **[Completado 2026-05-06]** Desplegada exitosamente la versión 1.1.38 con mejoras de UI, cálculo automático de categorías caninas, renombrado visual a Canina/Caza, barra flotante de guardado y ajustes en recursos. Se actualizaron y pasaron exitosamente los tests locales antes del despliegue.
 - **[Completado 2026-05-05]** Configurado servidor Nginx y Certbot SSL para que la aplicación multi-tenant soporte correctamente HTTPS en el nuevo subdominio `xanastur.clubagility.com` y `www.xanastur.clubagility.com`. Se expandió el certificado existente y se ajustaron las redirecciones.
 - **[Completado 2026-05-05]** Desplegada exitosamente la versión 1.1.37 con optimizaciones de UI/UX (galería móvil, valoración de esfuerzo 1-5, limpieza de navegación) y mejoras en los permisos y seguridad de competiciones. El servidor compiló el frontend y backend correctamente.
 - **[Completado 2026-05-03]** Desplegado el acceso seguro de administracion entre clubes mediante codigos temporales de un solo uso. El servidor quedo en el commit `b2bb075` y las rutas `api/club-handoff` y `api/admin/clubs/{club}/handoff` estan registradas en produccion.
