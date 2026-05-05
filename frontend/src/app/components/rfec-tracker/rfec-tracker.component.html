@@ -180,32 +180,32 @@
         } @else if (selectedDog()?.rfec_grade === 'Competición') {
           <div class="progress-card no-print">
             <div class="progress-header">
-              <h3>Rumbo al Campeonato de España Absoluto (Vía Directa)</h3>
-              <p>Requisitos: 80 puntos totales, mínimo 40 en Agility.</p>
+              <h3>Rumbo al Campeonato de España {{ ceTargets().name }} (Vía Directa)</h3>
+              <p>Requisitos: {{ ceTargets().total }} puntos totales en Grado Competición, mínimo {{ ceTargets().agility }} en Agility.</p>
             </div>
             <div class="progress-grid">
               <div class="progress-item">
-                <span class="progress-label">Puntos Totales ({{ calculatedStats().totalPoints }}/80)</span>
+                <span class="progress-label">Puntos Totales ({{ calculatedStats().ceTotalPoints }}/{{ ceTargets().total }})</span>
                 <div class="progress-bar-container">
-                  <div class="progress-bar-fill" [style.width]="(calculatedStats().totalPoints / 80 * 100) + '%'"></div>
+                  <div class="progress-bar-fill" [style.width]="(calculatedStats().ceTotalPoints / ceTargets().total * 100) + '%'"></div>
                 </div>
               </div>
               <div class="progress-item">
-                <span class="progress-label">Puntos Agility ({{ calculatedStats().agilityPoints }}/40)</span>
+                <span class="progress-label">Puntos Agility ({{ calculatedStats().ceAgilityPoints }}/{{ ceTargets().agility }})</span>
                 <div class="progress-bar-container">
-                  <div class="progress-bar-fill" [style.background]="'#3b82f6'" [style.width]="(calculatedStats().agilityPoints / 40 * 100) + '%'"></div>
+                  <div class="progress-bar-fill" [style.background]="'#3b82f6'" [style.width]="(calculatedStats().ceAgilityPoints / ceTargets().agility * 100) + '%'"></div>
                 </div>
               </div>
             </div>
             
-            @if (calculatedStats().totalPoints >= 80 && calculatedStats().agilityPoints >= 40) {
+            @if (calculatedStats().ceTotalPoints >= ceTargets().total && calculatedStats().ceAgilityPoints >= ceTargets().agility) {
               <div class="success-alert" style="display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center; padding: 1.5rem; margin-top: 1.5rem; background: linear-gradient(135deg, #fef08a 0%, #fde047 100%); border: 2px solid #eab308; border-radius: 12px; box-shadow: 0 4px 6px rgba(234, 179, 8, 0.2);">
                 <div style="display: flex; align-items: center; gap: 12px;">
                   <span class="material-icons" style="font-size: 32px; color: #a16207;">emoji_events</span> 
                   <strong style="font-size: 1.25em; color: #854d0e; text-transform: uppercase; letter-spacing: 0.5px;">¡Clasificado para el Campeonato de España!</strong>
                   <span class="material-icons" style="font-size: 32px; color: #a16207;">emoji_events</span>
                 </div>
-                <p style="color: #713f12; margin: 0; font-weight: 500;">Has conseguido los 80 puntos y 40 en Agility necesarios para la Vía Directa.</p>
+                <p style="color: #713f12; margin: 0; font-weight: 500;">Has conseguido los {{ ceTargets().total }} puntos y {{ ceTargets().agility }} en Agility en Grado Competición necesarios para la Vía Directa.</p>
               </div>
             }
           </div>

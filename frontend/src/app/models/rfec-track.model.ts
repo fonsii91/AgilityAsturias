@@ -9,6 +9,7 @@ export interface RfecTrack {
     judge_name?: string | null;
     location?: string | null;
     notes?: string | null;
+    grade?: string | null;
     created_at?: string;
     updated_at?: string;
 }

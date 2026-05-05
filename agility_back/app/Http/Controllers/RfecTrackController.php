@@ -29,6 +29,7 @@ class RfecTrackController extends Controller
             'judge_name' => 'nullable|string|max:100',
             'location' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
+            'grade' => 'nullable|string|max:50',
         ]);
 
         // Security check: ensure the user owns the dog
@@ -61,6 +62,7 @@ class RfecTrackController extends Controller
             'judge_name' => 'nullable|string|max:100',
             'location' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
+            'grade' => 'nullable|string|max:50',
         ]);
 
         $rfecTrack->update($validated);

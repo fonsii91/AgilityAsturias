@@ -173,7 +173,8 @@ export class RfecTrackerComponent implements OnInit {
       qualification: track.qualification,
       speed: track.speed ?? null,
       judge_name: track.judge_name || '',
-      notes: track.notes || ''
+      notes: track.notes || '',
+      grade: track.grade || 'Iniciación'
     };
     this.isFormOpen = true;
   }
@@ -230,7 +231,8 @@ export class RfecTrackerComponent implements OnInit {
       speed: this.formData.speed || 0,
       judge_name: this.formData.judge_name,
       location: finalLocation,
-      notes: this.formData.notes
+      notes: this.formData.notes,
+      grade: this.isEditing ? this.formData.grade : (this.selectedDog()?.rfec_grade || 'Iniciación')
     };
 
     try {
@@ -323,6 +325,8 @@ export class RfecTrackerComponent implements OnInit {
     const ts = this.dogTracks();
     let totalPoints = 0;
     let agilityPoints = 0;
+    let ceTotalPoints = 0;
+    let ceAgilityPoints = 0;
     const jueces = new Set<string>();
 
     for (const t of ts) {
@@ -345,6 +349,15 @@ export class RfecTrackerComponent implements OnInit {
           if (t.judge_name) {
             jueces.add(t.judge_name.toLowerCase().trim());
           }
+
+          // Para Campeonato de España SOLO cuentan mangas corridas en Grado Competición
+          // Permitimos t.grade undefined para mantener compatibilidad con mangas antiguas
+          if (t.grade === 'Competición' || (!t.grade && this.selectedDog()?.rfec_grade === 'Competición')) {
+             ceTotalPoints += pts;
+             if (t.manga_type && t.manga_type.startsWith('Agility')) {
+                ceAgilityPoints += pts;
+             }
+          }
         }
       }
     }
@@ -352,7 +365,19 @@ export class RfecTrackerComponent implements OnInit {
     return {
       totalPoints,
       agilityPoints,
+      ceTotalPoints,
+      ceAgilityPoints,
       uniqueJudges: jueces.size
+    };
+  });
+
+  ceTargets = computed(() => {
+    const cat = this.selectedDog()?.rfec_category;
+    const isSenior = cat === 'Senior' || cat === 'Veterano';
+    return {
+      name: isSenior ? 'Senior' : 'Absoluto',
+      total: isSenior ? 40 : 80,
+      agility: isSenior ? 20 : 40
     };
   });
 }

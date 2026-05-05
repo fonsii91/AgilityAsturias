@@ -20,6 +20,7 @@ class RfecTrack extends Model
         'judge_name',
         'location',
         'notes',
+        'grade',
         'club_id'
     ];
 
