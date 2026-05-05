@@ -174,13 +174,13 @@ import { SuggestionService } from '../../../services/suggestion.service';
                 <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Instagram</mat-label>
                   <span matPrefix class="form-icon text-bold">@&nbsp;</span>
-                  <input matInput formControlName="instagram" placeholder="agilityasturias">
+                  <input matInput formControlName="instagram" placeholder="mi_club">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full">
                   <mat-label>Facebook</mat-label>
                   <mat-icon matPrefix class="form-icon">thumb_up</mat-icon>
-                  <input matInput formControlName="facebook" placeholder="agilityasturias">
+                  <input matInput formControlName="facebook" placeholder="mi_club">
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="w-full full-width">
@@ -224,7 +224,7 @@ import { SuggestionService } from '../../../services/suggestion.service';
                     </div>
                     <mat-form-field appearance="outline" class="w-full">
                       <mat-icon matPrefix class="form-icon">language</mat-icon>
-                      <input matInput formControlName="domain" placeholder="Ej: agilityasturias.com">
+                      <input matInput formControlName="domain" placeholder="Ej: miclub.com">
                     </mat-form-field>
                   </div>
 

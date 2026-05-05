@@ -94,6 +94,22 @@
     transform: translateY(-8px) scale(1.02);
 }
 
+@media (max-width: 768px) {
+    .video-grid {
+        grid-template-columns: 1fr !important;
+        gap: 2rem !important;
+        padding: 0 !important;
+    }
+
+    .video-card {
+        width: 100% !important;
+        max-width: 480px !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        max-height: none !important;
+    }
+}
+
 @media (min-width: 768px) {
     .video-card.is-youtube {
         aspect-ratio: 16/9;

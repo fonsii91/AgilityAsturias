@@ -146,6 +146,7 @@ export class CompetitionService {
             isAttending: !!data.is_attending,
             attendingDogIds: data.attending_dog_ids || [],
             attendingDogsDetails: data.attending_dogs_details || [],
+            allAttendingDogIds: data.all_attending_dog_ids || [],
             diasAsistencia: data.dias_asistencia || []
         };
     }

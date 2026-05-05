@@ -18,7 +18,14 @@ import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.co
 export class CrudCompeticionComponent {
     private toastService = inject(ToastService);
     private imageCompressor = inject(ImageCompressorService);
-    competitions: any;
+    proximosEventos: any;
+    eventosPasados: any;
+    displayedEvents: any;
+    totalPages: any;
+    
+    activeTab = signal<'proximos' | 'pasados'>('proximos');
+    currentPage = signal<number>(1);
+    pageSize = 10;
 
     // View state
     isEditing = signal(false);
@@ -38,8 +45,10 @@ export class CrudCompeticionComponent {
     ) {
         // Create a computed signal to sort competitions by date
         const rawCompetitions = this.competitionService.getCompetitions();
-        this.competitions = computed(() => {
-            return [...rawCompetitions()].sort((a, b) => {
+        
+        // Sorting function
+        const sortEvents = (events: Competition[], ascending: boolean = true) => {
+            return [...events].sort((a, b) => {
                 const parseDateStr = (dateStr: string) => {
                     if (!dateStr) return 0;
                     const parts = dateStr.substring(0, 10).split('-');
@@ -50,8 +59,39 @@ export class CrudCompeticionComponent {
                 };
                 const dateA = parseDateStr(a.fechaEvento);
                 const dateB = parseDateStr(b.fechaEvento);
-                return dateA - dateB;
+                return ascending ? dateA - dateB : dateB - dateA;
             });
+        };
+
+        const todayDate = new Date();
+        todayDate.setHours(0, 0, 0, 0);
+
+        const isPastEvent = (c: Competition) => {
+            const dateStr = c.fechaFinEvento || c.fechaEvento;
+            if (!dateStr) return true; // If no date, consider past? Actually shouldn't happen
+            const parts = dateStr.substring(0, 10).split('-');
+            const compDate = parts.length === 3 ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])) : new Date(0);
+            return compDate.getTime() < todayDate.getTime();
+        };
+
+        this.proximosEventos = computed(() => {
+            return sortEvents(rawCompetitions().filter(c => !isPastEvent(c)), true);
+        });
+
+        this.eventosPasados = computed(() => {
+            // Pasados ordenados de más reciente a más antiguo
+            return sortEvents(rawCompetitions().filter(c => isPastEvent(c)), false);
+        });
+        
+        this.displayedEvents = computed(() => {
+            const list = this.activeTab() === 'proximos' ? this.proximosEventos() : this.eventosPasados();
+            const startIndex = (this.currentPage() - 1) * this.pageSize;
+            return list.slice(startIndex, startIndex + this.pageSize);
+        });
+        
+        this.totalPages = computed(() => {
+            const list = this.activeTab() === 'proximos' ? this.proximosEventos() : this.eventosPasados();
+            return Math.max(1, Math.ceil(list.length / this.pageSize));
         });
 
         this.competitionForm = this.fb.group({
@@ -74,6 +114,23 @@ export class CrudCompeticionComponent {
         this.showForm.update(v => !v);
         if (!this.showForm()) {
             this.resetForm();
+        }
+    }
+
+    setTab(tab: 'proximos' | 'pasados') {
+        this.activeTab.set(tab);
+        this.currentPage.set(1);
+    }
+
+    nextPage() {
+        if (this.currentPage() < this.totalPages()) {
+            this.currentPage.update(p => p + 1);
+        }
+    }
+
+    prevPage() {
+        if (this.currentPage() > 1) {
+            this.currentPage.update(p => p - 1);
         }
     }
 

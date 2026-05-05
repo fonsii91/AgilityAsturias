@@ -1,0 +1,90 @@
+<div class="page-container">
+  <div class="page-header">
+    <button class="back-btn" (click)="onCancel()">
+      <i class="fas fa-arrow-left"></i> Ir al Ranking
+    </button>
+    <div class="header-titles">
+      <h2 class="page-title">Modificar Puntos</h2>
+      <p class="page-subtitle">Dar o quitar puntos al perro seleccionado</p>
+    </div>
+  </div>
+
+  <div class="page-content">
+    <div class="form-card">
+      <div class="form-group">
+        <label for="dogSelect">Selecciona un Perro:</label>
+        <select id="dogSelect" [(ngModel)]="selectedDogId" [disabled]="isLoading">
+          <option [ngValue]="null" disabled selected>-- Elige un perro --</option>
+          @for (dog of dogs(); track dog) {
+            <option [ngValue]="dog.id">{{ dog.name }} ({{ getOwnerName(dog) }})</option>
+          }
+        </select>
+        @if (dogs().length === 0 && !isLoading) {
+          <small>No hay perros disponibles.</small>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Acción:</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="action" [(ngModel)]="action" (ngModelChange)="onActionChange()" value="add" [disabled]="isLoading">
+            <i class="fas fa-plus-circle" style="margin-right: 6px;"></i> Dar Puntos
+          </label>
+          <label>
+            <input type="radio" name="action" [(ngModel)]="action" (ngModelChange)="onActionChange()" value="remove" [disabled]="isLoading">
+            <i class="fas fa-minus-circle" style="margin-right: 6px;"></i> Quitar Puntos
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="categorySelect">Categoría a valorar:</label>
+        <select id="categorySelect" [(ngModel)]="selectedCategory" [disabled]="isLoading">
+          <option value="" disabled selected>-- Selecciona categoría --</option>
+          @for (cat of categories; track cat) {
+            <option [value]="cat">{{ getEmoji(cat) }} {{ cat }}</option>
+          }
+        </select>
+      </div>
+
+      @if (selectedCategory === 'Otro') {
+        <div class="form-group">
+          <label for="customCategoryInput">Especifica la categoría:</label>
+          <input type="text" id="customCategoryInput" [(ngModel)]="customCategory" [disabled]="isLoading" placeholder="Ej: Esfuerzo, Simpatía...">
+        </div>
+      }
+
+      <div class="form-group">
+        <label>Cantidad de puntos (1 a 3):</label>
+        <div class="points-group">
+          <label class="point-pill" [class.selected]="selectedPoints === 1">
+            <input type="radio" name="points" [(ngModel)]="selectedPoints" [value]="1" [disabled]="isLoading">
+            1 Punto
+          </label>
+          <label class="point-pill" [class.selected]="selectedPoints === 2">
+            <input type="radio" name="points" [(ngModel)]="selectedPoints" [value]="2" [disabled]="isLoading">
+            2 Puntos
+          </label>
+          <label class="point-pill" [class.selected]="selectedPoints === 3">
+            <input type="radio" name="points" [(ngModel)]="selectedPoints" [value]="3" [disabled]="isLoading">
+            3 Puntos
+          </label>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="cancel-btn" (click)="onCancel()" [disabled]="isLoading">Cancelar</button>
+        <button class="submit-btn" (click)="onSubmit()" [disabled]="!isFormValid() || isLoading" [ngClass]="{'remove-btn': action === 'remove'}">
+          @if (isLoading) {
+            <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
+          }
+          @if (!isLoading) {
+            <i class="fas fa-check" style="margin-right: 8px;"></i>
+          }
+          {{ isLoading ? 'Guardando...' : (action === 'add' ? 'Dar Puntos' : 'Quitar Puntos') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

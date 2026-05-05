@@ -492,9 +492,9 @@ input:checked + .slider:before { transform: translateX(24px); }
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    background: var(--primary-color);
+    background: var(--rpe-color, var(--primary-color));
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: transform 0.1s, background-color 0.3s ease;
     box-shadow: var(--shadow-sm);
 }
 

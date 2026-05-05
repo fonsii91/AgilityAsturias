@@ -32,6 +32,9 @@ class CompetitionController extends Controller
                         'dias_asistencia' => $dog->pivot->dias_asistencia ? json_decode($dog->pivot->dias_asistencia, true) : []
                     ];
                 });
+                
+                $comp->all_attending_dog_ids = $comp->attendingDogs()->pluck('dogs.id')->unique()->values();
+
                 return $comp;
             });
         }
@@ -114,7 +117,14 @@ class CompetitionController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        Competition::destroy($id);
+        $competition = Competition::findOrFail($id);
+
+        $dateToCompare = $competition->fecha_fin_evento ?: $competition->fecha_evento;
+        if ($dateToCompare && $dateToCompare < now()->format('Y-m-d')) {
+            abort(403, 'Cannot delete historical events.');
+        }
+
+        $competition->delete();
 
         return response()->noContent();
     }

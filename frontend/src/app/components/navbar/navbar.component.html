@@ -57,7 +57,7 @@
       <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span class="material-icons">sports_score</span> Eventos</a></li>
       <li><a routerLink="/info-reservas" routerLinkActive="active-route"><span class="material-icons">visibility</span> Monitor Reservas</a></li>
       <li><a routerLink="/admin/asistencia" routerLinkActive="active-route"><span class="material-icons">fact_check</span> Verificar Asistencia</a></li>
-      <li><a (click)="openExtraPointsDialog()" style="cursor: pointer;"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
+      <li><a routerLink="/admin/puntos-extra" routerLinkActive="active-route" (click)="closeMenu()"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
       <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route"><span class="material-icons">people</span> Gestión Miembros</a></li>
       <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route"><span class="material-icons">calendar_month</span> Gestión Horarios</a></li>
     </ul>

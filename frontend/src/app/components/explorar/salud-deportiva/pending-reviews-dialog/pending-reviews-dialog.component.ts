@@ -110,6 +110,14 @@ export class PendingReviewsDialogComponent {
     return 'local_fire_department'; 
   }
 
+  getRpeColor(level: number): string {
+    if (level <= 2) return '#64748b'; // Gris/Azul (Muy Suave)
+    if (level <= 4) return '#22c55e'; // Verde (Suave)
+    if (level <= 6) return '#eab308'; // Amarillo (Moderado)
+    if (level <= 8) return '#f97316'; // Naranja (Duro)
+    return '#ef4444'; // Rojo (Máximo)
+  }
+
   showInfo(type: 'time' | 'jump' | 'studies') {
     if (type === 'time') {
       this.toast.info('Se cuenta ÚNICAMENTE el tiempo de máxima intensidad. 1 h de clase suele suponer entre 4 y 6 min reales en pista.', 8000);

@@ -6,7 +6,6 @@ import { ToastComponent } from './components/toast/toast.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { AuthService } from './services/auth.service';
 import { MatDialog } from '@angular/material/dialog';
-import { DarPuntosExtraDialogComponent } from './components/dar-puntos-extra-dialog/dar-puntos-extra-dialog.component';
 import { ReservationService } from './services/reservation.service';
 import { CompetitionService } from './services/competition.service';
 import { TimeSlotService } from './services/time-slot.service';
@@ -142,13 +141,6 @@ export class App implements OnInit, OnDestroy {
 
   maximizeWarning() {
       this.isWarningMinimized.set(false);
-  }
-
-  openExtraPointsDialog() {
-      this.dialog.open(DarPuntosExtraDialogComponent, {
-          width: '400px',
-          maxWidth: '90vw'
-      });
   }
 
   private handleVisibilityChange = () => {

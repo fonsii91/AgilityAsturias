@@ -1,7 +1,12 @@
 <div class="ranking-container">
 
   <div class="ranking-header-actions"
-    style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-top: 10px;">
+    style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-top: 10px; gap: 10px;">
+    @if (authService.isStaff()) {
+      <button class="btn-primary" routerLink="/admin/puntos-extra" style="background-color: var(--primary-color, #3b82f6); color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: fit-content;">
+        <span class="material-icons" style="font-size: 1.2rem;">military_tech</span> Dar Puntos
+      </button>
+    }
     <app-instrucciones titulo="Clasificación y Puntos">
 
 

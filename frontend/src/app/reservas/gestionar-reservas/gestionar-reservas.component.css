@@ -45,8 +45,8 @@ h2 {
 }
 
 .btn-edit-schedule:hover {
-    border-color: var(--primary-blue);
-    color: var(--primary-blue);
+    border-color: var(--primary-color, #0056b3);
+    color: var(--primary-color, #0056b3);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -99,14 +99,14 @@ h2 {
 }
 
 .week-selector button.active {
-    background: var(--primary-blue);
+    background: var(--primary-color, #0056b3);
     color: white;
     box-shadow: 0 4px 12px rgba(0, 115, 207, 0.3);
 }
 
 .week-selector button:hover:not(.active) {
     background: #f8fafc;
-    color: var(--primary-blue);
+    color: var(--primary-color, #0056b3);
 }
 
 /* Day Groups */
@@ -336,12 +336,12 @@ h2 {
 
 .toggle-attendees-btn:hover,
 .toggle-attendees-btn.active {
-    color: var(--primary-blue);
+    color: var(--primary-color, #0056b3);
 }
 
 .toggle-attendees-btn:hover .group-icon,
 .toggle-attendees-btn.active .group-icon {
-    color: var(--primary-blue);
+    color: var(--primary-color, #0056b3);
 }
 
 .chevron {
@@ -384,7 +384,7 @@ h2 {
 .attendee-avatar {
     width: 36px;
     height: 36px;
-    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+    background: linear-gradient(135deg, var(--primary-color, #0056b3) 0%, var(--primary-color, #004494) 100%);
     color: white;
     border-radius: 50%;
     display: flex;
@@ -476,7 +476,7 @@ h2 {
 }
 
 .btn-book {
-    background: var(--primary-blue);
+    background: var(--primary-color, #0056b3);
     color: white;
     box-shadow: 0 4px 6px rgba(0, 115, 207, 0.2);
 }
@@ -484,7 +484,7 @@ h2 {
 .btn-book:hover:not([disabled]) {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(0, 115, 207, 0.3);
-    background: #0062b3;
+    filter: brightness(0.9);
 }
 
 .btn-book:disabled {
@@ -568,7 +568,7 @@ h2 {
 
 .header-icon {
     font-size: 24px;
-    color: var(--primary-blue);
+    color: var(--primary-color, #0056b3);
     background: #eff6ff;
     padding: 8px;
     border-radius: 12px;
@@ -637,7 +637,7 @@ h2 {
 }
 
 .indicator-icon {
-    color: var(--primary-blue);
+    color: var(--primary-color, #0056b3);
     font-size: 20px;
 }
 
@@ -725,13 +725,13 @@ h2 {
 .modern-input:focus,
 .modern-input:focus-within {
     background: white;
-    border-color: var(--primary-blue);
+    border-color: var(--primary-color, #0056b3);
     box-shadow: 0 0 0 4px rgba(0, 115, 207, 0.1);
     outline: none;
 }
 
 .input-with-icon:focus-within .input-icon {
-    color: var(--primary-blue);
+    color: var(--primary-color, #0056b3);
 }
 
 .select-wrapper {
@@ -784,7 +784,7 @@ h2 {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--primary-blue);
+    background: var(--primary-color, #0056b3);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -797,7 +797,7 @@ h2 {
 }
 
 .btn-primary-action:hover {
-    background: var(--primary-blue-dark);
+    filter: brightness(0.9);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0, 115, 207, 0.3);
 }
@@ -956,7 +956,7 @@ h2 {
 
 .btn-icon-action.edit:hover {
     background: #eff6ff;
-    color: var(--primary-blue);
+    color: var(--primary-color, #0056b3);
 }
 
 .btn-icon-action.delete:hover {
@@ -1056,9 +1056,9 @@ h2 {
 }
 
 .dog-checkbox input:checked+.dog-label {
-    border-color: var(--primary-blue);
+    border-color: var(--primary-color, #0056b3);
     background: #eff6ff;
-    color: var(--primary-blue);
+    color: var(--primary-color, #0056b3);
     box-shadow: 0 4px 6px rgba(0, 115, 207, 0.1);
 }
 
@@ -1170,7 +1170,7 @@ h2 {
 }
 
 .btn-confirm {
-    background-color: var(--primary-blue);
+    background-color: var(--primary-color, #0056b3);
     color: white;
     border: none;
     padding: 8px 16px;

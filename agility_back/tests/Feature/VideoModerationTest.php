@@ -108,4 +108,37 @@ class VideoModerationTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_permite_al_staff_editar_y_borrar_cualquier_video_sin_ser_propietario()
+    {
+        $staff = User::factory()->create(['role' => 'staff', 'club_id' => $this->club->id]);
+        
+        $uploader = User::factory()->create(['role' => 'member', 'club_id' => $this->club->id]);
+        $dogOwner = User::factory()->create(['role' => 'member', 'club_id' => $this->club->id]);
+        $dog = Dog::factory()->create(['user_id' => $dogOwner->id, 'club_id' => $this->club->id]);
+        
+        // Un miembro cualquiera sube un vídeo del perro de otro miembro
+        $video = Video::factory()->create([
+            'user_id' => $uploader->id,
+            'dog_id' => $dog->id,
+            'club_id' => $this->club->id,
+            'title' => 'Video original'
+        ]);
+
+        // El staff (que no lo subió ni es dueño del perro) intenta editarlo
+        $responseEdit = $this->actingAs($staff)->postJson("/api/videos/{$video->id}", [
+            'title' => 'Editado por moderación',
+            'dog_id' => $dog->id,
+            'date' => now()->format('Y-m-d')
+        ]);
+
+        $responseEdit->assertStatus(200);
+        $this->assertEquals('Editado por moderación', $video->fresh()->title);
+
+        // El staff intenta borrarlo
+        $responseDelete = $this->actingAs($staff)->postJson("/api/videos/{$video->id}/delete");
+        
+        $responseDelete->assertStatus(200);
+        $this->assertDatabaseMissing('videos', ['id' => $video->id]);
+    }
 }

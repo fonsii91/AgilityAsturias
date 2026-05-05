@@ -9,11 +9,12 @@ import { FichaPerroComponent } from '../ficha-perro/ficha-perro.component';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 import { getEmojiForCategory } from '../../utils/point-categories';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-ranking',
     standalone: true,
-    imports: [CommonModule, FichaPerroComponent, MatTooltipModule, InstruccionesComponent],
+    imports: [CommonModule, RouterModule, FichaPerroComponent, MatTooltipModule, InstruccionesComponent],
     templateUrl: './ranking.component.html',
     styleUrls: ['./ranking.component.css']
 })

@@ -1,21 +1,22 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 import { DogService } from '../../services/dog.service';
 import { Dog } from '../../models/dog.model';
 import { getEmojiForCategory } from '../../utils/point-categories';
 
 @Component({
-  selector: 'app-dar-puntos-extra-dialog',
+  selector: 'app-modificar-puntos',
   standalone: true,
   imports: [CommonModule, FormsModule, MatSnackBarModule],
-  templateUrl: './dar-puntos-extra-dialog.component.html',
-  styleUrl: './dar-puntos-extra-dialog.component.css'
+  templateUrl: './modificar-puntos.component.html',
+  styleUrl: './modificar-puntos.component.css'
 })
-export class DarPuntosExtraDialogComponent implements OnInit {
-  dialogRef = inject(MatDialogRef<DarPuntosExtraDialogComponent>);
+export class ModificarPuntosComponent implements OnInit {
+  router = inject(Router);
+  location = inject(Location);
   dogService = inject(DogService);
   snackBar = inject(MatSnackBar);
 
@@ -75,7 +76,7 @@ export class DarPuntosExtraDialogComponent implements OnInit {
   }
 
   onCancel() {
-    this.dialogRef.close();
+    this.router.navigate(['/ranking']);
   }
 
   async onSubmit() {
@@ -97,7 +98,7 @@ export class DarPuntosExtraDialogComponent implements OnInit {
         duration: 3000,
         panelClass: ['success-snackbar']
       });
-      this.dialogRef.close(true);
+      this.router.navigate(['/ranking']);
     } catch (error) {
       console.error('Error al modificar puntos', error);
       this.snackBar.open('Error al modificar los puntos.', 'Cerrar', {

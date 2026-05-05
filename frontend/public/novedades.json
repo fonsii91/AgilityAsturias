@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.1.37",
+    "date": "2026-05-05",
+    "features": [
+      "¡Tus vídeos a lo grande! Hemos ajustado el tamaño de la galería en los teléfonos móviles para que las grabaciones aprovechen todo el ancho de tu pantalla.",
+      "Hemos simplificado la forma de registrar el esfuerzo tras cada entrenamiento. Ahora podrás valorar el nivel de cansancio de tu perro en una escala del 1 al 5, haciendo que sea mucho más rápido e intuitivo llevar al día su salud deportiva.",
+      "Limpieza general: hemos retirado algunos apartados inactivos del menú principal para que tu navegación por la plataforma sea aún más directa y sin distracciones."
+    ],
+    "bugfixes": [
+      "Hemos implementado refuerzos de seguridad invisibles en el registro de competiciones para garantizar que tu historial deportivo y el de tu perro estén siempre a salvo y ordenados."
+    ]
+  },
+  {
     "version": "1.1.36",
     "date": "2026-05-04",
     "features": [

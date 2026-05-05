@@ -6,7 +6,6 @@ import { AuthService } from '../../services/auth.service';
 import { NotificationService, AppNotification } from '../../services/notification.service';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { DarPuntosExtraDialogComponent } from '../dar-puntos-extra-dialog/dar-puntos-extra-dialog.component';
 import { SugerenciaDialog } from '../sugerencias/sugerencia-dialog/sugerencia-dialog';
 import { environment } from '../../../environments/environment';
 
@@ -86,14 +85,6 @@ export class NavbarComponent {
             } else if (notif.type.includes('NewAnnouncementNotification') || notif.data.type === 'announcement') {
                 this.router.navigate(['/tablon-anuncios']);
             }
-        });
-    }
-
-    openExtraPointsDialog() {
-        this.closeMenu();
-        this.dialog.open(DarPuntosExtraDialogComponent, {
-            width: '400px',
-            maxWidth: '90vw'
         });
     }
 

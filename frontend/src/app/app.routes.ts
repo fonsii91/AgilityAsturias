@@ -196,6 +196,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'admin/puntos-extra',
+        loadComponent: () => import('./components/modificar-puntos/modificar-puntos.component').then(m => m.ModificarPuntosComponent),
+        canActivate: [staffGuard],
+        title: titleResolver, data: { pageTitle: 'Modificar Puntos' }
+    },
+    {
         path: 'login',
         component: LoginComponent,
         title: titleResolver, data: { pageTitle: '' }

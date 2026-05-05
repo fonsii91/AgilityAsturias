@@ -99,29 +99,54 @@ describe('UploadVideoComponent', () => {
         expect(toastServiceMock.success).toHaveBeenCalledWith('Vídeo subido exitosamente.');
     });
 
-    it('should correctly filter pastAndCurrentCompetitions when dates have timestamps', () => {
-        // Today is dynamically evaluated in the component, so we mock dates relative to today
+    it('should correctly filter and limit pastAndCurrentCompetitions to 10 events', () => {
         const today = new Date();
         
-        const pastDate = new Date(today);
-        pastDate.setDate(today.getDate() - 5);
-        
+        // Generate 12 past dates
+        const comps = Array.from({ length: 12 }, (_, i) => {
+            const date = new Date(today);
+            date.setDate(today.getDate() - (i + 1));
+            return { id: i + 1, nombre: `Past Comp ${i + 1}`, fechaEvento: date.toISOString().replace('Z', '.000000Z') };
+        });
+
+        // Add 1 future date
         const futureDate = new Date(today);
         futureDate.setDate(today.getDate() + 5);
+        comps.push({ id: 13, nombre: 'Future Comp', fechaEvento: futureDate.toISOString().replace('Z', '.000000Z') });
 
-        // Format dates as strings with timestamps similar to backend
-        const pastDateString = pastDate.toISOString().replace('Z', '.000000Z');
-        const futureDateString = futureDate.toISOString().replace('Z', '.000000Z');
-
-        compServiceMock.getCompetitions.mockReturnValue(signal([
-            { id: 1, nombre: 'Past Comp', fechaEvento: pastDateString },
-            { id: 2, nombre: 'Future Comp', fechaEvento: futureDateString }
-        ]));
+        compServiceMock.getCompetitions.mockReturnValue(signal(comps));
 
         const filtered = component.pastAndCurrentCompetitions;
         
-        expect(filtered.length).toBe(1);
-        expect(filtered[0].id).toBe(1);
-        expect(filtered[0].nombre).toBe('Past Comp');
+        // Should not include the future date, and should be limited to 10
+        expect(filtered.length).toBe(10);
+        expect(filtered.some(c => c.nombre === 'Future Comp')).toBe(false);
+    });
+
+    it('should correctly sort dogs into two blocks: attending first (alphabetical) then rest (alphabetical)', () => {
+        // Setup dogs
+        dogServiceMock.getAllDogs.mockReturnValue(signal([
+            { id: 1, name: 'Zebra' },
+            { id: 2, name: 'Alpha' },
+            { id: 3, name: 'Beta' },
+            { id: 4, name: 'Charlie' }
+        ]));
+
+        // Setup a competition with Alpha and Zebra attending
+        compServiceMock.getCompetitions.mockReturnValue(signal([
+            { id: 99, allAttendingDogIds: [1, 2] }
+        ]));
+
+        component.uploadForm.patchValue({ competition_id: 99 });
+
+        const sorted = component.sortedDogs;
+
+        expect(sorted.length).toBe(4);
+        // First block: Attending dogs (Alpha, Zebra), alphabetically sorted
+        expect(sorted[0].name).toBe('Alpha');
+        expect(sorted[1].name).toBe('Zebra');
+        // Second block: Non-attending dogs (Beta, Charlie), alphabetically sorted
+        expect(sorted[2].name).toBe('Beta');
+        expect(sorted[3].name).toBe('Charlie');
     });
 });

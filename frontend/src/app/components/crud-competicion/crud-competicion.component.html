@@ -49,6 +49,27 @@
   <!-- LIST VIEW -->
   @if (!showForm()) {
     <div class="list-view">
+      
+      <!-- TABS -->
+      <div class="tabs-container" style="display: flex; gap: 1rem; margin-bottom: 1.5rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+        <button class="tab-button" 
+                [class.active]="activeTab() === 'proximos'" 
+                (click)="setTab('proximos')"
+                style="background: none; border: none; font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 6px; transition: all 0.2s;"
+                [style.background]="activeTab() === 'proximos' ? '#f1f5f9' : 'transparent'"
+                [style.color]="activeTab() === 'proximos' ? '#0f172a' : '#64748b'">
+          Próximos Eventos
+        </button>
+        <button class="tab-button" 
+                [class.active]="activeTab() === 'pasados'" 
+                (click)="setTab('pasados')"
+                style="background: none; border: none; font-weight: 500; cursor: pointer; padding: 0.5rem 1rem; border-radius: 6px; transition: all 0.2s;"
+                [style.background]="activeTab() === 'pasados' ? '#f1f5f9' : 'transparent'"
+                [style.color]="activeTab() === 'pasados' ? '#0f172a' : '#64748b'">
+          Eventos Anteriores <span style="font-size: 0.75em; padding: 2px 6px; border-radius: 10px; background: #e2e8f0; color: #475569; margin-left: 4px;">Histórico</span>
+        </button>
+      </div>
+
       <div class="table-responsive">
         <table class="table">
           <thead>
@@ -60,7 +81,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (comp of competitions(); track comp) {
+            @for (comp of displayedEvents(); track comp) {
               <tr>
                 <td [class.border-comp]="!comp.tipo || comp.tipo === 'competicion'"
                   [class.border-other]="comp.tipo === 'otros'">
@@ -83,22 +104,45 @@
                   <button class="btn-icon edit" (click)="editCompetition(comp)" title="Editar">
                     <mat-icon>edit</mat-icon>
                   </button>
-                  <button class="btn-icon delete" (click)="deleteCompetition(comp.id)" title="Eliminar">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                  @if (activeTab() === 'proximos') {
+                    <button class="btn-icon delete" (click)="deleteCompetition(comp.id)" title="Eliminar">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  } @else {
+                    <button class="btn-icon delete" disabled title="No se pueden borrar eventos históricos" style="opacity: 0.3; cursor: not-allowed;">
+                      <mat-icon>lock</mat-icon>
+                    </button>
+                  }
                 </td>
               </tr>
             }
-            @if (competitions().length === 0) {
+            @if (displayedEvents().length === 0) {
               <tr>
-                <td colspan="5" class="empty-msg">
-                  No hay eventos registrados actualmente.
+                <td colspan="5" class="empty-msg" style="text-align: center; padding: 2rem;">
+                  @if (activeTab() === 'proximos') {
+                    No hay eventos próximos registrados actualmente.
+                  } @else {
+                    No hay eventos en el historial.
+                  }
                 </td>
               </tr>
             }
           </tbody>
         </table>
       </div>
+
+      <!-- PAGINATION -->
+      @if (totalPages() > 1) {
+        <div class="pagination" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem;">
+          <button (click)="prevPage()" [disabled]="currentPage() === 1" class="btn-icon" style="background: #f1f5f9; border-radius: 50%; padding: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid #cbd5e1; cursor: pointer;">
+            <mat-icon style="font-size: 20px; width: 20px; height: 20px; color: #475569;">chevron_left</mat-icon>
+          </button>
+          <span style="font-size: 0.9rem; color: #475569; font-weight: 500;">Página {{ currentPage() }} de {{ totalPages() }}</span>
+          <button (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="btn-icon" style="background: #f1f5f9; border-radius: 50%; padding: 4px; display: flex; align-items: center; justify-content: center; border: 1px solid #cbd5e1; cursor: pointer;">
+            <mat-icon style="font-size: 20px; width: 20px; height: 20px; color: #475569;">chevron_right</mat-icon>
+          </button>
+        </div>
+      }
     </div>
   }
 

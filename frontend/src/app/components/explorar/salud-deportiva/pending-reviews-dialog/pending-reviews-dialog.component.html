@@ -85,7 +85,7 @@
           <div class="intensity-header d-flex align-items-center justify-content-between mb-3">
             <label class="mb-0" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">Esfuerzo
               Percibido</label>
-            <div class="intensity-badge">
+            <div class="intensity-badge" [style.backgroundColor]="getRpeColor(pending.intensity_rpe)" style="transition: background-color 0.3s ease;">
               <mat-icon class="emoji-indicator" style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">{{
                 getIconForIntensity(pending.intensity_rpe) }}</mat-icon>
               {{ pending.intensity_rpe }} <small>/ 10</small>
@@ -94,7 +94,8 @@
 
           <div class="intensity-slider-wrap" style="flex-direction: column; align-items: stretch; gap: 8px;">
             <input type="range" class="custom-range premium-range" [ngModel]="pending.intensity_rpe"
-              (ngModelChange)="updateRpe(pending, $event)" min="1" max="10" step="1" style="width: 100%;">
+              (ngModelChange)="updateRpe(pending, $event)" min="1" max="10" step="1" style="width: 100%;"
+              [style.--rpe-color]="getRpeColor(pending.intensity_rpe)">
             <div class="d-flex justify-content-between w-100 px-1">
               <span class="slider-label text-muted d-flex align-items-center"
                 style="font-size: 0.75rem; min-width: auto;"><mat-icon class="mr-1"

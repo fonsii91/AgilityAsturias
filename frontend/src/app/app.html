@@ -42,7 +42,7 @@
             <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">sports_score</span> Eventos</a></li>
             <li><a routerLink="/info-reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">visibility</span> Monitor Reservas</a></li>
             <li><a routerLink="/admin/asistencia" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">fact_check</span> Verificar Asistencia</a></li>
-            <li><a (click)="openExtraPointsDialog(); sidenav.close()" style="cursor: pointer;"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
+            <li><a routerLink="/admin/puntos-extra" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">military_tech</span> Puntos Extra</a></li>
             <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">people</span> Gestión Miembros</a></li>
             <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">calendar_month</span> Gestión Horarios</a></li>
           }
@@ -51,6 +51,7 @@
           @if (authService.isManager()) {
             <li class="mobile-nav-divider">Gestor</li>
             <li><a routerLink="/admin/clubs/edit/{{ tenantService.tenantInfo()?.id }}" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">settings</span> Configurar Club</a></li>
+            <li><a routerLink="/gestor/landing-page" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">design_services</span> Diseño P. Bienvenida</a></li>
           }
 
           <!-- Administrar Section -->

@@ -11,8 +11,8 @@ export const environment = {
     },
     apiUrl: 'http://agility_back.test/api',
     clubConfig: {
-        name: "Agility Asturias",
-        slogan: "Más que un deporte, una conexión única con tu perro.",
+        name: "Nombre del Club",
+        slogan: "Slogan de tu club",
         logoPath: "ClubAgilityBlue.png",
         colors: {
             primary: "#0073CF",
@@ -20,16 +20,16 @@ export const environment = {
             warn: "#EF4444"
         },
         social: {
-            instagram: "https://www.instagram.com/agility.asturias/",
-            facebook: "https://www.facebook.com/AgilityAsturias/photos"
+            instagram: "",
+            facebook: ""
         },
         contact: {
-            phone: "633 48 43 45",
-            whatsappId: "34633484345",
-            email: "agilityasturias@gmail.com",
-            addressLine1: "Antigüo Campo de fútbol La Salle",
-            addressLine2: "Langreo, Asturias, CP: 33939",
-            mapUrl: "https://maps.google.com/maps?q=Agility+Asturias,+Langreo&t=&z=15&ie=UTF8&iwloc=&output=embed"
+            phone: "000 000 000",
+            whatsappId: "34000000000",
+            email: "contacto@tuclub.com",
+            addressLine1: "Dirección de tu club",
+            addressLine2: "Ciudad, Provincia",
+            mapUrl: "https://maps.google.com/maps?q=Madrid&t=&z=15&ie=UTF8&iwloc=&output=embed"
         },
         homeConfig: {
             heroImage: "Images/Perros/Pumba.jpeg",

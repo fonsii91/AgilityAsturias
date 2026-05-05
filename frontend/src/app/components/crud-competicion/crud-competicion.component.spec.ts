@@ -71,17 +71,54 @@ describe('CrudCompeticionComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should sort competitions by date robustly, ignoring timestamps', () => {
-        // Change the mock to inject a timestamp
+    it('should split and sort competitions into proximos and pasados correctly', () => {
+        const todayDate = new Date();
+        const pastDate = new Date(todayDate);
+        pastDate.setDate(todayDate.getDate() - 10);
+        const futureDate1 = new Date(todayDate);
+        futureDate1.setDate(todayDate.getDate() + 5);
+        const futureDate2 = new Date(todayDate);
+        futureDate2.setDate(todayDate.getDate() + 10);
+
         mockCompetitions.set([
-            { id: 1, nombre: 'Comp 1', fechaEvento: '2026-08-15T23:00:00.000000Z' },
-            { id: 2, nombre: 'Comp 2', fechaEvento: '2026-08-10' }
+            { id: 1, nombre: 'Past Comp', fechaEvento: pastDate.toISOString().replace('Z', '.000000Z') },
+            { id: 2, nombre: 'Future Comp 1', fechaEvento: futureDate1.toISOString().replace('Z', '.000000Z') },
+            { id: 3, nombre: 'Future Comp 2', fechaEvento: futureDate2.toISOString().replace('Z', '.000000Z') }
         ]);
 
-        const sorted = component.competitions();
-        // Since we changed it to dateA - dateB (ascending), 2026-08-10 should come before 2026-08-15
-        expect(sorted[0].id).toBe(2); 
-        expect(sorted[1].id).toBe(1);
+        // Próximos: Future 1 then Future 2 (Ascending)
+        const proximos = component.proximosEventos();
+        expect(proximos.length).toBe(2);
+        expect(proximos[0].id).toBe(2);
+        expect(proximos[1].id).toBe(3);
+
+        // Pasados: Past Comp (Descending)
+        const pasados = component.eventosPasados();
+        expect(pasados.length).toBe(1);
+        expect(pasados[0].id).toBe(1);
+    });
+
+    it('should paginate displayedEvents correctly', () => {
+        const todayDate = new Date();
+        const comps = Array.from({ length: 15 }, (_, i) => {
+            const futureDate = new Date(todayDate);
+            futureDate.setDate(todayDate.getDate() + i + 1);
+            return { id: i + 1, nombre: `Comp ${i}`, fechaEvento: futureDate.toISOString() };
+        });
+        
+        mockCompetitions.set(comps);
+        
+        component.setTab('proximos');
+        component.pageSize = 10;
+        
+        expect(component.displayedEvents().length).toBe(10);
+        expect(component.totalPages()).toBe(2);
+        
+        component.nextPage();
+        expect(component.displayedEvents().length).toBe(5);
+        
+        component.prevPage();
+        expect(component.displayedEvents().length).toBe(10);
     });
 
     it('should init new competition form', () => {

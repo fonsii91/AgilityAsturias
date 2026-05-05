@@ -1,14 +1,16 @@
 import { signal, Injector, runInInjectionContext } from '@angular/core';
-import { DarPuntosExtraDialogComponent } from './dar-puntos-extra-dialog.component';
+import { ModificarPuntosComponent } from './modificar-puntos.component';
 import { TestBed } from '@angular/core/testing';
-import { MatDialogRef } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { DogService } from '../../services/dog.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-describe('DarPuntosExtraDialogComponent', () => {
-  let component: DarPuntosExtraDialogComponent;
+describe('ModificarPuntosComponent', () => {
+  let component: ModificarPuntosComponent;
   let mockDogService: any;
-  let mockDialogRef: any;
+  let mockRouter: any;
+  let mockLocation: any;
   let mockSnackBar: any;
 
   beforeEach(() => {
@@ -21,8 +23,12 @@ describe('DarPuntosExtraDialogComponent', () => {
       giveExtraPoints: vi.fn().mockResolvedValue({})
     };
 
-    mockDialogRef = {
-      close: vi.fn()
+    mockRouter = {
+      navigate: vi.fn()
+    };
+    
+    mockLocation = {
+      back: vi.fn()
     };
 
     mockSnackBar = {
@@ -31,7 +37,8 @@ describe('DarPuntosExtraDialogComponent', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: MatDialogRef, useValue: mockDialogRef },
+        { provide: Router, useValue: mockRouter },
+        { provide: Location, useValue: mockLocation },
         { provide: DogService, useValue: mockDogService },
         { provide: MatSnackBar, useValue: mockSnackBar }
       ]
@@ -39,7 +46,7 @@ describe('DarPuntosExtraDialogComponent', () => {
 
     const injector = TestBed.inject(Injector);
     runInInjectionContext(injector, () => {
-      component = new DarPuntosExtraDialogComponent();
+      component = new ModificarPuntosComponent();
     });
   });
 
@@ -98,7 +105,7 @@ describe('DarPuntosExtraDialogComponent', () => {
 
     expect(mockDogService.giveExtraPoints).toHaveBeenCalledWith(1, 2, 'Puntualidad');
     expect(mockSnackBar.open).toHaveBeenCalledWith('¡Puntos otorgados exitosamente!', 'Cerrar', expect.any(Object));
-    expect(mockDialogRef.close).toHaveBeenCalledWith(true);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/ranking']);
   });
 
   it('should call giveExtraPoints with negative points', async () => {
@@ -111,7 +118,7 @@ describe('DarPuntosExtraDialogComponent', () => {
 
     expect(mockDogService.giveExtraPoints).toHaveBeenCalledWith(2, -3, 'Caca');
     expect(mockSnackBar.open).toHaveBeenCalledWith('¡Puntos quitados exitosamente!', 'Cerrar', expect.any(Object));
-    expect(mockDialogRef.close).toHaveBeenCalledWith(true);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/ranking']);
   });
 
   it('should handle custom category correctly in submit', async () => {
@@ -136,7 +143,8 @@ describe('DarPuntosExtraDialogComponent', () => {
     await component.onSubmit();
 
     expect(mockSnackBar.open).toHaveBeenCalledWith('Error al modificar los puntos.', 'Cerrar', expect.any(Object));
-    expect(mockDialogRef.close).not.toHaveBeenCalled();
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
     expect(component.isLoading).toBe(false);
   });
 });
+

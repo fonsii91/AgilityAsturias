@@ -143,6 +143,27 @@ class MemberVideoTest extends TestCase
         $this->assertNotEquals('Hackeado', $video->fresh()->title);
     }
 
+    public function test_permite_al_dueno_del_perro_editar_el_video_aunque_no_lo_haya_subido()
+    {
+        // Un usuario distinto (otherUser) sube un vídeo de NUESTRO perro (dog)
+        $video = Video::factory()->create([
+            'user_id' => $this->otherUser->id,
+            'dog_id' => $this->dog->id,
+            'club_id' => $this->club->id,
+            'title' => 'Video original'
+        ]);
+
+        // Nosotros (dueños del perro) intentamos editar el vídeo que subió otherUser
+        $response = $this->actingAs($this->user)->postJson("/api/videos/{$video->id}", [
+            'title' => 'Editado por el dueño',
+            'dog_id' => $this->dog->id,
+            'date' => now()->format('Y-m-d')
+        ]);
+
+        $response->assertStatus(200);
+        $this->assertEquals('Editado por el dueño', $video->fresh()->title);
+    }
+
     public function test_permite_al_propietario_borrar_su_video()
     {
         Storage::fake('public');

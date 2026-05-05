@@ -116,7 +116,7 @@ class VideoController extends Controller
             $query->latest()->orderBy('id', 'desc');
         }
 
-        $perPage = $request->has('per_page') ? min((int) $request->per_page, 100) : 10;
+        $perPage = $request->has('per_page') ? min((int) $request->per_page, 100) : 9;
         $videos = $query->paginate($perPage);
         
         $responseArray = $videos->toArray();
@@ -339,7 +339,7 @@ class VideoController extends Controller
                      ->where('in_public_gallery', true)
                      ->where('is_public', true); // Must be explicitly public
 
-        $videos = $query->latest()->paginate(20);
+        $videos = $query->latest()->paginate(9);
         return response()->json($videos);
     }
 

@@ -84,16 +84,25 @@ export class UploadVideoComponent implements OnInit {
 
     get sortedDogs(): Dog[] {
         const dogs = this.dogService.getAllDogs()() || [];
-        const userId = this.authService.currentUserSignal()?.id;
-        if (!userId) {
-            return [...dogs].sort((a, b) => a.name.localeCompare(b.name));
+        
+        // Check if there is a selected competition
+        const selectedCompId = this.uploadForm.get('competition_id')?.value;
+        let attendingDogIds: number[] = [];
+        if (selectedCompId) {
+            const comp = this.compService.getCompetitions()().find(c => c.id == selectedCompId);
+            if (comp && comp.allAttendingDogIds) {
+                attendingDogIds = comp.allAttendingDogIds;
+            }
         }
 
         return [...dogs].sort((a, b) => {
-            const aIsMine = this.hasDogUser(a, userId);
-            const bIsMine = this.hasDogUser(b, userId);
-            if (aIsMine && !bIsMine) return -1;
-            if (!aIsMine && bIsMine) return 1;
+            // Priority 1: Dogs attending the selected competition
+            const aIsAttending = attendingDogIds.includes(a.id);
+            const bIsAttending = attendingDogIds.includes(b.id);
+            if (aIsAttending && !bIsAttending) return -1;
+            if (!aIsAttending && bIsAttending) return 1;
+            
+            // Priority 2: Alphabetical
             return a.name.localeCompare(b.name);
         });
     }
@@ -111,12 +120,17 @@ export class UploadVideoComponent implements OnInit {
     get pastAndCurrentCompetitions(): import('../../../models/competition.model').Competition[] {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        return this.compService.getCompetitions()().filter(comp => {
-            if (!comp.fechaEvento) return true;
-            const parts = comp.fechaEvento.substring(0, 10).split('-');
-            const compDate = parts.length === 3 ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])) : new Date(0);
-            return compDate.getTime() <= today.getTime();
-        });
+
+        return this.compService.getCompetitions()()
+            .filter(comp => {
+                if (!comp.fechaEvento) return true;
+                const parts = comp.fechaEvento.substring(0, 10).split('-');
+                const compDate = parts.length === 3 ? new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2])) : new Date(0);
+                
+                // Show if it has already started (time <= today)
+                return compDate.getTime() <= today.getTime();
+            })
+            .slice(0, 10); // Maximum of 10 recent events to keep mobile UI extremely clean
     }
 
     async onFileSelected(event: any) {
