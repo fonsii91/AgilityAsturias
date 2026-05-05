@@ -71,8 +71,8 @@ describe('DogDocsComponent', () => {
   });
 
   it('should calculate category based on dog height', () => {
-    // 45cm falls into "Intermediate (I) - 45cm"
-    expect(component.calculatedCategory).toBe('Intermediate (I) - 45cm');
+    // 45cm falls into "I" (Intermediate)
+    expect(component.getAutoRsceCategory()).toBe('I');
   });
 
   it('should call updateDog on saveChanges', async () => {

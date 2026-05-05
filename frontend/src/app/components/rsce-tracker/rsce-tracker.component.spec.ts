@@ -214,7 +214,7 @@ describe('RsceTrackerComponent', () => {
     const today = new Date();
     const pastDateStr = new Date(today.getTime() - 86400000).toISOString().replace('Z', '.000000Z');
     competitionsSignal.set([
-      { id: 1, fechaEvento: pastDateStr }
+      { id: 1, fechaEvento: pastDateStr, federacion: 'RSCE' }
     ]);
     
     expect(component.pastAndCurrentCompetitions().length).toBe(1);

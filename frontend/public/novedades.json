@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.1.38",
+    "date": "2026-05-06",
+    "features": [
+      "¡Más fácil de entender! Hemos cambiado las siglas técnicas por términos más cercanos. A partir de ahora verás 'Canina' y 'Caza' en los apartados de competición para que sea mucho más intuitivo registrar las carreras.",
+      "¡El papeleo se hace solo! Ahora la aplicación calculará automáticamente tu categoría de guía deportivo basándose en tu año de nacimiento, ahorrándote tener que revisar el reglamento.",
+      "¡Nunca más perderás tus cambios! Hemos añadido una cómoda barra flotante inteligente que te avisará si tienes modificaciones sin guardar en el perfil y entrenamientos de tus peludos, asegurando que toda su información quede siempre bien registrada.",
+      "Hemos dado un toque más moderno y profesional al diseño del distintivo de 'Excelente a 0' en tu historial de pistas para que luzca aún mejor."
+    ],
+    "bugfixes": [
+      "Hemos ajustado visualmente los nombres de los documentos en la sección de Recursos para que se lean siempre de forma clara y nítida en cualquier pantalla."
+    ]
+  },
+  {
     "version": "1.1.37",
     "date": "2026-05-05",
     "features": [

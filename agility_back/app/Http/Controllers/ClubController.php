@@ -138,6 +138,16 @@ class ClubController extends Controller
             $settings = json_decode($settings, true);
         }
 
+        if (!isset($settings['homeConfig'])) {
+            $settings['homeConfig'] = [];
+        }
+        if (!isset($settings['homeConfig']['heroImage'])) {
+            $settings['homeConfig']['heroImage'] = '/Images/Salud/collie-cansancio-1.png';
+        }
+        if (!isset($settings['homeConfig']['ctaImage'])) {
+            $settings['homeConfig']['ctaImage'] = '/Images/Salud/collie-salto-alto.png';
+        }
+
         $club = Club::create([
             'name' => $validated['name'],
             'slug' => $validated['slug'],

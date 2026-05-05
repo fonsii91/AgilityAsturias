@@ -133,6 +133,7 @@ class ManagerRoleCapabilitiesTest extends TestCase
             'fecha_evento' => now()->addDays(5)->format('Y-m-d'),
             'location' => 'Club',
             'tipo' => 'competicion',
+            'federacion' => 'RSCE',
         ]);
 
         $response->assertStatus(201);

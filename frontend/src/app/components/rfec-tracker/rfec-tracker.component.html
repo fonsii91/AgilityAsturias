@@ -244,7 +244,7 @@
                       <td>{{ track.manga_type }}</td>
                       <td>{{ track.judge_name || '-' }}</td>
                       <td>
-                        <span class="badge" [ngClass]="track.qualification.toLowerCase().replace(' ', '')">
+                        <span class="badge" [ngClass]="track.qualification.toLowerCase().replaceAll(' ', '')">
                           {{ track.qualification }}
                         </span>
                       </td>

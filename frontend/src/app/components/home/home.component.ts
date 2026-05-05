@@ -26,13 +26,13 @@ export class HomeComponent {
 
     get heroImage() {
         const tenantImg = this.tenantService.tenantInfo()?.settings?.homeConfig?.heroImage;
-        const imagePath = tenantImg || (this.clubConfig as any).homeConfig?.heroImage || 'Images/Perros/Pumba.jpeg';
+        const imagePath = tenantImg || (this.clubConfig as any).homeConfig?.heroImage || 'Images/Salud/collie-cansancio-1.png';
         return imagePath.startsWith('http') ? imagePath : this.location.prepareExternalUrl(imagePath);
     }
 
     get ctaImage() {
         const tenantImg = this.tenantService.tenantInfo()?.settings?.homeConfig?.ctaImage;
-        const imagePath = tenantImg || (this.clubConfig as any).homeConfig?.ctaImage || 'Images/Perros/perro_saltando.jpg';
+        const imagePath = tenantImg || (this.clubConfig as any).homeConfig?.ctaImage || 'Images/Salud/collie-salto-alto.png';
         return imagePath.startsWith('http') ? imagePath : this.location.prepareExternalUrl(imagePath);
     }
 

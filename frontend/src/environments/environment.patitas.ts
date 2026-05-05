@@ -23,7 +23,8 @@ export const environment = {
             mapUrl: "https://maps.google.com/maps?q=Polideportivo+Gijon&t=&z=15&ie=UTF8&iwloc=&output=embed"
         },
         homeConfig: {
-            heroImage: "Images/Perros/Pumba.jpeg",
+            heroImage: "Images/Salud/collie-cansancio-1.png",
+            ctaImage: "Images/Salud/collie-salto-alto.png",
             services: {
                 title: "Nuestros Servicios",
                 subtitle: "Descubre todo lo que ofrecemos para ti y tu perro.",

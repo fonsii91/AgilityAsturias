@@ -81,14 +81,14 @@ describe('Perfil Component', () => {
     });
 
     it('should allow editing and saving name', async () => {
-        component.toggleEditName();
+        component.toggleEditProfile();
         fixture.detectChanges();
 
-        component.editedName.set('New Name');
-        await component.saveName();
+        component.editedName = 'New Name';
+        await component.saveProfile();
 
         expect(mockAuthService.updateProfileCalledWith[0]).toBe('New Name');
-        expect(mockToastService.successCalledWith).toBe('Nombre actualizado correctamente');
+        expect(mockToastService.successCalledWith).toBe('Perfil actualizado correctamente');
     });
 
     it('should allow editing and saving RFEC data', async () => {

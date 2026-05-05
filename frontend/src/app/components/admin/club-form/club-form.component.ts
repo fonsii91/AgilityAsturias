@@ -852,7 +852,10 @@ export class ClubFormComponent implements OnInit {
     { name: 'Midnight Purple', primary: '#4C1D95', accent: '#DB2777' },
     { name: 'Ocean Deep', primary: '#0F766E', accent: '#F43F5E' },
     { name: 'Slate & Amber', primary: '#334155', accent: '#F59E0B' },
-    { name: 'Crimson Red', primary: '#BE123C', accent: '#1E3A8A' }
+    { name: 'Crimson Red', primary: '#BE123C', accent: '#1E3A8A' },
+    { name: 'Sunset Energy', primary: '#EA580C', accent: '#4338CA' },
+    { name: 'Obsidian Black', primary: '#0F172A', accent: '#10B981' },
+    { name: 'Royal Amethyst', primary: '#6D28D9', accent: '#14B8A6' }
   ];
 
   applyPalette(palette: { primary: string, accent: string }) {
