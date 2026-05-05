@@ -17,32 +17,52 @@
     </div>
     <div class="profile-info">
       <div class="name-edit-container">
-        @if (!isEditingName()) {
+        @if (!isEditingProfile()) {
         <div class="name-display">
           <h2 style="color: var(--primary-color, #1d4ed8);">{{ user.displayName }}</h2>
-          <button class="btn-icon-edit" (click)="toggleEditName()" title="Editar nombre">
+          <button class="btn-icon-edit" (click)="toggleEditProfile()" title="Editar perfil">
             <span class="material-icons-outlined">edit</span>
           </button>
         </div>
         }
-        @if (isEditingName()) {
-        <div class="name-input-group">
-          <input type="text" [(ngModel)]="editedName" (keyup.enter)="saveName()" class="edit-name-input"
-            style="border-color: var(--primary-color, #3b82f6);">
-          <div class="edit-actions">
-            <button class="btn-check" (click)="saveName()" [style.color]="'#22c55e'">
-              <span class="material-icons">check_circle</span>
-            </button>
-            <button class="btn-cancel-edit" (click)="toggleEditName()" style="color: #ef4444;">
-              <span class="material-icons">cancel</span>
+        @if (isEditingProfile()) {
+        <div class="profile-edit-form" style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.5rem; width: 100%; max-width: 380px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 1rem; margin-top: 0.5rem;">
+          <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem; color: #1e293b; display: flex; align-items: center; gap: 6px;">
+            <span class="material-icons-outlined" style="font-size: 1.2rem; color: var(--primary-color, #3b82f6);">manage_accounts</span> Editar Perfil
+          </h3>
+          <div style="margin-bottom: 1rem; display: flex; flex-direction: column; gap: 4px;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Nombre Completo</label>
+            <input type="text" [(ngModel)]="editedName" (keyup.enter)="saveProfile()" placeholder="Tu nombre" 
+              style="width: 100%; padding: 10px 12px; border: 2px solid transparent; border-radius: 8px; background: #f1f5f9; color: #1e293b; font-size: 0.95rem; font-family: inherit; transition: all 0.2s; box-sizing: border-box;">
+          </div>
+          <div style="margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 4px;">
+            <label style="font-size: 0.85rem; font-weight: 600; color: #475569;">Año de Nacimiento</label>
+            <input type="number" [(ngModel)]="editedBirthYear" (keyup.enter)="saveProfile()" placeholder="Ej: 1990"
+              style="width: 100%; padding: 10px 12px; border: 2px solid transparent; border-radius: 8px; background: #f1f5f9; color: #1e293b; font-size: 0.95rem; font-family: inherit; transition: all 0.2s; box-sizing: border-box;">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button (click)="toggleEditProfile()" style="flex: 1; padding: 0.6rem; background: white; border: 1px solid #cbd5e1; color: #475569; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Cancelar</button>
+            <button (click)="saveProfile()" style="flex: 1; padding: 0.6rem; background: var(--primary-color, #3b82f6); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: filter 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;">
+              <span class="material-icons-outlined" style="font-size: 1.1rem;">save</span> Guardar
             </button>
           </div>
         </div>
         }
       </div>
       <p>{{ user.email }}</p>
-      <span class="role-badge" [ngClass]="user.role">{{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase)
-        }}</span>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <span class="role-badge" [ngClass]="user.role">{{ user.role === 'user' ? 'Inactivo' : (user.role | titlecase) }}</span>
+        @if (user.birth_year && !isEditingProfile()) {
+        <span class="role-badge" style="background-color: #f1f5f9; color: #475569; text-transform: none; display: flex; align-items: center; gap: 4px;">
+          <span class="material-icons-outlined" style="font-size: 14px;">cake</span> {{ user.birth_year }}
+        </span>
+        }
+        @if (!user.birth_year && !isEditingProfile()) {
+        <span class="role-badge" (click)="toggleEditProfile()" style="background-color: transparent; border: 1px dashed #cbd5e1; color: #64748b; text-transform: none; display: flex; align-items: center; gap: 4px; cursor: pointer; transition: all 0.2s;">
+          <span class="material-icons-outlined" style="font-size: 14px;">add</span> Añadir nacimiento
+        </span>
+        }
+      </div>
 
     </div>
   </div>
@@ -52,7 +72,7 @@
       <div class="rfec-header" style="justify-content: space-between; align-items: center; display: flex; margin-bottom: 1rem;">
         <div style="display: flex; align-items: center; gap: 8px;">
           <span class="material-icons-outlined" style="color: var(--primary-color, #3b82f6);">badge</span>
-          <span>Licencia RFEC (Caza)</span>
+          <span>Licencia Caza (RFEC)</span>
         </div>
         @if (!isEditingRfec()) {
         <button class="btn-icon-edit" (click)="toggleEditRfec()" title="Editar Licencia" style="margin: 0; opacity: 0.6;">
@@ -72,6 +92,11 @@
             <span class="rfec-label" style="min-width: 90px;">Caducidad:</span>
             <span style="font-weight: 500; font-size: 1rem; color: #1e293b;">{{ user.rfec_expiration_date ? (user.rfec_expiration_date | date:'dd/MM/yyyy') : '-' }}</span>
           </div>
+
+          <div class="rfec-data-row">
+            <span class="rfec-label" style="min-width: 90px;">Categoría:</span>
+            <span style="font-weight: 500; font-size: 1rem; color: #1e293b;">{{ user.rfec_category || 'Absoluto' }}</span>
+          </div>
         </div>
       </div>
       } @else {
@@ -85,6 +110,16 @@
           <span class="material-icons-outlined input-icon">event</span>
           <input type="date" [(ngModel)]="rfecData.expiration" class="rfec-input"
             style="border-color: var(--primary-color, #3b82f6);">
+        </div>
+
+        <div class="rfec-input-row">
+          <span class="material-icons-outlined input-icon">person</span>
+          <select [(ngModel)]="rfecData.category" class="rfec-input" style="border-color: var(--primary-color, #3b82f6); background: white;">
+            <option value="">Absoluto (Regular)</option>
+            <option value="Infantil">Infantil</option>
+            <option value="Junior">Junior</option>
+            <option value="Senior">Sénior / Veterano</option>
+          </select>
         </div>
         <div class="rfec-actions">
           <button class="rfec-btn-save" (click)="saveRfec()" style="background-color: var(--primary-color, #3b82f6);">Guardar</button>

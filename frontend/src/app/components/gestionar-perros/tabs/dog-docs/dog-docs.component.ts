@@ -5,6 +5,7 @@ import { DogStateService } from '../../services/dog-state.service';
 import { ToastService } from '../../../../services/toast.service';
 import { DogService } from '../../../../services/dog.service';
 import { environment } from '../../../../../environments/environment';
+import { AuthService } from '../../../../services/auth.service';
 
 @Component({
   selector: 'app-dog-docs',
@@ -72,6 +73,22 @@ import { environment } from '../../../../../environments/environment';
                 <option value="L">Standard / Large (L) - &ge;48cm</option>
               </select>
               <small class="help-text" style="color: #64748b;">Métrica autocálculada por la FCI en base a la altura introducida en la pestaña de Entrenamiento. Puedes modificarla si es necesario.</small>
+            </div>
+            <div class="form-group" style="margin-top: 0.5rem; padding-top: 1rem; border-top: 1px dashed #cbd5e1;">
+              <label>Categoría del Guía (RSCE)</label>
+              <select [(ngModel)]="formData.rsce_handler_category" (ngModelChange)="checkChanges()">
+                <option value="">-- No definido --</option>
+                <option value="J12">J12 (Menor de 12 años)</option>
+                <option value="J15">J15 (12 a 14 años)</option>
+                <option value="J19">J19 (15 a 18 años)</option>
+                <option value="Absoluta">Absoluta (19 a 54 años)</option>
+                <option value="S55">S55 (55 a 64 años)</option>
+                <option value="S65">S65 (Mayor de 65 años)</option>
+              </select>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 4px;">
+                <small class="help-text" style="color: #64748b; flex: 1;">Según año nacimiento.</small>
+                <button (click)="calculateHandlerCategory()" class="reset-btn" style="color: var(--primary-color, #3b82f6); background: none; font-size: 0.8rem; padding: 0; font-weight: 600;">Autocalcular</button>
+              </div>
             </div>
           </div>
 
@@ -163,6 +180,7 @@ export class DogDocsComponent {
   dogState = inject(DogStateService);
   dogService = inject(DogService);
   toast = inject(ToastService);
+  authService = inject(AuthService);
   
   dog = this.dogState.getDog();
   clubTheme = environment.clubConfig.colors;
@@ -173,6 +191,7 @@ export class DogDocsComponent {
     rsce_license: this.dog()?.pivot?.rsce_license || '',
     rsce_expiration_date: this.dog()?.pivot?.rsce_expiration_date ? this.dog()!.pivot!.rsce_expiration_date!.split('T')[0] : '',
     rsce_grade: this.dog()?.pivot?.rsce_grade || '',
+    rsce_handler_category: this.dog()?.pivot?.rsce_handler_category || '',
     rsce_category: this.dog()?.rsce_category || this.getAutoRsceCategory(),
     rfec_grade: this.dog()?.rfec_grade || '',
     rfec_category: this.dog()?.rfec_category || this.getAutoRfecCategory()
@@ -210,6 +229,26 @@ export class DogDocsComponent {
     return '60';
   }
 
+  calculateHandlerCategory() {
+    const user = this.authService.currentUserSignal();
+    if (!user?.birth_year) {
+      this.toast.error('Primero debes configurar tu Año de Nacimiento en Mi Perfil');
+      return;
+    }
+    const age = new Date().getFullYear() - user.birth_year;
+    let newCategory = '';
+    if (age < 12) newCategory = 'J12';
+    else if (age >= 12 && age <= 14) newCategory = 'J15';
+    else if (age >= 15 && age <= 18) newCategory = 'J19';
+    else if (age >= 19 && age <= 54) newCategory = 'Absoluta';
+    else if (age >= 55 && age <= 64) newCategory = 'S55';
+    else if (age >= 65) newCategory = 'S65';
+
+    this.formData.rsce_handler_category = newCategory;
+    this.checkChanges();
+    this.toast.success('Categoría de guía RSCE calculada');
+  }
+
   async saveChanges() {
     const currentDog = this.dog();
     if (!currentDog) return;
@@ -223,6 +262,7 @@ export class DogDocsComponent {
         rsce_license: this.formData.rsce_license || null,
         rsce_expiration_date: this.formData.rsce_expiration_date || null,
         rsce_grade: this.formData.rsce_grade || null,
+        rsce_handler_category: this.formData.rsce_handler_category || null,
         rsce_category: this.formData.rsce_category || null,
         rfec_grade: this.formData.rfec_grade || null,
         rfec_category: this.formData.rfec_category || null

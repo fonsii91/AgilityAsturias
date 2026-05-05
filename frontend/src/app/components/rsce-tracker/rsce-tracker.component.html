@@ -1,11 +1,11 @@
 <div class="tracker-container">
   <!-- Desktop Print Header (Hidden on screen) -->
   <div class="print-header">
-    <h2>Bitácora RSCE</h2>
+    <h2>Bitácora Canina</h2>
     @if (selectedDog()) {
     <div class="print-dog-info">
       <p><strong>Perro:</strong> {{ selectedDog()?.name }} ({{ selectedDog()?.breed || 'Mestizo' }})</p>
-      <p><strong>Licencia RSCE:</strong> {{ selectedDog()?.pivot?.rsce_license || 'No registrada' }}</p>
+      <p><strong>Licencia Canina:</strong> {{ selectedDog()?.pivot?.rsce_license || 'No registrada' }}</p>
       <p><strong>Microchip:</strong> {{ selectedDog()?.microchip || 'No registrado' }}</p>
     </div>
     }
@@ -14,7 +14,7 @@
   <div class="tracker-header no-print">
     <div class="header-titles" style="display: flex; justify-content: space-between; align-items: flex-start;">
       <div>
-        <h2><span class="material-icons-outlined" style="color: var(--primary-color);">analytics</span> Seguimiento RSCE
+        <h2><span class="material-icons-outlined" style="color: var(--primary-color);">analytics</span> Monitor Canina
         </h2>
         <p>Registra tus mangas de Agility y Jumping, mantén el control de tus puntos y exporta el documento para la
           Federación.</p>
@@ -22,7 +22,7 @@
       <app-instrucciones titulo="Instrucciones del Seguimiento">
         <div style="display: flex; flex-direction: column; gap: 16px; font-size: 14px;">
           <p>El panel superior rastrea automáticamente tu progreso para subir de Grado basándose en la normativa oficial de
-            la RSCE. Para que una pista sume puntos, debe ser calificada siempre como <strong>Excelente a 0</strong>.</p>
+            la Canina. Para que una pista sume puntos, debe ser calificada siempre como <strong>Excelente a 0</strong>.</p>
 
           <div style="background: #f8fafc; padding: 16px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
             <h4 style="margin: 0 0 12px 0; font-size: 15px; color: #1e293b;">🐕 Si estás en Grado 0 (Iniciación):</h4>
@@ -30,7 +30,7 @@
               <li style="display: flex; gap: 10px; align-items: flex-start;">
                 <span class="material-icons"
                   style="font-size: 18px; color: var(--primary-color); flex-shrink: 0; margin-top: 2px;">pets</span>
-                <span><strong>Requisitos oficiales:</strong> Para poder acceder al Grado 1 y comenzar a acumular puntos, tu perro debe tener la <strong>edad mínima reglamentaria</strong> y haber superado con éxito el <strong>Test de Sociabilidad de la RSCE</strong>.</span>
+                <span><strong>Requisitos oficiales:</strong> Para poder acceder al Grado 1 y comenzar a acumular puntos, tu perro debe tener la <strong>edad mínima reglamentaria</strong> y haber superado con éxito el <strong>Test de Sociabilidad de la Canina</strong>.</span>
               </li>
             </ul>
           </div>
@@ -145,7 +145,7 @@
     @if (!selectedDogId()) {
     <div class="empty-state no-print">
       <span class="material-icons-outlined empty-icon">pets</span>
-      <p>Selecciona un perro de la lista superior para ver sus registros RSCE.</p>
+      <p>Selecciona un perro de la lista superior para ver sus registros Canina.</p>
     </div>
     } @else {
 
@@ -153,7 +153,7 @@
     <div class="empty-state no-print" style="background-color: #fff1f2; border: 1px solid #fecdd3;">
       <span class="material-icons-outlined empty-icon" style="color: #fda4af;">lock</span>
       <p style="color: #9f1239; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">Función Bloqueada</p>
-      <p style="color: #be123c; margin: 0;">No disponible hasta introducir licencia RSCE en el <a
+      <p style="color: #be123c; margin: 0;">No disponible hasta introducir licencia Canina en el <a
           [routerLink]="['/gestionar-perros/perro', selectedDogId(), 'documentacion']" style="color: #be123c; text-decoration: underline;">perfil privado</a> del
         perro.</p>
     </div>
@@ -209,7 +209,7 @@
         <div class="grade-zero-checklist">
           <div class="info-note" style="border-left-color: var(--primary-color); margin-bottom: 1.5rem; background: #fff;">
             <span class="material-icons" style="color: var(--primary-color);">info</span>
-            <p><strong>Los perros en Grado 0 o Iniciación no llevan un contador de pistas.</strong> <br>Para habilitar la bitácora RSCE, marca la siguiente casilla cuando tu perro haya cumplido los requisitos oficiales de iniciación.</p>
+            <p><strong>Los perros en Grado 0 o Iniciación no llevan un contador de pistas.</strong> <br>Para habilitar la bitácora Canina, marca la siguiente casilla cuando tu perro haya cumplido los requisitos oficiales de iniciación.</p>
           </div>
           
           <label class="checklist-item" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1.5rem; background: white; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" [class.checked]="gradeZeroChecklist()">
@@ -290,7 +290,7 @@
           <span class="material-icons" style="color: #d97706; font-size: 28px;">gavel</span>
           <div>
             <strong style="color: #92400e; font-size: 1.05em; display: block; margin-bottom: 4px;">Faltan Jueces Diferentes</strong>
-            <p style="margin: 0; font-size: 0.95em; color: #b45309; line-height: 1.5;">Tienes las pistas necesarias a cero, pero la normativa de la RSCE exige que hayan sido evaluadas por distintos jueces. Fíjate en los paréntesis grises de las barras superiores. Sigue compitiendo bajo otros jueces para desbloquear el ascenso.</p>
+            <p style="margin: 0; font-size: 0.95em; color: #b45309; line-height: 1.5;">Tienes las pistas necesarias a cero, pero la normativa de la Canina exige que hayan sido evaluadas por distintos jueces. Fíjate en los paréntesis grises de las barras superiores. Sigue compitiendo bajo otros jueces para desbloquear el ascenso.</p>
           </div>
         </div>
         }

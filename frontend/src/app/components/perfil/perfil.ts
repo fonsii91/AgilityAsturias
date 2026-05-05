@@ -30,13 +30,14 @@ export class Perfil {
 
 
 
-  // Name editing state
-  isEditingName = signal(false);
-  editedName = signal('');
+  // Profile editing state
+  isEditingProfile = signal(false);
+  editedName: string = '';
+  editedBirthYear: number | null = null;
   
   // RFEC editing state
   isEditingRfec = signal(false);
-  rfecData = { license: '', expiration: '' };
+  rfecData: { license: string; expiration: string; category: string } = { license: '', expiration: '', category: '' };
 
   // Branding theme
   clubTheme = environment.clubConfig.colors;
@@ -46,20 +47,25 @@ export class Perfil {
       const user = this.authService.currentUserSignal();
       if (user) {
         this.dogService.loadUserDogs();
-        this.editedName.set(user.name);
+        this.editedName = user.name;
+        this.editedBirthYear = user.birth_year || null;
         this.rfecData = { 
             license: user.rfec_license || '', 
-            expiration: user.rfec_expiration_date ? user.rfec_expiration_date.split('T')[0] : '' 
+            expiration: user.rfec_expiration_date ? user.rfec_expiration_date.split('T')[0] : '',
+            category: user.rfec_category || ''
         };
       }
     }, { allowSignalWrites: true });
   }
 
-  toggleEditName() {
-    this.isEditingName.set(!this.isEditingName());
-    if (this.isEditingName()) {
+  toggleEditProfile() {
+    this.isEditingProfile.set(!this.isEditingProfile());
+    if (this.isEditingProfile()) {
       const user = this.authService.currentUserSignal();
-      if (user) this.editedName.set(user.name);
+      if (user) {
+        this.editedName = user.name;
+        this.editedBirthYear = user.birth_year || null;
+      }
     }
   }
 
@@ -70,7 +76,8 @@ export class Perfil {
       if (user) {
         this.rfecData = { 
             license: user.rfec_license || '', 
-            expiration: user.rfec_expiration_date ? user.rfec_expiration_date.split('T')[0] : '' 
+            expiration: user.rfec_expiration_date ? user.rfec_expiration_date.split('T')[0] : '',
+            category: user.rfec_category || ''
         };
       }
     }
@@ -126,22 +133,42 @@ export class Perfil {
     }
   }
 
-  async saveName() {
-    if (!this.editedName().trim()) return;
+  async saveProfile() {
+    if (!this.editedName.trim()) return;
 
     try {
-      await this.authService.updateProfile(this.editedName());
-      this.isEditingName.set(false);
-      this.toastService.success('Nombre actualizado correctamente');
+      const user = this.authService.currentUserSignal();
+      let calculatedCategory = user?.rfec_category;
+
+      if (this.editedBirthYear && (!user?.birth_year || user.birth_year !== this.editedBirthYear)) {
+        const age = new Date().getFullYear() - this.editedBirthYear;
+        if (age < 14) calculatedCategory = 'Infantil';
+        else if (age >= 14 && age <= 17) calculatedCategory = 'Junior';
+        else if (age >= 18 && age <= 54) calculatedCategory = '';
+        else if (age >= 55) calculatedCategory = 'Senior';
+      }
+
+      await this.authService.updateProfile(
+        this.editedName,
+        undefined,
+        undefined,
+        undefined,
+        calculatedCategory,
+        this.editedBirthYear
+      );
+      this.isEditingProfile.set(false);
+      this.toastService.success('Perfil actualizado correctamente');
     } catch (error: any) {
-      console.error('Error updating name:', error);
-      let errorMsg = 'Error al actualizar el nombre';
+      console.error('Error updating profile:', error);
+      let errorMsg = 'Error al actualizar el perfil';
       if (error.error && error.error.message) {
         errorMsg = error.error.message;
       }
       this.toastService.error(errorMsg);
     }
   }
+
+
 
   async saveRfec() {
     try {
@@ -151,7 +178,9 @@ export class Perfil {
           user.name, 
           undefined, 
           this.rfecData.license || '', 
-          this.rfecData.expiration || ''
+          this.rfecData.expiration || '',
+          this.rfecData.category || '',
+          undefined
       );
       this.isEditingRfec.set(false);
       this.toastService.success('Licencia RFEC actualizada');

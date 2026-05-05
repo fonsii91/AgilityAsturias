@@ -142,4 +142,17 @@ class ResourceController extends Controller
 
         return response()->json(['message' => 'Deleted successfully']);
     }
+    public function toggleGlobal($id)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $resource = Resource::findOrFail($id);
+        $resource->is_global = !$resource->is_global;
+        $resource->save();
+
+        return response()->json($resource->load('uploader:id,name,role'));
+    }
 }

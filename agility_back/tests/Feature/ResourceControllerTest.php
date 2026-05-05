@@ -128,4 +128,99 @@ class ResourceControllerTest extends TestCase
         $this->assertDatabaseMissing('resources', ['id' => $resource->id]);
         Storage::disk('public')->assertMissing($path);
     }
+    public function test_admin_can_toggle_global()
+    {
+        $resource = Resource::create([
+            'title' => 'Local Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://local.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => false,
+        ]);
+
+        $response = $this->actingAs($this->admin)
+                         ->putJson("/api/resources/{$resource->id}/toggle-global");
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('is_global', true);
+
+        $this->assertDatabaseHas('resources', [
+            'id' => $resource->id,
+            'is_global' => true,
+        ]);
+
+        // Toggle back
+        $response = $this->actingAs($this->admin)
+                         ->putJson("/api/resources/{$resource->id}/toggle-global");
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('is_global', false);
+    }
+
+    public function test_member_cannot_toggle_global()
+    {
+        $resource = Resource::create([
+            'title' => 'Local Resource',
+            'type' => 'link',
+            'category' => 'General',
+            'level' => 'all',
+            'url' => 'https://local.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => false,
+        ]);
+
+        $response = $this->actingAs($this->member)
+                         ->putJson("/api/resources/{$resource->id}/toggle-global");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_global_resource_visible_to_other_clubs()
+    {
+        $otherClub = Club::create([
+            'name' => 'Other Club',
+            'subdomain' => 'otherclub',
+            'slug' => 'otherclub',
+            'db_connection' => 'sqlite'
+        ]);
+
+        $otherMember = User::factory()->create([
+            'role' => 'member',
+            'club_id' => $otherClub->id,
+        ]);
+
+        $globalResource = Resource::create([
+            'title' => 'Global Rules',
+            'type' => 'link',
+            'category' => 'Reglamentos',
+            'level' => 'all',
+            'url' => 'https://global.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => true,
+        ]);
+
+        $localResource = Resource::create([
+            'title' => 'Local Rules',
+            'type' => 'link',
+            'category' => 'Reglamentos',
+            'level' => 'all',
+            'url' => 'https://local.com',
+            'uploaded_by' => $this->admin->id,
+            'club_id' => $this->club->id,
+            'is_global' => false,
+        ]);
+
+        $response = $this->actingAs($otherMember)
+                         ->withSession(['active_club_id' => $otherClub->id]) // Ensure club scope is set properly or via subdomain
+                         ->getJson('/api/resources');
+
+        $response->assertStatus(200)
+                 ->assertJsonFragment(['title' => 'Global Rules'])
+                 ->assertJsonMissing(['title' => 'Local Rules']);
+    }
 }

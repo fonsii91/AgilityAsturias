@@ -132,6 +132,11 @@
           </button>
           }
           @if (canManage()) {
+          @if (isAdmin()) {
+          <button mat-icon-button class="action-btn global-btn" [ngClass]="{'is-global': resource.is_global}" (click)="toggleGlobal($event, resource)" [matTooltip]="resource.is_global ? 'Quitar Global' : 'Hacer Global'">
+            <mat-icon>{{ resource.is_global ? 'public' : 'public_off' }}</mat-icon>
+          </button>
+          }
           <button mat-icon-button class="action-btn edit-btn" [routerLink]="['/recursos/editar', resource.id]"
             (click)="$event.stopPropagation()" matTooltip="Editar">
             <mat-icon>edit</mat-icon>

@@ -64,14 +64,15 @@
             <li><a routerLink="/admin/videos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">video_library</span> Revisar vídeos</a></li>
             <li><a routerLink="/admin/videos-borrados" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">auto_delete</span> Vídeos Borrados</a></li>
             <li><a routerLink="/admin/salud-monitor" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">monitor_heart</span> Monitor ACWR</a></li>
-            <li><a routerLink="/admin/rsce-monitor" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">query_stats</span> Monitor RSCE</a></li>
+            <li><a routerLink="/admin/rsce-monitor" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">query_stats</span> Monitor Canina</a></li>
           }
 
           <!-- Explorar and Area Pública for logged-in users -->
           @if (authService.isMember()) {
             <li class="mobile-nav-divider">Explorar</li>
             <li><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">favorite</span> Salud Deportiva</a></li>
-            <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">analytics</span> Seguimiento RSCE</a></li>
+            <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">analytics</span> Monitor Canina</a></li>
+            <li><a routerLink="/bitacora-rfec" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">pets</span> Monitor Caza</a></li>
             <li><a routerLink="/tablon-anuncios" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">campaign</span> Tablón de Anuncios</a></li>
             <li><a routerLink="/recursos" routerLinkActive="active-route" (click)="sidenav.close()"><span class="material-icons">folder_shared</span> Recursos</a></li>
 
@@ -146,7 +147,7 @@
         }
         @if (hasRsceWarning()) {
           <button class="btn-warning-action" (click)="goToDogsManagement()" style="width: 100%; justify-content: center; background: #ea580c;">
-            <span>Renovar RSCE (Mis Perros)</span>
+            <span>Renovar Canina (Mis Perros)</span>
             <span class="material-icons">pets</span>
           </button>
         }

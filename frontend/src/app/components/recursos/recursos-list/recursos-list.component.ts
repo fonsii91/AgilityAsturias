@@ -134,4 +134,30 @@ export class RecursosListComponent implements OnInit {
       });
     }
   }
+
+  isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
+
+  toggleGlobal(event: Event, resource: Resource): void {
+    event.stopPropagation();
+    if (!this.isAdmin()) return;
+
+    this.resourceService.toggleGlobal(resource.id).subscribe({
+      next: (updatedResource) => {
+        // Update locally
+        const currentResources = this.resources();
+        const index = currentResources.findIndex(r => r.id === updatedResource.id);
+        if (index !== -1) {
+          const newResources = [...currentResources];
+          newResources[index] = updatedResource;
+          this.resources.set(newResources);
+        }
+      },
+      error: (error) => {
+        console.error('Error toggling global state:', error);
+        alert('Hubo un error al cambiar el estado global.');
+      }
+    });
+  }
 }

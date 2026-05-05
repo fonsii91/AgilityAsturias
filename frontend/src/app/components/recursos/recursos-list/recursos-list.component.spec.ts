@@ -14,14 +14,16 @@ describe('RecursosListComponent', () => {
   beforeEach(() => {
     resourceServiceSpy = {
       getResources: vitest.fn().mockReturnValue(of([
-        { id: 1, title: 'Doc 1', type: 'document', category: 'General', level: 'all', file_path: 'path1' },
-        { id: 2, title: 'Link 1', type: 'link', category: 'Reglamentos', level: 'advanced', url: 'http://example.com' }
+        { id: 1, title: 'Doc 1', type: 'document', category: 'General', level: 'all', file_path: 'path1', is_global: false },
+        { id: 2, title: 'Link 1', type: 'link', category: 'Reglamentos', level: 'advanced', url: 'http://example.com', is_global: true }
       ])),
-      deleteResource: vitest.fn().mockReturnValue(of({}))
+      deleteResource: vitest.fn().mockReturnValue(of({})),
+      toggleGlobal: vitest.fn().mockReturnValue(of({ id: 1, title: 'Doc 1', type: 'document', category: 'General', level: 'all', file_path: 'path1', is_global: true }))
     };
 
     authServiceSpy = {
-      isStaff: vitest.fn().mockReturnValue(false)
+      isStaff: vitest.fn().mockReturnValue(false),
+      isAdmin: vitest.fn().mockReturnValue(false)
     };
 
     TestBed.configureTestingModule({
@@ -76,4 +78,38 @@ describe('RecursosListComponent', () => {
     expect(resourceServiceSpy.getResources).toHaveBeenCalledTimes(2); // Once on init, once after delete
   });
 
+  it('should return true for isAdmin if user is admin', () => {
+    authServiceSpy.isAdmin.mockReturnValue(true);
+    expect(component.isAdmin()).toBe(true);
+  });
+
+  it('should return false for isAdmin if user is not admin', () => {
+    authServiceSpy.isAdmin.mockReturnValue(false);
+    expect(component.isAdmin()).toBe(false);
+  });
+
+  it('should not allow toggleGlobal if not admin', () => {
+    authServiceSpy.isAdmin.mockReturnValue(false);
+    const mockEvent = new Event('click');
+    vitest.spyOn(mockEvent, 'stopPropagation');
+    
+    component.toggleGlobal(mockEvent, { id: 1 } as any);
+    
+    expect(mockEvent.stopPropagation).toHaveBeenCalled();
+    expect(resourceServiceSpy.toggleGlobal).not.toHaveBeenCalled();
+  });
+
+  it('should allow toggleGlobal if admin and update resource in list', () => {
+    authServiceSpy.isAdmin.mockReturnValue(true);
+    const mockEvent = new Event('click');
+    vitest.spyOn(mockEvent, 'stopPropagation');
+    
+    component.toggleGlobal(mockEvent, { id: 1 } as any);
+    
+    expect(mockEvent.stopPropagation).toHaveBeenCalled();
+    expect(resourceServiceSpy.toggleGlobal).toHaveBeenCalledWith(1);
+    
+    const resources = component.resources();
+    expect(resources[0].is_global).toBe(true); // Should be updated locally
+  });
 });

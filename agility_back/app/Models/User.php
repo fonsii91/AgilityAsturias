@@ -30,6 +30,8 @@ class User extends Authenticatable
         'reset_token',
         'rfec_license',
         'rfec_expiration_date',
+        'rfec_category',
+        'birth_year',
         'club_id',
     ];
 
@@ -63,7 +65,7 @@ class User extends Authenticatable
      */
     public function dogs()
     {
-        return $this->belongsToMany(Dog::class)->using(DogUser::class)->withPivot('is_primary_owner', 'rsce_license', 'rsce_expiration_date', 'rsce_grade', 'sociability_test_passed');
+        return $this->belongsToMany(Dog::class)->using(DogUser::class)->withPivot('is_primary_owner', 'rsce_license', 'rsce_expiration_date', 'rsce_grade', 'rsce_handler_category', 'sociability_test_passed');
     }
 
     /**

@@ -12,6 +12,7 @@ export interface Resource {
   level: string;
   url: string | null;
   file_path: string | null;
+  is_global?: boolean;
   user_id: number;
   created_at: string;
   updated_at: string;
@@ -82,5 +83,9 @@ export class ResourceService {
   deleteResource(id: number): Observable<any> {
     this.clearCache();
     return this.http.post(`${this.apiUrl}/${id}/delete`, {});
+  }
+  toggleGlobal(id: number): Observable<Resource> {
+    this.clearCache();
+    return this.http.put<Resource>(`${this.apiUrl}/${id}/toggle-global`, {});
   }
 }

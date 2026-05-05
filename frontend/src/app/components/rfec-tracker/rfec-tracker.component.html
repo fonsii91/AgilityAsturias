@@ -2,10 +2,10 @@
     <div class="tracker-header no-print">
       <div class="header-titles" style="display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
-          <h2><span class="material-icons-outlined" style="color: var(--primary-color);">analytics</span> Seguimiento RFEC</h2>
+          <h2><span class="material-icons-outlined" style="color: var(--primary-color);">analytics</span> Monitor Caza</h2>
           <p>Registra tus mangas y controla los puntos para tus ascensos o para el Campeonato de España.</p>
         </div>
-        <app-instrucciones titulo="Normativa RFEC">
+        <app-instrucciones titulo="Normativa Caza">
           <div style="font-size: 14px; display: flex; flex-direction: column; gap: 12px;">
             <p><strong>Puntuación Directa:</strong> Las mangas calificadas como <strong>Excelente</strong> pueden sumar puntos. Si tienes 0 penalizaciones sumas <strong>10 pts</strong>. Si tienes entre 0 y 5.99 penalizaciones sumas <strong>5 pts</strong>.</p>
             <p><strong>De Iniciación a Promoción:</strong> No competitivo. Solo necesitas que el perro tenga 18 meses y el Test de Sociabilidad.</p>
@@ -32,7 +32,7 @@
       @if (!selectedDogId()) {
       <div class="empty-state no-print">
         <span class="material-icons-outlined empty-icon">pets</span>
-        <p>Selecciona un perro de la lista superior para ver sus registros RFEC.</p>
+        <p>Selecciona un perro de la lista superior para ver sus registros Caza.</p>
       </div>
       } @else {
   
@@ -113,7 +113,7 @@
               <label class="checklist-item" style="display: flex; align-items: flex-start; gap: 1rem; padding: 1rem; background: white; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s;" [class.checked]="chkLicencia()">
                 <input type="checkbox" [ngModel]="chkLicencia()" (ngModelChange)="chkLicencia.set($event)" style="width: 20px; height: 20px; margin-top: 2px; accent-color: var(--primary-color);">
                 <div style="flex: 1;">
-                  <strong style="display: block; font-size: 1rem; color: #1e293b; margin-bottom: 2px;">Licencia y Club RFEC</strong>
+                  <strong style="display: block; font-size: 1rem; color: #1e293b; margin-bottom: 2px;">Licencia y Club Caza</strong>
                   <span style="color: #64748b; font-size: 0.85rem;">Dispone de licencia federativa en vigor y pertenece a un club afiliado.</span>
                 </div>
               </label>
@@ -275,7 +275,7 @@
     <div class="modal-overlay">
       <div class="modal-content">
         <div class="modal-header">
-          <h3>{{ isEditing ? 'Editar Manga' : 'Registrar Manga RFEC' }}</h3>
+          <h3>{{ isEditing ? 'Editar Manga' : 'Registrar Manga Caza' }}</h3>
           <button class="close-btn" (click)="closeForm()">&times;</button>
         </div>
         
@@ -288,7 +288,7 @@
                 <option [value]="comp.id">{{ comp.nombre }} ({{ comp.fechaEvento | date:'dd/MM' }})</option>
               }
             </select>
-            <small style="color: #64748b; font-size: 0.8rem;">Solo se muestran competiciones RFEC pasadas/actuales.</small>
+            <small style="color: #64748b; font-size: 0.8rem;">Solo se muestran competiciones Caza pasadas/actuales.</small>
           </div>
   
           @if (!formData.competition_id) {

@@ -105,6 +105,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas protegidas EXCLUSIVAMENTE por rol admin
     Route::middleware(['role:admin'])->group(function () {
+        // Resources (Admin)
+        Route::put('/resources/{id}/toggle-global', [ResourceController::class, 'toggleGlobal']);
         // Dog Workloads Monitor
         Route::get('/admin/salud/monitor', [\App\Http\Controllers\DogWorkloadController::class, 'adminMonitorData']);
         // AI Avatars (Admin)

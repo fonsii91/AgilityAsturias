@@ -45,6 +45,7 @@ class DogController extends Controller
             'rsce_license' => 'nullable|string',
             'rsce_expiration_date' => 'nullable|date',
             'rsce_grade' => 'nullable|string|max:10',
+            'rsce_handler_category' => 'nullable|string|max:50',
             'rsce_category' => 'nullable|string|max:10',
             'microchip' => 'nullable|string|max:30',
             'pedigree' => 'nullable|string',
@@ -56,12 +57,13 @@ class DogController extends Controller
             'rfec_category' => 'nullable|string|max:20',
         ]);
 
-        $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade'])->toArray();
+        $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade', 'rsce_handler_category'])->toArray();
         $pivotData = [
             'is_primary_owner' => true,
             'rsce_license' => collect($validated)->get('rsce_license'),
             'rsce_expiration_date' => collect($validated)->get('rsce_expiration_date'),
             'rsce_grade' => collect($validated)->get('rsce_grade'),
+            'rsce_handler_category' => collect($validated)->get('rsce_handler_category'),
         ];
 
         $dog = new Dog($dogData);
@@ -100,6 +102,7 @@ class DogController extends Controller
             'rsce_license' => 'nullable|string',
             'rsce_expiration_date' => 'nullable|date',
             'rsce_grade' => 'nullable|string|max:10',
+            'rsce_handler_category' => 'nullable|string|max:50',
             'rsce_category' => 'nullable|string|max:10',
             'microchip' => 'nullable|string|max:30',
             'pedigree' => 'nullable|string',
@@ -116,7 +119,7 @@ class DogController extends Controller
             'rfec_category' => 'nullable|string|max:20',
         ]);
 
-        $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade'])->toArray();
+        $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade', 'rsce_handler_category'])->toArray();
         $dog->update($dogData);
 
         // Update pivot for current user only for fields present in request
@@ -129,6 +132,9 @@ class DogController extends Controller
         }
         if (array_key_exists('rsce_grade', $validated)) {
             $pivotUpdates['rsce_grade'] = $validated['rsce_grade'];
+        }
+        if (array_key_exists('rsce_handler_category', $validated)) {
+            $pivotUpdates['rsce_handler_category'] = $validated['rsce_handler_category'];
         }
 
         if (!empty($pivotUpdates)) {

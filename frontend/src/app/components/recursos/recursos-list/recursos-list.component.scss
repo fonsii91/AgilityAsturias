@@ -308,6 +308,8 @@
                         &.download-btn { color: var(--primary-color, #3b82f6); }
                         &.edit-btn { color: var(--accent-color, #f59e0b); }
                         &.delete-btn { color: var(--warn-color, #ef4444); }
+                        &.global-btn { color: #9ca3af; }
+                        &.global-btn.is-global { color: #10b981; background: #ecfdf5; border-color: #a7f3d0; }
 
                         &:hover {
                             background: white;
@@ -317,6 +319,7 @@
                             &.download-btn { border-color: var(--primary-color, #3b82f6); filter: brightness(0.9); }
                             &.edit-btn { border-color: var(--accent-color, #f59e0b); filter: brightness(0.9); }
                             &.delete-btn { border-color: var(--warn-color, #ef4444); filter: brightness(0.9); }
+                            &.global-btn { border-color: #10b981; color: #10b981; filter: brightness(0.9); }
                         }
                     }
                 }

@@ -345,6 +345,8 @@ class AuthController extends Controller
                 'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'rfec_license' => 'nullable|string|max:255',
                 'rfec_expiration_date' => 'nullable|date',
+                'rfec_category' => 'nullable|string|max:50',
+                'birth_year' => 'nullable|integer|min:1900|max:'.date('Y'),
             ], [
                 'name.max' => 'El nombre no puede tener más de 255 caracteres.',
                 'photo.image' => 'El archivo debe ser una imagen.',
@@ -363,6 +365,38 @@ class AuthController extends Controller
             }
             if ($request->has('rfec_expiration_date')) {
                 $user->rfec_expiration_date = $request->rfec_expiration_date;
+            }
+            if ($request->has('rfec_category')) {
+                $user->rfec_category = $request->rfec_category;
+            }
+            if ($request->has('birth_year')) {
+                $user->birth_year = $request->birth_year;
+
+                if ($user->birth_year) {
+                    $age = date('Y') - $user->birth_year;
+                    $rsceCategory = '';
+                    if ($age < 12) {
+                        $rsceCategory = 'J12';
+                    } elseif ($age >= 12 && $age <= 14) {
+                        $rsceCategory = 'J15';
+                    } elseif ($age >= 15 && $age <= 18) {
+                        $rsceCategory = 'J19';
+                    } elseif ($age >= 19 && $age <= 54) {
+                        $rsceCategory = 'Absoluta';
+                    } elseif ($age >= 55 && $age <= 64) {
+                        $rsceCategory = 'S55';
+                    } elseif ($age >= 65) {
+                        $rsceCategory = 'S65';
+                    }
+
+                    if ($rsceCategory) {
+                        // We use the DB facade or loop to update the pivot. 
+                        // Since dogs() relationship exists, we can iterate.
+                        foreach ($user->dogs as $dog) {
+                            $user->dogs()->updateExistingPivot($dog->id, ['rsce_handler_category' => $rsceCategory]);
+                        }
+                    }
+                }
             }
 
             if ($request->hasFile('photo')) {

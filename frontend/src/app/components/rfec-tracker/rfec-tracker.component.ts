@@ -12,6 +12,7 @@ import { RfecTrack } from '../../models/rfec-track.model';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 import { Competition } from '../../models/competition.model';
 import confetti from 'canvas-confetti';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-rfec-tracker',
@@ -26,6 +27,7 @@ export class RfecTrackerComponent implements OnInit {
   compService = inject(CompetitionService);
   videoService = inject(VideoService);
   toast = inject(ToastService);
+  authService = inject(AuthService);
 
   dogs = this.dogService.getDogs();
   selectedDogId = signal<number | null>(null);
@@ -111,7 +113,8 @@ export class RfecTrackerComponent implements OnInit {
     qualification: 'Excelente a 0',
     speed: null as number | null,
     judge_name: '',
-    notes: ''
+    notes: '',
+    grade: null as string | null
   };
 
   ngOnInit() {
@@ -205,7 +208,8 @@ export class RfecTrackerComponent implements OnInit {
       qualification: 'Excelente a 0',
       speed: null,
       judge_name: '',
-      notes: ''
+      notes: '',
+      grade: null
     };
   }
 
@@ -330,34 +334,31 @@ export class RfecTrackerComponent implements OnInit {
     const jueces = new Set<string>();
 
     for (const t of ts) {
-      // Puntos solo para Excelente
-      const qual = t.qualification.toLowerCase();
-      if (qual === 'excelente a 0' || qual === 'excelente') {
-        let pts = 0;
-        
-        if (qual === 'excelente a 0') {
-          pts = 10;
-        } else if (qual === 'excelente') {
-          pts = 5;
+      const qual = t.qualification.toLowerCase().trim();
+      let pts = 0;
+      
+      if (qual.includes('excelente a 0') || qual.includes('excelente a cero') || qual === 'exc a 0') {
+        pts = 10;
+      } else if (qual.includes('excelente')) {
+        pts = 5;
+      }
+
+      if (pts > 0) {
+        totalPoints += pts;
+        if (t.manga_type && t.manga_type.toLowerCase().includes('agility')) {
+          agilityPoints += pts;
+        }
+        if (t.judge_name) {
+          jueces.add(t.judge_name.toLowerCase().trim());
         }
 
-        if (pts > 0) {
-          totalPoints += pts;
-          if (t.manga_type && t.manga_type.startsWith('Agility')) {
-            agilityPoints += pts;
-          }
-          if (t.judge_name) {
-            jueces.add(t.judge_name.toLowerCase().trim());
-          }
-
-          // Para Campeonato de España SOLO cuentan mangas corridas en Grado Competición
-          // Permitimos t.grade undefined para mantener compatibilidad con mangas antiguas
-          if (t.grade === 'Competición' || (!t.grade && this.selectedDog()?.rfec_grade === 'Competición')) {
-             ceTotalPoints += pts;
-             if (t.manga_type && t.manga_type.startsWith('Agility')) {
-                ceAgilityPoints += pts;
-             }
-          }
+        // Para Campeonato de España SOLO cuentan mangas corridas en Grado Competición
+        // Permitimos t.grade undefined para mantener compatibilidad con mangas antiguas
+        if (t.grade === 'Competición' || (!t.grade && this.selectedDog()?.rfec_grade === 'Competición')) {
+           ceTotalPoints += pts;
+           if (t.manga_type && t.manga_type.toLowerCase().includes('agility')) {
+              ceAgilityPoints += pts;
+           }
         }
       }
     }
@@ -372,10 +373,11 @@ export class RfecTrackerComponent implements OnInit {
   });
 
   ceTargets = computed(() => {
-    const cat = this.selectedDog()?.rfec_category;
-    const isSenior = cat === 'Senior' || cat === 'Veterano';
+    const user = this.authService.currentUserSignal();
+    const cat = user?.rfec_category;
+    const isSenior = cat === 'Senior' || cat === 'Veterano' || cat === 'Sénior / Veterano';
     return {
-      name: isSenior ? 'Senior' : 'Absoluto',
+      name: isSenior ? 'Sénior / Veterano' : 'Absoluto',
       total: isSenior ? 40 : 80,
       agility: isSenior ? 20 : 40
     };

@@ -17,7 +17,7 @@
           </li>
           <li style="display: flex; gap: 10px; align-items: flex-start;">
             <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">person</span>
-            <span><strong>Nombre del Juez:</strong> Si seleccionas "Competición Agility", asegúrate de escribir el nombre del Juez. Esto es clave porque en el futuro se les autocompletará a los socios en su rastreador RSCE.</span>
+            <span><strong>Nombre del Juez:</strong> Si seleccionas "Competición Agility", asegúrate de escribir el nombre del Juez. Esto es clave porque en el futuro se les autocompletará a los socios en su rastreador Canina.</span>
           </li>
           <li style="display: flex; gap: 10px; align-items: flex-start;">
             <span class="material-icons" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">image</span>
@@ -164,8 +164,8 @@
             <select id="federacion" formControlName="federacion" class="form-control"
               [ngClass]="{ 'is-invalid': submitted && competitionForm.get('tipo')?.value === 'competicion' && !f['federacion'].value }">
               <option value="" disabled selected>Selecciona una federación</option>
-              <option value="RSCE">RSCE (Real Sociedad Canina Española)</option>
-              <option value="RFEC">RFEC (Real Federación Española de Caza)</option>
+              <option value="RSCE">Canina (Real Sociedad Canina de España)</option>
+              <option value="RFEC">Caza (Real Federación Española de Caza)</option>
               <option value="Otro">Otro</option>
             </select>
             @if (submitted && competitionForm.get('tipo')?.value === 'competicion' && !f['federacion'].value) {
@@ -175,7 +175,7 @@
             }
           </div>
           <div class="form-group" style="background-color: #f8fafc; padding: 12px; border-radius: 6px; border: 1px dashed #cbd5e1; margin-bottom: 1rem;">
-            <label for="judge_name">Nombre del Juez <span style="font-size: 0.8em; font-weight: normal; color: #64748b;">(Importante, se autocompletará en el Rastreador RSCE)</span></label>
+            <label for="judge_name">Nombre del Juez <span style="font-size: 0.8em; font-weight: normal; color: #64748b;">(Importante, se autocompletará en el Rastreador Canina)</span></label>
             <input type="text" id="judge_name" formControlName="judge_name" class="form-control"
               placeholder="Ej: José López">
           </div>

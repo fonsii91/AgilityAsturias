@@ -23,6 +23,7 @@ export interface Dog {
         rsce_license?: string;
         rsce_expiration_date?: string;
         rsce_grade?: string;
+        rsce_handler_category?: string;
         sociability_test_passed?: boolean;
     };
     acwr_color?: 'none' | 'gray' | 'blue' | 'green' | 'yellow' | 'red';

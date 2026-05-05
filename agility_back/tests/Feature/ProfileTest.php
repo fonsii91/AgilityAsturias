@@ -125,4 +125,63 @@ class ProfileTest extends TestCase
 
         $response->assertStatus(401);
     }
+
+    public function test_permite_actualizar_el_ano_de_nacimiento_y_categoria_rfec()
+    {
+        $user = $this->createUser();
+
+        $response = $this->actingAs($user)->postJson('/api/user/profile', [
+            'birth_year' => 1990,
+            'rfec_category' => 'Absoluto'
+        ]);
+
+        $response->assertStatus(200)
+                 ->assertJsonPath('user.birth_year', 1990)
+                 ->assertJsonPath('user.rfec_category', 'Absoluto');
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'birth_year' => 1990,
+            'rfec_category' => 'Absoluto'
+        ]);
+    }
+
+    public function test_calcula_automaticamente_la_categoria_rsce_para_los_perros_del_usuario_al_actualizar_nacimiento()
+    {
+        $user = $this->createUser();
+        $dog = \App\Models\Dog::create([
+            'name' => 'Test Dog',
+            'user_id' => $user->id,
+            'club_id' => $this->club->id
+        ]);
+        $user->dogs()->attach($dog->id, ['is_primary_owner' => true]);
+
+        // J15: Edad 13 años (Asumiendo año actual 2026 -> 2013)
+        $currentYear = (int)date('Y');
+        $birthYear = $currentYear - 13;
+
+        $response = $this->actingAs($user)->postJson('/api/user/profile', [
+            'birth_year' => $birthYear
+        ]);
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('dog_user', [
+            'user_id' => $user->id,
+            'dog_id' => $dog->id,
+            'rsce_handler_category' => 'J15'
+        ]);
+
+        // Absoluta: Edad 30 años
+        $birthYearAbsoluta = $currentYear - 30;
+        $this->actingAs($user)->postJson('/api/user/profile', [
+            'birth_year' => $birthYearAbsoluta
+        ]);
+
+        $this->assertDatabaseHas('dog_user', [
+            'user_id' => $user->id,
+            'dog_id' => $dog->id,
+            'rsce_handler_category' => 'Absoluta'
+        ]);
+    }
 }
