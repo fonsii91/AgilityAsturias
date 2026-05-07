@@ -22,6 +22,7 @@ description: Datos para desplegar en producción el proyecto
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado 2026-05-07]** Desplegada la integración de Google Analytics 4 (GA4) con Consent Mode v2. Se instrumentaron los flujos principales (login, registro, reservas, cargas de trabajo y acceso a módulos) para nutrir la analítica multi-tenant sin romper la privacidad GDPR.
 - **[Completado 2026-05-06]** Configurado servidor Nginx y Certbot SSL para soportar HTTPS en el nuevo subdominio `leonidogs.clubagility.com` y `www.leonidogs.clubagility.com`. Se expandió el certificado existente y se verificó el enrutamiento.
 - **[Completado 2026-05-06]** Solucionado error 404 en el subdominio `xanastur.clubagility.com`. Se ha corregido la configuración de Nginx restaurando `sites-enabled/agilityasturias` como un enlace simbólico (symlink) hacia `sites-available/agilityasturias`. Previamente había una desincronización entre ambos archivos que causaba que Nginx devolviera un error 404 en el acceso raíz y favicon.
 - **[Completado 2026-05-06]** Desplegada exitosamente la versión 1.1.38 con mejoras de UI, cálculo automático de categorías caninas, renombrado visual a Canina/Caza, barra flotante de guardado y ajustes en recursos. Se actualizaron y pasaron exitosamente los tests locales antes del despliegue.

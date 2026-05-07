@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { TenantService } from '../../services/tenant.service';
+import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
     selector: 'app-login',
@@ -18,6 +19,7 @@ export class LoginComponent {
     private fb = inject(FormBuilder);
     private router = inject(Router);
     tenantService = inject(TenantService);
+    analyticsService = inject(AnalyticsService);
     clubConfig = environment.clubConfig;
     clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
 
@@ -47,6 +49,7 @@ export class LoginComponent {
 
         this.authService.login({ email: email!, password: password! }).subscribe({
             next: () => {
+                this.analyticsService.logLogin();
                 this.isLoading.set(false);
                 // Navigation is handled in AuthService
             },

@@ -15,6 +15,7 @@ import { Video } from '../../models/video.model';
 import confetti from 'canvas-confetti';
 import { SmartVideoPlayerComponent } from '../galeria-videos/smart-video-player/smart-video-player.component';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
+import { AnalyticsService } from '../../services/analytics.service';
 
 import { MatIconModule } from '@angular/material/icon';
 
@@ -36,6 +37,7 @@ export class RsceTrackerComponent implements OnInit {
   private videoService = inject(VideoService);
   private datePipe = inject(DatePipe);
   tenantService = inject(TenantService);
+  analyticsService = inject(AnalyticsService);
 
   clubName = computed(() => this.tenantService.tenantInfo()?.name || environment.clubConfig.name);
   dogs = this.dogService.getDogs();
@@ -108,6 +110,7 @@ export class RsceTrackerComponent implements OnInit {
   locationSelectMode = signal<string>('');
 
   ngOnInit() {
+    this.analyticsService.logModuleAccess('canina');
     this.loadTracks();
     this.loadUserVideos();
   }

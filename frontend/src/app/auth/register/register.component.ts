@@ -5,6 +5,7 @@ import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { TenantService } from '../../services/tenant.service';
+import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
     selector: 'app-register',
@@ -19,6 +20,7 @@ export class RegisterComponent {
     private router = inject(Router);
     private route = inject(ActivatedRoute);
     tenantService = inject(TenantService);
+    analyticsService = inject(AnalyticsService);
     clubConfig = environment.clubConfig;
     clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
 
@@ -63,6 +65,7 @@ export class RegisterComponent {
 
         this.authService.register(payload).subscribe({
             next: () => {
+                this.analyticsService.logSignUp();
                 this.isLoading.set(false);
                 // Navigation is handled in AuthService, but we can do it here too if needed
             },

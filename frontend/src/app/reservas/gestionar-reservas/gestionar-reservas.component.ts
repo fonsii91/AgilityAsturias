@@ -18,6 +18,7 @@ import { InstruccionesComponent } from '../../components/shared/instrucciones/in
 import { DogWorkloadService } from '../../services/dog-workload.service';
 import { AcwrData } from '../../models/dog-workload.model';
 import { OnboardingService } from '../../services/onboarding';
+import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
     selector: 'app-gestionar-reservas',
@@ -34,6 +35,7 @@ export class GestionarReservasComponent {
     toastService = inject(ToastService);
     dogWorkloadService = inject(DogWorkloadService);
     onboardingService = inject(OnboardingService);
+    analyticsService = inject(AnalyticsService);
 
     // Modal state
     isModalOpen = false;
@@ -102,6 +104,7 @@ export class GestionarReservasComponent {
 
 
     constructor() {
+        this.analyticsService.logModuleAccess('reservas');
         effect(() => {
             const user = this.authService.currentUserSignal();
             if (user) {

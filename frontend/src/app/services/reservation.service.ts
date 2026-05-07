@@ -3,12 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Reservation } from '../models/reservation.model';
 import { environment } from '../../environments/environment';
 import { tap } from 'rxjs';
+import { AnalyticsService } from './analytics.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ReservationService {
     private http = inject(HttpClient);
+    private analyticsService = inject(AnalyticsService);
     private apiUrl = `${environment.apiUrl}/reservations`;
 
     // Maintain signal for reactivity
@@ -80,6 +82,7 @@ export class ReservationService {
                     this.reservationsSignal.update(list => [...list, ...newReservations]);
                     // Refresh availability after booking
                     this.fetchAvailability();
+                    this.analyticsService.logReservation('made');
                     resolve(newReservations);
                 },
                 error: (err) => reject(err)
@@ -94,6 +97,7 @@ export class ReservationService {
                     this.reservationsSignal.update(list => list.filter(r => r.id !== id));
                     // Refresh availability after deletion
                     this.fetchAvailability();
+                    this.analyticsService.logReservation('cancelled');
                     resolve();
                 },
                 error: (err) => reject(err)

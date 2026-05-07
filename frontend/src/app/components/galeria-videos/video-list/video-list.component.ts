@@ -14,6 +14,7 @@ import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { TenantService } from '../../../services/tenant.service';
 import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
+import { AnalyticsService } from '../../../services/analytics.service';
 
 @Component({
     selector: 'app-video-list',
@@ -30,6 +31,7 @@ export class VideoListComponent implements OnInit {
     private toastService = inject(ToastService);
     private cdr = inject(ChangeDetectorRef);
     tenantService = inject(TenantService);
+    analyticsService = inject(AnalyticsService);
     clubConfig = environment.clubConfig;
     clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
 
@@ -58,6 +60,7 @@ export class VideoListComponent implements OnInit {
     activeSort: string = 'latest';
 
     ngOnInit() {
+        this.analyticsService.logModuleAccess('videos');
         this.currentUserId = this.authService.currentUserSignal()?.id || null;
         this.loadVideos();
         this.dogService.loadAllDogs();

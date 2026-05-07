@@ -14,6 +14,7 @@ import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.co
 import { Competition } from '../../models/competition.model';
 import confetti from 'canvas-confetti';
 import { AuthService } from '../../services/auth.service';
+import { AnalyticsService } from '../../services/analytics.service';
 
 @Component({
   selector: 'app-rfec-tracker',
@@ -29,6 +30,7 @@ export class RfecTrackerComponent implements OnInit {
   videoService = inject(VideoService);
   toast = inject(ToastService);
   authService = inject(AuthService);
+  analyticsService = inject(AnalyticsService);
 
   dogs = this.dogService.getDogs();
   selectedDogId = signal<number | null>(null);
@@ -124,6 +126,7 @@ export class RfecTrackerComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.analyticsService.logModuleAccess('caza');
     this.loadData();
   }
 

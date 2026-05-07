@@ -16,14 +16,16 @@ import { NotificationService } from './services/notification.service';
 import { DogService } from './services/dog.service';
 import { environment } from '../environments/environment';
 import { TenantService } from './services/tenant.service';
+import { AnalyticsService } from './services/analytics.service';
 
 import { CommonModule, DatePipe } from '@angular/common';
 import { ClubagilityComponent } from './clubagility/clubagility.component';
 import { OnboardingWidgetComponent } from './components/shared/onboarding-widget/onboarding-widget';
+import { CookieBannerComponent } from './components/shared/cookie-banner/cookie-banner.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent, HasFeatureDirective],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent, HasFeatureDirective, CookieBannerComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -31,6 +33,7 @@ export class App implements OnInit, OnDestroy {
   protected readonly title = computed(() => this.tenantService.tenantInfo()?.name || 'Club Agility');
   authService = inject(AuthService);
   tenantService = inject(TenantService);
+  analyticsService = inject(AnalyticsService);
   private toastService = inject(ToastService);
   private swUpdate = inject(SwUpdate);
   private injector = inject(Injector);

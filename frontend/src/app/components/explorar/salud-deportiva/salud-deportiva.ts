@@ -15,6 +15,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { PendingReviewsDialogComponent } from './pending-reviews-dialog/pending-reviews-dialog.component';
 import { HistoryDialogComponent } from './history-dialog/history-dialog.component';
 import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
+import { AnalyticsService } from '../../../services/analytics.service';
 
 @Component({
   selector: 'app-salud-deportiva',
@@ -100,10 +101,12 @@ export class SaludDeportivaComponent implements OnInit {
   constructor(
     private workloadService: DogWorkloadService,
     private dogService: DogService,
-    private toast: ToastService
+    private toast: ToastService,
+    private analyticsService: AnalyticsService
   ) { }
 
   ngOnInit() {
+    this.analyticsService.logModuleAccess('salud_deportiva');
     this.dogService.loadUserDogs().then(dogs => {
       this.dogs.set(dogs);
       if (dogs.length > 0) {
