@@ -51,20 +51,24 @@ export class AnalyticsService {
       send_page_view: false, // Lo enviamos manualmente con el router
       user_properties: {
         'platform_mode': platformMode,
-        'club_slug': this.tenantService.getTenantSlug() || 'none'
+        'club_slug': (this.tenantService && typeof this.tenantService.getTenantSlug === 'function') ? this.tenantService.getTenantSlug() : 'none'
       }
     });
 
     this.isInitialized = true;
 
     // 4. Suscribirse a cambios de ruta para Page Views
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      (window as any).gtag('event', 'page_view', {
-        page_path: event.urlAfterRedirects,
-      });
-    });
+    const routerEvents = this.router?.events;
+    if (routerEvents && typeof routerEvents.pipe === 'function') {
+      const piped = routerEvents.pipe(filter((event: any) => event instanceof NavigationEnd));
+      if (piped && typeof piped.subscribe === 'function') {
+        piped.subscribe((event: any) => {
+          (window as any).gtag('event', 'page_view', {
+            page_path: event.urlAfterRedirects,
+          });
+        });
+      }
+    }
 
     // 5. Detectar evento de instalación PWA
     window.addEventListener('appinstalled', () => {

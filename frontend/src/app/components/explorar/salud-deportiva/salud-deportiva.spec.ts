@@ -1,3 +1,4 @@
+import { provideRouter } from '@angular/router';
 import { ComponentFixture, TestBed, getTestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 import { SaludDeportivaComponent } from './salud-deportiva';
@@ -52,6 +53,7 @@ describe('SaludDeportivaComponent', () => {
     await TestBed.configureTestingModule({
       imports: [SaludDeportivaComponent],
       providers: [
+        provideRouter([]),
         { provide: DogService, useValue: mockDogService },
         { provide: DogWorkloadService, useValue: mockWorkloadService },
         { provide: ToastService, useValue: mockToastService },

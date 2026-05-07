@@ -8,6 +8,7 @@ import { CrearAnuncioComponent } from './crear-anuncio.component';
 import { AnnouncementService } from '../../../services/announcement.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
+import { OnboardingService } from '../../../services/onboarding';
 import { FormBuilder } from '@angular/forms';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
@@ -44,6 +45,7 @@ describe('CrearAnuncioComponent', () => {
 
     await TestBed.configureTestingModule({
       providers: [
+        { provide: OnboardingService, useValue: { markStepCompleted: vi.fn() } },
         FormBuilder,
         { provide: AnnouncementService, useValue: announcementServiceSpy },
         { provide: AuthService, useValue: authServiceSpy },
@@ -58,7 +60,8 @@ describe('CrearAnuncioComponent', () => {
         TestBed.inject(AnnouncementService),
         TestBed.inject(AuthService),
         TestBed.inject(ToastService),
-        TestBed.inject(Router)
+        TestBed.inject(Router),
+        TestBed.inject(OnboardingService)
       );
     });
   });

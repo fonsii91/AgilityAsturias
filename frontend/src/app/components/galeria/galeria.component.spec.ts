@@ -26,7 +26,9 @@ describe('GaleriaComponent', () => {
     };
 
     mockAuthService = {
-      isStaff: signal(true)
+      isStaff: signal(true),
+      currentUserSignal: signal({ id: 1, role: 'staff' }),
+      isLoading: signal(false)
     };
 
     mockImageCompressor = {

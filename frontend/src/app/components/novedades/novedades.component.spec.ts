@@ -3,6 +3,7 @@ import { NovedadesComponent, ReleaseNote } from './novedades.component';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient, HttpClient } from '@angular/common/http';
 import { vi } from 'vitest';
+import { AnalyticsService } from '../../services/analytics.service';
 
 describe('NovedadesComponent', () => {
   let httpTestingController: HttpTestingController;
@@ -26,6 +27,7 @@ describe('NovedadesComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
+        { provide: AnalyticsService, useValue: { logSystemAction: ()=>{} } },
         provideHttpClient(),
         provideHttpClientTesting(),
         NovedadesComponent
@@ -40,14 +42,14 @@ describe('NovedadesComponent', () => {
 
   it('should create', () => {
     TestBed.runInInjectionContext(() => {
-      const component = new NovedadesComponent(TestBed.inject(HttpClient));
+      const component = new NovedadesComponent(TestBed.inject(HttpClient), TestBed.inject(AnalyticsService));
       expect(component).toBeTruthy();
     });
   });
 
   it('should fetch releases on init and update the signal', () => {
     TestBed.runInInjectionContext(() => {
-      const component = new NovedadesComponent(TestBed.inject(HttpClient));
+      const component = new NovedadesComponent(TestBed.inject(HttpClient), TestBed.inject(AnalyticsService));
       component.ngOnInit();
 
       const req = httpTestingController.expectOne('novedades.json');
@@ -65,7 +67,7 @@ describe('NovedadesComponent', () => {
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     TestBed.runInInjectionContext(() => {
-      const component = new NovedadesComponent(TestBed.inject(HttpClient));
+      const component = new NovedadesComponent(TestBed.inject(HttpClient), TestBed.inject(AnalyticsService));
       component.ngOnInit();
 
       const req = httpTestingController.expectOne('novedades.json');

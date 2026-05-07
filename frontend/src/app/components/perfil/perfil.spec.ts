@@ -34,6 +34,7 @@ describe('Perfil Component', () => {
         mockAuthService = {
             currentUserSignal: mockUserSignal,
             userProfileSignal: mockUserSignal,
+            isLoading: signal(false),
             updateProfileCalledWith: null,
             updateProfile: async function(...args: any[]) {
                 this.updateProfileCalledWith = args;

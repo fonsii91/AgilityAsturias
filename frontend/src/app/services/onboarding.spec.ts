@@ -1,13 +1,22 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { OnboardingService } from './onboarding';
+import { AuthService } from './auth.service';
+import { ToastService } from './toast.service';
+import { signal } from '@angular/core';
 
-import { Onboarding } from './onboarding';
-
-describe('Onboarding', () => {
-  let service: Onboarding;
+describe('OnboardingService', () => {
+  let service: OnboardingService;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(Onboarding);
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [
+        { provide: AuthService, useValue: { currentUserSignal: signal(null), isLoading: signal(false) } },
+        { provide: ToastService, useValue: { success: vitest.fn(), error: vitest.fn() } }
+      ]
+    });
+    service = TestBed.inject(OnboardingService);
   });
 
   it('should be created', () => {

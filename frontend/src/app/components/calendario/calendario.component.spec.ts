@@ -11,6 +11,7 @@ import { PersonalEventService } from '../../services/personal-event.service';
 import { AuthService } from '../../services/auth.service';
 import { DogService } from '../../services/dog.service';
 import { signal, ChangeDetectorRef, NgZone } from '@angular/core';
+import { OnboardingService } from '../../services/onboarding';
 
 describe('CalendarioComponent Logic', () => {
     beforeAll(() => {
@@ -71,7 +72,8 @@ describe('CalendarioComponent Logic', () => {
                 { provide: AuthService, useValue: mockAuthService },
                 { provide: DogService, useValue: mockDogService },
                 { provide: ChangeDetectorRef, useValue: { detectChanges: vi.fn() } },
-                { provide: NgZone, useValue: { run: (fn: any) => fn() } }
+                { provide: NgZone, useValue: { run: (fn: any) => fn() } },
+                { provide: OnboardingService, useValue: { markStepCompleted: vi.fn(), activeTutorialType: signal(null), activeSteps: signal([]) } }
             ]
         });
 
