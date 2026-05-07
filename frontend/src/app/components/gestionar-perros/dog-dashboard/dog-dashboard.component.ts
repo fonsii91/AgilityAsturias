@@ -6,6 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { DogService } from '../../../services/dog.service';
 import { ToastService } from '../../../services/toast.service';
 import { ImageCompressorService } from '../../../services/image-compressor.service';
+import { OnboardingService } from '../../../services/onboarding';
 
 @Component({
   selector: 'app-dog-dashboard',
@@ -188,6 +189,7 @@ export class DogDashboardComponent implements OnInit, OnDestroy {
   dogService = inject(DogService);
   toast = inject(ToastService);
   imageCompressor = inject(ImageCompressorService);
+  onboardingService = inject(OnboardingService);
   
   dog = this.dogState.getDog();
   isLoading = signal(true);
@@ -202,7 +204,9 @@ export class DogDashboardComponent implements OnInit, OnDestroy {
         const loaded = await this.dogState.loadDog(id);
         this.isLoading.set(false);
         
-        if (!loaded) {
+        if (loaded) {
+          this.onboardingService.markStepCompleted('miembro_perfil');
+        } else {
           console.warn('Dog not found, maybe redirect to list');
         }
       }

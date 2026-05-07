@@ -17,6 +17,8 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 h1 {
@@ -84,8 +86,23 @@ th {
     display: flex;
     align-items: center;
     gap: 1rem;
-    font-weight: 500;
     color: #333;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.user-email {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 400;
 }
 
 .avatar {
@@ -231,9 +248,36 @@ th {
 }
 
 @media (max-width: 768px) {
-    .action-btn {
+    table, thead, tbody, th, td, tr { 
+        display: block; 
+    }
+    thead tr { 
+        display: none; 
+    }
+    tr {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 1rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    tr:last-child {
+        border-bottom: none;
+    }
+    td {
+        border: none;
+        padding: 0;
+    }
+    .user-cell {
+        margin-bottom: 0.25rem;
+    }
+    .action-buttons-wrapper {
+        justify-content: flex-start;
         width: 100%;
-        margin-top: 0.5rem;
+    }
+    .role-select {
+        flex: 1;
+        width: auto;
     }
 }
 

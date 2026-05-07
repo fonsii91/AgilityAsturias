@@ -7,6 +7,7 @@ import { TimeSlotService } from '../../services/time-slot.service';
 import { ToastService } from '../../services/toast.service';
 import { TimeSlot } from '../../models/time-slot.model';
 import { environment } from '../../../environments/environment';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
   selector: 'app-gestionar-horarios',
@@ -19,6 +20,7 @@ export class GestionarHorariosComponent {
   clubConfig = environment.clubConfig;
   timeSlotService = inject(TimeSlotService);
   toastService = inject(ToastService);
+  onboardingService = inject(OnboardingService);
 
   timeSlots = this.timeSlotService.getTimeSlots();
 
@@ -127,6 +129,7 @@ export class GestionarHorariosComponent {
         };
         await this.timeSlotService.updateTimeSlot(this.editingSlot.id, slotData);
         this.toastService.success('Horario actualizado.');
+        this.onboardingService.markStepCompleted('staff_clase');
       } else {
         // Creación masiva
         for (const day of this.slotForm.days) {
@@ -142,6 +145,7 @@ export class GestionarHorariosComponent {
         this.toastService.success(`Horario(s) creado(s) para ${this.slotForm.days.length} día(s).`);
       }
       this.timeSlotService.fetchTimeSlots(); // Refresh
+      this.onboardingService.markStepCompleted('gestor_horario');
       this.closeModal();
     } catch (error) {
       console.error(error);

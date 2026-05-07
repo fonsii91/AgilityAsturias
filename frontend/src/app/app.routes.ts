@@ -106,6 +106,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Gestión Avatares IA' }
     },
     {
+        path: 'admin/onboarding-monitor',
+        loadComponent: () => import('./components/admin-onboarding-monitor/admin-onboarding-monitor').then(m => m.AdminOnboardingMonitorComponent),
+        canActivate: [adminGuard],
+        title: titleResolver, data: { pageTitle: 'Monitor de Onboarding' }
+    },
+    {
         path: 'gestionar-horarios',
         loadComponent: () => import('./reservas/gestionar-horarios/gestionar-horarios.component').then(m => m.GestionarHorariosComponent),
         canActivate: [staffGuard],

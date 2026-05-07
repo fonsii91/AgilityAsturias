@@ -1,6 +1,7 @@
 import { Component, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { DogStateService } from '../../services/dog-state.service';
 import { DogService } from '../../../../services/dog.service';
 import { ToastService } from '../../../../services/toast.service';
@@ -9,7 +10,7 @@ import { environment } from '../../../../../environments/environment';
 @Component({
   selector: 'app-dog-training',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   template: `
     <div class="health-container">
       <div class="form-header">
@@ -46,7 +47,7 @@ import { environment } from '../../../../../environments/environment';
             @if (!dog()?.birth_date || dog()?.birth_date === '') {
               <div class="info-note" style="background:#fee2e2; border-left-color:#ef4444; margin-bottom: 8px;">
                 <span class="material-icons-outlined" style="color:#ef4444;">warning</span>
-                <p style="color:#b91c1c;">Falta la <strong>Fecha de Nacimiento</strong> en su perfil público. Es obligatoria para poder calcular su edad de castración.</p>
+                <p style="color:#b91c1c; margin: 0;">Falta la <strong>Fecha de Nacimiento</strong> en su <a [routerLink]="['/gestionar-perros', dog()?.id, 'resumen']" style="color:#991b1b; text-decoration: underline; font-weight: bold;">pestaña de Resumen</a>. Es obligatoria para poder calcular su edad de castración.</p>
               </div>
             }
             <div style="display: flex; gap: 10px;">

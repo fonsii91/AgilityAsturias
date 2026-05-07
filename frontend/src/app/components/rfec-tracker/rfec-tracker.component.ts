@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Dog } from '../../models/dog.model';
 import { DogService } from '../../services/dog.service';
 import { RfecTrackService } from '../../services/rfec-track.service';
@@ -17,7 +18,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-rfec-tracker',
   standalone: true,
-  imports: [CommonModule, FormsModule, InstruccionesComponent],
+  imports: [CommonModule, FormsModule, RouterModule, InstruccionesComponent],
   templateUrl: './rfec-tracker.component.html',
   styleUrls: ['./rfec-tracker.component.scss']
 })
@@ -69,6 +70,11 @@ export class RfecTrackerComponent implements OnInit {
 
   selectedDog = computed(() => {
     return this.dogs().find(d => d.id === this.selectedDogId()) || null;
+  });
+
+  hasLicenseProfile = computed(() => {
+    const user = this.authService.currentUserSignal();
+    return !!user?.rfec_license && user.rfec_license.trim() !== '';
   });
 
   // Calcular puntos

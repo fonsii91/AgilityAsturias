@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { TenantService } from '../../services/tenant.service';
@@ -17,6 +17,7 @@ export class RegisterComponent {
     authService = inject(AuthService);
     private fb = inject(FormBuilder);
     private router = inject(Router);
+    private route = inject(ActivatedRoute);
     tenantService = inject(TenantService);
     clubConfig = environment.clubConfig;
     clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
@@ -30,6 +31,15 @@ export class RegisterComponent {
 
     isLoading = signal(false);
     errorMessage = signal('');
+    inviteToken: string | null = null;
+
+    ngOnInit() {
+        this.route.queryParams.subscribe(params => {
+            if (params['invite']) {
+                this.inviteToken = params['invite'];
+            }
+        });
+    }
 
     constructor() { }
 
@@ -46,7 +56,12 @@ export class RegisterComponent {
         this.isLoading.set(true);
         this.errorMessage.set('');
 
-        this.authService.register({ name: name!, email: email!, password: password! }).subscribe({
+        const payload: any = { name: name!, email: email!, password: password! };
+        if (this.inviteToken) {
+            payload.invite_token = this.inviteToken;
+        }
+
+        this.authService.register(payload).subscribe({
             next: () => {
                 this.isLoading.set(false);
                 // Navigation is handled in AuthService, but we can do it here too if needed

@@ -120,7 +120,18 @@
   </div>
   }
 
-  @if (!isLoading() && acwrData()) {
+  @if (!isLoading() && dogs().length > 0 && !hasTrainingProfile()) {
+  <div class="empty-state-card glass-card mt-5 fade-in text-center" style="padding: 3rem 2rem; max-width: 600px; margin: 0 auto; border-radius: 16px;">
+    <span class="material-icons-outlined mb-3" style="font-size: 4rem; color: #94a3b8;">lock</span>
+    <h3 style="color: var(--primary-color); font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem;">¡Desbloquea el módulo Salud Deportiva! 🏆</h3>
+    <p style="color: #475569; font-size: 1rem; margin-bottom: 2rem;">Para poder monitorizar el rendimiento y prevenir lesiones en tu perro, necesitamos que completes su perfil de Entrenamiento (peso y altura).</p>
+    <a [routerLink]="['/gestionar-perros', selectedDogId(), 'entrenamiento']" class="btn-primary" style="text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; cursor: pointer;">
+      <span class="material-icons">pets</span> Ir al perfil del perro
+    </a>
+  </div>
+  }
+
+  @if (!isLoading() && acwrData() && hasTrainingProfile()) {
   <div class="bento-dashboard slide-fade-in">
 
     <!-- GLOBAL ALERT ROW -->

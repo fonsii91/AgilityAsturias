@@ -6,6 +6,7 @@ import { DogService } from '../../../services/dog.service';
 import { ToastService } from '../../../services/toast.service';
 import { ImageCompressorService } from '../../../services/image-compressor.service';
 import { environment } from '../../../../environments/environment';
+import { OnboardingService } from '../../../services/onboarding';
 
 @Component({
   selector: 'app-dog-form',
@@ -140,6 +141,7 @@ export class DogFormComponent {
   toast = inject(ToastService);
   router = inject(Router);
   imageCompressor = inject(ImageCompressorService);
+  onboardingService = inject(OnboardingService);
   
   formData = {
     name: '',
@@ -190,6 +192,8 @@ export class DogFormComponent {
       }
       
       this.toast.success('Perro registrado');
+      this.onboardingService.markStepCompleted('staff_perros');
+      this.onboardingService.markStepCompleted('miembro_perros');
       // Reload user dogs locally so DogService keeps it
       await this.dogService.loadUserDogs();
       this.router.navigate(['/gestionar-perros']);

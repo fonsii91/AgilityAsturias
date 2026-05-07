@@ -662,5 +662,23 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
   - `frontend/src/app/components/admin-deleted-videos/admin-deleted-videos.component.spec.ts`
 - **Descripción:** Se crearon pruebas unitarias para los componentes del panel "Revisar Vídeos". Para el dashboard de estadísticas, se probó la carga inicial de datos y el reintento de subidas, usando la inyección de dependencias estricta de Angular (`runInInjectionContext`). Para el historial de borrados, se validó la carga de datos paginada interceptando el `VideoService`.
 
-### End-to-End (Playwright)
 - No requerido (Las interfaces y la integración del historial/estadísticas están ampliamente probadas a nivel unitario).
+
+---
+
+## 32. Experiencia de Usuario (UX) Global - Onboarding Multipaso
+**Fecha:** 07/05/2026
+**Capas Cubiertas:** Frontend y Backend
+
+### Backend (PHPUnit)
+- **Archivos Modificados/Creados:**
+  - `agility_back/tests/Feature/OnboardingControllerTest.php`
+- **Descripción:** Se testeó la funcionalidad de guardar y consultar el progreso del onboarding. Se validó que un usuario pueda marcar un paso específico como completado y que pueda marcar un tutorial entero como finalizado, persistiendo el progreso en un campo JSON.
+
+### Frontend (Vitest + Angular)
+- **Archivos Modificados/Creados:**
+  - `frontend/src/app/services/onboarding.service.spec.ts`
+- **Descripción:** Se validó el servicio `OnboardingService`, probando la inferencia automática del rol desde el ID del paso, el manejo de progreso con Signals reactivos y el activador automático (`checkAutoFinish`) para mostrar la animación interactiva de finalización tras completar todos los pasos. Se usaron utilidades como `vi.spyOn` para falsear interacciones con el DOM (Canvas de confeti y animaciones).
+
+### End-to-End (Playwright)
+- No requerido (El flujo de estado del progreso y su interacción cruzada están probados ampliamente en Backend y test unitarios en el Frontend).

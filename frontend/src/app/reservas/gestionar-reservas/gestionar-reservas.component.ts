@@ -17,6 +17,7 @@ import { FichaPerroComponent } from '../../components/ficha-perro/ficha-perro.co
 import { InstruccionesComponent } from '../../components/shared/instrucciones/instrucciones.component';
 import { DogWorkloadService } from '../../services/dog-workload.service';
 import { AcwrData } from '../../models/dog-workload.model';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
     selector: 'app-gestionar-reservas',
@@ -32,6 +33,7 @@ export class GestionarReservasComponent {
     timeSlotService = inject(TimeSlotService);
     toastService = inject(ToastService);
     dogWorkloadService = inject(DogWorkloadService);
+    onboardingService = inject(OnboardingService);
 
     // Modal state
     isModalOpen = false;
@@ -486,6 +488,7 @@ export class GestionarReservasComponent {
             });
             this.closeModal();
             this.toastService.success('¡Reserva confirmada con éxito!');
+            this.onboardingService.markStepCompleted('miembro_clase');
         } catch (error: any) {
             console.error('Error al reservar:', error);
             // Handle specific backend error message

@@ -10,6 +10,7 @@ import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.co
 import { getEmojiForCategory } from '../../utils/point-categories';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
     selector: 'app-ranking',
@@ -23,6 +24,7 @@ export class RankingComponent {
     authService = inject(AuthService);
     dogService = inject(DogService);
     toastService = inject(ToastService);
+    onboardingService = inject(OnboardingService);
 
     ranking = signal<any[]>([]);
     isLoading = signal(true);
@@ -120,5 +122,10 @@ export class RankingComponent {
                 this.toastService.error('Error al actualizar el perro');
             }
         }
+    }
+
+    onInstructionsOpened() {
+        this.onboardingService.markStepCompleted('staff_asistencia');
+        this.onboardingService.markStepCompleted('miembro_clasificacion');
     }
 }

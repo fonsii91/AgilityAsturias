@@ -104,8 +104,11 @@
         </div>
       </app-instrucciones>
     </div>
-    <div class="stats">
+    <div class="stats" style="display: flex; gap: 15px; align-items: center;">
       <span>Usuarios: {{ displayUsers().length }}</span>
+      <button (click)="generateMemberInviteLink()" style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: none; background-color: var(--primary-color); color: white; cursor: pointer; font-size: 0.95rem; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: all 0.2s;">
+        <span class="material-icons" style="font-size: 1.2rem;">person_add</span> Invitar Miembro
+      </button>
     </div>
   </div>
 
@@ -124,8 +127,6 @@
             <tr>
               <th>Usuario</th>
               <th>Acciones</th>
-              <th>Estado</th>
-              <th>Email</th>
             </tr>
           </thead>
           <tbody>
@@ -139,7 +140,10 @@
                       <img [src]="clubConfig.logoPath" [alt]="clubName() + ' Logo'"
                         class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
                       }
-                      <span>{{ user.displayName }}</span>
+                      <div class="user-details">
+                        <span class="user-name">{{ user.displayName }}</span>
+                        <span class="user-email">{{ user.email }}</span>
+                      </div>
                     </td>
                     <td>
                       <div class="action-buttons-wrapper">
@@ -167,12 +171,6 @@
                         </button>
                       </div>
                     </td>
-                    <td>
-                      <span class="badge" [class]="user.role">
-                        {{ user.role === 'user' ? 'Inactivo' : (user.role === 'manager' ? 'Gestor' : (user.role | titlecase)) }}
-                      </span>
-                    </td>
-                    <td class="email-cell">{{ user.email }}</td>
                   </tr>
                 }
               </tbody>

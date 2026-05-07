@@ -7,6 +7,7 @@ import { AnnouncementService, Announcement } from '../../services/announcement.s
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
   selector: 'app-tablon-anuncios',
@@ -46,6 +47,7 @@ export class TablonAnunciosComponent implements OnInit {
   
   authService = inject(AuthService);
   sanitizer = inject(DomSanitizer);
+  onboardingService = inject(OnboardingService);
 
   // Allow admin and staff to create and delete messages
   canManage = this.authService.isAdmin() || this.authService.isStaff();
@@ -66,6 +68,7 @@ export class TablonAnunciosComponent implements OnInit {
       next: (data) => {
         this.announcements.set(data);
         this.isLoading.set(false);
+        this.onboardingService.markStepCompleted('miembro_anuncios');
       },
       error: (err) => {
         console.error('Error fetching announcements', err);

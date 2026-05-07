@@ -53,6 +53,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/users/{id}/role', [AuthController::class, 'updateRole']);
         Route::post('/users/{id}/delete', [AuthController::class, 'destroy']);
         Route::post('/users/{id}/generate-reset-link', [AuthController::class, 'generateResetLink']);
+        Route::post('/users/generate-invite-link', [AuthController::class, 'generateInviteLink']);
 
         Route::post('/competitions', [CompetitionController::class, 'store']);
         Route::post('/competitions/{id}', [CompetitionController::class, 'update']);
@@ -136,6 +137,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::middleware(['role:admin,manager,staff,member'])->group(function () {
+        // Onboarding
+        Route::get('/user/onboarding', [\App\Http\Controllers\OnboardingController::class, 'getProgress']);
+        Route::post('/user/onboarding/step', [\App\Http\Controllers\OnboardingController::class, 'updateStep']);
+        Route::post('/user/onboarding/tutorial-finish', [\App\Http\Controllers\OnboardingController::class, 'finishTutorial']);
+
         // Ranking
         Route::get('/ranking', [RankingController::class, 'index']);
 

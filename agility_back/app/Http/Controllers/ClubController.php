@@ -11,7 +11,7 @@ class ClubController extends Controller
     public function current()
     {
         if (app()->bound('active_club_id')) {
-            $club = Club::find(app('active_club_id'));
+            $club = Club::with('plan.features')->find(app('active_club_id'));
             if ($club) {
                 return response()->json([
                     'id' => $club->id,
@@ -20,6 +20,8 @@ class ClubController extends Controller
                     'domain' => $club->domain,
                     'logo_url' => $club->logo_url,
                     'settings' => $club->settings,
+                    'plan_id' => $club->plan_id,
+                    'features' => $club->plan ? $club->plan->features->pluck('slug') : [],
                 ]);
             }
         }

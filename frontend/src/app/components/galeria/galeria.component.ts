@@ -7,6 +7,7 @@ import { AuthService } from '../../services/auth.service';
 import { ImageCompressorService } from '../../services/image-compressor.service';
 import { AddPhotoDialog, AddPhotoDialogData } from './add-photo-dialog/add-photo-dialog';
 import { ConfirmDialog, ConfirmDialogData } from '../shared/confirm-dialog/confirm-dialog';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
     selector: 'app-galeria',
@@ -38,6 +39,7 @@ export class GaleriaComponent implements OnInit {
     private authService = inject(AuthService);
     private imageCompressor = inject(ImageCompressorService);
     private dialog = inject(MatDialog);
+    private onboardingService = inject(OnboardingService);
 
     isStaff = this.authService.isStaff;
 
@@ -92,6 +94,7 @@ export class GaleriaComponent implements OnInit {
             next: (photo) => {
                 this.images.update(current => [photo, ...current]);
                 this.isUploading.set(false);
+                this.onboardingService.markStepCompleted('gestor_galeria');
             },
             error: (err) => {
                 console.error('Error uploading photo', err);
@@ -125,6 +128,7 @@ export class GaleriaComponent implements OnInit {
                 this.galleryService.deletePhoto(id).subscribe({
                     next: () => {
                         this.images.update(current => current.filter(img => img.id !== id));
+                        this.onboardingService.markStepCompleted('gestor_galeria');
                         if (this.lightboxOpen()) {
                             this.closeLightbox();
                         }

@@ -150,12 +150,13 @@
     } @else {
 
     @if (!selectedDog()?.pivot?.rsce_license) {
-    <div class="empty-state no-print" style="background-color: #fff1f2; border: 1px solid #fecdd3;">
-      <span class="material-icons-outlined empty-icon" style="color: #fda4af;">lock</span>
-      <p style="color: #9f1239; font-weight: 600; font-size: 1.1rem; margin-bottom: 0.5rem;">Función Bloqueada</p>
-      <p style="color: #be123c; margin: 0;">No disponible hasta introducir licencia Canina en el <a
-          [routerLink]="['/gestionar-perros', selectedDogId(), 'documentacion']" style="color: #be123c; text-decoration: underline;">perfil privado</a> del
-        perro.</p>
+    <div class="empty-state-card glass-card no-print fade-in text-center" style="background-color: #fff1f2; border: 1px solid #fecdd3; padding: 3rem 2rem; max-width: 600px; margin: 2rem auto; border-radius: 16px;">
+      <span class="material-icons-outlined mb-3" style="font-size: 4rem; color: #fda4af;">lock</span>
+      <h3 style="color: #9f1239; font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem;">¡Desbloquea el módulo Canina! 🏆</h3>
+      <p style="color: #be123c; font-size: 1rem; margin-bottom: 2rem;">Para poder gestionar tus competiciones de la RSCE, necesitamos que añadas el número de licencia en el perfil de tu perro.</p>
+      <a [routerLink]="['/gestionar-perros', selectedDogId(), 'documentacion']" class="btn-primary" style="background-color: #e11d48; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer;">
+        <span class="material-icons">pets</span> Ir al Perfil del Perro
+      </a>
     </div>
     } @else {
 

@@ -30,11 +30,26 @@ class AuthController extends Controller
                 'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
             ]);
 
+            $role = 'user'; // Default role
+            if ($request->has('invite_token')) {
+                try {
+                    $decrypted = decrypt(base64_decode($request->invite_token));
+                    $parts = explode('|', $decrypted);
+                    $activeClubId = app()->bound('active_club_id') ? app('active_club_id') : null;
+
+                    if (count($parts) === 2 && $parts[0] === 'auto_member' && (int)$parts[1] === (int)$activeClubId) {
+                        $role = 'member';
+                    }
+                } catch (\Exception $e) {
+                    // Ignore and keep as 'user'
+                }
+            }
+
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
-                'role' => 'user', // Default role
+                'role' => $role,
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -456,6 +471,28 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Enlace de recuperación generado',
             'link' => $resetLink
+        ]);
+    }
+
+    public function generateInviteLink(Request $request)
+    {
+        $currentUser = $request->user();
+
+        if (!in_array($currentUser->role, ['admin', 'manager', 'staff'])) {
+            return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
+        }
+
+        $activeClubId = app()->bound('active_club_id') ? app('active_club_id') : $currentUser->club_id;
+        $token = base64_encode(encrypt('auto_member|' . $activeClubId));
+
+        $origin = $request->header('origin');
+        $frontendUrl = $origin ? $origin : env('FRONTEND_URL', 'https://clubagility.com');
+        
+        $inviteLink = rtrim($frontendUrl, '/') . '/register?invite=' . $token;
+
+        return response()->json([
+            'message' => 'Enlace de invitación generado',
+            'link' => $inviteLink
         ]);
     }
 

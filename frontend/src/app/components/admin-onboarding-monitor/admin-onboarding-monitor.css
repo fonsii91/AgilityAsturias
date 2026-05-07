@@ -1,0 +1,219 @@
+.monitor-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header-section {
+  margin-bottom: 2rem;
+}
+
+.header-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1e293b;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.header-section p {
+  color: #64748b;
+  font-size: 1rem;
+  margin: 0;
+}
+
+.glass-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.users-table th {
+  background-color: #f8fafc;
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.users-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.users-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar .material-icons-outlined {
+  color: #94a3b8;
+  font-size: 1.5rem;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-details .name {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.95rem;
+}
+
+.user-details .email {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.role-badge.admin { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+.role-badge.manager { background-color: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+.role-badge.staff { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+.role-badge.member { background-color: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+
+.progress-bar-wrapper {
+  width: 100%;
+  max-width: 200px;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  color: #475569;
+}
+
+.progress-bar-bg {
+  height: 8px;
+  background-color: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.status-badge.success {
+  background-color: #f0fdf4;
+  color: #15803d;
+}
+
+.status-badge.success .material-icons {
+  font-size: 1.1rem;
+  color: #16a34a;
+}
+
+.status-badge.pending {
+  background-color: #fffbeb;
+  color: #b45309;
+}
+
+.status-badge.pending .material-icons {
+  font-size: 1.1rem;
+  color: #d97706;
+}
+
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+  color: #64748b;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e2e8f0;
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.empty-message {
+  padding: 3rem !important;
+  color: #64748b;
+}
+
+@media (max-width: 768px) {
+  .monitor-container {
+    padding: 1rem;
+  }
+  
+  .users-table th, .users-table td {
+    padding: 0.75rem 1rem;
+  }
+  
+  .role-badge {
+    display: none; /* Hide on mobile to save space */
+  }
+}

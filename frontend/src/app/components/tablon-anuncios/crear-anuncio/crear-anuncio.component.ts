@@ -6,6 +6,7 @@ import { AnnouncementService } from '../../../services/announcement.service';
 import { AuthService, User } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
+import { OnboardingService } from '../../../services/onboarding';
 
 @Component({
   selector: 'app-crear-anuncio',
@@ -28,7 +29,8 @@ export class CrearAnuncioComponent implements OnInit {
     private announcementService: AnnouncementService,
     private authService: AuthService,
     private toastService: ToastService,
-    private router: Router
+    private router: Router,
+    private onboardingService: OnboardingService
   ) {
     this.announcementForm = this.fb.group({
       title: ['', [Validators.required, Validators.maxLength(255)]],
@@ -76,6 +78,7 @@ export class CrearAnuncioComponent implements OnInit {
     this.announcementService.createAnnouncement(payload).subscribe({
       next: () => {
         this.toastService.success('Anuncio publicado espectacularmente');
+        this.onboardingService.markStepCompleted('staff_anuncio');
         this.isSubmitting.set(false);
         this.router.navigate(['/tablon-anuncios']);
       },

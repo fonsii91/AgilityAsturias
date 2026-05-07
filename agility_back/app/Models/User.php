@@ -33,6 +33,7 @@ class User extends Authenticatable
         'rfec_category',
         'birth_year',
         'club_id',
+        'onboarding_progress',
     ];
 
     /**
@@ -58,6 +59,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'rfec_license' => \App\Casts\GracefulEncryption::class,
             'rfec_expiration_date' => \App\Casts\GracefulEncryption::class,
+            'onboarding_progress' => 'array',
         ];
     }
     /**

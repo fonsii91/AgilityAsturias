@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { DogService } from '../../services/dog.service';
 import { Dog } from '../../models/dog.model';
 import { getEmojiForCategory } from '../../utils/point-categories';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
   selector: 'app-modificar-puntos',
@@ -19,6 +20,7 @@ export class ModificarPuntosComponent implements OnInit {
   location = inject(Location);
   dogService = inject(DogService);
   snackBar = inject(MatSnackBar);
+  onboardingService = inject(OnboardingService);
 
   dogs = this.dogService.getAllDogs();
   
@@ -98,6 +100,7 @@ export class ModificarPuntosComponent implements OnInit {
         duration: 3000,
         panelClass: ['success-snackbar']
       });
+      this.onboardingService.markStepCompleted('staff_puntos');
       this.router.navigate(['/ranking']);
     } catch (error) {
       console.error('Error al modificar puntos', error);

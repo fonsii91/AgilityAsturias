@@ -7,6 +7,7 @@ import { Competition } from '../../models/competition.model';
 import { ImageCompressorService } from '../../services/image-compressor.service';
 import { ToastService } from '../../services/toast.service';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
     selector: 'app-crud-competicion',
@@ -18,6 +19,7 @@ import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.co
 export class CrudCompeticionComponent {
     private toastService = inject(ToastService);
     private imageCompressor = inject(ImageCompressorService);
+    private onboardingService = inject(OnboardingService);
     proximosEventos: any;
     eventosPasados: any;
     displayedEvents: any;
@@ -261,6 +263,7 @@ export class CrudCompeticionComponent {
             } else {
                 await this.competitionService.addCompetition(competitionData);
                 this.toastService.success('Competición creada');
+                this.onboardingService.markStepCompleted('staff_evento');
             }
             this.toggleView();
         } catch (error) {

@@ -21,6 +21,8 @@ export interface TenantInfo {
   slug: string;
   logo_url: string | null;
   settings: ClubSettings | null;
+  plan_id?: number | null;
+  features?: string[];
 }
 
 @Injectable({
@@ -34,6 +36,12 @@ export class TenantService {
 
   constructor() {
     this.detectTenant();
+  }
+
+  public hasFeature(featureSlug: string): boolean {
+    const info = this.tenantInfo();
+    if (!info || !info.features) return false;
+    return info.features.includes(featureSlug);
   }
 
   private detectTenant() {

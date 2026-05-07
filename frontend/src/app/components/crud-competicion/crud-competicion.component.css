@@ -329,6 +329,82 @@ textarea.form-control {
         flex-direction: column-reverse;
         gap: 0.5rem;
     }
+
+    /* Transform Table into Cards for Mobile */
+    .tabs-container {
+        flex-wrap: wrap;
+    }
+
+    .table-responsive {
+        border: none;
+        overflow-x: hidden;
+    }
+    
+    .table thead {
+        display: none;
+    }
+    
+    .table, .table tbody, .table tr, .table td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+    
+    .table tr {
+        margin-bottom: 1rem;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+    }
+    
+    .table td {
+        border: none;
+        padding: 0.5rem 1rem;
+        text-align: left;
+    }
+    
+    .table td:nth-child(1) {
+        padding-top: 1rem;
+        font-size: 1.1rem;
+    }
+    
+    .table td:nth-child(2) {
+        color: #475569;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .table td:nth-child(2)::before {
+        content: "📅";
+    }
+    
+    .table td:nth-child(3) {
+        color: #e63946;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .table td:nth-child(3)::before {
+        content: "⏳ Cierre:";
+        color: #64748b;
+    }
+    
+    .table td.actions {
+        display: flex;
+        justify-content: flex-end;
+        background: #f8fafc;
+        padding: 0.75rem 1rem;
+    }
 }
 
 /* Modal Styles */

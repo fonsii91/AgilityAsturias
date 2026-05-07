@@ -12,6 +12,7 @@ class Club extends Model
         'domain',
         'logo_url',
         'settings',
+        'plan_id',
     ];
 
     protected $casts = [
@@ -21,5 +22,23 @@ class Club extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function plan()
+    {
+        return $this->belongsTo(Plan::class);
+    }
+
+    /**
+     * Check if the club's current plan includes a specific feature.
+     */
+    public function hasFeature($featureSlug)
+    {
+        if (!$this->plan) {
+            return false;
+        }
+
+        // We can cache this in the future if needed
+        return $this->plan->features()->where('slug', $featureSlug)->exists();
     }
 }

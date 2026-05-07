@@ -112,7 +112,7 @@ export class AuthService {
         );
     }
 
-    register(data: { name: string, email: string, password: string }): Observable<AuthResponse> {
+    register(data: { name: string, email: string, password: string, invite_token?: string }): Observable<AuthResponse> {
         this.isLoading.set(true);
         return this.http.post<AuthResponse>(`${this.apiUrl}/register`, data).pipe(
             tap(response => {
@@ -240,6 +240,10 @@ export class AuthService {
 
     generateResetLink(userId: number): Promise<{ link: string, message: string }> {
         return firstValueFrom(this.http.post<{ link: string, message: string }>(`${this.apiUrl}/users/${userId}/generate-reset-link`, {}));
+    }
+
+    generateMemberInviteLink(): Promise<{ link: string, message: string }> {
+        return firstValueFrom(this.http.post<{ link: string, message: string }>(`${this.apiUrl}/users/generate-invite-link`, {}));
     }
 
     resetPassword(data: { token: string, password: string, password_confirmation: string }): Promise<{ message: string }> {

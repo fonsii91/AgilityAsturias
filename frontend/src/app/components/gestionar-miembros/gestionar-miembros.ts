@@ -6,6 +6,7 @@ import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
 import { TenantService } from '../../services/tenant.service';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
   selector: 'app-gestionar-miembros',
@@ -18,6 +19,7 @@ export class GestionarMiembrosComponent implements OnInit {
   authService = inject(AuthService);
   toastService = inject(ToastService);
   tenantService = inject(TenantService);
+  onboardingService = inject(OnboardingService);
   clubConfig = environment.clubConfig;
   clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
 
@@ -59,13 +61,26 @@ export class GestionarMiembrosComponent implements OnInit {
       await navigator.clipboard.writeText(response.link);
 
       this.toastService.success('Enlace de recuperación copiado al portapapeles');
+      this.onboardingService.markStepCompleted('gestor_equipo');
     } catch (error: any) {
       console.error('Error generating reset link', error);
       let errorMsg = 'Error al generar el enlace';
-      if (error.error && error.error.message) {
+      if (error?.error?.message) {
         errorMsg = error.error.message;
       }
       this.toastService.error(errorMsg);
+    }
+  }
+
+  async generateMemberInviteLink() {
+    try {
+      const response = await this.authService.generateMemberInviteLink();
+      await navigator.clipboard.writeText(response.link);
+      this.toastService.success('Enlace de invitación copiado al portapapeles');
+      this.onboardingService.markStepCompleted('gestor_equipo');
+    } catch (error) {
+      console.error('Error al generar enlace de invitación', error);
+      this.toastService.error('Error al generar enlace de invitación');
     }
   }
 

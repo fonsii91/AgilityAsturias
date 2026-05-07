@@ -1,5 +1,6 @@
 import { Component, OnInit, signal, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { DogWorkloadService } from '../../../services/dog-workload.service';
 import { DogService } from '../../../services/dog.service';
 import { AcwrData, DogWorkload } from '../../../models/dog-workload.model';
@@ -20,6 +21,7 @@ import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones
   standalone: true,
   imports: [
     CommonModule, 
+    RouterModule,
     FormsModule, 
     AthleticProfileCardComponent, 
     MatDialogModule, 
@@ -59,6 +61,12 @@ export class SaludDeportivaComponent implements OnInit {
 
     // Se mantiene siempre la foto original del perro como foto principal.
     return dog.photo_url || '/placeholder-dog.jpg';
+  });
+
+  hasTrainingProfile = computed(() => {
+    const dog = this.selectedDog();
+    if (!dog) return false;
+    return dog.weight_kg != null && dog.height_cm != null;
   });
 
   // Formularios manuales

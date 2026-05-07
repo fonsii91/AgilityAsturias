@@ -13,6 +13,7 @@ import { ImageCompressorService } from '../../../services/image-compressor.servi
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TenantService } from '../../../services/tenant.service';
 import { SuggestionService } from '../../../services/suggestion.service';
+import { OnboardingService } from '../../../services/onboarding';
 
 @Component({
   selector: 'app-club-form',
@@ -825,6 +826,7 @@ export class ClubFormComponent implements OnInit {
   private imageCompressor = inject(ImageCompressorService);
   private tenantService = inject(TenantService);
   private suggestionService = inject(SuggestionService);
+  private onboardingService = inject(OnboardingService);
   
   form!: FormGroup;
   
@@ -1069,6 +1071,7 @@ export class ClubFormComponent implements OnInit {
           await this.tenantService.reload();
         }
         
+        this.onboardingService.markStepCompleted('gestor_logo');
         this.router.navigate(['/admin/clubs']);
       },
       error: (err) => {

@@ -6,6 +6,7 @@ import { ToastService } from '../../services/toast.service';
 import { AuthService, User } from '../../services/auth.service';
 import { DogService } from '../../services/dog.service';
 import { Dog } from '../../models/dog.model';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
     selector: 'app-attendance-verification',
@@ -19,6 +20,7 @@ export class AttendanceVerificationComponent {
     private toastService = inject(ToastService);
     private authService = inject(AuthService);
     private dogService = inject(DogService);
+    private onboardingService = inject(OnboardingService);
 
     pendingSessions = signal<any[]>([]);
     pendingCompetitions = signal<any[]>([]);
@@ -270,6 +272,7 @@ export class AttendanceVerificationComponent {
             }).subscribe({
                 next: () => {
                     this.toastService.success('Asistencia de competición confirmada correctamente');
+                    this.onboardingService.markStepCompleted('staff_asistencia');
                     this.pendingCompetitions.update(list => list.filter(item => item.id !== comp.id));
                     this.closeConfirmModal();
                 },
@@ -292,6 +295,7 @@ export class AttendanceVerificationComponent {
             }).subscribe({
                 next: () => {
                     this.toastService.success('Asistencia confirmada correctamente');
+                    this.onboardingService.markStepCompleted('staff_asistencia');
                     this.pendingSessions.update(list => list.filter(item => this.getSessionKey(item) !== key));
                     this.closeConfirmModal();
                 },

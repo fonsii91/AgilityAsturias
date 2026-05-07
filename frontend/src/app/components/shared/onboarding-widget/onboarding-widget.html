@@ -1,0 +1,55 @@
+<div class="onboarding-container" *ngIf="onboardingService.activeTutorialType()">
+  
+  <!-- Popover / Checklist -->
+  <div class="onboarding-popover" *ngIf="isExpanded()" @popover>
+    <div class="popover-header">
+      <div class="header-titles">
+        <h4>Comienza tu aventura</h4>
+        <p>Tutorial de {{ activeTypeDisplay }}</p>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill" [style.width.%]="onboardingService.activeTutorialProgress()"></div>
+        </div>
+      </div>
+      <button class="close-btn" (click)="toggle()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="popover-content">
+      <div class="step-item" 
+           *ngFor="let step of onboardingService.activeSteps()"
+           [class.completed]="onboardingService.isStepCompleted(step.id)"
+           (click)="navigate(step)">
+        
+        <div class="step-icon">
+          <mat-icon *ngIf="!onboardingService.isStepCompleted(step.id)">{{ step.icon }}</mat-icon>
+          <mat-icon *ngIf="onboardingService.isStepCompleted(step.id)" class="check-icon">check_circle</mat-icon>
+        </div>
+        
+        <div class="step-text">
+          <span class="step-title">{{ step.title }}</span>
+          <span class="step-desc">{{ step.description }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAB -->
+  <button class="onboarding-fab" (click)="toggle()" [class.expanded]="isExpanded()">
+    <div class="spinner-container" *ngIf="!isExpanded()">
+      <mat-progress-spinner
+        mode="determinate"
+        [value]="onboardingService.activeTutorialProgress()"
+        diameter="48"
+        strokeWidth="4"
+        class="custom-spinner">
+      </mat-progress-spinner>
+      <div class="spinner-text">
+        <mat-icon>rocket_launch</mat-icon>
+      </div>
+    </div>
+    <div class="close-icon" *ngIf="isExpanded()">
+      <mat-icon>expand_more</mat-icon>
+    </div>
+  </button>
+</div>

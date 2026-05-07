@@ -1,4 +1,4 @@
-﻿.management-container {
+.management-container {
     max-width: 1000px;
     margin: 2rem auto;
     padding: 2rem 1rem;
@@ -71,22 +71,22 @@ h2 {
 }
 
 .status-badge {
-    background: #eff6ff;
-    color: #2563eb;
+    background: color-mix(in srgb, var(--primary-color) 10%, white);
+    color: var(--primary-color);
     font-size: 0.75rem;
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 20px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border: 1px solid #bfdbfe;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 30%, white);
     animation: pulseBadge 2s infinite;
 }
 
 @keyframes pulseBadge {
-    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-    70% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
-    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary-color) 40%, transparent); }
+    70% { box-shadow: 0 0 0 6px transparent; }
+    100% { box-shadow: 0 0 0 0 transparent; }
 }
 
 /* Form Grid & Inputs */
@@ -145,7 +145,7 @@ h2 {
 .modern-input:focus-within {
     background: white;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(0, 115, 207, 0.1);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 10%, transparent);
     outline: none;
 }
 
@@ -211,24 +211,24 @@ h2 {
     font-weight: 600;
     font-size: 0.95rem;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 115, 207, 0.2);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 20%, transparent);
     transition: all 0.2s ease;
 }
 
 .btn-primary-action:hover {
-    background: var(--accent-orange, #005bb5);
+    background: var(--primary-dark, color-mix(in srgb, var(--primary-color) 80%, black));
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 115, 207, 0.3);
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
 .btn-primary-action.btn-edit {
-    background: #10b981;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    background: var(--primary-color);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 20%, transparent);
 }
 
 .btn-primary-action.btn-edit:hover {
-    background: #059669;
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    background: var(--primary-dark, color-mix(in srgb, var(--primary-color) 80%, black));
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
 /* Divider */
@@ -287,8 +287,8 @@ h2 {
 
 .admin-slot-card.highlighted {
     border-color: var(--primary-color);
-    background: #f0f9ff;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    background: color-mix(in srgb, var(--primary-color) 5%, white);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 20%, transparent);
 }
 
 .slot-card-left {
@@ -373,7 +373,7 @@ h2 {
 }
 
 .btn-icon-action.edit:hover {
-    background: #eff6ff;
+    background: color-mix(in srgb, var(--primary-color) 10%, white);
     color: var(--primary-color);
 }
 
@@ -416,7 +416,8 @@ h2 {
     width: 90%;
     max-width: 480px;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-    overflow: hidden;
+    overflow-y: auto;
+    max-height: 90vh;
 }
 
 .modal-content.large-modal {
@@ -446,7 +447,7 @@ h2 {
 .header-icon {
     font-size: 24px;
     color: var(--primary-color);
-    background: #eff6ff;
+    background: color-mix(in srgb, var(--primary-color) 10%, white);
     padding: 8px;
     border-radius: 12px;
 }
@@ -538,7 +539,7 @@ h2 {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(var(--primary-color-rgb, 0, 115, 207), 0.3);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
 /* Selector M�ltiple de D�as */

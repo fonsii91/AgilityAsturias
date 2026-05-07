@@ -7,6 +7,7 @@ import { PersonalEventService } from '../../services/personal-event.service';
 import { PersonalEvent } from '../../models/personal-event.model';
 import { FormsModule } from '@angular/forms';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
+import { OnboardingService } from '../../services/onboarding';
 interface CalendarDay {
     date: Date;
     isCompetition: boolean;
@@ -72,6 +73,7 @@ export class CalendarioComponent implements AfterViewInit {
     // Attendance state
     authService = inject(AuthService);
     dogService = inject(DogService);
+    onboardingService = inject(OnboardingService);
     isConfirmingAttendance = false;
     selectedDogIds = new Set<number>();
     selectedAttendanceDays = new Set<string>();
@@ -412,6 +414,8 @@ export class CalendarioComponent implements AfterViewInit {
             this.selectedCompetition.attendingDogIds = dogIdsArray;
             this.selectedCompetition.diasAsistencia = daysArray;
             this.isConfirmingAttendance = false;
+            
+            this.onboardingService.markStepCompleted('miembro_evento');
 
             if (this.viewingAttendees) {
                 this.loadAttendees();

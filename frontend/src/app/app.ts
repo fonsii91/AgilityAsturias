@@ -18,10 +18,11 @@ import { TenantService } from './services/tenant.service';
 
 import { CommonModule, DatePipe } from '@angular/common';
 import { ClubagilityComponent } from './clubagility/clubagility.component';
+import { OnboardingWidgetComponent } from './components/shared/onboarding-widget/onboarding-widget';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

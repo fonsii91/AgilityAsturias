@@ -8,6 +8,7 @@ import { ImageCompressorService } from '../../services/image-compressor.service'
 import { ToastService } from '../../services/toast.service';
 import { Dog } from '../../models/dog.model';
 import { environment } from '../../../environments/environment';
+import { OnboardingService } from '../../services/onboarding';
 
 @Component({
   selector: 'app-perfil',
@@ -21,6 +22,7 @@ export class Perfil {
   dogService = inject(DogService);
   imageCompressor = inject(ImageCompressorService);
   toastService = inject(ToastService);
+  onboardingService = inject(OnboardingService);
 
   dogs = this.dogService.getDogs();
 
@@ -54,6 +56,7 @@ export class Perfil {
             expiration: user.rfec_expiration_date ? user.rfec_expiration_date.split('T')[0] : '',
             category: user.rfec_category || ''
         };
+        this.onboardingService.markStepCompleted('miembro_perfil');
       }
     }, { allowSignalWrites: true });
   }

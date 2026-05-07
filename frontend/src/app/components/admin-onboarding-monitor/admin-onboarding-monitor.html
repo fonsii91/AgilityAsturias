@@ -1,0 +1,82 @@
+<div class="monitor-container">
+  <div class="header-section">
+    <h2><span class="material-icons-outlined" style="color: var(--primary-color);">checklist_rtl</span> Monitor de Onboarding</h2>
+    <p>Supervisa qué miembros han completado el tutorial de introducción a la aplicación.</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando datos de los miembros...</p>
+    </div>
+  } @else {
+    <div class="card glass-card">
+      <div class="table-responsive">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Progreso ({{ expectedSteps.length }} pasos)</th>
+              <th>Estado Tutorial</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users(); track user.id) {
+              <tr>
+                <td>
+                  <div class="user-info">
+                    <div class="avatar">
+                      @if (user.photo_url) {
+                        <img [src]="user.photo_url" [alt]="user.name">
+                      } @else {
+                        <span class="material-icons-outlined">person</span>
+                      }
+                    </div>
+                    <div class="user-details">
+                      <span class="name">{{ user.name }}</span>
+                      <span class="email">{{ user.email }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="role-badge" [ngClass]="user.role">{{ user.role }}</span>
+                </td>
+                <td>
+                  <div class="progress-bar-wrapper">
+                    <div class="progress-info">
+                      <span class="progress-text">{{ user.stepsCompleted }} / {{ user.totalSteps }} completados</span>
+                      <span class="progress-percentage">{{ (user.stepsCompleted / user.totalSteps) * 100 | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="progress-bar-bg">
+                      <div class="progress-bar-fill" 
+                           [style.width.%]="(user.stepsCompleted / user.totalSteps) * 100"
+                           [style.background-color]="getProgressBarColor(user.stepsCompleted, user.totalSteps)">
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  @if (user.tutorialCompleted) {
+                    <span class="status-badge success">
+                      <span class="material-icons">check_circle</span> Completado
+                    </span>
+                  } @else {
+                    <span class="status-badge pending">
+                      <span class="material-icons">hourglass_empty</span> Pendiente
+                    </span>
+                  }
+                </td>
+              </tr>
+            }
+            @if (users().length === 0) {
+              <tr>
+                <td colspan="4" class="text-center empty-message">No se han encontrado usuarios.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+</div>

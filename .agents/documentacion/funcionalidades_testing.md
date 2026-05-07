@@ -78,3 +78,8 @@ Puedes ir marcando las casillas (`[x]`) a medida que completemos las pruebas de 
 - [x] **Monitorización RSCE:** Control avanzado de licencias y pistas de la comunidad.
 - [x] **Monitorización Salud:** Vista global de la salud y el ACWR de todos los perros.
 - [x] **Revisar Vídeos:** Monitorización de sincronización con YouTube (estadísticas) y visualización del historial global de vídeos borrados.
+
+---
+
+## 5. Experiencia de Usuario (UX) Global
+- [x] **Onboarding:** Tutorial multipaso interactivo para nuevos usuarios (Gestor, Staff, Miembro).
