@@ -43,16 +43,18 @@
             <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Como personal del equipo tienes acceso a opciones exclusivas de gestión:</p>
 
             <ul style="padding-left: 0; margin-bottom: 0; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
-              <li style="display: flex; gap: 10px; align-items: flex-start;">
-                <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">add_circle_outline</span>
-                <div><strong>Añadir Recurso:</strong> Este botón superior permite subir archivos nuevos o compartir enlaces, y asociarles el nivel mínimo y categoría correspondientes.</div>
-              </li>
+              <ng-container *hasFeature="'recursos'">
+                <li style="display: flex; gap: 10px; align-items: flex-start;">
+                  <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">add_circle_outline</span>
+                  <div><strong>Añadir Recurso:</strong> Este botón superior permite subir archivos nuevos o compartir enlaces, y asociarles el nivel mínimo y categoría correspondientes.</div>
+                </li>
+              </ng-container>
               <li style="display: flex; gap: 10px; align-items: flex-start;">
                 <div style="display: flex; gap: 4px; flex-shrink: 0;">
                   <span class="material-icons" style="color: #f59e0b; margin-top: 2px;">edit</span>
                   <span class="material-icons" style="color: #ef4444; margin-top: 2px;">delete</span>
                 </div>
-                <div><strong>Gestión de contenido:</strong> Dentro de cada recurso (al pasar el ratón por encima en ordenador o al mantener presionado con el móvil), aparecerán los botones para editar el material subido o borrarlo permanentemente.</div>
+                <div><strong>Gestión de contenido:</strong> Dentro de cada recurso (al pasar el ratón por encima en ordenador o al mantener presionado con el móvil), aparecerán los botones para editar el material subido o borrarlo permanentemente. Además, puedes ocultar recursos globales para tu club.</div>
               </li>
             </ul>
             }
@@ -87,7 +89,7 @@
 
     <div class="action-buttons-group">
       @if (canManage()) {
-      <button routerLink="/recursos/nuevo" class="btn-primary-add">
+      <button *hasFeature="'recursos'" routerLink="/recursos/nuevo" class="btn-primary-add">
         <span class="material-icons">add_circle_outline</span>
         <span class="btn-text">Añadir Recurso</span>
       </button>
@@ -142,13 +144,15 @@
           </button>
           }
           @if (canEditOrDeleteResource(resource)) {
-          <button mat-icon-button class="action-btn edit-btn" [routerLink]="['/recursos/editar', resource.id]"
-            (click)="$event.stopPropagation()" matTooltip="Editar">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button mat-icon-button class="action-btn delete-btn" (click)="deleteResource($event, resource)" matTooltip="Eliminar">
-            <mat-icon>delete</mat-icon>
-          </button>
+          <ng-container *hasFeature="'recursos'">
+            <button mat-icon-button class="action-btn edit-btn" [routerLink]="['/recursos/editar', resource.id]"
+              (click)="$event.stopPropagation()" matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button class="action-btn delete-btn" (click)="deleteResource($event, resource)" matTooltip="Eliminar">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ng-container>
           }
         </div>
       </div>

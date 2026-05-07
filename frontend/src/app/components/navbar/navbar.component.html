@@ -15,7 +15,7 @@
               class="material-icons">home</span> Bienvenida</a></li>
         <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
             Galería</a></li>
-        <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
+        <li *hasFeature="'galeria-videos'"><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
               class="material-icons">videocam</span> Videoteca</a></li>
         <li><a routerLink="/contacto" routerLinkActive="active-route"><span
               class="material-icons">contact_support</span> Contacto</a></li>
@@ -29,7 +29,7 @@
                   class="material-icons">home</span> Bienvenida</a></li>
             <li><a routerLink="/galeria" routerLinkActive="active-route"><span
                   class="material-icons">photo_library</span> Galería</a></li>
-            <li><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
+            <li *hasFeature="'galeria-videos'"><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
                   class="material-icons">videocam</span> Videoteca</a></li>
             <li><a routerLink="/contacto" routerLinkActive="active-route"><span
                   class="material-icons">contact_support</span> Contacto</a></li>
@@ -51,13 +51,13 @@
         <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">apps</span> Miembros <span
             class="material-icons arrow">expand_more</span></a>
         <ul class="dropdown-menu-list">
-          <li><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span>
+          <li *hasFeature="'reservas-pistas'"><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span>
               Reservas</a></li>
           <li><a routerLink="/calendario" routerLinkActive="active-route"><span
                 class="material-icons">calendar_month</span> Calendario</a></li>
           <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
               Clasificación</a></li>
-          <li><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
+          <li *hasFeature="'galeria-videos'"><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
               Vídeos</a></li>
         </ul>
       </li>
@@ -71,7 +71,7 @@
         <ul class="dropdown-menu-list">
           <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span
                 class="material-icons">sports_score</span> Eventos</a></li>
-          <li><a routerLink="/info-reservas" routerLinkActive="active-route"><span
+          <li *hasFeature="'reservas-pistas'"><a routerLink="/info-reservas" routerLinkActive="active-route"><span
                 class="material-icons">visibility</span> Monitor Reservas</a></li>
           <li><a routerLink="/admin/asistencia" routerLinkActive="active-route"><span
                 class="material-icons">fact_check</span> Verificar Asistencia</a></li>
@@ -79,7 +79,7 @@
                 class="material-icons">military_tech</span> Puntos Extra</a></li>
           <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route"><span
                 class="material-icons">people</span> Gestión Miembros</a></li>
-          <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route"><span
+          <li *hasFeature="'reservas-pistas'"><a routerLink="/gestionar-horarios" routerLinkActive="active-route"><span
                 class="material-icons">calendar_month</span> Gestión Horarios</a></li>
         </ul>
       </li>
@@ -109,13 +109,15 @@
                 class="material-icons">admin_panel_settings</span> Roles</a></li>
           <li><a routerLink="/admin/clubs" routerLinkActive="active-route"><span class="material-icons">domain</span>
               Gestión de Clubes</a></li>
+          <li><a routerLink="/admin/suscripciones" routerLinkActive="active-route"><span class="material-icons">card_membership</span>
+              Planes y Funciones</a></li>
           <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route"><span
                 class="material-icons">report_problem</span> Ver sugerencias</a></li>
           <li class="dropdown-divider"></li>
           <li
             style="padding: 4px 20px; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">
             Revisar</li>
-          <li><a routerLink="/admin/videos" routerLinkActive="active-route"><span
+          <li *hasFeature="'galeria-videos'"><a routerLink="/admin/videos" routerLinkActive="active-route"><span
                 class="material-icons">video_library</span> Revisar vídeos</a></li>
           <li><a routerLink="/admin/salud-monitor" routerLinkActive="active-route"><span
                 class="material-icons">monitor_heart</span> Monitor ACWR</a></li>
@@ -135,11 +137,11 @@
         <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span
             class="material-icons arrow">expand_more</span></a>
         <ul class="dropdown-menu-list">
-          <li><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route"><span
+          <li *hasFeature="'salud-canina'"><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route"><span
                 class="material-icons">favorite</span> Salud Deportiva</a></li>
-          <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route"><span
+          <li *hasFeature="'modulo-canina'"><a routerLink="/bitacora-rsce" routerLinkActive="active-route"><span
                 class="material-icons">analytics</span> Canina (RSCE)</a></li>
-          <li><a routerLink="/bitacora-rfec" routerLinkActive="active-route"><span class="material-icons">pets</span>
+          <li *hasFeature="'modulo-caza'"><a routerLink="/bitacora-rfec" routerLinkActive="active-route"><span class="material-icons">pets</span>
               Caza (RFEC)</a></li>
           <li><a routerLink="/tablon-anuncios" routerLinkActive="active-route"><span
                 class="material-icons">campaign</span> Tablón de Anuncios</a></li>

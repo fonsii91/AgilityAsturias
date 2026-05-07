@@ -129,6 +129,7 @@ class ClubController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:clubs,slug',
             'domain' => 'nullable|string|max:255|unique:clubs,domain',
+            'plan_id' => 'nullable|exists:plans,id',
             'logo_url' => 'nullable|string|max:255',
             'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
             'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
@@ -154,6 +155,7 @@ class ClubController extends Controller
             'name' => $validated['name'],
             'slug' => $validated['slug'],
             'domain' => $validated['domain'] ?? null,
+            'plan_id' => $validated['plan_id'] ?? null,
             'logo_url' => $validated['logo_url'] ?? null,
             'settings' => $settings,
         ]);
@@ -174,6 +176,7 @@ class ClubController extends Controller
                 'name' => 'required|string|max:255',
                 'slug' => 'required|string|max:255|unique:clubs,slug,' . $club->id,
                 'domain' => 'nullable|string|max:255|unique:clubs,domain,' . $club->id,
+                'plan_id' => 'nullable|exists:plans,id',
                 'logo_url' => 'nullable|string|max:255',
                 'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
                 'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
@@ -201,6 +204,9 @@ class ClubController extends Controller
             }
             if (array_key_exists('domain', $validated)) {
                 $updateData['domain'] = $validated['domain'] ?? null;
+            }
+            if (array_key_exists('plan_id', $validated)) {
+                $updateData['plan_id'] = $validated['plan_id'] ?? null;
             }
         }
 

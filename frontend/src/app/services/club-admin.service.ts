@@ -10,6 +10,7 @@ export interface Club {
     domain?: string | null;
     logo_url: string | null;
     settings: any;
+    plan_id?: number | null;
 }
 
 export interface ClubHandoff {

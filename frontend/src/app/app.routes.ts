@@ -16,6 +16,7 @@ import { staffGuard } from './guards/staff.guard';
 import { adminGuard } from './guards/admin.guard';
 import { memberGuard } from './guards/member.guard';
 import { managerGuard } from './guards/manager.guard';
+import { featureGuard } from './guards/feature.guard';
 
 export const routes: Routes = [
     {
@@ -50,7 +51,7 @@ export const routes: Routes = [
     {
         path: 'reservas',
         loadComponent: () => import('./reservas/gestionar-reservas/gestionar-reservas.component').then(m => m.GestionarReservasComponent),
-        canActivate: [memberGuard],
+        canActivate: [memberGuard, featureGuard('reservas-pistas')],
         title: titleResolver, data: { pageTitle: '' }
     },
 
@@ -67,6 +68,7 @@ export const routes: Routes = [
     {
         path: 'videos-publicos',
         loadComponent: () => import('./components/galeria-videos-publica/galeria-videos-publica.component').then(m => m.GaleriaVideosPublicaComponent),
+        canActivate: [featureGuard('galeria-videos')],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
@@ -84,7 +86,7 @@ export const routes: Routes = [
     {
         path: 'admin/videos',
         loadComponent: () => import('./components/admin-videos-stats/admin-videos-stats.component').then(m => m.AdminVideosStatsComponent),
-        canActivate: [adminGuard],
+        canActivate: [adminGuard, featureGuard('galeria-videos')],
         title: titleResolver, data: { pageTitle: 'Estadísticas de Vídeos' }
     },
     {
@@ -112,9 +114,15 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Monitor de Onboarding' }
     },
     {
+        path: 'admin/suscripciones',
+        loadComponent: () => import('./components/admin-suscripciones/admin-suscripciones').then(m => m.AdminSuscripcionesComponent),
+        canActivate: [adminGuard],
+        title: titleResolver, data: { pageTitle: 'Planes y Funcionalidades' }
+    },
+    {
         path: 'gestionar-horarios',
         loadComponent: () => import('./reservas/gestionar-horarios/gestionar-horarios.component').then(m => m.GestionarHorariosComponent),
-        canActivate: [staffGuard],
+        canActivate: [staffGuard, featureGuard('reservas-pistas')],
         title: titleResolver, data: { pageTitle: 'Gestión de Horarios' }
     },
     {
@@ -144,7 +152,7 @@ export const routes: Routes = [
     {
         path: 'info-reservas',
         loadComponent: () => import('./components/info-reservas/info-reservas.component').then(m => m.InfoReservasComponent),
-        canActivate: [staffGuard],
+        canActivate: [staffGuard, featureGuard('reservas-pistas')],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
@@ -225,13 +233,13 @@ export const routes: Routes = [
     {
         path: 'galeria-videos',
         loadComponent: () => import('./components/galeria-videos/video-list/video-list.component').then(m => m.VideoListComponent),
-        canActivate: [memberGuard],
+        canActivate: [memberGuard, featureGuard('galeria-videos')],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'galeria-videos/subir',
         loadComponent: () => import('./components/galeria-videos/upload-video/upload-video.component').then(m => m.UploadVideoComponent),
-        canActivate: [memberGuard],
+        canActivate: [memberGuard, featureGuard('galeria-videos')],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
@@ -243,13 +251,13 @@ export const routes: Routes = [
     {
         path: 'recursos/nuevo',
         loadComponent: () => import('./components/recursos/recursos-form/recursos-form.component').then(m => m.RecursosFormComponent),
-        canActivate: [staffGuard],
+        canActivate: [staffGuard, featureGuard('recursos')],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
         path: 'recursos/editar/:id',
         loadComponent: () => import('./components/recursos/recursos-form/recursos-form.component').then(m => m.RecursosFormComponent),
-        canActivate: [staffGuard],
+        canActivate: [staffGuard, featureGuard('recursos')],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
@@ -261,19 +269,19 @@ export const routes: Routes = [
     {
         path: 'explorar/salud-deportiva',
         loadComponent: () => import('./components/explorar/salud-deportiva/salud-deportiva').then(m => m.SaludDeportivaComponent),
-        canActivate: [memberGuard],
+        canActivate: [memberGuard, featureGuard('salud-canina')],
         title: titleResolver, data: { pageTitle: 'Salud Deportiva' }
     },
     {
         path: 'bitacora-rsce',
         loadComponent: () => import('./components/rsce-tracker/rsce-tracker.component').then(m => m.RsceTrackerComponent),
-        canActivate: [memberGuard],
+        canActivate: [memberGuard, featureGuard('modulo-canina')],
         title: titleResolver, data: { pageTitle: 'Seguimiento RSCE' }
     },
     {
         path: 'bitacora-rfec',
         loadComponent: () => import('./components/rfec-tracker/rfec-tracker.component').then(m => m.RfecTrackerComponent),
-        canActivate: [memberGuard],
+        canActivate: [memberGuard, featureGuard('modulo-caza')],
         title: titleResolver, data: { pageTitle: 'Seguimiento RFEC' }
     }
 ];

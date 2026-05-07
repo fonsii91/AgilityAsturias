@@ -6,11 +6,20 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
+import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { environment } from '../../../environments/environment';
+
+interface Plan {
+  id: number;
+  name: string;
+  price: string;
+}
 
 @Component({
   selector: 'app-clubs-list',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, RouterModule],
+  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, RouterModule, FormsModule],
   template: `
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
@@ -54,6 +63,19 @@ import { ToastService } from '../../services/toast.service';
           </td>
         </ng-container>
 
+        <!-- Plan Column -->
+        <ng-container matColumnDef="plan">
+          <th mat-header-cell *matHeaderCellDef> Plan </th>
+          <td mat-cell *matCellDef="let club">
+            <select [ngModel]="club.plan_id" (ngModelChange)="changeClubPlan(club, $event)" class="plan-select">
+              <option [ngValue]="null">Sin Plan (Restringido)</option>
+              @for (plan of plans(); track plan.id) {
+                <option [ngValue]="plan.id">{{ plan.name }}</option>
+              }
+            </select>
+          </td>
+        </ng-container>
+
         <!-- Actions Column -->
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef> Acciones </th>
@@ -83,17 +105,42 @@ import { ToastService } from '../../services/toast.service';
     .font-bold { font-weight: 700; }
     .text-blue-600 { color: #2563eb; }
     .hover\\:underline:hover { text-decoration: underline; }
+    .plan-select { padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.875rem; background: white; outline: none; }
+    .plan-select:focus { border-color: #3b82f6; }
   `]
 })
 export class ClubsListComponent implements OnInit {
   private clubService = inject(ClubAdminService);
   private toast = inject(ToastService);
+  private http = inject(HttpClient);
 
   clubs = signal<Club[]>([]);
-  displayedColumns: string[] = ['id', 'name', 'slug', 'domain', 'actions'];
+  plans = signal<Plan[]>([]);
+  displayedColumns: string[] = ['id', 'name', 'slug', 'domain', 'plan', 'actions'];
 
   ngOnInit(): void {
     this.loadClubs();
+    this.loadPlans();
+  }
+
+  loadPlans() {
+    this.http.get<Plan[]>(`${environment.apiUrl}/admin/plans`).subscribe({
+      next: (plans) => this.plans.set(plans),
+      error: (err) => this.toast.error('Error al cargar los planes')
+    });
+  }
+
+  changeClubPlan(club: Club, newPlanId: number | null) {
+    this.http.put(`${environment.apiUrl}/admin/clubs/${club.id}/plan`, { plan_id: newPlanId }).subscribe({
+      next: () => {
+        this.toast.success(`Plan de ${club.name} actualizado`);
+        club.plan_id = newPlanId;
+      },
+      error: () => {
+        this.toast.error('Error al actualizar el plan');
+        this.loadClubs(); // reload to revert UI
+      }
+    });
   }
 
   getClubBaseUrl(club: Club): string {

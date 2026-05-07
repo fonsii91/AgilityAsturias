@@ -128,6 +128,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/suggestions', [SuggestionController::class, 'index']);
         Route::post('/admin/suggestions/{id}/resolve', [SuggestionController::class, 'resolve']);
         Route::post('/admin/suggestions/{id}/unresolve', [SuggestionController::class, 'unresolve']);
+        // Subscriptions & Features (Admin)
+        Route::get('/admin/plans', [\App\Http\Controllers\SubscriptionAdminController::class, 'getPlans']);
+        Route::get('/admin/features', [\App\Http\Controllers\SubscriptionAdminController::class, 'getFeatures']);
+        Route::post('/admin/plans', [\App\Http\Controllers\SubscriptionAdminController::class, 'createPlan']);
+        Route::put('/admin/plans/{plan}', [\App\Http\Controllers\SubscriptionAdminController::class, 'updatePlan']);
+        Route::put('/admin/plans/{plan}/features', [\App\Http\Controllers\SubscriptionAdminController::class, 'syncFeatures']);
+        Route::put('/admin/clubs/{club}/plan', [\App\Http\Controllers\SubscriptionAdminController::class, 'assignPlanToClub']);
     });
 
     Route::middleware(['role:admin,manager'])->group(function () {

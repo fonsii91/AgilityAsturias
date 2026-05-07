@@ -32,20 +32,20 @@
           }
           @if (authService.isMember()) {
           <li class="mobile-nav-divider">Miembros</li>
-          <li><a routerLink="/reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'reservas-pistas'"><a routerLink="/reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">event</span> Reservas</a></li>
           <li><a routerLink="/calendario" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">calendar_month</span> Calendario</a></li>
           <li><a routerLink="/ranking" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">emoji_events</span> Clasificación</a></li>
-          <li><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'galeria-videos'"><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">movie</span> Vídeos</a></li>
           }
 
           @if (!authService.isMember()) {
           <li><a routerLink="/galeria" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">photo_library</span> Galería</a></li>
-          <li><a routerLink="/videos-publicos" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'galeria-videos'"><a routerLink="/videos-publicos" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">videocam</span> Videoteca</a></li>
           }
 
@@ -59,7 +59,7 @@
           <li class="mobile-nav-divider">Staff</li>
           <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">sports_score</span> Eventos</a></li>
-          <li><a routerLink="/info-reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'reservas-pistas'"><a routerLink="/info-reservas" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">visibility</span> Monitor Reservas</a></li>
           <li><a routerLink="/admin/asistencia" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">fact_check</span> Verificar Asistencia</a></li>
@@ -67,7 +67,7 @@
                 class="material-icons">military_tech</span> Puntos Extra</a></li>
           <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">people</span> Gestión Miembros</a></li>
-          <li><a routerLink="/gestionar-horarios" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'reservas-pistas'"><a routerLink="/gestionar-horarios" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">calendar_month</span> Gestión Horarios</a></li>
           }
 
@@ -91,9 +91,9 @@
                 class="material-icons">report_problem</span> Ver sugerencias</a></li>
           <li class="mobile-nav-divider"
             style="padding-top: 0.5rem; color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">Revisar</li>
-          <li><a routerLink="/admin/videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'galeria-videos'"><a routerLink="/admin/videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">video_library</span> Revisar vídeos</a></li>
-          <li><a routerLink="/admin/videos-borrados" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'galeria-videos'"><a routerLink="/admin/videos-borrados" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">auto_delete</span> Vídeos Borrados</a></li>
           <li><a routerLink="/admin/salud-monitor" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">monitor_heart</span> Monitor ACWR</a></li>
@@ -104,11 +104,11 @@
           <!-- Explorar and Area Pública for logged-in users -->
           @if (authService.isMember()) {
           <li class="mobile-nav-divider">Explorar</li>
-          <li><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'salud-canina'"><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">favorite</span> Salud Deportiva</a></li>
-          <li><a routerLink="/bitacora-rsce" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'modulo-canina'"><a routerLink="/bitacora-rsce" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">analytics</span> Canina (RSCE)</a></li>
-          <li><a routerLink="/bitacora-rfec" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'modulo-caza'"><a routerLink="/bitacora-rfec" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">pets</span> Caza (RFEC)</a></li>
           <li><a routerLink="/tablon-anuncios" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">campaign</span> Tablón de Anuncios</a></li>
@@ -120,7 +120,7 @@
               (click)="sidenav.close()"><span class="material-icons">home</span> Bienvenida</a></li>
           <li><a routerLink="/galeria" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">photo_library</span> Galería</a></li>
-          <li><a routerLink="/videos-publicos" routerLinkActive="active-route" (click)="sidenav.close()"><span
+          <li *hasFeature="'galeria-videos'"><a routerLink="/videos-publicos" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">videocam</span> Videoteca</a></li>
           <li><a routerLink="/contacto" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">contact_support</span> Contacto</a></li>

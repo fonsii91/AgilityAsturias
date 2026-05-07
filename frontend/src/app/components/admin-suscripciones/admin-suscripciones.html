@@ -1,0 +1,86 @@
+<div class="admin-container">
+  <div class="header-section">
+    <div class="title-container">
+      <h1>Planes y Funcionalidades</h1>
+      <p class="subtitle">Gestiona las suscripciones SaaS y qué accesos tiene cada plan.</p>
+    </div>
+    <button class="btn-primary" (click)="toggleNewPlanForm()">
+      <mat-icon>add</mat-icon> Nuevo Plan
+    </button>
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <p>Cargando datos del sistema...</p>
+  </div>
+  } @else {
+
+  @if (showNewPlanForm()) {
+  <div class="form-card">
+    <h3>Crear Nuevo Plan</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nombre del Plan</label>
+        <input type="text" [(ngModel)]="newPlan().name" placeholder="Ej. Plan Básico">
+      </div>
+      <div class="form-group">
+        <label>Slug (Identificador único)</label>
+        <input type="text" [(ngModel)]="newPlan().slug" placeholder="Ej. basico">
+      </div>
+      <div class="form-group">
+        <label>Precio Mensual (€)</label>
+        <input type="number" [(ngModel)]="newPlan().price" step="0.01">
+      </div>
+      <div class="form-group full-width">
+        <label>Descripción corta</label>
+        <input type="text" [(ngModel)]="newPlan().description" placeholder="Descripción comercial">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" (click)="toggleNewPlanForm()">Cancelar</button>
+      <button class="btn-primary" (click)="createPlan()">Guardar Plan</button>
+    </div>
+  </div>
+  }
+
+  <div class="matrix-card">
+    <div class="matrix-wrapper">
+      <table class="features-matrix">
+        <thead>
+          <tr>
+            <th class="feature-col">Funcionalidad</th>
+            @for (plan of plans(); track plan.id) {
+            <th class="plan-col">
+              <div class="plan-header">
+                <h4>{{ plan.name }}</h4>
+                <span class="price">{{ plan.price }}€/mes</span>
+              </div>
+            </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (feature of features(); track feature.id) {
+          <tr>
+            <td class="feature-cell">
+              <strong>{{ feature.name }}</strong>
+              <small>{{ feature.description }}</small>
+            </td>
+            @for (plan of plans(); track plan.id) {
+            <td class="toggle-cell">
+              <label class="switch">
+                <input type="checkbox" [checked]="hasFeature(plan, feature.id)"
+                  (change)="toggleFeature(plan, feature)">
+                <span class="slider round"></span>
+              </label>
+            </td>
+            }
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  }
+</div>

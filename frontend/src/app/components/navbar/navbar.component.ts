@@ -8,11 +8,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SugerenciaDialog } from '../sugerencias/sugerencia-dialog/sugerencia-dialog';
 import { environment } from '../../../environments/environment';
+import { HasFeatureDirective } from '../../directives/has-feature.directive';
 
 @Component({
     selector: 'app-navbar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive, CommonModule, MatToolbarModule, MatDialogModule],
+    imports: [RouterLink, RouterLinkActive, CommonModule, MatToolbarModule, MatDialogModule, HasFeatureDirective],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.css'
 })

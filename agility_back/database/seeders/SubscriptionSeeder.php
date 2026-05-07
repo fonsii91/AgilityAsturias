@@ -40,6 +40,18 @@ class SubscriptionSeeder extends Seeder
             'description' => 'Registro de vacunas, celos y revisiones veterinarias.'
         ]);
 
+        $featureVideos = Feature::firstOrCreate(['slug' => 'galeria-videos'], [
+            'name' => 'Galería de Vídeos',
+            'type' => 'boolean',
+            'description' => 'Acceso a la subida y visualización de vídeos de entrenamientos y competiciones.'
+        ]);
+
+        $featureRecursos = Feature::firstOrCreate(['slug' => 'recursos'], [
+            'name' => 'Recursos Comunitarios',
+            'type' => 'boolean',
+            'description' => 'Acceso a normativas, tutoriales y recursos educativos del club.'
+        ]);
+
         // Create plans
         $planBasico = Plan::firstOrCreate(['slug' => 'basico'], [
             'name' => 'Plan Básico',
@@ -68,19 +80,22 @@ class SubscriptionSeeder extends Seeder
             $featureReservas->id,
         ]);
 
-        // Pro: Reservations + RSCE + RFEC
+        // Pro: Reservations + RSCE + RFEC + Resources
         $planPro->features()->syncWithoutDetaching([
             $featureReservas->id,
             $featureRsce->id,
             $featureRfec->id,
+            $featureRecursos->id,
         ]);
 
-        // Elite: All features
+        // Elite: All features (Pro + Salud + Videos)
         $planElite->features()->syncWithoutDetaching([
             $featureReservas->id,
             $featureRsce->id,
             $featureRfec->id,
             $featureSalud->id,
+            $featureVideos->id,
+            $featureRecursos->id,
         ]);
 
         // Assign default 'Pro' plan to all existing clubs so no one loses access suddenly

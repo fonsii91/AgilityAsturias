@@ -1,6 +1,7 @@
 import { Component, signal, inject, OnInit, OnDestroy, Injector, effect, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { HasFeatureDirective } from './directives/has-feature.directive';
 
 import { ToastComponent } from './components/toast/toast.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -22,7 +23,7 @@ import { OnboardingWidgetComponent } from './components/shared/onboarding-widget
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent, HasFeatureDirective],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

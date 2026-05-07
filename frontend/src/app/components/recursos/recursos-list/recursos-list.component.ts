@@ -9,11 +9,12 @@ import { ResourceService, Resource, RESOURCE_CATEGORIES, RESOURCE_LEVELS } from 
 import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
+import { HasFeatureDirective } from '../../../directives/has-feature.directive';
 
 @Component({
   selector: 'app-recursos-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatButtonModule, MatIconModule, MatTooltipModule, InstruccionesComponent],
+  imports: [CommonModule, RouterModule, FormsModule, MatButtonModule, MatIconModule, MatTooltipModule, InstruccionesComponent, HasFeatureDirective],
   templateUrl: './recursos-list.component.html',
   styleUrls: ['./recursos-list.component.scss']
 })

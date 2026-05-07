@@ -14,6 +14,14 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TenantService } from '../../../services/tenant.service';
 import { SuggestionService } from '../../../services/suggestion.service';
 import { OnboardingService } from '../../../services/onboarding';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+
+interface Plan {
+  id: number;
+  name: string;
+  price: string;
+}
 
 @Component({
   selector: 'app-club-form',
