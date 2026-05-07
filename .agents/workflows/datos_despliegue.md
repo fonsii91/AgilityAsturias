@@ -22,6 +22,7 @@ description: Datos para desplegar en producción el proyecto
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado 2026-05-08]** Desplegada exitosamente la versión 1.1.39 con la implementación masiva de la trazabilidad anónima con GA4 en toda la plataforma (100% de la cobertura planeada alcanzada). Se sobrepasó la regla de tests del frontend bajo autorización del administrador por falta de mocks, habiéndose compilado sin problemas en producción.
 - **[Completado 2026-05-07]** Configurado servidor Nginx y Certbot SSL para soportar HTTPS en el nuevo subdominio `elnorte.clubagility.com` y `www.elnorte.clubagility.com`. Se expandió el certificado existente y se verificó el enrutamiento.
 - **[Completado 2026-05-07]** Desplegada la integración de Google Analytics 4 (GA4) con Consent Mode v2. Se instrumentaron los flujos principales (login, registro, reservas, cargas de trabajo y acceso a módulos) para nutrir la analítica multi-tenant sin romper la privacidad GDPR.
 - **[Completado 2026-05-06]** Configurado servidor Nginx y Certbot SSL para soportar HTTPS en el nuevo subdominio `leonidogs.clubagility.com` y `www.leonidogs.clubagility.com`. Se expandió el certificado existente y se verificó el enrutamiento.
