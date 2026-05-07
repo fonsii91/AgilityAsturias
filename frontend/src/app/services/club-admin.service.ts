@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { Observable, map } from 'rxjs';
+import { Observable, map, tap } from 'rxjs';
+import { AnalyticsService } from './analytics.service';
 
 export interface Club {
     id: number;
@@ -23,6 +24,7 @@ export interface ClubHandoff {
 })
 export class ClubAdminService {
     private http = inject(HttpClient);
+    private analytics = inject(AnalyticsService);
     private apiUrl = environment.apiUrl;
 
     getClubs(): Observable<Club[]> {
@@ -34,7 +36,7 @@ export class ClubAdminService {
     }
 
     createClub(club: Partial<Club>): Observable<Club> {
-        return this.http.post<Club>(`${this.apiUrl}/admin/clubs`, club);
+        return this.http.post<Club>(`${this.apiUrl}/admin/clubs`, club).pipe(tap(() => this.analytics.logSuperAdminAction('tenant_created')));
     }
 
     updateClub(id: number, club: Partial<Club>): Observable<Club> {
@@ -47,7 +49,7 @@ export class ClubAdminService {
     }
 
     createClubWithFormData(formData: FormData): Observable<Club> {
-        return this.http.post<Club>(`${this.apiUrl}/admin/clubs`, formData);
+        return this.http.post<Club>(`${this.apiUrl}/admin/clubs`, formData).pipe(tap(() => this.analytics.logSuperAdminAction('tenant_created')));
     }
 
     deleteClub(id: number): Observable<any> {

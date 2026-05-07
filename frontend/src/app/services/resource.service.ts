@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, shareReplay } from 'rxjs';
+import { Observable, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AnalyticsService } from './analytics.service';
 
 export interface Resource {
   id: number;
@@ -49,6 +50,7 @@ export class ResourceService {
   private cache = new Map<string, Observable<Resource[]>>();
 
   private http = inject(HttpClient);
+  private analytics = inject(AnalyticsService);
 
   getResources(category?: string, level?: string): Observable<Resource[]> {
     let url = this.apiUrl;
@@ -74,7 +76,9 @@ export class ResourceService {
 
   createResource(data: FormData): Observable<Resource> {
     this.clearCache();
-    return this.http.post<Resource>(this.apiUrl, data);
+    return this.http.post<Resource>(this.apiUrl, data).pipe(
+      tap(() => this.analytics.logResourceInteraction('uploaded'))
+    );
   }
 
   updateResource(id: number, data: FormData): Observable<Resource> {
@@ -84,7 +88,9 @@ export class ResourceService {
 
   deleteResource(id: number): Observable<any> {
     this.clearCache();
-    return this.http.post(`${this.apiUrl}/${id}/delete`, {});
+    return this.http.post(`${this.apiUrl}/${id}/delete`, {}).pipe(
+      tap(() => this.analytics.logResourceInteraction('deleted'))
+    );
   }
   toggleGlobal(id: number): Observable<Resource> {
     this.clearCache();

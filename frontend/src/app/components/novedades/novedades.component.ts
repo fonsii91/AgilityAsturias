@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { environment } from '../../../environments/environment';
+import { AnalyticsService } from '../../services/analytics.service';
 
 export interface ReleaseNote {
   version: string;
@@ -23,9 +24,13 @@ export class NovedadesComponent implements OnInit {
   releases = signal<ReleaseNote[]>([]);
   clubConfig = environment.clubConfig;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private analytics: AnalyticsService
+  ) {}
 
   ngOnInit(): void {
+    this.analytics.logSystemAction('changelog_viewed');
     this.http.get<ReleaseNote[]>('novedades.json').subscribe({
       next: (data) => {
         this.releases.set(data);

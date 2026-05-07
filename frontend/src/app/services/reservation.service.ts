@@ -127,6 +127,7 @@ export class ReservationService {
             this.http.post<void>(`${environment.apiUrl}/time-slot-exceptions`, { slot_id: slotId, date, reason }).subscribe({
                 next: () => {
                     this.fetchExceptions();
+                    this.analyticsService.logStaffAction('exception_created');
                     resolve();
                 },
                 error: (err) => reject(err)
@@ -152,7 +153,9 @@ export class ReservationService {
     }
 
     confirmAttendance(data: { date: string, slot_id: number, attended_ids: number[] }) {
-        return this.http.post(`${environment.apiUrl}/admin/attendance/confirm`, data);
+        return this.http.post(`${environment.apiUrl}/admin/attendance/confirm`, data).pipe(
+            tap(() => this.analyticsService.logCompetition('attendance_validated'))
+        );
     }
 
     getPendingCompetitions() {

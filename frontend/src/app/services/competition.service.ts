@@ -2,12 +2,14 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Competition } from '../models/competition.model';
 import { environment } from '../../environments/environment';
+import { AnalyticsService } from './analytics.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class CompetitionService {
     private http = inject(HttpClient);
+    private analytics = inject(AnalyticsService);
     private apiUrl = `${environment.apiUrl}/competitions`;
     private competitionsSignal = signal<Competition[]>([]);
 
@@ -50,6 +52,7 @@ export class CompetitionService {
                 next: (newCompData) => {
                     const newComp = this.mapFromBackend(newCompData);
                     this.competitionsSignal.update(list => [...list, newComp]);
+                    this.analytics.logCompetition('created');
                     resolve(newComp);
                 },
                 error: (err) => reject(err)
@@ -64,6 +67,7 @@ export class CompetitionService {
                 next: (savedCompData) => {
                     const savedComp = this.mapFromBackend(savedCompData);
                     this.competitionsSignal.update(list => list.map(c => c.id === savedComp.id ? savedComp : c));
+                    this.analytics.logCompetition('edited');
                     resolve(savedComp);
                 },
                 error: (err) => reject(err)
@@ -76,6 +80,7 @@ export class CompetitionService {
             this.http.post<void>(`${this.apiUrl}/${id}/delete`, {}).subscribe({
                 next: () => {
                     this.competitionsSignal.update(list => list.filter(c => c.id !== id));
+                    this.analytics.logCompetition('deleted');
                     resolve();
                 },
                 error: (err) => reject(err)
@@ -90,7 +95,10 @@ export class CompetitionService {
                 payload.dogs_attendance = dogsAttendance;
             }
             this.http.post<any>(`${this.apiUrl}/${id}/attend`, payload).subscribe({
-                next: (res) => resolve(res),
+                next: (res) => {
+                    this.analytics.logCompetition('joined');
+                    resolve(res);
+                },
                 error: (err) => reject(err)
             });
         });
@@ -99,7 +107,10 @@ export class CompetitionService {
     unattendCompetition(id: number) {
         return new Promise<any>((resolve, reject) => {
             this.http.post<any>(`${this.apiUrl}/${id}/unattend`, {}).subscribe({
-                next: (res) => resolve(res),
+                next: (res) => {
+                    this.analytics.logCompetition('cancelled');
+                    resolve(res);
+                },
                 error: (err) => reject(err)
             });
         });

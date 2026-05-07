@@ -1,8 +1,9 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { tap, catchError, of, Observable, firstValueFrom, map } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable, of, tap } from 'rxjs';
 import { Router } from '@angular/router';
+import { AnalyticsService } from './analytics.service';
 
 export interface User {
     id: number;
@@ -39,6 +40,7 @@ export interface AuthResponse {
 export class AuthService {
     private http = inject(HttpClient);
     private router = inject(Router);
+    private analytics = inject(AnalyticsService);
     private apiUrl = environment.apiUrl;
 
     currentUserSignal = signal<User | null>(null);
@@ -126,6 +128,7 @@ export class AuthService {
     }
 
     logout(): Promise<void> {
+        this.analytics.logSystemAction('logout');
         const token = localStorage.getItem('access_token');
         if (token) {
             this.http.post(`${this.apiUrl}/logout`, {}, {
@@ -204,7 +207,10 @@ export class AuthService {
     }
 
     updateUserRole(userId: number, role: string): Promise<any> {
-        return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/role`, { role }));
+        return firstValueFrom(this.http.post(`${this.apiUrl}/users/${userId}/role`, { role })).then(res => {
+            this.analytics.logStaffAction('role_updated');
+            return res;
+        });
     }
 
     deleteUser(userId: number): Promise<any> {
@@ -239,7 +245,10 @@ export class AuthService {
     }
 
     generateResetLink(userId: number): Promise<{ link: string, message: string }> {
-        return firstValueFrom(this.http.post<{ link: string, message: string }>(`${this.apiUrl}/users/${userId}/generate-reset-link`, {}));
+        return firstValueFrom(this.http.post<{ link: string, message: string }>(`${this.apiUrl}/users/${userId}/generate-reset-link`, {})).then(res => {
+            this.analytics.logStaffAction('password_reset_generated');
+            return res;
+        });
     }
 
     generateMemberInviteLink(): Promise<{ link: string, message: string }> {

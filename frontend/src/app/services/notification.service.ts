@@ -2,6 +2,7 @@ import { Injectable, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable, tap } from 'rxjs';
+import { AnalyticsService } from './analytics.service';
 
 export interface AppNotification {
     id: string;
@@ -26,6 +27,7 @@ export interface AppNotification {
 })
 export class NotificationService {
     private http = inject(HttpClient);
+    private analytics = inject(AnalyticsService);
     private apiUrl = `${environment.apiUrl}/notifications`;
 
     notificationsSignal = signal<AppNotification[]>([]);
@@ -55,6 +57,7 @@ export class NotificationService {
                 );
                 this.notificationsSignal.set(currentList);
                 this.unreadCountSignal.set(currentList.filter(n => !n.read_at).length);
+                this.analytics.logCommunication('notification_read');
             })
         );
     }

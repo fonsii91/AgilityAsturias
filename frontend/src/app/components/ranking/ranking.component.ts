@@ -1,5 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AnalyticsService } from '../../services/analytics.service';
 
 import { ReservationService } from '../../services/reservation.service';
 import { AuthService } from '../../services/auth.service';
@@ -21,6 +22,7 @@ import { OnboardingService } from '../../services/onboarding';
 })
 export class RankingComponent {
     private reservationService = inject(ReservationService);
+    private analytics = inject(AnalyticsService);
     authService = inject(AuthService);
     dogService = inject(DogService);
     toastService = inject(ToastService);
@@ -34,6 +36,7 @@ export class RankingComponent {
 
     constructor() {
         this.loadRanking();
+        this.analytics.logSystemAction('ranking_viewed');
     }
 
     loadRanking() {

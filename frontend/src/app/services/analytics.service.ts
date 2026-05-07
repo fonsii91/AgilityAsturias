@@ -90,7 +90,7 @@ export class AnalyticsService {
     (window as any).gtag('event', eventName, eventParams);
   }
 
-  // Helpers específicos
+  // Helpers específicos originales
   public logLogin(method: string = 'email') {
     this.logEvent('login', { method });
   }
@@ -109,5 +109,52 @@ export class AnalyticsService {
 
   public logWorkload() {
     this.logEvent('workload_logged');
+  }
+
+  // --- NUEVOS HELPERS BASADOS EN EL DOCUMENTO DE FUNCIONALIDADES ---
+
+  // Método central abstracto para cualquier funcionalidad genérica
+  public logFeatureInteraction(category: string, action: string, label?: string) {
+    this.logEvent('feature_interaction', {
+      feature_category: category,
+      feature_action: action,
+      feature_label: label
+    });
+  }
+
+  public logDogInteraction(action: 'created' | 'deleted' | 'shared' | 'unshared' | 'photo_updated' | 'doc_uploaded' | 'doc_deleted' | 'config_changed') {
+    this.logFeatureInteraction('dogs', action);
+  }
+
+  public logVideoInteraction(action: 'uploaded' | 'deleted' | 'liked' | 'unliked' | 'downloaded' | 'approved' | 'edited') {
+    this.logFeatureInteraction('multimedia', action);
+  }
+
+  public logResourceInteraction(action: 'downloaded' | 'uploaded' | 'deleted', resourceType: string = 'general') {
+    this.logFeatureInteraction('resources', action, resourceType);
+  }
+
+  public logCommunication(action: 'announcement_read' | 'suggestion_sent' | 'notification_read') {
+    this.logFeatureInteraction('communication', action);
+  }
+
+  public logCompetition(action: 'joined' | 'cancelled' | 'created' | 'deleted' | 'attendance_validated' | 'edited') {
+    this.logFeatureInteraction('competition', action);
+  }
+
+  public logRSCE(action: 'log_added' | 'log_edited' | 'log_deleted') {
+    this.logFeatureInteraction('rsce_tracker', action);
+  }
+
+  public logStaffAction(action: 'schedule_changed' | 'exception_created' | 'role_updated' | 'announcement_created' | 'announcement_deleted' | 'password_reset_generated' | 'manual_points_assigned' | 'health_log_approved') {
+    this.logFeatureInteraction('staff_management', action);
+  }
+
+  public logSuperAdminAction(action: 'tenant_created' | 'modules_toggled' | 'plan_changed' | 'tenant_suspended') {
+    this.logFeatureInteraction('super_admin', action);
+  }
+
+  public logSystemAction(action: 'logout' | 'cookie_accepted' | 'cookie_rejected' | 'account_deleted' | 'search_used' | 'filter_used' | 'view_changed' | 'ranking_viewed' | 'changelog_viewed') {
+    this.logFeatureInteraction('system_ui', action);
   }
 }

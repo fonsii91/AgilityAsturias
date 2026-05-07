@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.39",
+    "date": "2026-05-08",
+    "features": [
+      "Hemos implementado mejoras internas en la aplicación para conocer de forma anónima qué apartados usáis más. ¡Esto nos ayudará a enfocar nuestros esfuerzos en mejorar las herramientas que realmente importan a la comunidad!"
+    ]
+  },
+  {
     "version": "1.1.38",
     "date": "2026-05-06",
     "features": [

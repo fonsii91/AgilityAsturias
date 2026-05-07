@@ -1,7 +1,8 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AnalyticsService } from './analytics.service';
 import { Suggestion } from '../models/suggestion.model';
 
 @Injectable({
@@ -14,6 +15,7 @@ export class SuggestionService {
   public suggestionsSignal = signal<Suggestion[]>([]);
 
   private http = inject(HttpClient);
+  private analytics = inject(AnalyticsService);
 
   /**
    * Obtener todas las sugerencias (Admin)
@@ -26,7 +28,9 @@ export class SuggestionService {
    * Crear nueva sugerencia/bug
    */
   createSuggestion(data: { type: 'bug' | 'suggestion' | 'landing_page', content: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/suggestions`, data);
+    return this.http.post(`${this.apiUrl}/suggestions`, data).pipe(
+      tap(() => this.analytics.logCommunication('suggestion_sent'))
+    );
   }
 
   /**
