@@ -44,6 +44,7 @@
           <div class="card-footer">
             <div class="meta-info">
               <span class="author"><span class="material-icons">person</span> {{ suggestion.user?.name || 'Usuario desconocido' }}</span>
+              <span class="club"><span class="material-icons">business</span> {{ suggestion.club?.name || 'Club desconocido' }}</span>
               <span class="date"><span class="material-icons">event</span> {{ suggestion.created_at | date:'dd/MM/yyyy HH:mm' }}</span>
             </div>
             

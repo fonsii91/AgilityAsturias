@@ -15,7 +15,7 @@ class SuggestionController extends Controller
     {
         try {
             $suggestions = Suggestion::withoutGlobalScope(\App\Models\Scopes\TenantScope::class)
-                ->with('user:id,name,email')
+                ->with(['user:id,name,email', 'club:id,name'])
                 ->orderByRaw("CASE WHEN status = 'pending' THEN 1 WHEN status = 'unresolved' THEN 2 WHEN status = 'resolved' THEN 3 ELSE 4 END")
                 ->orderBy('created_at', 'desc')
                 ->get();
