@@ -10,7 +10,7 @@
   <!-- Dynamic Views -->
   @switch (currentView()) {
     @case ('home') {
-      <app-home-saas></app-home-saas>
+      <app-home-saas (viewChange)="currentView.set($event)"></app-home-saas>
     }
     @case ('features') {
       <app-features-saas></app-features-saas>

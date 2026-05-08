@@ -4,7 +4,7 @@
     <span class="logo-text">Club Agility</span>
   </div>
   
-  <nav class="saas-nav">
+  <nav class="saas-nav" [class.open]="isMenuOpen">
     <button 
       class="nav-item" 
       [class.active]="currentView === 'home'" 
@@ -24,4 +24,8 @@
       Únete Ahora
     </button>
   </nav>
+
+  <button class="hamburger-menu" (click)="toggleMenu()">
+    <span class="material-icons">{{ isMenuOpen ? 'close' : 'menu' }}</span>
+  </button>
 </header>
