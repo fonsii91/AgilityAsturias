@@ -117,9 +117,14 @@ export class OnboardingService {
   }
 
   fetchProgress() {
-    this.http.get<{ onboarding_progress: any }>(`${this.apiUrl}/user/onboarding`).subscribe(res => {
-      this.progress.set(res.onboarding_progress || {});
-      this.checkAutoFinish();
+    this.http.get<{ onboarding_progress: any }>(`${this.apiUrl}/user/onboarding`).subscribe({
+      next: (res) => {
+        this.progress.set(res.onboarding_progress || {});
+        this.checkAutoFinish();
+      },
+      error: (err) => {
+        // Silently ignore errors (e.g., during tests or if unauthenticated)
+      }
     });
   }
 
@@ -140,9 +145,14 @@ export class OnboardingService {
       tutorial: type,
       step: stepId,
       completed: true
-    }).subscribe(res => {
-      this.progress.set(res.onboarding_progress || {});
-      this.checkAutoFinish();
+    }).subscribe({
+      next: (res) => {
+        this.progress.set(res.onboarding_progress || {});
+        this.checkAutoFinish();
+      },
+      error: (err) => {
+        // Silently ignore errors
+      }
     });
   }
 
@@ -248,8 +258,13 @@ export class OnboardingService {
   finishTutorial(type: string) {
     this.http.post<{ onboarding_progress: any }>(`${this.apiUrl}/user/onboarding/tutorial-finish`, {
       tutorial: type
-    }).subscribe(res => {
-      this.progress.set(res.onboarding_progress || {});
+    }).subscribe({
+      next: (res) => {
+        this.progress.set(res.onboarding_progress || {});
+      },
+      error: (err) => {
+        // Silently ignore errors
+      }
     });
   }
 }

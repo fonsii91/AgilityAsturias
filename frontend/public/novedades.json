@@ -4,7 +4,8 @@
     "date": "2026-05-08",
     "features": [
       "Hemos implementado mejoras internas en la aplicación para conocer de forma anónima qué apartados usáis más. ¡Esto nos ayudará a enfocar nuestros esfuerzos en mejorar las herramientas que realmente importan a la comunidad!",
-      "Hemos pulido el tutorial de inicio para que, si ya tienes un perfil creado para tu perro y solo necesitas actualizar sus datos o su foto, el paso se marque automáticamente como completado sin necesidad de añadir un perro nuevo."
+      "Hemos pulido el tutorial de inicio para que, si ya tienes un perfil creado para tu perro y solo necesitas actualizar sus datos o su foto, el paso se marque automáticamente como completado sin necesidad de añadir un perro nuevo.",
+      "Hemos flexibilizado el sistema de reservas y cancelaciones. A partir de ahora tu club podrá definir un límite de tiempo personalizado (por ejemplo, 2h o 6h) en lugar del cierre estricto de 24 horas. Además, hemos rediseñado visualmente el panel de configuración de horarios para que sea mucho más intuitivo."
     ]
   },
   {
