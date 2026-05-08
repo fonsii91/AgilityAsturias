@@ -275,8 +275,8 @@ class AuthController extends Controller
     {
         $currentUser = $request->user();
 
-        // Allow admin, manager, or staff
-        if (!in_array($currentUser->role, ['admin', 'manager', 'staff'])) {
+        // Allow admin or manager
+        if (!in_array($currentUser->role, ['admin', 'manager'])) {
             return response()->json(['message' => 'No tienes permisos para realizar esta acción.'], 403);
         }
 
@@ -291,13 +291,7 @@ class AuthController extends Controller
                 return response()->json(['message' => 'No puedes eliminarte a ti mismo desde esta vista.'], 400);
             }
 
-            // Staff restrictions
-            if ($currentUser->role === 'staff') {
-                // Cannot delete an admin, manager, or another staff
-                if (in_array($targetUser->role, ['admin', 'manager', 'staff'])) {
-                    return response()->json(['message' => 'El personal no puede eliminar a administradores, gestores u otro personal.'], 403);
-                }
-            }
+
 
             // Manager restrictions
             if ($currentUser->role === 'manager') {
@@ -456,6 +450,20 @@ class AuthController extends Controller
         $targetUser = User::find($id);
         if (!$targetUser) {
             return response()->json(['message' => 'Usuario no encontrado.'], 404);
+        }
+
+        // Restricciones para Staff
+        if ($currentUser->role === 'staff') {
+            if (in_array($targetUser->role, ['admin', 'manager', 'staff']) && $currentUser->id !== $targetUser->id) {
+                return response()->json(['message' => 'El personal no puede restablecer la contraseña de administradores, gestores u otro personal.'], 403);
+            }
+        }
+
+        // Restricciones para Manager
+        if ($currentUser->role === 'manager') {
+            if (in_array($targetUser->role, ['admin', 'manager']) && $currentUser->id !== $targetUser->id) {
+                return response()->json(['message' => 'Los gestores no pueden restablecer la contraseña de administradores u otros gestores.'], 403);
+            }
         }
 
         $token = \Illuminate\Support\Str::random(60);

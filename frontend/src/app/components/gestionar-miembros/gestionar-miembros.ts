@@ -133,6 +133,10 @@ export class GestionarMiembrosComponent implements OnInit {
 
   // Delete User Logic
   openDeleteModal(user: UserProfile) {
+    if (!this.authService.isAdmin() && !this.authService.isManager()) {
+      this.toastService.error('No tienes permisos para realizar esta acción');
+      return;
+    }
     this.userToDelete.set(user);
     this.deleteConfirmationText.set('');
     document.body.style.overflow = 'hidden';

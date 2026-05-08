@@ -8,7 +8,8 @@
       "Hemos flexibilizado el sistema de reservas y cancelaciones. A partir de ahora tu club podrá definir un límite de tiempo personalizado (por ejemplo, 2h o 6h) en lugar del cierre estricto de 24 horas. Además, hemos rediseñado visualmente el panel de configuración de horarios para que sea mucho más intuitivo."
     ],
     "bugfixes": [
-      "Hemos mejorado el diseño de la barra de navegación y la página de bienvenida para que se adapten de maravilla en dispositivos móviles, incluso si el nombre de tu club es excesivamente largo, evitando que el texto empuje tus iconos fuera de la pantalla."
+      "Hemos mejorado el diseño de la barra de navegación y la página de bienvenida para que se adapten de maravilla en dispositivos móviles, incluso si el nombre de tu club es excesivamente largo, evitando que el texto empuje tus iconos fuera de la pantalla.",
+      "Hemos reforzado internamente los permisos y la seguridad en la gestión del club para garantizar que la plataforma siga siendo un entorno seguro para todos."
     ]
   },
   {

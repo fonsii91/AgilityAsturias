@@ -312,11 +312,11 @@ class DogController extends Controller
         $dog = Dog::findOrFail($id);
 
         $request->validate([
-            'avatar_cansancio_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'avatar_cansancio_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'avatar_cansancio_3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'avatar_cansancio_4' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
-            'avatar_cansancio_5' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:5120',
+            'avatar_cansancio_1' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'avatar_cansancio_2' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'avatar_cansancio_3' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'avatar_cansancio_4' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'avatar_cansancio_5' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';

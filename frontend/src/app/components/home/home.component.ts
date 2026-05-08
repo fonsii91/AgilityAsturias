@@ -5,11 +5,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { TenantService } from '../../services/tenant.service';
+import { HasFeatureDirective } from '../../directives/has-feature.directive';
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [RouterLink, MatIconModule],
+    imports: [RouterLink, MatIconModule, HasFeatureDirective],
     templateUrl: './home.component.html',
     styleUrl: './home.component.css'
 })

@@ -132,8 +132,8 @@ class ClubController extends Controller
             'plan_id' => 'nullable|exists:plans,id',
             'logo_url' => 'nullable|string|max:255',
             'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
-            'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-            'cta_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'cta_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $settings = $request->input('settings');
@@ -179,8 +179,8 @@ class ClubController extends Controller
                 'plan_id' => 'nullable|exists:plans,id',
                 'logo_url' => 'nullable|string|max:255',
                 'logo_file' => 'nullable|image|mimes:jpeg,png,jpg,webp,svg|max:2048',
-                'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-                'cta_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+                'hero_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+                'cta_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Validation failed: ' . json_encode($e->errors()));
@@ -224,12 +224,20 @@ class ClubController extends Controller
         $changed = false;
 
         if ($request->hasFile('logo_file')) {
+            if ($club->logo_url && str_contains($club->logo_url, '/storage/')) {
+                $oldPath = str_replace(asset('storage/'), '', $club->logo_url);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
             $path = $request->file('logo_file')->store("clubs/{$slug}/settings", 'public');
             $club->logo_url = asset('storage/' . $path);
             $changed = true;
         }
 
         if ($request->hasFile('hero_file')) {
+            if (isset($settings['homeConfig']['heroImage']) && str_contains($settings['homeConfig']['heroImage'], '/storage/')) {
+                $oldPath = str_replace(asset('storage/'), '', $settings['homeConfig']['heroImage']);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
             $path = $request->file('hero_file')->store("clubs/{$slug}/settings", 'public');
             if (!isset($settings['homeConfig'])) {
                 $settings['homeConfig'] = [];
@@ -239,6 +247,10 @@ class ClubController extends Controller
         }
 
         if ($request->hasFile('cta_file')) {
+            if (isset($settings['homeConfig']['ctaImage']) && str_contains($settings['homeConfig']['ctaImage'], '/storage/')) {
+                $oldPath = str_replace(asset('storage/'), '', $settings['homeConfig']['ctaImage']);
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
+            }
             $path = $request->file('cta_file')->store("clubs/{$slug}/settings", 'public');
             if (!isset($settings['homeConfig'])) {
                 $settings['homeConfig'] = [];

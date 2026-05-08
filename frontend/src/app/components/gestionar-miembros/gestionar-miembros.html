@@ -165,10 +165,12 @@
                           title="Generar Enlace de Recuperación">
                           <span class="material-icons">key</span>
                         </button>
-                        <button class="btn-icon delete-btn" (click)="openDeleteModal(user)"
-                          title="Eliminar Miembro y Perros">
-                          <span class="material-icons">delete</span>
-                        </button>
+                        @if (authService.isAdmin() || authService.isManager()) {
+                          <button class="btn-icon delete-btn" (click)="openDeleteModal(user)"
+                            title="Eliminar Miembro y Perros">
+                            <span class="material-icons">delete</span>
+                          </button>
+                        }
                       </div>
                     </td>
                   </tr>

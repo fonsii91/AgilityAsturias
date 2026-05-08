@@ -22,7 +22,9 @@ describe('GestionarMiembrosComponent', () => {
       getAllUsers: vi.fn().mockResolvedValue(mockUsers),
       generateResetLink: vi.fn().mockResolvedValue({ link: 'http://test-link.com' }),
       updateUserRole: vi.fn().mockResolvedValue({}),
-      deleteUser: vi.fn().mockResolvedValue({})
+      deleteUser: vi.fn().mockResolvedValue({}),
+      isAdmin: vi.fn().mockReturnValue(true),
+      isManager: vi.fn().mockReturnValue(true)
     };
 
     mockToastService = {

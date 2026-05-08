@@ -28,7 +28,8 @@ describe('HomeComponent', () => {
             services: { items: [{ title: 'Service 1', description: 'Desc 1', icon: 'star' }] }
           }
         }
-      })
+      }),
+      hasFeature: vi.fn().mockReturnValue(true)
     };
 
     await TestBed.configureTestingModule({

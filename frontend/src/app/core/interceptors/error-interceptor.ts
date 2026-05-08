@@ -26,6 +26,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           if (req.method === 'GET') showErrorToast = false;
         } else if (error.status === 404) {
           errorMessage = 'El recurso solicitado no existe.';
+        } else if (error.status === 413) {
+          errorMessage = 'El archivo que intentas subir es demasiado pesado. Revisa el límite permitido.';
+        } else if (error.status === 422) {
+          // Intentar extraer el mensaje de error específico si es de un archivo
+          if (error.error?.errors) {
+             const firstError = Object.values(error.error.errors)[0] as string[];
+             errorMessage = firstError[0] || 'Por favor, revisa los datos introducidos.';
+          } else {
+             errorMessage = 'Los datos enviados no son válidos.';
+          }
         } else if (error.status >= 500) {
           errorMessage = 'Error en el servidor. Inténtalo más tarde.';
         }

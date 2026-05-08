@@ -1,0 +1,628 @@
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90mC:/Users/Usuario/Desktop/AgilityAsturiass/frontend[39m
+
+[90mstderr[2m | src/app/components/gestionar-miembros/gestionar-miembros.component.spec.ts[2m > [22m[2mGestionarMiembrosComponent[2m > [22m[2mshould handle error when updating user role
+[22m[39mError updating role { error: { message: [32m'Rol inválido'[39m } }
+
+ [32m✓[39m src/app/components/explorar/salud-deportiva/workload-gauge/workload-gauge.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 363[2mms[22m[39m
+ [31m❯[39m src/app/components/gestionar-miembros/gestionar-miembros.component.spec.ts [2m([22m[2m9 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 126[2mms[22m[39m
+     [32m✓[39m should create and load users on init[32m 29[2mms[22m[39m
+     [32m✓[39m should filter out admin users in displayUsers[32m 6[2mms[22m[39m
+     [32m✓[39m should generate a reset link and copy to clipboard[32m 37[2mms[22m[39m
+     [32m✓[39m should update user role and show success toast[32m 4[2mms[22m[39m
+     [32m✓[39m should handle error when updating user role[32m 5[2mms[22m[39m
+[31m     [31m×[31m should open and close delete modal[39m[32m 15[2mms[22m[39m
+[31m     [31m×[31m should delete user and update state[39m[32m 13[2mms[22m[39m
+[31m     [31m×[31m should handle error when deleting user[39m[32m 3[2mms[22m[39m
+     [32m✓[39m should open and close image zoom modal[32m 11[2mms[22m[39m
+[90mstdout[2m | src/app/components/gestionar-perros/dog-dashboard/dog-dashboard.component.spec.ts[2m > [22m[2mDogDashboardComponent[2m > [22m[2mdebe crearse correctamente
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [31m❯[39m src/app/components/home/home.component.spec.ts [2m([22m[2m2 tests[22m[2m | [22m[31m2 failed[39m[2m)[22m[32m 193[2mms[22m[39m
+[31m     [31m×[31m should create[39m[32m 175[2mms[22m[39m
+[31m     [31m×[31m should display the club slogan from tenant service[39m[32m 16[2mms[22m[39m
+[90mstdout[2m | src/app/components/gestionar-perros/dog-dashboard/dog-dashboard.component.spec.ts[2m > [22m[2mDogDashboardComponent[2m > [22m[2mdebe mostrar los datos principales del perro en el header
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/gestionar-perros/tabs/dog-settings/dog-settings.component.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 338[2mms[22m[39m
+[90mstderr[2m | src/app/components/perfil/perfil.spec.ts[2m > [22m[2mPerfil Component[2m > [22m[2mshould render user data
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+ [32m✓[39m src/app/components/contacto/contacto.component.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 427[2mms[22m[39m
+[90mstdout[2m | src/app/components/gestionar-perros/tabs/dog-docs/dog-docs.component.spec.ts[2m > [22m[2mDogDocsComponent[2m > [22m[2mshould create and initialize with dog data
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/gestionar-perros/dog-dashboard/dog-dashboard.component.spec.ts[2m > [22m[2mDogDashboardComponent[2m > [22m[2mdebe calcular la edad correctamente
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/perfil/perfil.spec.ts[2m > [22m[2mPerfil Component[2m > [22m[2mshould allow editing and saving name
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+ [32m✓[39m src/app/components/gestionar-perros/tabs/dog-family/dog-family.component.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 382[2mms[22m[39m
+[90mstdout[2m | src/app/components/gestionar-perros/dog-form/dog-form.component.spec.ts[2m > [22m[2mDogFormComponent[2m > [22m[2mshould create the component
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/gestionar-perros/dog-dashboard/dog-dashboard.component.spec.ts[2m > [22m[2mDogDashboardComponent[2m > [22m[2mdebe limpiar el estado al destruirse
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/gestionar-perros/tabs/dog-summary/dog-summary.component.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 408[2mms[22m[39m
+[90mstdout[2m | src/app/components/gestionar-perros/tabs/dog-docs/dog-docs.component.spec.ts[2m > [22m[2mDogDocsComponent[2m > [22m[2mshould calculate category based on dog height
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/gestionar-perros/dog-form/dog-form.component.spec.ts[2m > [22m[2mDogFormComponent[2m > [22m[2mshould disable submit button if name is empty
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/gestionar-perros/dog-dashboard/dog-dashboard.component.spec.ts[2m > [22m[2mDogDashboardComponent[2m > [22m[2mdebe subir una nueva foto correctamente
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/gestionar-perros/dog-dashboard/dog-dashboard.component.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 481[2mms[22m[39m
+     [33m[2m✓[22m[39m debe crearse correctamente [33m 310[2mms[22m[39m
+[90mstderr[2m | src/app/components/perfil/perfil.spec.ts[2m > [22m[2mPerfil Component[2m > [22m[2mshould allow editing and saving RFEC data
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/components/gestionar-perros/dog-form/dog-form.component.spec.ts[2m > [22m[2mDogFormComponent[2m > [22m[2mshould enable submit button if name is provided
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/gestionar-perros/tabs/dog-docs/dog-docs.component.spec.ts[2m > [22m[2mDogDocsComponent[2m > [22m[2mshould call updateDog on saveChanges
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/gestionar-perros/tabs/dog-training/dog-training.component.spec.ts[2m > [22m[2mDogTrainingComponent[2m > [22m[2mdebe manejar errores al guardar los datos deportivos
+[22m[39mError: Network error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/gestionar-perros/tabs/dog-training/dog-training.component.spec.ts:109:52
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new ZoneAwarePromise (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/node_modules/[4mzone.js[24m/fesm2015/zone.js:2221:23)
+    at runWithTimeout [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [32m✓[39m src/app/components/gestionar-perros/tabs/dog-training/dog-training.component.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[33m 515[2mms[22m[39m
+     [33m[2m✓[22m[39m debe crearse correctamente [33m 306[2mms[22m[39m
+ [32m✓[39m src/app/components/perfil/perfil.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 485[2mms[22m[39m
+     [33m[2m✓[22m[39m should render user data [33m 326[2mms[22m[39m
+[90mstdout[2m | src/app/components/gestionar-perros/dog-form/dog-form.component.spec.ts[2m > [22m[2mDogFormComponent[2m > [22m[2mshould call DogService.addDog and navigate on success
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/gestionar-perros/tabs/dog-docs/dog-docs.component.spec.ts[2m > [22m[2mDogDocsComponent[2m > [22m[2mshould handle errors on saveChanges
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/gestionar-perros/tabs/dog-docs/dog-docs.component.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[33m 598[2mms[22m[39m
+     [33m[2m✓[22m[39m should create and initialize with dog data [33m 397[2mms[22m[39m
+[90mstdout[2m | src/app/components/gestionar-perros/dog-form/dog-form.component.spec.ts[2m > [22m[2mDogFormComponent[2m > [22m[2mshould show error toast if creation fails
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/gestionar-perros/dog-form/dog-form.component.spec.ts[2m > [22m[2mDogFormComponent[2m > [22m[2mshould show error toast if creation fails
+[22m[39m{ error: { errors: { name: [36m[Array][39m } } }
+
+ [32m✓[39m src/app/components/gestionar-perros/dog-form/dog-form.component.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 491[2mms[22m[39m
+     [33m[2m✓[22m[39m should create the component [33m 310[2mms[22m[39m
+ [32m✓[39m src/app/components/sugerencias/sugerencia-dialog/sugerencia-dialog.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[33m 563[2mms[22m[39m
+     [33m[2m✓[22m[39m should create [33m 389[2mms[22m[39m
+ [32m✓[39m src/app/components/galeria/galeria.component.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 381[2mms[22m[39m
+     [33m[2m✓[22m[39m should create and load photos [33m 321[2mms[22m[39m
+[90mstdout[2m | src/app/components/explorar/salud-deportiva/salud-deportiva.spec.ts[2m > [22m[2mSaludDeportivaComponent[2m > [22m[2mdebe cargar los perros del usuario al inicializar
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/services/onboarding.service.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 149[2mms[22m[39m
+ [32m✓[39m src/app/components/explorar/salud-deportiva/salud-deportiva.spec.ts [2m([22m[2m1 test[22m[2m)[22m[33m 426[2mms[22m[39m
+     [33m[2m✓[22m[39m debe cargar los perros del usuario al inicializar [33m 424[2mms[22m[39m
+ [32m✓[39m src/app/components/gestionar-perros/tabs/dog-health/dog-health.component.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 159[2mms[22m[39m
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould be created
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould fetch and map competitions correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould correctly sort competitions even if fechaEvento has a time component
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould add a competition and update signals
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould update a competition and update signals
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould delete a competition and update signals
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/reset-password/reset-password.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 199[2mms[22m[39m
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould call attend api correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould call unattend api correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/competition.service.spec.ts[2m > [22m[2mCompetitionService[2m > [22m[2mshould call getAttendees api correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould create
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould invalidate form if required fields are missing
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould validate correctly when custom category is used
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould set appropriate categories based on action
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould clear categories when action changes
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould call giveExtraPoints with correct positive points
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould call giveExtraPoints with negative points
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould handle custom category correctly in submit
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould handle error when giveExtraPoints fails
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/modificar-puntos/modificar-puntos.component.spec.ts[2m > [22m[2mModificarPuntosComponent[2m > [22m[2mshould handle error when giveExtraPoints fails
+[22m[39mError al modificar puntos Error: API error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/modificar-puntos/modificar-puntos.component.spec.ts:137:58
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new ZoneAwarePromise (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/node_modules/[4mzone.js[24m/fesm2015/zone.js:2221:23)
+    at runWithTimeout [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+[90mstdout[2m | src/app/components/shared/onboarding-widget/onboarding-widget.spec.ts[2m > [22m[2mOnboardingWidget[2m > [22m[2mshould create
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/services/competition.service.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 74[2mms[22m[39m
+ [32m✓[39m src/app/components/modificar-puntos/modificar-puntos.component.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 80[2mms[22m[39m
+ [32m✓[39m src/app/components/shared/onboarding-widget/onboarding-widget.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 71[2mms[22m[39m
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould create
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould split and sort competitions into proximos and pasados correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould paginate displayedEvents correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould init new competition form
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould create
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/attendance-verification/attendance-verification.component.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 72[2mms[22m[39m
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould populate form when editing competition
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould group slots by day and sort them
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould call addCompetition on submit if not editing
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould filter slots by active filter
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould open modal for mass creation
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould open modal for editing specific slot
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould create
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould toggle day selection for mass creation
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould block submission if tipo is competicion and no federacion is provided
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould not allow empty days selection
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould call updateCompetition on submit if editing
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould load and filter tracks on init
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould delete slot when confirmed
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould show delete modal on deleteCompetition
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/crud-competicion/crud-competicion.component.spec.ts[2m > [22m[2mCrudCompeticionComponent[2m > [22m[2mshould call deleteCompetition from service and hide modal on confirmDelete
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould calculate grade 1 progress correctly
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould open and close add form
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould call trackService.addTrack on save new track
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould calculate grade 2 progress for next grade correctly
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould calculate Campeonato de España (CE) progress correctly for Grade 2
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould not delete slot when cancelled
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould save edited slot
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould discard non-speed tracks for Campeonato de España in Grade 3
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+ [32m✓[39m src/app/components/crud-competicion/crud-competicion.component.spec.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 126[2mms[22m[39m
+[90mstderr[2m | src/app/components/rsce-tracker/rsce-tracker.component.spec.ts[2m > [22m[2mRsceTrackerComponent[2m > [22m[2mshould robustly parse dates with timestamps for video matching and past competitions
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+ [32m✓[39m src/app/components/rsce-tracker/rsce-tracker.component.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 87[2mms[22m[39m
+[90mstdout[2m | src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts[2m > [22m[2mGestionarHorariosComponent Logic[2m > [22m[2mshould save multiple slots for mass creation
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/reservas/gestionar-horarios/gestionar-horarios.component.spec.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 132[2mms[22m[39m
+ [32m✓[39m src/app/components/calendario/calendario.component.spec.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+[90mstdout[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould create
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould create
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould auto-select first dog when dogs load
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould auto-select first dog when dogs load
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould evaluate Iniciacion checklist correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould evaluate Iniciacion checklist correctly
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould compute points for Promocion/Competicion correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould compute points for Promocion/Competicion correctly
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould grant points based purely on qualification, ignoring speed
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould grant points based purely on qualification, ignoring speed
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+[90mstdout[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould set hasCelebratedCE properly and trigger celebration when reaching 80 pts and 40 agility pts
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/rfec-tracker/rfec-tracker.component.spec.ts[2m > [22m[2mRfecTrackerComponent[2m > [22m[2mshould set hasCelebratedCE properly and trigger celebration when reaching 80 pts and 40 agility pts
+[22m[39mThe 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+The 'allowSignalWrites' flag is deprecated and no longer impacts effect() (writes are always allowed)
+
+ [32m✓[39m src/app/components/rfec-tracker/rfec-tracker.component.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 62[2mms[22m[39m
+ [32m✓[39m src/app/components/tablon-anuncios/tablon-anuncios.component.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 94[2mms[22m[39m
+[90mstdout[2m | src/app/reservas/gestionar-reservas/gestionar-reservas.component.spec.ts[2m > [22m[2mGestionarReservasComponent (Exceptions)[2m > [22m[2mshould correctly identify a cancelled slot based on exceptions
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-reservas/gestionar-reservas.component.spec.ts[2m > [22m[2mGestionarReservasComponent (Exceptions)[2m > [22m[2mshould call addException when confirming a toggle on an uncancelled slot
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/reservas/gestionar-reservas/gestionar-reservas.component.spec.ts[2m > [22m[2mGestionarReservasComponent (Exceptions)[2m > [22m[2mshould call deleteException when confirming a toggle on a cancelled slot
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/reservas/gestionar-reservas/gestionar-reservas.component.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+[90mstdout[2m | src/app/services/video.service.spec.ts[2m > [22m[2mVideoService[2m > [22m[2mshould be created
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/video.service.spec.ts[2m > [22m[2mVideoService[2m > [22m[2mshould fetch videos with pagination and filters
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/video.service.spec.ts[2m > [22m[2mVideoService[2m > [22m[2mshould upload a video
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/video.service.spec.ts[2m > [22m[2mVideoService[2m > [22m[2mshould toggle like
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/video.service.spec.ts[2m > [22m[2mVideoService[2m > [22m[2mshould delete a video
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/services/video.service.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+[90mstderr[2m | src/app/components/tablon-anuncios/crear-anuncio/crear-anuncio.component.spec.ts[2m > [22m[2mCrearAnuncioComponent[2m > [22m[2mshould handle submission errors
+[22m[39mError creating announcement Error: API Error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/tablon-anuncios/crear-anuncio/crear-anuncio.component.spec.ts:136:80
+    at Observable.init [as _subscribe] [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\observable\throwError.js:8:64[90m)[39m
+    at Observable._trySubscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:41:25[90m)[39m
+    at [90mC:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:35:31
+    at Object.errorContext [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\util\errorContext.js:22:9[90m)[39m
+    at Observable.subscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:26:24[90m)[39m
+    at CrearAnuncioComponent2.onSubmit (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/tablon-anuncios/crear-anuncio/crear-anuncio.component.ts:78:58)
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/tablon-anuncios/crear-anuncio/crear-anuncio.component.spec.ts:144:15
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+
+ [32m✓[39m src/app/components/tablon-anuncios/crear-anuncio/crear-anuncio.component.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+[90mstdout[2m | src/app/services/auth.service.spec.ts[2m > [22m[2mAuthService Profile Update[2m > [22m[2mshould send FormData to updateProfile and refresh user
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/auth.service.spec.ts[2m > [22m[2mAuthService Profile Update[2m > [22m[2mshould include photo in FormData when updating profile
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/admin-usuarios/admin-usuarios.component.spec.ts[2m > [22m[2mAdminUsuariosComponent[2m > [22m[2mshould handle error when loading users on init
+[22m[39mError loading users Error: Fetch failed
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-usuarios/admin-usuarios.component.spec.ts:64:55
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new ZoneAwarePromise (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/node_modules/[4mzone.js[24m/fesm2015/zone.js:2221:23)
+    at runWithTimeout [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [32m✓[39m src/app/services/auth.service.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+[90mstdout[2m | src/app/components/ranking/ranking.component.spec.ts[2m > [22m[2mRankingComponent[2m > [22m[2mshould create
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/admin-usuarios/admin-usuarios.component.spec.ts[2m > [22m[2mAdminUsuariosComponent[2m > [22m[2mshould handle error when updating user role
+[22m[39mError updating role { error: { message: [32m'Rol inválido'[39m } }
+
+[90mstdout[2m | src/app/components/ranking/ranking.component.spec.ts[2m > [22m[2mRankingComponent[2m > [22m[2mshould load ranking on init
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/admin-usuarios/admin-usuarios.component.spec.ts[2m > [22m[2mAdminUsuariosComponent[2m > [22m[2mshould handle generic error without message when updating user role
+[22m[39mError updating role Error: Unknown error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-usuarios/admin-usuarios.component.spec.ts:107:58
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:20
+
+[90mstdout[2m | src/app/components/ranking/ranking.component.spec.ts[2m > [22m[2mRankingComponent[2m > [22m[2mshould calculate medals correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/galeria-videos/upload-video/upload-video.component.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 90[2mms[22m[39m
+ [32m✓[39m src/app/components/admin-usuarios/admin-usuarios.component.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 43[2mms[22m[39m
+[90mstdout[2m | src/app/components/ranking/ranking.component.spec.ts[2m > [22m[2mRankingComponent[2m > [22m[2mshould verify hasDogUser correctly
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/ranking/ranking.component.spec.ts[2m > [22m[2mRankingComponent[2m > [22m[2mshould get owner names
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/ranking/ranking.component.spec.ts[2m > [22m[2mRankingComponent[2m > [22m[2mshould handle API errors gracefully
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/components/ranking/ranking.component.spec.ts[2m > [22m[2mRankingComponent[2m > [22m[2mshould open and close modal manually
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/ranking/ranking.component.spec.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 67[2mms[22m[39m
+[90mstdout[2m | src/app/services/rsce-track.service.spec.ts[2m > [22m[2mRsceTrackService[2m > [22m[2mshould be created
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/rsce-track.service.spec.ts[2m > [22m[2mRsceTrackService[2m > [22m[2mshould get tracks via GET
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/rsce-track.service.spec.ts[2m > [22m[2mRsceTrackService[2m > [22m[2mshould add track via POST
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/rsce-track.service.spec.ts[2m > [22m[2mRsceTrackService[2m > [22m[2mshould update track via POST
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/rsce-track.service.spec.ts[2m > [22m[2mRsceTrackService[2m > [22m[2mshould delete track via POST
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/rsce-track.service.spec.ts[2m > [22m[2mRsceTrackService[2m > [22m[2mshould get admin monitor data via GET
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/services/rsce-track.service.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+[90mstdout[2m | src/app/services/reservation.service.spec.ts[2m > [22m[2mReservationService (Exceptions)[2m > [22m[2mshould be created
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/suggestion.service.spec.ts[2m > [22m[2mSuggestionService[2m > [22m[2mshould be created
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/reservation.service.spec.ts[2m > [22m[2mReservationService (Exceptions)[2m > [22m[2mshould fetch exceptions and update the signal
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/suggestion.service.spec.ts[2m > [22m[2mSuggestionService[2m > [22m[2mshould fetch all suggestions (admin)
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/reservation.service.spec.ts[2m > [22m[2mReservationService (Exceptions)[2m > [22m[2mshould add an exception and refresh the list
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/suggestion.service.spec.ts[2m > [22m[2mSuggestionService[2m > [22m[2mshould create a new suggestion
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstdout[2m | src/app/services/reservation.service.spec.ts[2m > [22m[2mReservationService (Exceptions)[2m > [22m[2mshould delete an exception and refresh the list
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/services/reservation.service.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+[90mstdout[2m | src/app/services/suggestion.service.spec.ts[2m > [22m[2mSuggestionService[2m > [22m[2mshould mark a suggestion as resolved
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+[90mstderr[2m | src/app/components/galeria-videos/video-list/video-list.component.spec.ts[2m > [22m[2mVideoListComponent[2m > [22m[2mshould toggle like optimistically and revert on error
+[22m[39mError toggling like Error: error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/galeria-videos/video-list/video-list.component.spec.ts:84:74
+    at Observable.init [as _subscribe] [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\observable\throwError.js:8:64[90m)[39m
+    at Observable._trySubscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:41:25[90m)[39m
+    at [90mC:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:35:31
+    at Object.errorContext [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\util\errorContext.js:22:9[90m)[39m
+    at Observable.subscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:26:24[90m)[39m
+    at VideoListComponent2.toggleLike (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/galeria-videos/video-list/video-list.component.ts:183:48)
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/galeria-videos/video-list/video-list.component.spec.ts:86:19
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+
+[90mstderr[2m | src/app/components/recursos/recursos-form/recursos-form.component.spec.ts[2m > [22m[2mRecursosFormComponent[2m > [22m[2mshould handle submit errors gracefully
+[22m[39mError: Error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/recursos/recursos-form/recursos-form.component.spec.ts:142:72
+    at Observable.init [as _subscribe] [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\observable\throwError.js:8:64[90m)[39m
+    at Observable._trySubscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:41:25[90m)[39m
+    at [90mC:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:35:31
+    at Object.errorContext [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\util\errorContext.js:22:9[90m)[39m
+    at Observable.subscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:26:24[90m)[39m
+    at RecursosFormComponent2.onSubmit (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/recursos/recursos-form/recursos-form.component.ts:110:55)
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/recursos/recursos-form/recursos-form.component.spec.ts:151:15
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+
+[90mstdout[2m | src/app/services/suggestion.service.spec.ts[2m > [22m[2mSuggestionService[2m > [22m[2mshould mark a suggestion as unresolved
+[22m[39m[TenantService] Hostname: localhost, Slug detectado: Ninguno
+
+ [32m✓[39m src/app/components/recursos/recursos-form/recursos-form.component.spec.ts [2m([22m[2m8 tests[22m[2m)[22m[32m 66[2mms[22m[39m
+ [32m✓[39m src/app/services/suggestion.service.spec.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 50[2mms[22m[39m
+ [32m✓[39m src/app/components/galeria-videos/video-list/video-list.component.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 58[2mms[22m[39m
+ [32m✓[39m src/app/components/admin-sugerencias/admin-sugerencias.spec.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 55[2mms[22m[39m
+ [32m✓[39m src/app/components/novedades/novedades.component.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 24[2mms[22m[39m
+ [32m✓[39m src/app/components/admin-salud-monitor/admin-salud-monitor.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 20[2mms[22m[39m
+Not implemented: Window's scrollTo() method
+ [32m✓[39m src/app/components/recursos/recursos-list/recursos-list.component.spec.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 32[2mms[22m[39m
+ [32m✓[39m src/app/components/galeria-videos-publica/galeria-videos-publica.component.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m src/app/services/onboarding.spec.ts [2m([22m[2m1 test[22m[2m)[22m[32m 18[2mms[22m[39m
+ [32m✓[39m src/app/guards/staff.guard.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 19[2mms[22m[39m
+ [32m✓[39m src/app/components/info-reservas/info-reservas.component.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+[90mstderr[2m | src/app/components/admin-rsce-monitor/admin-rsce-monitor.spec.ts[2m > [22m[2mAdminRsceMonitorComponent[2m > [22m[2mshould handle error when loading data fails
+[22m[39mError loading rsce monitor data Error: API Error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-rsce-monitor/admin-rsce-monitor.spec.ts:57:74
+    at Observable.init [as _subscribe] [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\observable\throwError.js:8:64[90m)[39m
+    at Observable._trySubscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:41:25[90m)[39m
+    at [90mC:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:35:31
+    at Object.errorContext [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\util\errorContext.js:22:9[90m)[39m
+    at Observable.subscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:26:24[90m)[39m
+    at AdminRsceMonitorComponent2.loadStats (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-rsce-monitor/admin-rsce-monitor.ts:27:44)
+    at AdminRsceMonitorComponent2.ngOnInit (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-rsce-monitor/admin-rsce-monitor.ts:22:10)
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-rsce-monitor/admin-rsce-monitor.spec.ts:61:17
+    at runInInjectionContext [90m(file:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@angular/core[24m/fesm2022/_untracked-chunk.mjs:1458:12[90m)[39m
+
+ [32m✓[39m src/app/components/admin-rsce-monitor/admin-rsce-monitor.spec.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 14[2mms[22m[39m
+[90mstderr[2m | src/app/components/admin-deleted-videos/admin-deleted-videos.component.spec.ts[2m > [22m[2mAdminDeletedVideosComponent[2m > [22m[2mshould handle error when loading history
+[22m[39mError loading deleted videos history Error: Error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-deleted-videos/admin-deleted-videos.component.spec.ts:47:83
+    at Observable.init [as _subscribe] [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\observable\throwError.js:8:64[90m)[39m
+    at Observable._trySubscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:41:25[90m)[39m
+    at [90mC:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:35:31
+    at Object.errorContext [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\util\errorContext.js:22:9[90m)[39m
+    at Observable.subscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:26:24[90m)[39m
+    at AdminDeletedVideosComponent2.loadHistory (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-deleted-videos/admin-deleted-videos.component.ts:44:53)
+    at AdminDeletedVideosComponent2.ngOnInit (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-deleted-videos/admin-deleted-videos.component.ts:39:10)
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-deleted-videos/admin-deleted-videos.component.spec.ts:49:15
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+
+ [32m✓[39m src/app/components/admin-deleted-videos/admin-deleted-videos.component.spec.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+[90mstderr[2m | src/app/components/admin-videos-stats/admin-videos-stats.component.spec.ts[2m > [22m[2mAdminVideosStatsComponent[2m > [22m[2mshould handle error when loading stats
+[22m[39mError loading video stats Error: Error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-videos-stats/admin-videos-stats.component.spec.ts:56:78
+    at Observable.init [as _subscribe] [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\observable\throwError.js:8:64[90m)[39m
+    at Observable._trySubscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:41:25[90m)[39m
+    at [90mC:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:35:31
+    at Object.errorContext [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\util\errorContext.js:22:9[90m)[39m
+    at Observable.subscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:26:24[90m)[39m
+    at AdminVideosStatsComponent2.loadStats (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-videos-stats/admin-videos-stats.component.ts:50:44)
+    at AdminVideosStatsComponent2.ngOnInit (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-videos-stats/admin-videos-stats.component.ts:43:10)
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-videos-stats/admin-videos-stats.component.spec.ts:58:15
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+
+[90mstderr[2m | src/app/components/admin-videos-stats/admin-videos-stats.component.spec.ts[2m > [22m[2mAdminVideosStatsComponent[2m > [22m[2mshould show error toast if retryUpload fails
+[22m[39mError al reintentar vídeo Error: Error
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-videos-stats/admin-videos-stats.component.spec.ts:80:76
+    at Observable.init [as _subscribe] [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\observable\throwError.js:8:64[90m)[39m
+    at Observable._trySubscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:41:25[90m)[39m
+    at [90mC:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:35:31
+    at Object.errorContext [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\util\errorContext.js:22:9[90m)[39m
+    at Observable.subscribe [90m(C:\Users\Usuario\Desktop\AgilityAsturiass\frontend\[39mnode_modules\[4mrxjs[24m\dist\cjs\internal\Observable.js:26:24[90m)[39m
+    at AdminVideosStatsComponent2.retryUpload (C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-videos-stats/admin-videos-stats.component.ts:84:50)
+    at C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/admin-videos-stats/admin-videos-stats.component.spec.ts:82:15
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///C:/Users/Usuario/Desktop/AgilityAsturiass/frontend/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+
+ [32m✓[39m src/app/components/admin-videos-stats/admin-videos-stats.component.spec.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 13[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 5 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/app/components/gestionar-miembros/gestionar-miembros.component.spec.ts[2m > [22mGestionarMiembrosComponent[2m > [22mshould open and close delete modal
+[31m[1mTypeError[22m: this.authService.isAdmin is not a function[39m
+[36m [2m❯[22m GestionarMiembrosComponent2.openDeleteModal src/app/components/gestionar-miembros/gestionar-miembros.ts:[2m136:27[22m[39m
+    [90m134| [39m  [90m// Delete User Logic[39m
+    [90m135| [39m  [34mopenDeleteModal[39m(user[33m:[39m [33mUserProfile[39m) {
+    [90m136| [39m    [35mif[39m ([33m![39m[35mthis[39m[33m.[39mauthService[33m.[39m[34misAdmin[39m() [33m&&[39m [33m![39m[35mthis[39m[33m.[39mauthService[33m.[39m[34misManager[39m()) {
+    [90m   | [39m                          [31m^[39m
+    [90m137| [39m      this.toastService.error('No tienes permisos para realizar esta a…
+    [90m138| [39m      [35mreturn[39m[33m;[39m
+[90m [2m❯[22m src/app/components/gestionar-miembros/gestionar-miembros.component.spec.ts:[2m119:15[22m[39m
+[90m [2m❯[22m new ZoneAwarePromise node_modules/zone.js/fesm2015/zone.js:[2m2221:23[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/components/gestionar-miembros/gestionar-miembros.component.spec.ts[2m > [22mGestionarMiembrosComponent[2m > [22mshould delete user and update state
+[31m[1mTypeError[22m: this.authService.isAdmin is not a function[39m
+[36m [2m❯[22m GestionarMiembrosComponent2.openDeleteModal src/app/components/gestionar-miembros/gestionar-miembros.ts:[2m136:27[22m[39m
+    [90m134| [39m  [90m// Delete User Logic[39m
+    [90m135| [39m  [34mopenDeleteModal[39m(user[33m:[39m [33mUserProfile[39m) {
+    [90m136| [39m    [35mif[39m ([33m![39m[35mthis[39m[33m.[39mauthService[33m.[39m[34misAdmin[39m() [33m&&[39m [33m![39m[35mthis[39m[33m.[39mauthService[33m.[39m[34misManager[39m()) {
+    [90m   | [39m                          [31m^[39m
+    [90m137| [39m      this.toastService.error('No tienes permisos para realizar esta a…
+    [90m138| [39m      [35mreturn[39m[33m;[39m
+[90m [2m❯[22m src/app/components/gestionar-miembros/gestionar-miembros.component.spec.ts:[2m134:15[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/components/gestionar-miembros/gestionar-miembros.component.spec.ts[2m > [22mGestionarMiembrosComponent[2m > [22mshould handle error when deleting user
+[31m[1mTypeError[22m: this.authService.isAdmin is not a function[39m
+[36m [2m❯[22m GestionarMiembrosComponent2.openDeleteModal src/app/components/gestionar-miembros/gestionar-miembros.ts:[2m136:27[22m[39m
+    [90m134| [39m  [90m// Delete User Logic[39m
+    [90m135| [39m  [34mopenDeleteModal[39m(user[33m:[39m [33mUserProfile[39m) {
+    [90m136| [39m    [35mif[39m ([33m![39m[35mthis[39m[33m.[39mauthService[33m.[39m[34misAdmin[39m() [33m&&[39m [33m![39m[35mthis[39m[33m.[39mauthService[33m.[39m[34misManager[39m()) {
+    [90m   | [39m                          [31m^[39m
+    [90m137| [39m      this.toastService.error('No tienes permisos para realizar esta a…
+    [90m138| [39m      [35mreturn[39m[33m;[39m
+[90m [2m❯[22m src/app/components/gestionar-miembros/gestionar-miembros.component.spec.ts:[2m150:15[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/app/components/home/home.component.spec.ts[2m > [22mHomeComponent[2m > [22mshould create
+[41m[1m FAIL [22m[49m src/app/components/home/home.component.spec.ts[2m > [22mHomeComponent[2m > [22mshould display the club slogan from tenant service
+[31m[1mTypeError[22m: this.tenantService.hasFeature is not a function[39m
+[36m [2m❯[22m HasFeatureDirective2.updateView src/app/directives/has-feature.directive.ts:[2m33:42[22m[39m
+    [90m 31| [39m    [35mif[39m ([33m![39m[35mthis[39m[33m.[39mfeatureSlug) [35mreturn[39m[33m;[39m
+    [90m 32| [39m    
+    [90m 33| [39m    [35mconst[39m hasAccess [33m=[39m [35mthis[39m[33m.[39mtenantService[33m.[39m[34mhasFeature[39m([35mthis[39m[33m.[39mfeatureSlug)[33m;[39m
+    [90m   | [39m                                         [31m^[39m
+    [90m 34| [39m    
+    [90m 35| [39m    [35mif[39m (hasAccess [33m&&[39m [33m![39m[35mthis[39m[33m.[39mhasView) {
+[90m [2m❯[22m HasFeatureDirective2.set hasFeature [as hasFeature] src/app/directives/has-feature.directive.ts:[2m18:10[22m[39m
+[90m [2m❯[22m applyValueToInputField node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:[2m333:27[22m[39m
+[90m [2m❯[22m writeToDirectiveInput node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:[2m3973:7[22m[39m
+[90m [2m❯[22m setAllInputsForProperty node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:[2m5159:7[22m[39m
+[90m [2m❯[22m setPropertyAndInputs node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:[2m4892:23[22m[39m
+[90m [2m❯[22m ɵɵproperty node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:[2m14304:5[22m[39m
+[90m [2m❯[22m HomeComponent2_Template ng:/HomeComponent2.js:[2m132:9[22m[39m
+[90m [2m❯[22m executeTemplate node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:[2m4835:5[22m[39m
+[90m [2m❯[22m refreshView node_modules/@angular/core/fesm2022/_debug_node-chunk.mjs:[2m5505:7[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m49 passed[39m[22m[90m (51)[39m
+[2m      Tests [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m259 passed[39m[22m[90m (264)[39m
+[2m   Start at [22m 14:43:29
+[2m   Duration [22m 5.76s[2m (transform 13.70s, setup 31.27s, import 15.52s, tests 8.42s, environment 16.68s)[22m
+
