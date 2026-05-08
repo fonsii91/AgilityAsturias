@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Dog } from '../models/dog.model';
 import { environment } from '../../environments/environment';
 import { AnalyticsService } from './analytics.service';
+import { OnboardingService } from './onboarding';
 
 @Injectable({
     providedIn: 'root'
@@ -10,6 +11,7 @@ import { AnalyticsService } from './analytics.service';
 export class DogService {
     private http = inject(HttpClient);
     private analytics = inject(AnalyticsService);
+    private onboardingService = inject(OnboardingService);
     private apiUrl = `${environment.apiUrl}/dogs`;
     private dogsSignal = signal<Dog[]>([]);
     private allDogsSignal = signal<Dog[]>([]);
@@ -106,6 +108,8 @@ export class DogService {
                     this.dogsSignal.update(list => list.map(d => d.id === dogId ? updatedDog : d));
                     this.allDogsSignal.update(list => list.map(d => d.id === dogId ? updatedDog : d));
                     this.analytics.logDogInteraction('photo_updated');
+                    this.onboardingService.markStepCompleted('staff_perros');
+                    this.onboardingService.markStepCompleted('miembro_perros');
                     resolve(updatedDog);
                 },
                 error: (err) => reject(err)
@@ -121,6 +125,8 @@ export class DogService {
                     this.dogsSignal.update(list => list.map(d => d.id === id ? updatedDog : d));
                     this.allDogsSignal.update(list => list.map(d => d.id === id ? updatedDog : d));
                     this.analytics.logDogInteraction('config_changed');
+                    this.onboardingService.markStepCompleted('staff_perros');
+                    this.onboardingService.markStepCompleted('miembro_perros');
                     resolve(updatedDog);
                 },
                 error: (err) => reject(err)

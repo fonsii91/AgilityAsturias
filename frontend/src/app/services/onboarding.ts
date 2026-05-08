@@ -20,7 +20,7 @@ export const GESTOR_TUTORIAL: OnboardingStep[] = [
 ];
 
 export const STAFF_TUTORIAL: OnboardingStep[] = [
-  { id: 'staff_perros', title: 'Añade un perro a tu manada', description: 'Desde "Mi Manada" registra a tu primer compañero para gestionar su perfil.', icon: 'pets', route: '/gestionar-perros' },
+  { id: 'staff_perros', title: 'Añade a tu perro', description: 'Desde "Mi Manada" crea el perfil de tu perro para gestionarlo.', icon: 'pets', route: '/gestionar-perros' },
   { id: 'staff_clase', title: 'Modifica el horario base', description: 'Ajusta la hora, el nombre o las plazas de una clase y comprueba los cambios.', icon: 'edit_calendar', route: '/gestionar-horarios' },
   { id: 'staff_evento', title: 'Crea tu primer evento', description: 'Crea una competición o evento de prueba en el calendario.', icon: 'emoji_events', route: '/gestionar-competiciones' },
   { id: 'staff_anuncio', title: 'Publica un anuncio', description: 'Escribe un saludo de bienvenida en el tablón para todos los socios.', icon: 'campaign', route: '/tablon-anuncios' },
@@ -29,7 +29,7 @@ export const STAFF_TUTORIAL: OnboardingStep[] = [
 ];
 
 export const MIEMBRO_TUTORIAL: OnboardingStep[] = [
-  { id: 'miembro_perros', title: 'Añade a tu Compañero', description: 'Registra el perfil de tu primer perro.', icon: 'pets', route: '/gestionar-perros' },
+  { id: 'miembro_perros', title: 'Añade o edita a tu Compañero', description: 'Crea o modifica el perfil de tu perro.', icon: 'pets', route: '/gestionar-perros' },
   { id: 'miembro_clase', title: 'Apúntate a una clase', description: 'Reserva una plaza en una clase desde reservas.', icon: 'event_available', route: '/reservas' },
   { id: 'miembro_evento', title: 'Apúntate a un evento', description: 'Inscríbete en un evento o competición desde el calendario.', icon: 'emoji_events', route: '/calendario' },
   { id: 'miembro_anuncios', title: 'Revisa el tablón', description: 'Lee las noticias o informaciones publicadas para los miembros.', icon: 'campaign', route: '/tablon-anuncios' },
