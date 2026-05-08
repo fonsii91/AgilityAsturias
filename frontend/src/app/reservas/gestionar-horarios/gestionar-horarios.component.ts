@@ -8,6 +8,10 @@ import { ToastService } from '../../services/toast.service';
 import { TimeSlot } from '../../models/time-slot.model';
 import { environment } from '../../../environments/environment';
 import { OnboardingService } from '../../services/onboarding';
+import { TenantService } from '../../services/tenant.service';
+import { ClubAdminService } from '../../services/club-admin.service';
+import { AuthService } from '../../services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-gestionar-horarios',
@@ -21,6 +25,9 @@ export class GestionarHorariosComponent {
   timeSlotService = inject(TimeSlotService);
   toastService = inject(ToastService);
   onboardingService = inject(OnboardingService);
+  tenantService = inject(TenantService);
+  clubAdminService = inject(ClubAdminService);
+  authService = inject(AuthService);
 
   timeSlots = this.timeSlotService.getTimeSlots();
 
@@ -63,6 +70,9 @@ export class GestionarHorariosComponent {
 
   editingSlot: TimeSlot | null = null;
   isModalOpen = false;
+  isSettingsModalOpen = false;
+  isSubmittingSettings = signal(false);
+  cancellationNoticeHours: number = 24;
   slotForm = {
     days: ['Lunes'] as string[],
     name: '' as string | null,
@@ -86,6 +96,39 @@ export class GestionarHorariosComponent {
   closeModal() {
     this.isModalOpen = false;
     this.editingSlot = null;
+  }
+
+  openSettingsModal() {
+    this.cancellationNoticeHours = this.tenantService.tenantInfo()?.settings?.['cancellation_notice_hours'] ?? 24;
+    this.isSettingsModalOpen = true;
+  }
+
+  closeSettingsModal() {
+    this.isSettingsModalOpen = false;
+  }
+
+  async saveSettings() {
+    if (this.isSubmittingSettings()) return;
+    const info = this.tenantService.tenantInfo();
+    if (!info) return;
+
+    this.isSubmittingSettings.set(true);
+    try {
+      const updatedSettings = { ...info.settings, cancellation_notice_hours: Number(this.cancellationNoticeHours) };
+      await firstValueFrom(this.clubAdminService.updateClub(info.id, {
+        name: info.name,
+        slug: info.slug,
+        settings: updatedSettings
+      }));
+      this.toastService.success('Reglas de reserva actualizadas.');
+      await this.tenantService.reload(); // Refresh tenant info
+      this.closeSettingsModal();
+    } catch (err) {
+      console.error(err);
+      this.toastService.error('Error al guardar la configuración.');
+    } finally {
+      this.isSubmittingSettings.set(false);
+    }
   }
 
   editSlot(slot: TimeSlot) {

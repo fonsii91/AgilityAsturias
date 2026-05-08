@@ -19,6 +19,7 @@ import { DogWorkloadService } from '../../services/dog-workload.service';
 import { AcwrData } from '../../models/dog-workload.model';
 import { OnboardingService } from '../../services/onboarding';
 import { AnalyticsService } from '../../services/analytics.service';
+import { TenantService } from '../../services/tenant.service';
 
 @Component({
     selector: 'app-gestionar-reservas',
@@ -36,6 +37,11 @@ export class GestionarReservasComponent {
     dogWorkloadService = inject(DogWorkloadService);
     onboardingService = inject(OnboardingService);
     analyticsService = inject(AnalyticsService);
+    tenantService = inject(TenantService);
+
+    cancellationNoticeHours = computed(() => {
+        return this.tenantService.tenantInfo()?.settings?.['cancellation_notice_hours'] ?? 24;
+    });
 
     // Modal state
     isModalOpen = false;
@@ -391,11 +397,11 @@ export class GestionarReservasComponent {
             const diffMs = slotDateTime.getTime() - now.getTime();
             const diffHours = diffMs / (1000 * 60 * 60);
 
-            if (diffHours < 24) {
-                // Check margin of 15 mins past the 24 hour limit
-                const limitTime = new Date(slotDateTime.getTime() - (24 * 60 * 60 * 1000) + (15 * 60 * 1000));
+            if (diffHours < this.cancellationNoticeHours()) {
+                // Check margin of 15 mins past the configured limit
+                const limitTime = new Date(slotDateTime.getTime() - (this.cancellationNoticeHours() * 60 * 60 * 1000) + (15 * 60 * 1000));
                 if (now > limitTime) {
-                    this.toastService.warning('Las reservas se cierran 24 horas antes de su comienzo.');
+                    this.toastService.warning(`Las reservas se cierran ${this.cancellationNoticeHours()} horas antes de su comienzo.`);
                     return;
                 }
             }
@@ -525,8 +531,8 @@ export class GestionarReservasComponent {
             const diffMs = slotDateTime.getTime() - now.getTime();
             const diffHours = diffMs / (1000 * 60 * 60);
 
-            if (diffHours < 24) {
-                this.toastService.warning('No puedes cancelar tu reserva con menos de 24 horas de antelación. Contacta con administración en caso de urgencia.');
+            if (diffHours < this.cancellationNoticeHours()) {
+                this.toastService.warning(`No puedes cancelar tu reserva con menos de ${this.cancellationNoticeHours()} horas de antelación. Contacta con administración en caso de urgencia.`);
                 return; // Block opening the modal
             }
         }

@@ -208,4 +208,89 @@ class MemberReservationTest extends TestCase
         
         Carbon::setTestNow();
     }
+
+    public function test_prevents_booking_within_custom_cancellation_notice_limit()
+    {
+        $this->club->settings = ['cancellation_notice_hours' => 6];
+        $this->club->save();
+
+        $member = User::factory()->create(['role' => 'member', 'club_id' => $this->club->id]);
+        $dog = Dog::factory()->create(['club_id' => $this->club->id, 'user_id' => $member->id]);
+        $member->dogs()->attach($dog->id);
+
+        $slot = TimeSlot::factory()->create(['start_time' => '10:00:00', 'club_id' => $this->club->id]);
+
+        // Mock time to be 5 hours before the slot (e.g. today at 05:00:00 for a slot at 10:00:00)
+        Carbon::setTestNow(Carbon::today()->addHours(5));
+
+        $response = $this->actingAs($member)->postJson('/api/reservations', [
+            'slot_id' => $slot->id,
+            'user_id' => $member->id,
+            'date' => Carbon::today()->format('Y-m-d'),
+            'dog_ids' => [$dog->id]
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonFragment(['message' => 'No puedes reservar con menos de 6 horas de antelación.']);
+
+        Carbon::setTestNow();
+    }
+
+    public function test_allows_booking_outside_custom_cancellation_notice_limit()
+    {
+        $this->club->settings = ['cancellation_notice_hours' => 6];
+        $this->club->save();
+
+        $member = User::factory()->create(['role' => 'member', 'club_id' => $this->club->id]);
+        $dog = Dog::factory()->create(['club_id' => $this->club->id, 'user_id' => $member->id]);
+        $member->dogs()->attach($dog->id);
+
+        $slot = TimeSlot::factory()->create(['start_time' => '10:00:00', 'club_id' => $this->club->id]);
+
+        // Mock time to be 7 hours before the slot (e.g. today at 03:00:00 for a slot at 10:00:00)
+        Carbon::setTestNow(Carbon::today()->addHours(3));
+
+        $response = $this->actingAs($member)->postJson('/api/reservations', [
+            'slot_id' => $slot->id,
+            'user_id' => $member->id,
+            'date' => Carbon::today()->format('Y-m-d'),
+            'dog_ids' => [$dog->id]
+        ]);
+
+        $response->assertStatus(201);
+
+        Carbon::setTestNow();
+    }
+
+    public function test_prevents_cancelling_within_custom_cancellation_notice_limit()
+    {
+        $this->club->settings = ['cancellation_notice_hours' => 12];
+        $this->club->save();
+
+        $member = User::factory()->create(['role' => 'member', 'club_id' => $this->club->id]);
+        $dog = Dog::factory()->create(['club_id' => $this->club->id, 'user_id' => $member->id]);
+        $member->dogs()->attach($dog->id);
+
+        $slot = TimeSlot::factory()->create(['start_time' => '18:00:00', 'club_id' => $this->club->id]);
+
+        // Mock time to be 10 hours before the slot (e.g. today at 08:00:00 for a slot at 18:00:00)
+        Carbon::setTestNow(Carbon::today()->addHours(8));
+
+        $reservation = Reservation::factory()->create([
+            'user_id' => $member->id,
+            'dog_id' => $dog->id,
+            'slot_id' => $slot->id,
+            'date' => Carbon::today()->format('Y-m-d'),
+            'status' => 'active',
+            'created_at' => now()->subHours(2), // past grace period
+            'club_id' => $this->club->id
+        ]);
+
+        $response = $this->actingAs($member)->postJson('/api/reservations/' . $reservation->id . '/delete');
+
+        $response->assertStatus(422)
+            ->assertJsonFragment(['message' => 'No puedes cancelar una reserva con menos de 12 horas de antelación. Contacta con administración en caso de emergencia.']);
+
+        Carbon::setTestNow();
+    }
 }

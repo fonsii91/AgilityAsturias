@@ -15,11 +15,11 @@
           </li>
           <li style="display: flex; gap: 10px; align-items: flex-start;">
             <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">schedule</span>
-            <span><strong>Regla de Cierre (24 Horas):</strong> No es posible apuntarse ni cancelar una reserva mediante la app si faltan menos de 24 horas para que empiece la clase.</span>
+            <span><strong>Regla de Cierre ({{ cancellationNoticeHours() }} Horas):</strong> No es posible apuntarse ni cancelar una reserva mediante la app si faltan menos de {{ cancellationNoticeHours() }} horas para que empiece la clase.</span>
           </li>
           <li style="display: flex; gap: 10px; align-items: flex-start;">
             <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">timer</span>
-            <span><strong>El Margen de Cortesía (15 Minutos):</strong> Si cancelas una plaza por error, dispones de 15 minutos exactos para rectificar y volverte a apuntar mágicamente, incluso rompiendo la regla de las 24 horas. Pasados esos 15 minutos, la plaza queda liberada definitivamente.</span>
+            <span><strong>El Margen de Cortesía (15 Minutos):</strong> Si cancelas una plaza por error, dispones de 15 minutos exactos para rectificar y volverte a apuntar mágicamente, incluso rompiendo la regla de las {{ cancellationNoticeHours() }} horas. Pasados esos 15 minutos, la plaza queda liberada definitivamente.</span>
           </li>
           <li style="display: flex; gap: 10px; align-items: flex-start;">
             <span class="material-icons" style="color: #eab308; flex-shrink: 0; margin-top: 2px;">groups</span>
@@ -32,7 +32,7 @@
           <ul style="padding-left: 0; list-style: none; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 16px;">
             <li style="display: flex; gap: 10px; align-items: flex-start;">
               <span class="material-icons" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">admin_panel_settings</span>
-              <span><strong>Inscripción Ilimitada:</strong> El Staff ignora bloqueos de tiempo (24h) y aforos. Puedes pulsar 'Reservar' ilimitadamente y buscar el nombre de otro socio para apuntar a sus perros.</span>
+              <span><strong>Inscripción Ilimitada:</strong> El Staff ignora bloqueos de tiempo ({{ cancellationNoticeHours() }}h) y aforos. Puedes pulsar 'Reservar' ilimitadamente y buscar el nombre de otro socio para apuntar a sus perros.</span>
             </li>
             <li style="display: flex; gap: 10px; align-items: flex-start;">
               <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">pets</span>
@@ -44,7 +44,7 @@
             </li>
             <li style="display: flex; gap: 10px; align-items: flex-start;">
               <span class="material-icons" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">edit</span>
-              <span><strong>Modo Edición Segura:</strong> Para cancelar rápidamente a un alumno, debes pulsar el <strong>Lápiz</strong> junto a "Ver asistentes". Esto revelará las papeleras (ignoran la regla de 24h). Vuelve a pulsarlo para bloquear accidentes.</span>
+              <span><strong>Modo Edición Segura:</strong> Para cancelar rápidamente a un alumno, debes pulsar el <strong>Lápiz</strong> junto a "Ver asistentes". Esto revelará las papeleras (ignoran la regla de {{ cancellationNoticeHours() }}h). Vuelve a pulsarlo para bloquear accidentes.</span>
             </li>
             <li style="display: flex; gap: 10px; align-items: flex-start;">
               <span class="material-icons" style="color: #dc2626; flex-shrink: 0; margin-top: 2px;">block</span>
@@ -420,7 +420,7 @@
         <h3><span class="material-icons" style="vertical-align: text-bottom; color: #f44336; margin-right: 8px;">person_remove</span> Eliminar Reservas de Miembro</h3>
         <div class="modal-body">
           <p class="confirm-message">¿Estás seguro de que quieres eliminar TODAS las reservas de <strong>{{ userToDelete?.userName }}</strong> para la clase del <strong>{{ userToDelete?.date | date:'dd/MM' }}</strong>?</p>
-          <p class="note warning">Esta acción no se puede deshacer e ignorará la regla de las 24 horas.</p>
+          <p class="note warning">Esta acción no se puede deshacer e ignorará la regla de las {{ cancellationNoticeHours() }} horas.</p>
         </div>
         <div class="modal-actions" style="margin-top: 1.5rem;">
           <button class="btn-secondary" (click)="closeStaffDeleteUserModal()">Cancelar</button>

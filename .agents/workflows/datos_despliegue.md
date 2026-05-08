@@ -22,6 +22,7 @@ description: Datos para desplegar en producción el proyecto
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado 2026-05-08]** Se ha actualizado el panel de Administración de Sugerencias y Errores para que muestre de forma explícita a qué Club pertenece el usuario que envía el reporte, mejorando así la gestión centralizada por parte de los administradores globales.
 - **[Completado]** Scheduler Laravel: el servidor tiene una unica crontab general para ejecutar todas las tareas programadas:
   ```bash
   * * * * * cd /var/www/agilityasturias/agility_back && /usr/bin/php artisan schedule:run >> /dev/null 2>&1

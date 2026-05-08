@@ -43,7 +43,7 @@ El sistema de competición distingue tres niveles de dificultad y experiencia pa
 ## 4. Criterios de Ascenso
 
 **Ascenso de Iniciación a Promoción:**
-El nivel de Iniciación es **no competitivo** (participación permitida desde los 12 meses de edad del perro), por lo que el binomio **no necesita acumular puntos**. Para debutar en el nivel de Promoción, simplemente debe cumplir los siguientes requisitos administrativos:
+Para debutar en el nivel de Promoción, el perro debe cumplir los siguientes requisitos administrativos:
 *   **Edad del perro:** Haber cumplido los **18 meses**.
 *   **Test de Sociabilidad:** Haber obtenido obligatoriamente el **Certificado de Aptitud**.
 *   **Medición:** Contar con una medición provisional o definitiva obligatoria.
@@ -58,8 +58,6 @@ Para que un binomio ascienda al nivel máximo, debe cumplir los siguientes requi
 *   **Sistema de Puntuación:**
     *   Manga sin penalizaciones (a cero): suma **10 puntos**.
     *   Manga con penalización hasta 5,99: suma **5 puntos**.
-
-*Nota: Una vez que se obtienen los puntos necesarios para ascender de Promoción a Competición, el ascenso suele producirse al inicio de la temporada siguiente, y no se permite el descenso de nuevo a Promoción.*
 
 ## 5. Calificaciones en Mangas
 En cada manga disputada, las calificaciones otorgadas según la penalización total obtenida son las siguientes:

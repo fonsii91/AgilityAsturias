@@ -168,12 +168,13 @@ class ReservationController extends Controller
                 }
             }
 
-            // 24-HOUR RULE FOR BOOKING
+            // CANCELLATION NOTICE RULE FOR BOOKING
             $timeSlot = \App\Models\TimeSlot::find($validated['slot_id']);
             if ($timeSlot) {
+                $cancellationNotice = $user->club->settings['cancellation_notice_hours'] ?? 24;
                 $slotDateTime = \Carbon\Carbon::parse($validated['date'] . ' ' . $timeSlot->start_time);
-                // Si la diferencia es menor a 24h significa que ya ha pasado el límite normal
-                if (now()->diffInHours($slotDateTime, false) < 24) {
+                // Si la diferencia es menor a las horas configuradas significa que ya ha pasado el límite normal
+                if (now()->diffInHours($slotDateTime, false) < $cancellationNotice) {
                     // Check if they have a recently cancelled reservation for this strict window
                     $recentCancel = \App\Models\Reservation::where('user_id', $validated['user_id'])
                         ->where('slot_id', $validated['slot_id'])
@@ -184,7 +185,7 @@ class ReservationController extends Controller
 
                     if (!$recentCancel) {
                         return response()->json([
-                            'message' => 'No puedes reservar con menos de 24 horas de antelación.'
+                            'message' => 'No puedes reservar con menos de ' . $cancellationNotice . ' horas de antelación.'
                         ], 422);
                     }
                 }
@@ -289,8 +290,9 @@ class ReservationController extends Controller
             abort(403);
         }
 
-        // 24-hour rule: Members cannot cancel within 24 hours of the starting time
+        // Cancellation Notice rule: Members cannot cancel within configured hours of the starting time
         if (!$isAdminOrStaff && $reservation->timeSlot && $reservation->date) {
+            $cancellationNotice = $user->club->settings['cancellation_notice_hours'] ?? 24;
             $dateStr = is_string($reservation->date) ? $reservation->date : $reservation->date->format('Y-m-d');
             $slotDateTime = \Carbon\Carbon::parse($dateStr . ' ' . $reservation->timeSlot->start_time);
 
@@ -298,9 +300,9 @@ class ReservationController extends Controller
             $gracePeriodEnd = $reservation->created_at->addMinutes(15);
             $isWithinGracePeriod = now()->isBefore($gracePeriodEnd);
 
-            if (now()->diffInHours($slotDateTime, false) < 24 && !$isWithinGracePeriod) {
+            if (now()->diffInHours($slotDateTime, false) < $cancellationNotice && !$isWithinGracePeriod) {
                 return response()->json([
-                    'message' => 'No puedes cancelar una reserva con menos de 24 horas de antelación. Contacta con administración en caso de emergencia.'
+                    'message' => 'No puedes cancelar una reserva con menos de ' . $cancellationNotice . ' horas de antelación. Contacta con administración en caso de emergencia.'
                 ], 422);
             }
         }
@@ -362,17 +364,18 @@ class ReservationController extends Controller
             }
         }
 
-        // 24-hour rule: Members cannot cancel within 24 hours of the starting time
+        // Cancellation Notice rule: Members cannot cancel within configured hours of the starting time
         if (!$isAdminOrStaff && !$isWithinGracePeriod) {
             $timeSlot = \App\Models\TimeSlot::find($request->slot_id);
             if ($timeSlot) {
+                $cancellationNotice = $user->club->settings['cancellation_notice_hours'] ?? 24;
                 // Carbon parse combining the requested date and the timeslot's start time
                 $slotDateTime = \Carbon\Carbon::parse($request->date . ' ' . $timeSlot->start_time);
 
                 // diffInHours with false returns negative if $slotDateTime is in the past
-                if (now()->diffInHours($slotDateTime, false) < 24) {
+                if (now()->diffInHours($slotDateTime, false) < $cancellationNotice) {
                     return response()->json([
-                        'message' => 'No puedes cancelar una reserva con menos de 24 horas de antelación y han pasado más de 15 minutos desde que la hiciste. Contacta con administración en caso de emergencia.'
+                        'message' => 'No puedes cancelar una reserva con menos de ' . $cancellationNotice . ' horas de antelación y han pasado más de 15 minutos desde que la hiciste. Contacta con administración en caso de emergencia.'
                     ], 422);
                 }
             }

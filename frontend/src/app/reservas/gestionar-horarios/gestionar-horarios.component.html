@@ -1,18 +1,33 @@
-﻿<div class="management-container"
-  [style.--club-primary]="clubConfig.colors.primary"
-  [style.--club-accent]="clubConfig.colors.accent"
-  [style.--club-warn]="clubConfig.colors.warn">
-  <div class="header-main" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+<div class="management-container" [style.--club-primary]="clubConfig.colors.primary"
+  [style.--club-accent]="clubConfig.colors.accent" [style.--club-warn]="clubConfig.colors.warn">
+  <div style="margin-bottom: 1rem;">
+    <a routerLink="/reservas"
+      style="display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; cursor: pointer;"
+      onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#64748b'">
+      <span class="material-icons" style="font-size: 18px;">arrow_back</span>
+      Volver a Reservas
+    </a>
+  </div>
+  <div class="header-main"
+    style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
     <div>
-      <h2><span class="material-icons" style="vertical-align: middle; margin-right: 8px;">calendar_month</span> Gestión de Horarios Maestros</h2>
-      <p class="subtitle">Configura los horarios disponibles por defecto para las clases del club.</p>
+      <h2 style="margin-top: 0;"><span class="material-icons"
+          style="vertical-align: middle; margin-right: 8px;">calendar_month</span> Gestión de Horarios</h2>
+      <p class="subtitle" style="margin-top: 4px;">Configura los horarios disponibles por defecto para las clases del
+        club.</p>
     </div>
-    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-      <button class="btn-secondary" routerLink="/reservas" style="display: flex; align-items: center; gap: 6px; border: 1px solid #e2e8f0; background: white; color: var(--text-secondary); border-radius: 10px; padding: 10px 20px; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
-        <span class="material-icons btn-icon-small">arrow_back</span>
-        Volver a Reservas
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+      @if (authService.isManager()) {
+      <button class="btn-secondary" (click)="openSettingsModal()"
+        style="display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #e2e8f0; background: white; color: #475569; border-radius: 10px; padding: 10px 20px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); width: 180px; white-space: nowrap;"
+        title="Reglas de Cancelación" onmouseover="this.style.background='#f8fafc'"
+        onmouseout="this.style.background='white'">
+        <span class="material-icons btn-icon-small">settings</span>
+        Ajustes
       </button>
-      <button class="btn-primary-action" (click)="openModal()">
+      }
+      <button class="btn-primary-action" (click)="openModal()"
+        style="display: flex; align-items: center; justify-content: center; width: 180px; white-space: nowrap;">
         <span class="material-icons btn-icon-small">add</span>
         Añadir Horario
       </button>
@@ -29,71 +44,75 @@
         </h4>
         <span class="count-badge">{{ timeSlots().length }} horarios</span>
       </div>
-      
+
       <!-- Filtros Rápidos -->
       <div class="filters-container" style="margin-top: 1rem; display: flex; gap: 8px; flex-wrap: wrap;">
         <button class="filter-pill" [class.active]="activeFilter() === 'Todos'" (click)="toggleFilter('Todos')">
           Todos
         </button>
         @for (day of availableDays; track day) {
-          <button class="filter-pill" [class.active]="activeFilter() === day" (click)="toggleFilter(day)">
-            {{ day.substring(0, 3) }}
-          </button>
+        <button class="filter-pill" [class.active]="activeFilter() === day" (click)="toggleFilter(day)">
+          {{ day.substring(0, 3) }}
+        </button>
         }
       </div>
-      
+
       <div class="slots-groups-container" style="display: flex; flex-direction: column; gap: 2rem; margin-top: 1.5rem;">
         @for (group of filteredAndGroupedSlots(); track group.day) {
-          <div class="day-group">
-            <h3 class="day-group-header" style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
-              <span class="material-icons" style="color: var(--primary-color)">today</span> 
-              {{ group.day }} <span style="font-size: 0.9rem; color: #64748b; font-weight: 500;">({{ group.slots.length }})</span>
-            </h3>
-            <div class="slots-list-container">
-              @for (slot of group.slots; track slot.id) {
-                <div class="admin-slot-card" [class.highlighted]="editingSlot?.id === slot.id">
-                  <div class="slot-card-left">
-                    <div class="day-badge-container" [style.opacity]="isAfternoonSlot(slot.start_time) ? '0.9' : '1'">
-                      <span class="day-badge" [class.afternoon-badge]="isAfternoonSlot(slot.start_time)">
-                        <span class="material-icons" style="font-size: 20px;">{{ isAfternoonSlot(slot.start_time) ? 'wb_cloudy' : 'wb_sunny' }}</span>
-                      </span>
-                    </div>
-                    <div class="slot-info-main">
-                      @if (slot.name) {
-                        <span class="slot-name" style="font-weight: 600; font-size: 1.1rem; margin-bottom: 2px;">{{ slot.name }}</span>
-                      }
-                      <span class="time-range">{{ slot.start_time | slice:0:5 }} - {{ slot.end_time | slice:0:5 }}</span>
-                      <span class="capacity-badge">
-                        <span class="material-icons icon-tiny">person</span>
-                        {{ slot.max_bookings }} plazas max.
-                      </span>
-                    </div>
-                  </div>
-                  <div class="slot-actions">
-                    <button class="btn-icon-action edit" (click)="editSlot(slot)" title="Editar">
-                      <span class="material-icons">edit</span>
-                    </button>
-                    <button class="btn-icon-action delete" (click)="deleteSlot(slot.id)" title="Eliminar">
-                      <span class="material-icons">delete_outline</span>
-                    </button>
-                  </div>
+        <div class="day-group">
+          <h3 class="day-group-header"
+            style="margin-bottom: 1rem; color: var(--text-main); font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons" style="color: var(--primary-color)">today</span>
+            {{ group.day }} <span style="font-size: 0.9rem; color: #64748b; font-weight: 500;">({{ group.slots.length
+              }})</span>
+          </h3>
+          <div class="slots-list-container">
+            @for (slot of group.slots; track slot.id) {
+            <div class="admin-slot-card" [class.highlighted]="editingSlot?.id === slot.id">
+              <div class="slot-card-left">
+                <div class="day-badge-container" [style.opacity]="isAfternoonSlot(slot.start_time) ? '0.9' : '1'">
+                  <span class="day-badge" [class.afternoon-badge]="isAfternoonSlot(slot.start_time)">
+                    <span class="material-icons" style="font-size: 20px;">{{ isAfternoonSlot(slot.start_time) ?
+                      'wb_cloudy' : 'wb_sunny' }}</span>
+                  </span>
                 </div>
-              }
+                <div class="slot-info-main">
+                  @if (slot.name) {
+                  <span class="slot-name" style="font-weight: 600; font-size: 1.1rem; margin-bottom: 2px;">{{ slot.name
+                    }}</span>
+                  }
+                  <span class="time-range">{{ slot.start_time | slice:0:5 }} - {{ slot.end_time | slice:0:5 }}</span>
+                  <span class="capacity-badge">
+                    <span class="material-icons icon-tiny">person</span>
+                    {{ slot.max_bookings }} plazas max.
+                  </span>
+                </div>
+              </div>
+              <div class="slot-actions">
+                <button class="btn-icon-action edit" (click)="editSlot(slot)" title="Editar">
+                  <span class="material-icons">edit</span>
+                </button>
+                <button class="btn-icon-action delete" (click)="deleteSlot(slot.id)" title="Eliminar">
+                  <span class="material-icons">delete_outline</span>
+                </button>
+              </div>
             </div>
+            }
           </div>
+        </div>
         }
 
         @if (timeSlots().length === 0) {
-          <div class="empty-schedule-state">
-            <div class="empty-icon-wrapper">
-              <span class="material-icons">event_busy</span>
-            </div>
-            <h3>Silencio en la pista...</h3>
-            <p>Todavía no hay ningún horario programado.</p>
-            <button class="btn-primary-action" style="margin-top: 1rem;" (click)="openModal()">
-              <span class="material-icons btn-icon-small">add</span> Añadir primer horario
-            </button>
+        <div class="empty-schedule-state">
+          <div class="empty-icon-wrapper">
+            <span class="material-icons">event_busy</span>
           </div>
+          <h3>Silencio en la pista...</h3>
+          <p>Todavía no hay ningún horario programado.</p>
+          <button class="btn-primary-action" style="margin-top: 1rem;" (click)="openModal()">
+            <span class="material-icons btn-icon-small">add</span> Añadir primer horario
+          </button>
+        </div>
         }
       </div>
     </div>
@@ -102,99 +121,140 @@
 
 <!-- Modal -->
 @if (isModalOpen) {
-  <div class="modal-backdrop" (click)="closeModal()">
-    <div class="modal-content large-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header header-light">
-        <h3>
-          <span class="material-icons header-icon">calendar_month</span>
-          Gestión de Horarios
-        </h3>
-        <button class="btn-icon close-btn" (click)="closeModal()" title="Cerrar">
-          <span class="material-icons">close</span>
-        </button>
-      </div>
-      <div class="management-body" style="background: white; padding: 2rem;">
-        <div class="management-form-card" [class.editing-mode]="editingSlot" style="box-shadow: none; border: none; padding: 0;">
-          <div class="form-header-row">
-            <h4 class="section-title card-title">
-              <span class="material-icons indicator-icon">{{ editingSlot ? 'edit_calendar' : 'add_circle' }}</span>
-              {{ editingSlot ? 'Editar Horario Existente' : 'Programar Nuevo Horario' }}
-            </h4>
+<div class="modal-backdrop" (click)="closeModal()">
+  <div class="modal-content large-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header header-light">
+      <h3>
+        <span class="material-icons header-icon">calendar_month</span>
+        Gestión de Horarios
+      </h3>
+      <button class="btn-icon close-btn" (click)="closeModal()" title="Cerrar">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="management-body" style="background: white; padding: 2rem;">
+      <div class="management-form-card" [class.editing-mode]="editingSlot"
+        style="box-shadow: none; border: none; padding: 0;">
+        <div class="form-header-row">
+          <h4 class="section-title card-title">
+            <span class="material-icons indicator-icon">{{ editingSlot ? 'edit_calendar' : 'add_circle' }}</span>
+            {{ editingSlot ? 'Editar Horario Existente' : 'Programar Nuevo Horario' }}
+          </h4>
+          @if (editingSlot) {
+          <span class="status-badge">Modo Edición</span>
+          }
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Día(s) de la semana</label>
             @if (editingSlot) {
-              <span class="status-badge">Modo Edición</span>
-            }
-          </div>
-          
-          <div class="form-grid">
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label>Día(s) de la semana</label>
-              @if (editingSlot) {
-                <div class="select-wrapper">
-                  <select [(ngModel)]="slotForm.days[0]" class="modern-input">
-                    @for (day of availableDays; track day) {
-                      <option [value]="day">{{ day }}</option>
-                    }
-                  </select>
-                  <span class="material-icons select-icon">expand_more</span>
-                </div>
-              } @else {
-                <div class="days-multi-selector">
-                  @for (day of availableDays; track day) {
-                    <button class="day-select-btn" 
-                      [class.selected]="slotForm.days.includes(day)"
-                      (click)="toggleDaySelection(day)">
-                      {{ day.substring(0, 3) }}
-                    </button>
-                  }
-                </div>
+            <div class="select-wrapper">
+              <select [(ngModel)]="slotForm.days[0]" class="modern-input">
+                @for (day of availableDays; track day) {
+                <option [value]="day">{{ day }}</option>
+                }
+              </select>
+              <span class="material-icons select-icon">expand_more</span>
+            </div>
+            } @else {
+            <div class="days-multi-selector">
+              @for (day of availableDays; track day) {
+              <button class="day-select-btn" [class.selected]="slotForm.days.includes(day)"
+                (click)="toggleDaySelection(day)">
+                {{ day.substring(0, 3) }}
+              </button>
               }
             </div>
-            
-            <div class="form-group" style="grid-column: 1 / -1;">
-              <label>Nombre de la clase (Opcional)</label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">label</span>
-                <input type="text" [(ngModel)]="slotForm.name" class="modern-input with-icon" placeholder="Ej. Iniciación, Avanzado..." />
-              </div>
-            </div>
+            }
+          </div>
 
-            <div class="form-group">
-              <label>Hora Inicio</label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">schedule</span>
-                <input type="time" [(ngModel)]="slotForm.startTime" class="modern-input with-icon" />
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label>Hora Fin</label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">update</span>
-                <input type="time" [(ngModel)]="slotForm.endTime" class="modern-input with-icon" />
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label>Plazas Máx.</label>
-              <div class="input-with-icon">
-                <span class="material-icons input-icon">group</span>
-                <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input with-icon" min="1" />
-              </div>
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Nombre de la clase (Opcional)</label>
+            <div class="input-with-icon">
+              <span class="material-icons input-icon">label</span>
+              <input type="text" [(ngModel)]="slotForm.name" class="modern-input with-icon"
+                placeholder="Ej. Iniciación, Avanzado..." />
             </div>
           </div>
-          
-          <div class="form-actions-row">
-            <button class="btn-text" (click)="cancelEdit()">
-              <span class="material-icons btn-icon-small">cancel</span>
-              Cancelar
-            </button>
-            <button class="btn-primary-action" [class.btn-edit]="editingSlot" (click)="saveSlot()">
-              <span class="material-icons btn-icon-small">{{ editingSlot ? 'save' : 'add' }}</span>
-              {{ editingSlot ? 'Guardar Cambios' : 'Añadir Horario' }}
-            </button>
+
+          <div class="form-group">
+            <label>Hora Inicio</label>
+            <div class="input-with-icon">
+              <span class="material-icons input-icon">schedule</span>
+              <input type="time" [(ngModel)]="slotForm.startTime" class="modern-input with-icon" />
+            </div>
           </div>
+
+          <div class="form-group">
+            <label>Hora Fin</label>
+            <div class="input-with-icon">
+              <span class="material-icons input-icon">update</span>
+              <input type="time" [(ngModel)]="slotForm.endTime" class="modern-input with-icon" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Plazas Máx.</label>
+            <div class="input-with-icon">
+              <span class="material-icons input-icon">group</span>
+              <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input with-icon" min="1" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions-row">
+          <button class="btn-text" (click)="cancelEdit()">
+            <span class="material-icons btn-icon-small">cancel</span>
+            Cancelar
+          </button>
+          <button class="btn-primary-action" [class.btn-edit]="editingSlot" (click)="saveSlot()">
+            <span class="material-icons btn-icon-small">{{ editingSlot ? 'save' : 'add' }}</span>
+            {{ editingSlot ? 'Guardar Cambios' : 'Añadir Horario' }}
+          </button>
         </div>
       </div>
     </div>
   </div>
+</div>
+}
+
+<!-- Settings Modal -->
+@if (isSettingsModalOpen) {
+<div class="modal-backdrop" (click)="closeSettingsModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header header-light">
+      <h3>
+        <span class="material-icons header-icon">rule_folder</span>
+        Reglas de Reservas
+      </h3>
+      <button class="btn-icon close-btn" (click)="closeSettingsModal()" title="Cerrar">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="management-body" style="background: white; padding: 2rem;">
+      <div class="form-group">
+        <label>Límite de tiempo para Cancelar/Reservar</label>
+        <div class="input-with-icon" style="max-width: 220px; position: relative;">
+          <span class="material-icons input-icon">schedule</span>
+          <input type="number" [(ngModel)]="cancellationNoticeHours" class="modern-input with-icon" min="0" step="1"
+            style="padding-right: 60px;" />
+          <span
+            style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #64748b; font-weight: 500; pointer-events: none;">horas</span>
+        </div>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 8px;">
+          Los miembros no podrán cancelar ni reservar una plaza si faltan menos de este tiempo estipulado para que
+          comience la clase.
+        </p>
+      </div>
+      <div class="form-actions-row" style="margin-top: 2rem;">
+        <button class="btn-text" (click)="closeSettingsModal()">Cancelar</button>
+        <button class="btn-primary-action" (click)="saveSettings()" [disabled]="isSubmittingSettings()">
+          <span class="material-icons btn-icon-small">save</span>
+          {{ isSubmittingSettings() ? 'Guardando...' : 'Guardar Ajustes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 }
