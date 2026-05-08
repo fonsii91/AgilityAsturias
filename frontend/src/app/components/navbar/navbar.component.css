@@ -20,7 +20,8 @@
     margin: 0;
     padding: 0;
     margin-right: auto;
-    /* Pushes nav and auth to the right */
+    min-width: 0;
+    flex: 0 1 auto;
 }
 
 .nav-logo {
@@ -28,6 +29,7 @@
     width: auto;
     border-radius: 4px;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .nav-title {
@@ -37,6 +39,10 @@
     /* Slightly smaller for a slimmer toolbar */
     font-weight: 500;
     cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
 }
 
 nav.desktop-nav > ul {
@@ -172,6 +178,7 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     position: relative;
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .login-btn {
@@ -350,6 +357,7 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     cursor: pointer;
     padding: 0;
     z-index: 10;
+    flex-shrink: 0;
 }
 
 .mobile-menu-btn .bar {
@@ -626,8 +634,8 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
         width: auto;
         margin: 0;
         padding: 0;
-        /* Changed from 100% to auto */
-        /* justify-content: space-between; Removed */
+        min-width: 0;
+        flex: 0 1 auto;
     }
 
     .mobile-menu-btn {
