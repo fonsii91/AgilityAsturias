@@ -22,6 +22,7 @@ description: Datos para desplegar en producción el proyecto
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado 2026-05-08]** Desplegada la corrección del Onboarding de usuarios (el paso de perro se completa también al modificar los datos o su foto). Actualización de las Novedades para reflejar el cambio.
 - **[Completado 2026-05-08]** Desplegada la estabilización del entorno de testing Vitest, solucionando todos los errores de inyección y mocks faltantes. La integración de GA4 y el OnboardingService son ahora 100% compatibles con el entorno de pruebas JSDOM. Pipeline local en verde.
 - **[Completado 2026-05-08]** Desplegada exitosamente la versión 1.1.39 con la implementación masiva de la trazabilidad anónima con GA4 en toda la plataforma (100% de la cobertura planeada alcanzada). Se sobrepasó la regla de tests del frontend bajo autorización del administrador por falta de mocks, habiéndose compilado sin problemas en producción.
 - **[Completado 2026-05-07]** Configurado servidor Nginx y Certbot SSL para soportar HTTPS en el nuevo subdominio `elnorte.clubagility.com` y `www.elnorte.clubagility.com`. Se expandió el certificado existente y se verificó el enrutamiento.

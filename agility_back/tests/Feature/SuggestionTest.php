@@ -134,7 +134,7 @@ class SuggestionTest extends TestCase
         }
     }
 
-    public function test_permite_a_un_administrador_ver_todas_las_sugerencias_de_su_club()
+    public function test_permite_a_un_administrador_ver_todas_las_sugerencias_globales()
     {
         Suggestion::factory()->create([
             'user_id' => $this->user->id,
@@ -162,7 +162,7 @@ class SuggestionTest extends TestCase
         $response = $this->actingAs($this->admin)->getJson('/api/admin/suggestions');
 
         $response->assertStatus(200)
-            ->assertJsonCount(1);
+            ->assertJsonCount(2);
     }
 
     public function test_permite_a_un_administrador_marcar_una_sugerencia_como_resuelta_y_notifica_al_usuario()
