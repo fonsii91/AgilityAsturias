@@ -20,7 +20,7 @@ class ClubLeadResource extends Resource
 {
     protected static ?string $model = ClubLead::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?string $recordTitleAttribute = 'name';
 
