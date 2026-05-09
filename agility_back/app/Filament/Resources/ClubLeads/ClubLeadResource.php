@@ -11,27 +11,27 @@ use App\Filament\Resources\ClubLeads\Schemas\ClubLeadInfolist;
 use App\Filament\Resources\ClubLeads\Tables\ClubLeadsTable;
 use App\Models\ClubLead;
 use BackedEnum;
-use Filament\Forms\Form;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
 class ClubLeadResource extends Resource
 {
     protected static ?string $model = ClubLead::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return ClubLeadForm::configure($form);
+        return ClubLeadForm::configure($schema);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return ClubLeadInfolist::configure($infolist);
+        return ClubLeadInfolist::configure($schema);
     }
 
     public static function table(Table $table): Table

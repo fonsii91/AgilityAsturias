@@ -3,14 +3,14 @@
 namespace App\Filament\Resources\ClubLeads\Schemas;
 
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 
 class ClubLeadForm
 {
-    public static function configure(Form $form): Form
+    public static function configure(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 TextInput::make('name')
                     ->required(),
                 TextInput::make('slug')
