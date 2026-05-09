@@ -1,6 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-join-saas',
@@ -11,9 +13,11 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 })
 export class JoinSaas {
   private fb = inject(FormBuilder);
+  private http = inject(HttpClient);
   
   leadForm: FormGroup;
   isSubmitted = false;
+  isSubmitting = false;
   selectedPlan = signal<string | null>(null);
 
   constructor() {
@@ -36,9 +40,21 @@ export class JoinSaas {
 
   onSubmit() {
     if (this.leadForm.valid) {
-      this.isSubmitted = true;
-      // Aquí irá la llamada al backend, incluyendo el plan seleccionado
-      console.log('Lead request submitted:', { ...this.leadForm.value, plan: this.selectedPlan() });
+      this.isSubmitting = true;
+      const leadData = { ...this.leadForm.value, plan_selected: this.selectedPlan() };
+      
+      this.http.post(`${environment.apiUrl}/club-leads`, leadData).subscribe({
+        next: (res) => {
+          this.isSubmitted = true;
+          this.isSubmitting = false;
+          console.log('Lead request submitted:', res);
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          console.error('Error submitting lead:', err);
+          alert('Hubo un error al enviar tu solicitud. Inténtalo de nuevo más tarde.');
+        }
+      });
     } else {
       this.leadForm.markAllAsTouched();
     }

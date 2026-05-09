@@ -269,12 +269,12 @@
 }
 
 .missing {
-  color: #94a3b8 !important;
+  color: #64748b !important;
   text-decoration: line-through;
 }
 
 .cross-icon {
-  color: #cbd5e1;
+  color: #94a3b8;
   font-size: 1.25rem;
   flex-shrink: 0;
 }
@@ -291,6 +291,18 @@
   color: #eab308;
   font-size: 1.25rem;
   flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.gift-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.gift-subtext {
+  font-size: 0.85em;
+  opacity: 0.9;
+  margin-top: 0.15rem;
 }
 
 /* Guarantee Text */

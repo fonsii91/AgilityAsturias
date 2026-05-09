@@ -66,6 +66,7 @@ Herramienta avanzada para la prevención de lesiones y monitorización del rendi
 * **Asistencia a Competiciones:** Confirmar la inscripción o asistencia a una competición determinada ("apuntarse") o cancelar dicha inscripción ("desapuntarse"). Ver la lista de otros miembros que también van a asistir.
 * **Ranking Comunitario:** Consultar la clasificación de la liga interna o ranking del club para ver la posición de los perros en las diferentes categorías.
 * **Bitácora RSCE:** Herramienta para realizar un seguimiento personal de las pistas RSCE realizadas, guardar resultados, registrar puntos y llevar un control del grado de competición.
+* **Bitácora RFEC:** Herramienta paralela para el seguimiento de clasificaciones, resultados y progresión en la normativa de la Real Federación Española de Caza (RFEC).
 
 ---
 

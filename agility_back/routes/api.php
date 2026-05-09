@@ -24,6 +24,7 @@ use App\Http\Controllers\PersonalEventController;
 */
 
 // Public Routes
+Route::post('/club-leads', [\App\Http\Controllers\ClubLeadController::class, 'store']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset-password', [AuthController::class, 'resetPasswordWithToken']);

@@ -17,12 +17,11 @@ Este documento detalla los distintos planes de suscripción (SaaS) ofrecidos par
   - Tablón de anuncios.
 - **Limitaciones:**
   - *No incluye* Módulo de Salud Deportiva (ACWR).
-  - *No incluye* Gestión de Competiciones.
 
 ## 2. Plan Pro (Más Popular)
 **Todo lo que necesitas para digitalizar tu club al 100%.**
 
-- **Precio:** 19€ / mes (Oferta de lanzamiento durante los primeros 3 meses, después 49€ / mes).
+- **Precio:** 19€ / mes (Oferta de lanzamiento durante los primeros 2 meses, después 49€ / mes).
 - **Características Incluidas:**
   - **Todo lo incluido en el Plan Básico**
   - Página de bienvenida personalizada
@@ -30,8 +29,7 @@ Este documento detalla los distintos planes de suscripción (SaaS) ofrecidos par
   - Módulo de Seguimiento Canina (RSCE).
   - Módulo de Seguimiento Caza (RFEC).
   - Acceso a recursos.
-  - Galería de vídeos (con capacidad de almacenamiento de 100GB).
-  - **Migración de datos GRATIS** como regalo de bienvenida.
+  - **Galería de vídeos: 200GB** (incluye 100GB extra como regalo de bienvenida).
 
 ## 3. Plan Élite
 **Para clubes de alto rendimiento y organizadores de grandes eventos.**
@@ -40,7 +38,7 @@ Este documento detalla los distintos planes de suscripción (SaaS) ofrecidos par
 - **Características Incluidas:**
   - **Todo lo incluido en el Plan Pro.**
   - Dominio web propio y personalizado (ej: `tuclub.com` en lugar de `tuclub.clubagility.com`).
-  - Galería de vídeos (con capacidad de almacenamiento de 600GB).
+  - Galería de vídeos (con capacidad de almacenamiento de 1TB).
 
 ---
 *Garantía: Todos los planes incluyen una garantía de devolución del dinero de 30 días, pudiendo cancelar en cualquier momento.*
