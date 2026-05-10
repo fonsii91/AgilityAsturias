@@ -12,6 +12,7 @@ if [ -d "agility_back" ]; then
     echo "➡️  Actualizando Backend (Laravel)..."
     cd agility_back
     composer install --no-interaction --prefer-dist --optimize-autoloader
+    php artisan livewire:publish --assets
     php artisan migrate --force
     php artisan optimize:clear
     php artisan optimize

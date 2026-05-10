@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.40",
+    "date": "2026-05-10",
+    "bugfixes": [
+      "Hemos realizado ajustes técnicos invisibles solucionando pequeños errores de conexión y carga para garantizar una mayor estabilidad y rapidez en toda la plataforma."
+    ]
+  },
+  {
     "version": "1.1.39",
     "date": "2026-05-08",
     "features": [
