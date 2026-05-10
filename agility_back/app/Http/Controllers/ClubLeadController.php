@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\ClubLead;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\ClubLeadReceived;
+use App\Mail\NewClubLeadAdmin;
 
 class ClubLeadController extends Controller
 {
@@ -18,6 +21,13 @@ class ClubLeadController extends Controller
         ]);
 
         $lead = ClubLead::create($validated);
+
+        try {
+            Mail::to($lead->email)->send(new ClubLeadReceived($lead));
+            Mail::to('fonsii@clubagility.com')->send(new NewClubLeadAdmin($lead)); // or a configured admin email
+        } catch (\Exception $e) {
+            \Log::error('Error sending club lead emails: ' . $e->getMessage());
+        }
 
         return response()->json([
             'message' => 'Lead created successfully',
