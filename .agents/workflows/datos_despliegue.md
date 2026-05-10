@@ -22,8 +22,9 @@ description: Datos para desplegar en producción el proyecto
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado 2026-05-10]** Se solucionaron los errores 404 de los componentes de Livewire en producción publicando sus recursos estáticos (`php artisan livewire:publish --assets`), lo cual fue automatizado añadiéndolo al `deploy.sh`.
+- **[Completado 2026-05-10]** Se arregló el error 500 (Class "Filament\Tables\Actions\ViewAction" not found) en el panel de administradores (`ClubLeadsTable`), actualizando los namespaces de acciones de tablas según la nueva versión de Filament v5.
 - **[Completado 2026-05-10]** Configurado servidor Nginx y Certbot SSL para soportar HTTPS en el nuevo subdominio `admin.clubagility.com` y `www.admin.clubagility.com`. Se expandió el certificado existente y se verificó el enrutamiento.
-- **[Completado 2026-05-08]** Se ha actualizado el panel de Administración de Sugerencias y Errores para que muestre de forma explícita a qué Club pertenece el usuario que envía el reporte, mejorando así la gestión centralizada por parte de los administradores globales.
 - **[Completado]** Scheduler Laravel: el servidor tiene una unica crontab general para ejecutar todas las tareas programadas:
   ```bash
   * * * * * cd /var/www/agilityasturias/agility_back && /usr/bin/php artisan schedule:run >> /dev/null 2>&1
