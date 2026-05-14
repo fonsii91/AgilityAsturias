@@ -1,17 +1,13 @@
 # Gamificación de stickers para aplicación de clubs de agility
-## Contexto: las gamificaciones
-- Las gamificaciones se alternan por temporadas de seis meses, para no saturar al usuario. 
-- Solo hay una gamificación activa por temporada.
-- En este documento se recoge la información de la gamificación de stickers
 
-## Objetivo del sistema de stickers
+## 1. Contexto y Objetivos
 
-- La aplicación incorpora una mecánica de gamificación basada en **stickers coleccionables de los perros del club**. 
-- El objetivo es aumentar la participación de los socios en la aplicación y en la vida del club mediante recompensas visuales, colección e intercambios regulados.
-- La mecánica debe ser sencilla, divertida, social y segura, evitando que se vuelva demasiado compleja o frustrante.
+El presente documento detalla la mecánica de gamificación basada en **stickers (cromos coleccionables) de los perros del club**. Esta gamificación está pensada para alternarse por temporadas de seis meses, asegurando que los usuarios no se saturen (solo habrá una mecánica activa por temporada).
 
-## Concepto principal
-Cada club tendrá una colección principal llamada: Album del club
+El objetivo principal es aumentar la participación de los socios tanto en la aplicación como en la vida del club, a través de recompensas visuales, afán de colección e intercambios regulados. La experiencia debe ser en todo momento sencilla, divertida, eminentemente social y segura, evitando dinámicas que puedan resultar frustrantes o excesivamente complejas.
+
+## 2. Concepto principal
+Cada club tendrá una colección principal llamada **Álbum del club**.
 
 ### Álbum del club
 
@@ -42,9 +38,7 @@ Ejemplos:
 - Promoción 2020
 
 
-Esta clasificación se elige porque es estable y emocional. Es mejor que agrupar por edad, ya que la edad cambia cada año, mientras que el año de entrada al club no cambia.
-
-La idea es que el usuario no solo coleccione perros, sino también parte de la historia del club.
+Se opta por agrupar a los perros por su año de ingreso al club debido a que es un dato inmutable, a diferencia de la edad. Esta estructura aporta un fuerte componente emocional e histórico, logrando que el usuario no solo coleccione cromos, sino que recorra y descubra la historia cronológica de su club.
 
 Ejemplo:
 
@@ -166,7 +160,7 @@ No descubierto → Pixelado fuerte → Pixelado suave → Nítido completo
 - Importante: se consiguen solo cuando la gamificación de stickers está activa
 - Ejemplos de acciones que pueden dar cofres:
     - Asistir a clase.
-    - Sistir a eventos.
+    - Asistir a eventos.
     - Recibir puntos extra del staff.
     - Usar funcionalidades importantes de la app, como subir vídeos o registrar entrenamientos.
 
@@ -223,8 +217,6 @@ Ejemplos de uso de monedas:
 - Comprar sticker aleatorio.
 - Comprar un sticker concreto en tienda.
 - Participar en intercambios.
-
----
 
 ## Gestión de duplicados
 
@@ -303,7 +295,6 @@ Esto debe regularse para evitar precios abusivos.
 
 Opciones:
 
-- Precio fijo por rareza.
 - Rango de precio permitido.
 - Comisión en monedas.
 - Mercado no público, solo solicitudes directas.
@@ -315,7 +306,7 @@ El club debería poder activar o desactivar los intercambios.
 Ejemplo:
 
 ```text
-club.sticker_trades_enabled = true
+club.settings_stickers.sticker_trades_enabled = true
 ```
 
 ---
@@ -340,72 +331,6 @@ Los intercambios tienen ventajas, pero también riesgos.
 - Pueden hacer que usuarios muy activos dominen la economía.
 - Pueden complicar la interfaz si se diseñan mal.
 
-Por eso se recomienda empezar con una versión simple y regulada.
-
----
-
-## Objetos especiales
-
-En el futuro se pueden añadir objetos especiales, aunque no son necesarios para el MVP.
-
-Uno de los objetos planteados es el "imán".
-
----
-
-## Imán
-
-El imán originalmente se planteó como un objeto para "robar" un sticker a una persona con más colección.
-
-Se recomienda no usar la palabra "robar", porque puede generar sensación negativa dentro de un club pequeño.
-
-La versión recomendada es:
-
-```text
-El imán atrae una copia de un sticker duplicado de otro usuario con más colección.
-```
-
-La otra persona no pierde su sticker.
-
-Esto mantiene la fantasía de equilibrar la colección sin crear conflicto.
-
-Posible texto:
-
-```text
-El imán ha encontrado una copia inspirada en la colección de otro socio.
-```
-
----
-
-## Otros objetos posibles
-
-### Chuche
-
-Mejora un sticker aleatorio que todavía no esté completo.
-
-### Silbato
-
-Aumenta la probabilidad de conseguir un sticker nuevo en el próximo cofre.
-
-### Cepillo
-
-Reduce el pixelado de un sticker y lo mejora una fase.
-
-### Pelota
-
-Permite repetir una recompensa de cofre una vez.
-
-### Cámara
-
-Desbloquea una variante visual o una foto alternativa del perro.
-
-### Medalla
-
-Aplica un marco especial a un sticker completado.
-
-Estos objetos son opcionales y deberían añadirse en fases futuras si el sistema base funciona bien.
-
----
-
 ## Recompensas por completar promociones
 
 Completar una subcolección de promoción debe dar una recompensa.
@@ -428,14 +353,8 @@ Completar el álbum principal del club debería dar una recompensa especial.
 
 Ejemplos:
 
-- Cofre de oro.
-- Gran cantidad de monedas.
-- Insignia de coleccionista.
-- Marco especial exclusivo.
-- Título visible en el perfil.
-- Reconocimiento en el ranking del club.
+- Medalla/Insignia especial que se ve en el perfil de usuario. Ligada para siempre al usuario.
 
----
 
 ## Rankings
 
@@ -458,26 +377,17 @@ Los rankings deben tener tono divertido y no excesivamente competitivo.
 
 ## Privacidad y consentimiento
 
-Antes de convertir un perro en sticker coleccionable, debe existir control por parte del club o del propietario.
+Es imperativo habilitar controles de privacidad dentro del sistema de gamificación. Los administradores del club (y opcionalmente los propietarios) tendrán la capacidad de excluir perros específicos de la colección general si así lo deciden. 
 
-Recomendaciones:
-
-- El administrador del club puede decidir qué perros aparecen en la colección.
-- El propietario del perro puede permitir o no que su perro aparezca como sticker.
-- Si un perro se desactiva, debe decidirse si desaparece del álbum o pasa a una sección histórica.
-- Evitar mostrar datos sensibles del perro o del propietario en la colección.
-
----
+Si un perro se marca como inactivo o se oculta, desaparecerá inmediatamente del álbum y dejará de contabilizar para el número total de stickers de la colección.
 
 ## Perros activos, inactivos y antiguos
 
 El álbum principal debería priorizar perros activos del club.
 
 Para perros que ya no están en el club, existen varias opciones:
-
-### Opción A: mantenerlos como históricos
-
-El perro sigue apareciendo en el álbum, quizá en una categoría especial.
+- Mantenerlos como históricos
+- El perro sigue apareciendo en el álbum, en una categoría especial.
 
 Ejemplo:
 
@@ -485,223 +395,76 @@ Ejemplo:
 Leyendas del club
 ```
 
-### Opción B: ocultarlos para nuevos usuarios
-
-Los usuarios antiguos conservan sus stickers, pero los nuevos ya no pueden conseguirlos.
-
-### Opción C: eliminarlos del sistema de colección
-
-No recomendado salvo que haya motivos de privacidad o petición explícita.
-
-La opción más interesante suele ser mantener una sección histórica si el club quiere conservar memoria.
-
----
-
 ## Implementación técnica recomendada
 
-No es necesario generar manualmente varias imágenes si se puede procesar la foto original.
+Para optimizar el rendimiento y reducir los costes de infraestructura, no se generarán ni almacenarán múltiples versiones (pixeladas) de la misma foto original. El efecto de revelado progresivo (de pixelado a nitidez total) se aplicará de forma dinámica en el cliente (Angular) utilizando filtros CSS o transformaciones en Canvas de HTML5.
 
-No obstante, por rendimiento, se recomienda generar variantes al subir la foto del perro.
+**Ventajas de este enfoque:**
+- Reducción drástica del almacenamiento requerido en el servidor.
+- Menor tiempo de procesamiento en el backend (no hay que redimensionar ni aplicar filtros con PHP).
+- Facilidad para realizar pruebas y ajustes visuales del pixelado directamente en el frontend.
 
-Ejemplo de archivos generados:
-
-```text
-dog_original.jpg
-dog_pixelated_strong.jpg
-dog_pixelated_soft.jpg
-dog_thumbnail.jpg
-```
-
-La versión nítida usa la imagen original o una versión optimizada.
-
----
-
-## Aplicación de pixelado
-
-El pixelado puede hacerse de dos formas:
-
-### Opción A: frontend
-
-Aplicar CSS o canvas en Angular.
-
-Ventajas:
-
-- Menos almacenamiento.
-- Menos procesamiento en backend.
-- Fácil de probar.
-
-Inconvenientes:
-
-- Puede afectar rendimiento si hay muchos stickers en pantalla.
-- El resultado puede variar según navegador.
-- Puede exponer la imagen original si no se controla bien.
-
-### Opción B: backend
-
-Generar las variantes en Laravel al subir la foto.
-
-Ventajas:
-
-- Mejor rendimiento en el álbum.
-- Resultado consistente.
-- Se evita cargar y procesar muchas imágenes en el navegador.
-- Mejor control sobre qué versión ve el usuario.
-
-Inconvenientes:
-
-- Requiere procesamiento en servidor.
-- Ocupa algo más de almacenamiento.
-
-Recomendación: para producción, generar variantes en backend o en un worker.
-
----
 
 ## Modelo de datos orientativo
 
-### Tabla: dogs
+Para integrar el sistema de stickers en la base de datos actual de Laravel, se proponen las siguientes modificaciones y nuevas tablas:
 
-Campos relevantes:
+### 1. Modificaciones a tablas existentes
 
-```text
-id
-club_id
-name
-photo_url
-club_entry_date
-club_entry_year
-is_active
-is_collectible
-created_at
-updated_at
-```
+*(Se descarta añadir campos directamente a la tabla `users` para no ensuciarla, ya que las gamificaciones son rotativas).*
 
-### Tabla: sticker_collections
+**Tabla `dogs`:**
+- `club_entry_year` (integer, nullable): Año en el que el perro entró al club. Servirá para agrupar las "Promociones".
 
-Representa el progreso de un usuario sobre un perro concreto.
+**Tabla `clubs`:**
+- Se añadirá una nueva columna JSON `settings_stickers` para almacenar configuraciones específicas de esta gamificación. Dentro de este JSON, se incluirá al menos la clave `sticker_trades_enabled` (boolean, default: true) para que el club pueda activar o desactivar los intercambios.
 
-```text
-id
-club_id
-user_id
-dog_id
-level
-duplicates_count
-is_completed
-created_at
-updated_at
-```
+### 2. Nuevas tablas
 
-Niveles sugeridos:
+**Tabla `user_sticker_profiles` (Modelo `UserStickerProfile`):**
+Aísla el progreso general del usuario en esta gamificación específica. Al haber gamificaciones rotativas de 6 meses, esto evita tener campos como "monedas_stickers", "monedas_carreras", etc., en la tabla principal de `users`.
+- `id` (primary key)
+- `user_id` (foreign key a `users`)
+- `coins` (integer, default: 0): Monedas anti-frustración.
+- `unopened_chests` (json, nullable): Inventario de cofres ganados pero sin abrir (ej. `{"wood": 2, "silver": 1}`).
+- `claimed_promotions` (json, nullable): Array de promociones ya cobradas (ej. `[2024, 2025]`).
+- `season_id` (string/integer, nullable): Opcional. Útil si cuando la gamificación vuelva otro año queréis que los usuarios empiecen un álbum nuevo desde cero (vinculando el perfil a la temporada actual). Si queréis que mantengan su álbum histórico, este campo puede omitirse.
+- `created_at`, `updated_at`
 
-```text
-0 = no descubierto
-1 = pixelado fuerte
-2 = pixelado suave
-3 = nítido completo
-```
+**Tabla `user_stickers` (Modelo `UserSticker`):**
+Registra el progreso de cada usuario con cada perro (sticker).
+- `id` (primary key)
+- `user_id` (foreign key a `users`)
+- `dog_id` (foreign key a `dogs`)
+- `level` (integer, default: 1): Nivel de progreso visual (1 = Pixelado fuerte, 2 = Pixelado suave, 3 = Nítido completo). El estado 0 (no descubierto) implica que no existe registro en esta tabla.
+- `duplicates_count` (integer, default: 0): Contador de cuántas veces ha salido este perro en cofres *después* de haber alcanzado el nivel 3.
+- `created_at`, `updated_at`
 
-### Tabla: sticker_transactions
-
-Registra obtenciones, mejoras, conversiones e intercambios.
-
-```text
-id
-club_id
-user_id
-dog_id
-type
-level_before
-level_after
-coins_delta
-source
-created_at
-```
-
-Tipos posibles:
-
-```text
-chest_reward
-duplicate_to_coins
-trade_sent
-trade_received
-manual_adjustment
-shop_purchase
-```
-
-### Tabla: sticker_trade_requests
-
-Registra solicitudes de intercambio.
-
-```text
-id
-club_id
-sender_user_id
-receiver_user_id
-offered_dog_id
-requested_dog_id
-offered_coins
-requested_coins
-status
-created_at
-updated_at
-```
-
-Estados posibles:
-
-```text
-pending
-accepted
-rejected
-cancelled
-expired
-```
-
-### Tabla: sticker_chests
-
-Opcional si se quiere guardar cofres pendientes de abrir.
-
-```text
-id
-club_id
-user_id
-type
-status
-source
-created_at
-opened_at
-```
-
-Tipos:
-
-```text
-wood
-silver
-gold
-```
-
-Estados:
-
-```text
-pending
-opened
-expired
-```
-
----
+**Tabla `sticker_trades` (Modelo `StickerTrade`):**
+Gestiona las solicitudes de intercambio entre usuarios.
+- `id` (primary key)
+- `sender_id` (foreign key a `users`): Usuario que propone el intercambio.
+- `receiver_id` (foreign key a `users`): Usuario que recibe la solicitud.
+- `offered_dog_id` (foreign key a `dogs`): El sticker duplicado que el emisor de la solicitud ofrece dar.
+- `requested_dog_id` (foreign key a `dogs`): El sticker duplicado que el emisor de la solicitud pide a cambio al receptor.
+- `status` (string/enum): Estado de la solicitud (ej. `pending`, `accepted`, `rejected`, `cancelled`, `expired`).
+- `created_at`, `updated_at`
 
 ## Flujo de obtención de sticker
 
 Cuando un usuario abre un cofre:
 
 1. El sistema calcula recompensa.
-2. Puede salir monedas, sticker, mejora u objeto.
+2. Puede salir monedas, sticker repetido o sticker nuevo.
+    - Se considera sticker nuevo si su nivel es menor que 3.
+    - Se considera sticker repetido si su nivel es 3 o mayor.
 3. Si sale un perro que el usuario no tiene:
-   - Se crea o actualiza el progreso a nivel 1.
+   - Se crea y actualiza el progreso a nivel 1.
 4. Si sale un perro que ya tiene pero no está completo:
    - Se incrementa el nivel.
 5. Si sale un perro ya completado:
    - Se incrementa `duplicates_count`.
-6. Se muestra animación o mensaje de recompensa.
+6. Se muestra animación y mensaje de recompensa.
 
 ---
 
@@ -709,7 +472,7 @@ Cuando un usuario abre un cofre:
 
 1. Usuario A ve sus duplicados.
 2. Usuario A selecciona un duplicado para ofrecer.
-3. Usuario A elige qué sticker quiere recibir.
+3. Usuario A elige qué sticker de los duplicados de Usuario B quiere recibir.
 4. Usuario B recibe la solicitud.
 5. Usuario B acepta o rechaza.
 6. Si acepta:
@@ -720,21 +483,17 @@ Cuando un usuario abre un cofre:
 7. Si rechaza o caduca:
    - No cambia nada.
 
----
-
 ## Reglas anti-abuso
 
 Recomendaciones:
 
-- Límite semanal de intercambios.
+- Límite semanal de 3 intercambios.
 - Solo duplicados.
 - Confirmación por ambas partes.
 - Caducidad de solicitudes.
 - Registro completo de transacciones.
 - Posibilidad de desactivar intercambios por club.
-- Posibilidad de que administradores reviertan o auditen actividad sospechosa.
-
----
+- Posibilidad de que gestores y staff reviertan o auditen actividad sospechosa.
 
 ## MVP recomendado
 
@@ -747,7 +506,7 @@ Para la primera versión, implementar solo lo esencial:
    - Pixelado suave
    - Nítido completo
 4. Estado no descubierto con tarjeta genérica.
-5. Cofres de madera, plata y oro.
+5. Cofres.
 6. Monedas.
 7. Duplicados.
 8. Intercambios regulados solo con duplicados.
@@ -760,10 +519,6 @@ No incluir inicialmente:
 - Mercado abierto.
 - Muchas rarezas.
 - Ranking competitivo agresivo.
-- Siluetas reales del perro.
-- Segmentación de imagen.
-
----
 
 ## Decisiones cerradas
 
@@ -771,7 +526,7 @@ Estas son las decisiones principales tomadas:
 
 - Habrá una colección principal llamada **Álbum del club**.
 - Habrá una subcolección llamada **Promociones del club**.
-- Las promociones se basan en el **año de entrada del perro al club**.
+- Las promociones se basan en el **año de entrada del perro al club**. Que introducirá el usuario en el perfil del perro. El staff tendrá un panel en el que podrán modificar el año de entrada del perro.
 - No se organizará la colección por edad actual, porque cambia con el tiempo.
 - No se usará silueta real del perro, porque normalmente solo se dispone de fotos JPEG.
 - Los stickers progresarán de pixelado a nítido.
@@ -785,11 +540,9 @@ Estas son las decisiones principales tomadas:
 - Los duplicados de stickers completos podrán usarse para intercambios o monedas.
 - Los intercambios existirán, pero estarán regulados.
 - Los intercambios solo permitirán duplicados.
-- El club podrá activar o desactivar intercambios.
+- El staff podrá activar o desactivar intercambios.
 - Las monedas actuarán como sistema anti-frustración.
 - El sistema debe mantenerse simple en el MVP.
-
----
 
 ## Filosofía del diseño
 
