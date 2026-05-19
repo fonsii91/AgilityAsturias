@@ -45,7 +45,7 @@ Ejemplo:
 ```text
 Promoción 2025
 7 / 12 stickers completados
-Recompensa al completar: cofre de plata
+Recompensa al completar: cofre
 ```
 
 ## Fecha de entrada al club
@@ -164,42 +164,13 @@ No descubierto → Pixelado fuerte → Pixelado suave → Nítido completo
     - Recibir puntos extra del staff.
     - Usar funcionalidades importantes de la app, como subir vídeos o registrar entrenamientos.
 
-## Tipos de cofres
+## Recompensa del cofre
 
-Se recomienda usar tres tipos principales de cofres:
+Existirá un único tipo de cofre estándar en la aplicación para simplificar la mecánica de obtención.
 
-### Cofre de madera
-
-Recompensa básica.
-
-Puede contener:
-
-- Monedas.
-- Alta probabilidad de sticker repetido.
-- Media probabilidad de sticker en progreso
-- Baja probabilidad de sticker nuevo.
-
-### Cofre de plata
-
-Recompensa intermedia.
-
-Puede contener:
-
-- Más monedas.
-- Media probabilidad de sticker repetido.
-- Media probabilidad de sticker en progreso
-- Media probabilidad de sticker nuevo.
-
-### Cofre de oro
-
-Recompensa superior.
-
-Puede contener:
-
-- Más monedas.
-- Baja probabilidad de sticker repetido.
-- Media probabilidad de sticker en progreso
-- Alta probabilidad de sticker nuevo.
+Cada cofre puede contener:
+- Monedas (cantidad variable aleatoria).
+- Uno o varios sticker (que puede ser nuevo, en progreso, o repetido, basado en probabilidades dinámicas).
 
 ## Monedas
 
@@ -338,7 +309,7 @@ Completar una subcolección de promoción debe dar una recompensa.
 Ejemplos:
 
 ```text
-Completar Promoción 2026 → Cofre de plata
+Completar Promoción 2026 → Cofre
 Completar Promoción 2025 → 200 monedas
 Completar Fundadores del club → Marco especial "Fundador"
 ```
@@ -422,19 +393,19 @@ Para integrar el sistema de stickers en la base de datos actual de Laravel, se p
 ### 2. Nuevas tablas
 
 **Tabla `user_sticker_profiles` (Modelo `UserStickerProfile`):**
-Aísla el progreso general del usuario en esta gamificación específica. Al haber gamificaciones rotativas de 6 meses, esto evita tener campos como "monedas_stickers", "monedas_carreras", etc., en la tabla principal de `users`.
+Aísla el progreso general del usuario en esta gamificación específica y por temporada. Al haber gamificaciones rotativas de 6 meses, esto evita tener campos como "monedas_stickers", "monedas_carreras", etc., en la tabla principal de `users`.
 - `id` (primary key)
 - `user_id` (foreign key a `users`)
 - `coins` (integer, default: 0): Monedas anti-frustración.
-- `unopened_chests` (json, nullable): Inventario de cofres ganados pero sin abrir (ej. `{"wood": 2, "silver": 1}`).
+- `unopened_chests_count` (integer, default: 0): Número de cofres estándar acumulados y pendientes de abrir.
 - `claimed_promotions` (json, nullable): Array de promociones ya cobradas (ej. `[2024, 2025]`).
-- `season_id` (string/integer, nullable): Opcional. Útil si cuando la gamificación vuelva otro año queréis que los usuarios empiecen un álbum nuevo desde cero (vinculando el perfil a la temporada actual). Si queréis que mantengan su álbum histórico, este campo puede omitirse.
+- `season_id` (string/integer): Clave de temporada (obligatoria) para segmentar el progreso de diferentes ciclos de gamificación sin solapamiento de datos.
 - `created_at`, `updated_at`
 
 **Tabla `user_stickers` (Modelo `UserSticker`):**
-Registra el progreso de cada usuario con cada perro (sticker).
+Registra el progreso de cada usuario con cada perro (sticker), acotado a la temporada correspondiente para evitar mezclar progresos de distintos ciclos (Opción 1 A).
 - `id` (primary key)
-- `user_id` (foreign key a `users`)
+- `user_sticker_profile_id` (foreign key a `user_sticker_profiles`): Relaciona directamente el cromo con el perfil de gamificación y temporada del usuario.
 - `dog_id` (foreign key a `dogs`)
 - `level` (integer, default: 1): Nivel de progreso visual (1 = Pixelado fuerte, 2 = Pixelado suave, 3 = Nítido completo). El estado 0 (no descubierto) implica que no existe registro en esta tabla.
 - `duplicates_count` (integer, default: 0): Contador de cuántas veces ha salido este perro en cofres *después* de haber alcanzado el nivel 3.
@@ -449,6 +420,8 @@ Gestiona las solicitudes de intercambio entre usuarios.
 - `requested_dog_id` (foreign key a `dogs`): El sticker duplicado que el emisor de la solicitud pide a cambio al receptor.
 - `status` (string/enum): Estado de la solicitud (ej. `pending`, `accepted`, `rejected`, `cancelled`, `expired`).
 - `created_at`, `updated_at`
+
+*Nota de seguridad y concurrencia: Para prevenir condiciones de carrera (por ejemplo, que un mismo cromo duplicado sea intercambiado en dos solicitudes simultáneas), la base de datos debe aplicar un bloqueo de escritura (`lockForUpdate` en Laravel) sobre las filas correspondientes de la tabla `user_stickers` durante el proceso de aceptación de la solicitud dentro de una transacción base (`DB::transaction`).*
 
 ## Flujo de obtención de sticker
 
@@ -475,13 +448,16 @@ Cuando un usuario abre un cofre:
 3. Usuario A elige qué sticker de los duplicados de Usuario B quiere recibir.
 4. Usuario B recibe la solicitud.
 5. Usuario B acepta o rechaza.
-6. Si acepta:
-   - Se valida que ambos siguen teniendo los duplicados requeridos.
-   - Se descuentan duplicados.
-   - Se añaden los stickers o duplicados correspondientes.
-   - Se registra la transacción.
+6. Si acepta (Proceso transaccional concurrente seguro - Opción 1 B):
+   - Se inicia una transacción de base de datos (`DB::transaction`).
+   - Se bloquean para actualización las filas de `user_stickers` de ambos usuarios para los perros involucrados (`lockForUpdate`).
+   - Se valida que ambos usuarios sigan teniendo los duplicados requeridos.
+   - Se descuentan los duplicados correspondientes.
+   - Se añaden los stickers o duplicados al receptor y emisor.
+   - Se actualiza el estado de la solicitud a `accepted`.
+   - Se registra la transacción y se hace commit.
 7. Si rechaza o caduca:
-   - No cambia nada.
+   - No cambia nada en los inventarios. El estado de la solicitud cambia a `rejected`, `cancelled` o `expired`.
 
 ## Reglas anti-abuso
 
