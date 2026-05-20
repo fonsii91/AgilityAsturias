@@ -18,7 +18,16 @@ class RsceTrack extends Model
         'speed',
         'judge_name',
         'location',
-        'notes'
+        'notes',
+        'time',
+        'faults',
+        'refusals',
+        'time_penalty',
+        'total_penalty',
+        'is_clean',
+        'course_length',
+        'standard_time',
+        'club_id'
     ];
 
     public function dog()

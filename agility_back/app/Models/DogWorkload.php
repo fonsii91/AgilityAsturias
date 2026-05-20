@@ -21,6 +21,7 @@ class DogWorkload extends Model
         'jumped_max_height',
         'number_of_runs',
         'is_staff_verified',
+        'club_id',
     ];
 
     protected $casts = [

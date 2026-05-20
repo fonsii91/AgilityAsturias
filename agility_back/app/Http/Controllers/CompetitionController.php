@@ -226,5 +226,74 @@ class CompetitionController extends Controller
 
         return response()->json($attendees);
     }
+
+    public function adminScraperStatus(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $today = now()->toDateString();
+        $competitions = Competition::where('tipo', 'competicion')
+            ->where(function($query) use ($today) {
+                $query->where(function ($q) use ($today) {
+                    $q->whereNotNull('fecha_fin_evento')
+                      ->where('fecha_fin_evento', '<', $today);
+                })->orWhere(function ($q) use ($today) {
+                    $q->whereNull('fecha_fin_evento')
+                      ->where('fecha_evento', '<', $today);
+                });
+            })
+            ->orderBy('fecha_evento', 'desc')
+            ->get();
+
+        return response()->json($competitions);
+    }
+
+    public function adminScraperRun(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'competition_id' => 'required|exists:competitions,id'
+        ]);
+
+        $competition = Competition::findOrFail($request->competition_id);
+        
+        if (empty($competition->enlace) || strpos($competition->enlace, 'flowagility.com') === false) {
+            return response()->json([
+                'message' => 'Esta competición no tiene un enlace válido de FlowAgility.'
+            ], 422);
+        }
+
+        $endDate = $competition->fecha_fin_evento ?: $competition->fecha_evento;
+        if (now()->toDateString() <= $endDate) {
+            return response()->json([
+                'message' => 'No se puede realizar el scraping de una competición que aún no ha finalizado.'
+            ], 422);
+        }
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('flowagility:scrape', [
+                '--competition_id' => $competition->id,
+                '--force' => true
+            ]);
+
+            $output = \Illuminate\Support\Facades\Artisan::output();
+            $competition->refresh();
+
+            return response()->json([
+                'message' => 'Scraping completado.',
+                'output' => $output,
+                'competition' => $competition
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error durante el scraping: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }
 

@@ -1,0 +1,182 @@
+<div class="admin-container">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+    <div>
+      <h1 style="margin: 0; color: var(--primary-color); font-weight: 800; font-size: 1.8rem; display: flex; align-items: center; gap: 10px;">
+        <span class="material-icons" style="font-size: 32px;">sync_alt</span>
+        Monitor de Scraping (Admin)
+      </h1>
+      <p style="margin: 6px 0 0 0; color: var(--text-secondary); font-size: 0.95rem; max-width: 750px;">
+        Supervisión en tiempo real de la extracción automática de resultados desde <strong>FlowAgility</strong>. Puedes forzar la sincronización manual y examinar trazas de error detalladas.
+      </p>
+    </div>
+    <div>
+      <button class="btn-action btn-secondary" (click)="loadCompetitions()" [disabled]="isLoading()" style="height: fit-content;">
+        <span class="material-icons" [class.spinning]="isLoading()">refresh</span>
+        Actualizar Lista
+      </button>
+    </div>
+  </div>
+
+  @if (!isLoading()) {
+    <div class="table-responsive glass-effect" style="border-radius: 12px; border: 1px solid #cbd5e1;">
+      <table>
+        <thead>
+          <tr>
+            <th>Competición</th>
+            <th>Fecha Evento</th>
+            <th>Enlace FlowAgility</th>
+            <th style="text-align: center;">Estado</th>
+            <th>Último Scrapeo</th>
+            <th style="text-align: right;">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (comp of competitions(); track comp.id) {
+            <tr>
+              <td style="font-weight: 600; color: var(--text-main);">
+                <div style="display: flex; flex-direction: column;">
+                  <span>{{ comp.nombre }}</span>
+                  <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; margin-top: 2px;">
+                    <span class="material-icons" style="font-size: 12px; vertical-align: middle;">place</span>
+                    {{ comp.lugar || 'Lugar no especificado' }}
+                  </span>
+                </div>
+              </td>
+              <td>{{ comp.fecha_evento | date:'dd/MM/yyyy' }}</td>
+              <td>
+                @if (hasFlowAgilityLink(comp.enlace)) {
+                  <a [href]="comp.enlace" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary-color); text-decoration: none; font-weight: 500; font-size: 0.9rem;">
+                    <span class="material-icons" style="font-size: 16px;">open_in_new</span>
+                    Ver en FlowAgility
+                  </a>
+                } @else {
+                  <span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Sin enlace externo</span>
+                }
+              </td>
+              <td style="text-align: center;">
+                @if (!hasFlowAgilityLink(comp.enlace)) {
+                  <span class="badge badge-nolink">
+                    <span class="material-icons" style="font-size: 14px;">link_off</span>
+                    Incompatible
+                  </span>
+                } @else if (comp.scrape_status === 'success') {
+                  <span class="badge badge-success">
+                    <span class="material-icons" style="font-size: 14px;">check_circle</span>
+                    Completado
+                  </span>
+                } @else if (comp.scrape_status === 'failed') {
+                  <span class="badge badge-failed">
+                    <span class="material-icons" style="font-size: 14px;">error</span>
+                    Fallido
+                  </span>
+                } @else {
+                  <span class="badge badge-pending">
+                    <span class="material-icons" style="font-size: 14px;">hourglass_empty</span>
+                    Pendiente
+                  </span>
+                }
+              </td>
+              <td>
+                @if (comp.scraped_at) {
+                  {{ comp.scraped_at | date:'dd/MM/yyyy HH:mm' }}
+                } @else {
+                  <span style="color: #94a3b8; font-size: 0.9rem;">Nunca</span>
+                }
+              </td>
+              <td style="text-align: right;">
+                <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                  @if (comp.scrape_status === 'failed' && comp.scrape_error) {
+                    <button class="btn-action btn-secondary" (click)="viewError(comp)" style="padding: 6px 12px; font-size: 0.8rem; border-color: #fca5a5; color: #b91c1c; background-color: #fff5f5;">
+                      <span class="material-icons" style="font-size: 16px;">bug_report</span>
+                      Ver Error
+                    </button>
+                  }
+                  
+                  <button class="btn-action btn-primary" 
+                          [disabled]="!hasFlowAgilityLink(comp.enlace) || scrapingIds().includes(comp.id)" 
+                          (click)="runScraper(comp)"
+                          style="padding: 6px 14px; font-size: 0.8rem;">
+                    @if (scrapingIds().includes(comp.id)) {
+                      <span class="material-icons spinning" style="font-size: 16px;">sync</span>
+                      Scrapeando...
+                    } @else {
+                      <span class="material-icons" style="font-size: 16px;">play_arrow</span>
+                      Scrapear
+                    }
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+          
+          @if (competitions().length === 0) {
+            <tr>
+              <td colspan="6" style="padding: 48px; text-align: center; color: var(--text-light, #94a3b8);">
+                <span class="material-icons" style="font-size: 56px; color: #cbd5e1; margin-bottom: 12px;">event_busy</span>
+                <h3 style="margin: 0 0 6px 0; color: #64748b;">No hay competiciones pasadas</h3>
+                <p style="margin: 0; font-size: 0.9rem;">No se encontraron competiciones del tipo "competición" que ya hayan ocurrido.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0;">
+      <span class="spinner-small" style="width: 36px; height: 36px; border-width: 4px; border-top-color: var(--primary-color); margin-bottom: 20px;"></span>
+      <p style="color: var(--text-secondary); font-weight: 600; font-size: 1.05rem;">Cargando historial de competiciones y logs del monitor...</p>
+    </div>
+  }
+</div>
+
+<!-- Modal: Ver Detalle del Error de Scraping -->
+@if (selectedError()) {
+  <div class="modal-backdrop" (click)="closeErrorModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title" style="display: flex; align-items: center; gap: 8px; color: #b91c1c;">
+          <span class="material-icons">report_problem</span>
+          Detalle del Error: {{ selectedError()?.nombre }}
+        </h3>
+        <button class="modal-close" (click)="closeErrorModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="margin: 0 0 12px 0; font-size: 0.9rem; color: #64748b;">
+          Este error ocurrió durante el último proceso de scraping automatizado. Revise la salida detallada a continuación para identificar problemas de conectividad o cambios estructurales en FlowAgility:
+        </p>
+        <div class="console-box" style="border-left: 4px solid #ef4444; background: #fafafa; color: #1e293b; border-color: #ef4444;">{{ selectedError()?.error }}</div>
+      </div>
+      <div style="padding: 16px 24px; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; background-color: #f8fafc;">
+        <button class="btn-action btn-secondary" (click)="closeErrorModal()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal: Trazas de Salida de Consola en Tiempo Real (Scraping Completado) -->
+@if (consoleOutput()) {
+  <div class="modal-backdrop" (click)="closeConsoleModal()">
+    <div class="modal-card" style="max-width: 750px;" (click)="$event.stopPropagation()">
+      <div class="modal-header" style="background-color: #0f172a; border-bottom-color: #1e293b;">
+        <h3 class="modal-title" style="color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+          <span class="material-icons" style="color: #3b82f6;">terminal</span>
+          Salida de Consola: {{ consoleOutput()?.nombre }}
+        </h3>
+        <button class="modal-close" (click)="closeConsoleModal()" style="color: #94a3b8; hover: { background-color: #1e293b }">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      <div class="modal-body" style="background-color: #0b0f19; padding: 20px;">
+        <p style="margin: 0 0 16px 0; font-size: 0.9rem; color: #94a3b8;">
+          Trazas generadas durante la ejecución del comando Artisan `flowagility:scrape`:
+        </p>
+        <div class="console-box">{{ consoleOutput()?.output }}</div>
+      </div>
+      <div style="padding: 16px 24px; border-top: 1px solid #1e293b; display: flex; justify-content: flex-end; background-color: #0f172a;">
+        <button class="btn-action btn-primary" (click)="closeConsoleModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
+}

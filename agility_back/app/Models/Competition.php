@@ -24,6 +24,10 @@ class Competition extends Model
         'federacion',
         'nombre',
         'judge_name',
+        'results_scraped',
+        'scrape_status',
+        'scrape_error',
+        'scraped_at',
     ];
 
     public function attendees()

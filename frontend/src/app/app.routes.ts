@@ -102,6 +102,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Monitor RSCE' }
     },
     {
+        path: 'admin/scraper-monitor',
+        loadComponent: () => import('./components/admin-scraper-monitor/admin-scraper-monitor').then(m => m.AdminScraperMonitorComponent),
+        canActivate: [adminGuard],
+        title: titleResolver, data: { pageTitle: 'Monitor de Scraping' }
+    },
+    {
         path: 'admin/avatares',
         loadComponent: () => import('./components/admin-avatares/admin-avatares').then(m => m.AdminAvataresComponent),
         canActivate: [adminGuard],

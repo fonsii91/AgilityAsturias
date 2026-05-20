@@ -1,0 +1,91 @@
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ScraperAdminService } from '../../services/scraper-admin.service';
+import { ToastService } from '../../services/toast.service';
+
+@Component({
+  selector: 'app-admin-scraper-monitor',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './admin-scraper-monitor.html',
+  styleUrl: './admin-scraper-monitor.css'
+})
+export class AdminScraperMonitorComponent implements OnInit {
+  private scraperService = inject(ScraperAdminService);
+  private toast = inject(ToastService);
+
+  competitions = signal<any[]>([]);
+  isLoading = signal<boolean>(true);
+  scrapingIds = signal<number[]>([]);
+  selectedError = signal<{ nombre: string; error: string } | null>(null);
+  consoleOutput = signal<{ nombre: string; output: string } | null>(null);
+
+  ngOnInit(): void {
+    this.loadCompetitions();
+  }
+
+  loadCompetitions(): void {
+    this.isLoading.set(true);
+    this.scraperService.getPastCompetitions().subscribe({
+      next: (data) => {
+        this.competitions.set(data);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading past competitions', err);
+        this.toast.error('Error al cargar la lista de competiciones.');
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  hasFlowAgilityLink(enlace: string): boolean {
+    return !!enlace && enlace.includes('flowagility.com');
+  }
+
+  runScraper(comp: any): void {
+    if (this.scrapingIds().includes(comp.id)) return;
+
+    this.scrapingIds.update(ids => [...ids, comp.id]);
+    this.toast.info(`Iniciando extracción para "${comp.nombre}"...`);
+
+    this.scraperService.runScraper(comp.id).subscribe({
+      next: (res) => {
+        this.toast.success(`Scraping completado con éxito para "${comp.nombre}".`);
+        this.scrapingIds.update(ids => ids.filter(id => id !== comp.id));
+        
+        // Mostrar salida de consola en el panel lateral/modal
+        if (res.output) {
+          this.consoleOutput.set({
+            nombre: comp.nombre,
+            output: res.output
+          });
+        }
+        
+        this.loadCompetitions();
+      },
+      error: (err) => {
+        console.error('Error running scraper', err);
+        const errMsg = err.error?.message || 'Error desconocido';
+        this.toast.error(`Falló el scraping de "${comp.nombre}": ${errMsg}`);
+        this.scrapingIds.update(ids => ids.filter(id => id !== comp.id));
+        this.loadCompetitions();
+      }
+    });
+  }
+
+  viewError(comp: any): void {
+    this.selectedError.set({
+      nombre: comp.nombre,
+      error: comp.scrape_error || 'No se registró ningún mensaje de error.'
+    });
+  }
+
+  closeErrorModal(): void {
+    this.selectedError.set(null);
+  }
+
+  closeConsoleModal(): void {
+    this.consoleOutput.set(null);
+  }
+}

@@ -176,13 +176,42 @@ export class RfecTrackerComponent implements OnInit {
 
   editTrack(track: RfecTrack) {
     this.isEditing = true;
+    
+    // Normalize qualification to match select options
+    let qual = track.qualification || '';
+    const qLower = qual.toLowerCase().trim();
+    if (qLower === 'exc_0' || qLower === 'excelente a 0' || qLower === 'excelente a cero') {
+      qual = 'Excelente a 0';
+    } else if (qLower === 'exc' || qLower === 'excelente') {
+      qual = 'Excelente';
+    } else if (qLower === 'mb' || qLower === 'muy bueno' || qLower === 'muy_bueno') {
+      qual = 'Muy Bueno';
+    } else if (qLower === 'b' || qLower === 'bueno') {
+      qual = 'Bueno';
+    } else if (qLower === 'suf' || qLower === 'suficiente' || qLower === 'no clasificado' || qLower === 'no_clasi') {
+      qual = 'No Clasificado';
+    } else if (qLower === 'elim' || qLower === 'eliminado') {
+      qual = 'Eliminado';
+    } else if (qLower === 'np' || qLower === 'no presentado' || qLower === 'no_pres') {
+      qual = 'No Presentado';
+    }
+
+    // Normalize manga_type
+    let manga = track.manga_type || '';
+    const mLower = manga.toLowerCase().trim();
+    if (mLower === 'agility') {
+      manga = 'Agility';
+    } else if (mLower === 'jumping') {
+      manga = 'Jumping';
+    }
+
     this.formData = {
       id: track.id || 0,
       competition_id: null, // Always manual mode when editing for simplicity, or we could try to map it if we had competition_id in track
       manual_date: track.date,
       manual_location: track.location || '',
-      manga_type: track.manga_type,
-      qualification: track.qualification,
+      manga_type: manga,
+      qualification: qual,
       speed: track.speed ?? null,
       judge_name: track.judge_name || '',
       notes: track.notes || '',

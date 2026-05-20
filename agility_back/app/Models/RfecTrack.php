@@ -21,7 +21,15 @@ class RfecTrack extends Model
         'location',
         'notes',
         'grade',
-        'club_id'
+        'club_id',
+        'time',
+        'faults',
+        'refusals',
+        'time_penalty',
+        'total_penalty',
+        'is_clean',
+        'course_length',
+        'standard_time'
     ];
 
     public function dog()

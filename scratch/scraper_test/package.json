@@ -1,0 +1,9 @@
+{
+  "name": "scraper-test",
+  "version": "1.0.0",
+  "description": "Test FlowAgility login and DOM layout",
+  "main": "index.js",
+  "dependencies": {
+    "playwright": "^1.42.1"
+  }
+}

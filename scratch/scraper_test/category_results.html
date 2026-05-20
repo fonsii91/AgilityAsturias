@@ -1,0 +1,1399 @@
+<!DOCTYPE html><html lang="pt_PT" translate="no"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+<meta content="ODkVEwY7JHIdADcPOBMoAyc-LR96EhkEBTFVqRU3ymSLrYPWSofj2Kz2" name="csrf-token">
+    <title data-prefix="FlowAgility">FlowAgility </title>
+
+    <link phx-track-static="" rel="stylesheet" href="/assets/app-0157d5d360da61af028e2a33f1a9627d.css?vsn=d">
+    <script defer="" phx-track-static="" type="text/javascript" src="/assets/app-57128caeda97cd635d385cadb6f07f48.js?vsn=d"></script>
+
+
+
+<script src="https://cdn.websitepolicies.io/lib/cookieconsent/cookieconsent.min.js" defer=""></script><script>window.addEventListener('load',function(){window.wpcc.init({'border':'thin','corners':'small','colors':{'popup':{'background':'#f6f6f6','text':'#000000','border':'#555555'},'button':{'background':'#555555','text':'#ffffff'}},'content':{'href':'https://www.flowagility.com/cookies-policy','message':'We use cookies to ensure you get the best experience on our website.','button':'I agree'}})});</script>
+
+    <script>
+      /*to prevent Firefox FOUC, this must be here*/
+      let FF_FOUC_FIX;
+    </script>
+  <link type="text/css" rel="stylesheet" href="https://cdnconsents.websitepolicies.com/legacy/lib/cookieconsent/cookieconsent.min.css"><style></style></head>
+
+  <body class="flex flex-col h-screen justify-between bg-white "><div class="wpcc-container wpcc-float wpcc-corners-round wpcc-corners-small wpcc-border-thin wpcc-bottom wpcc-left wpcc-color-custom--943834009 " style=""><span class="wpcc-message">We use cookies to ensure you get the best experience on our website. <a class="wpcc-privacy" href="https://www.flowagility.com/cookies-policy" rel="noopener" target="_blank">Learn more</a></span><div class="wpcc-compliance"><button type="button" class="wpcc-btn" tabindex="0">I agree</button></div><div class="wpcc-poweredby"><a class="wpcc-privacy" href="https://www.websitepolicies.com/cookie-consent-banner-generator" target="_blank">Powered by WebsitePolicies</a></div></div>
+<div class="black-screen" id="spinner" style="display: none;">
+  <div class="thinking-thing">
+    <div class="loader"></div>
+  </div>
+</div>
+
+<div data-phx-main="" data-phx-session="SFMyNTY.g2gDaAJhBXQAAAAIZAACaWRtAAAAFHBoeC1HTEZSNy0xWjkyS0hwaDBGZAAMbGl2ZV9zZXNzaW9uaAJkAAdkZWZhdWx0bggAxlYkrfuisBhkAApwYXJlbnRfcGlkZAADbmlsZAAIcm9vdF9waWRkAANuaWxkAAlyb290X3ZpZXdkADhFbGl4aXIuRkFDb21XZWIuUGFydGljaXBhbnQuRXZlbnRzLkdyb3VwUnVucy5SZXN1bHRzTGl2ZWQABnJvdXRlcmQAFkVsaXhpci5GQUNvbVdlYi5Sb3V0ZXJkAAdzZXNzaW9udAAAAABkAAR2aWV3ZAA4RWxpeGlyLkZBQ29tV2ViLlBhcnRpY2lwYW50LkV2ZW50cy5Hcm91cFJ1bnMuUmVzdWx0c0xpdmVuBgAG9SZGngFiAAFRgA.wmjL9eyXZvwlJIzEw_7j7Deenf1_iR9XdxVFlMVmZiQ" data-phx-static="SFMyNTY.g2gDaAJhBXQAAAADZAAKYXNzaWduX25ld2pkAAVmbGFzaHQAAAABbQAAAARpbmZvbQAAAA1XZWxjb21lIGJhY2shZAACaWRtAAAAFHBoeC1HTEZSNy0xWjkyS0hwaDBGbgYAB_UmRp4BYgABUYA.5ZkwLodKFarXLZuajlvB9nyAuB6SXfaUJMrWgMsJxGY" id="phx-GLFR7-1Z92KHph0F" class="phx-connected" data-phx-root-id="phx-GLFR7-1Z92KHph0F"><nav class="bg-green-700 fixed w-full z-40 shadow-menu" data-phx-component="1" id="phx-GLFR7-1Z92KHph0F-1-0">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-14">
+      <div class="flex items-center">
+        <div class="shrink-0">
+          
+
+          <a href="/zone/event/b6a5b896-93bb-4b12-9344-cfb41c52fe65/group_runs/8b607d1b-104c-488a-8ec8-62510eb52eaf" id="menu_back_button">
+            <div class="h-6 w-6 fill-current text-white">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z"></path></svg>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        
+        <a href="/zone/event/b6a5b896-93bb-4b12-9344-cfb41c52fe65/group_run/f77e106b-a59d-479a-bedf-c7886f5ef5ae/results#list_anchor_header" data-phx-link="redirect" data-phx-link-state="push">
+          <div class="block flex flex-col w-8 content-center items-center relative group">
+            <div class="w-6 h-6 cursor-pointer fill-current  text-white group-hover:opacity-100">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M17,19.09L19.45,20.58L18.8,17.77L21,15.89L18.11,15.64L17,13L15.87,15.64L13,15.89L15.18,17.77L14.5,20.58L17,19.09M4,14H12V16H4V14M4,6H16V8H4V6M4,10H16V12H4V10Z"></path></svg>
+            </div>
+            
+              <div class="border-0 border-b-2 border-white w-8 absolute top-3">&nbsp;</div>
+            
+          </div>
+        </a>
+
+        
+        <a href="/zone/event/b6a5b896-93bb-4b12-9344-cfb41c52fe65/group_run/f77e106b-a59d-479a-bedf-c7886f5ef5ae/combined#list_anchor_header" data-phx-link="redirect" data-phx-link-state="push">
+          <div class="block flex flex-col w-9 content-center items-center relative group">
+            <div class="w-6 h-6 cursor-pointer fill-current opacity-50 text-white group-hover:opacity-100">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,7.09L14.45,8.58L13.8,5.77L16,3.89L13.11,3.64L12,1L10.87,3.64L8,3.89L10.18,5.77L9.5,8.58L12,7.09M15,23H9V10H15V23M1,17V23H7V17H1M5,21H3V19H5V21M17,13V23H23V13H17M21,21H19V15H21V21Z"></path></svg>
+            </div>
+            
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div id="sticky_header" data-phx-component="2">
+  
+</div>
+
+
+
+<main class="pt-16" role="main">
+  <div id="top-anchor" phx-hook="TopAnchor" class="mb-2"></div>
+  <div class="max-w-sm mx-auto px-4 sm:px-0">
+
+    <div id="header_component" data-phx-component="3">
+  
+
+  <a class="list-anchor" id="list_anchor_header"></a>
+  <div class="">
+    <div class="visible">
+      <div class="flex flex-row relative">
+        <div class="grow text-2xl font-bold font-caption mt-4">
+          Iniciación / JP1
+        </div>
+        <div class="grow-0 relative">
+          <div class="absolute bottom-1 right-2 flex flex-row">
+            
+              <div phx-click="show_run_info" class="mr-1 w-6 h-6 fill-current text-gray-500 hover:text-green-500 cursor-pointer">
+                <svg viewBox="0 0 24 24"><path fill="currentColor" d="M11,9H13V7H11M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,17H13V11H11V17Z"></path></svg>
+              </div>
+            
+          </div>
+        </div>
+      </div>
+      <div class="text-sm text-gray-500 mt-1">
+        sábado 9 mayo
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="mt-8 relative">
+      <h3 class="font-caption text-gray-500 border-b pb-2 mb-0.5 mt-8 border-gray-400">
+        Group Results
+        <span class="text-sm absolute top-0 ml-2 font-normal text-gray-500">[15]</span>
+      </h3>
+    </div>
+
+    
+      <div id="results_list" phx-update="replace">
+        
+          <div id="pset_row_pset_row_component_f0b41d56-dfb8-443a-b82e-1f19eec00dbc" data-phx-component="4">
+  <a class="list-anchor-psets" id="pset_f0b41d56-dfb8-443a-b82e-1f19eec00dbc"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="f0b41d56-dfb8-443a-b82e-1f19eec00dbc" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            1º
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="f0b41d56-dfb8-443a-b82e-1f19eec00dbc" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="4">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D103 / Rioiia
+        </div>
+
+        
+
+        
+
+        
+          <div class="mr-1 w-5 h-5 fill-current text-red-500 pr-0.5">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M13.13 22.19L11.5 18.36C13.07 17.78 14.54 17 15.9 16.09L13.13 22.19M5.64 12.5L1.81 10.87L7.91 8.1C7 9.46 6.22 10.93 5.64 12.5M19.22 4C19.5 4 19.75 4 19.96 4.05C20.13 5.44 19.94 8.3 16.66 11.58C14.96 13.29 12.93 14.6 10.65 15.47L8.5 13.37C9.42 11.06 10.73 9.03 12.42 7.34C15.18 4.58 17.64 4 19.22 4M19.22 2C17.24 2 14.24 2.69 11 5.93C8.81 8.12 7.5 10.53 6.65 12.64C6.37 13.39 6.56 14.21 7.11 14.77L9.24 16.89C9.62 17.27 10.13 17.5 10.66 17.5C10.89 17.5 11.13 17.44 11.36 17.35C13.5 16.53 15.88 15.19 18.07 13C23.73 7.34 21.61 2.39 21.61 2.39S20.7 2 19.22 2M14.54 9.46C13.76 8.68 13.76 7.41 14.54 6.63S16.59 5.85 17.37 6.63C18.14 7.41 18.15 8.68 17.37 9.46C16.59 10.24 15.32 10.24 14.54 9.46M8.88 16.53L7.47 15.12L8.88 16.53M6.24 22L9.88 18.36C9.54 18.27 9.21 18.12 8.91 17.91L4.83 22H6.24M2 22H3.41L8.18 17.24L6.76 15.83L2 20.59V22M2 19.17L6.09 15.09C5.88 14.79 5.73 14.47 5.64 14.12L2 17.76V19.17Z"></path></svg>
+          </div>
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Aitziber Echeverria Romer…
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Cohen
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                    <div class="w-1/4 py-1 text-left">
+                      20.66 s
+                    </div>
+                    <div class="w-1/4 py-1 text-center">
+                      0.00 TP
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      6.29 m/s
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      EXC_0
+                    </div>
+                  
+              
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_219c5d7e-acbc-4aa0-a3eb-31bdcf5c06ef" data-phx-component="5">
+  <a class="list-anchor-psets" id="pset_219c5d7e-acbc-4aa0-a3eb-31bdcf5c06ef"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="219c5d7e-acbc-4aa0-a3eb-31bdcf5c06ef" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            2º
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="219c5d7e-acbc-4aa0-a3eb-31bdcf5c06ef" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="5">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D20 / Agility Asturias
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Nacho Cepedano
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Luna
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                    <div class="w-1/4 py-1 text-left">
+                      21.29 s
+                    </div>
+                    <div class="w-1/4 py-1 text-center">
+                      0.00 TP
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      6.11 m/s
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      EXC_0
+                    </div>
+                  
+              
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_b6f0f21a-e5af-4828-9f05-8636b48b9400" data-phx-component="6">
+  <a class="list-anchor-psets" id="pset_b6f0f21a-e5af-4828-9f05-8636b48b9400"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="b6f0f21a-e5af-4828-9f05-8636b48b9400" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            3º
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="b6f0f21a-e5af-4828-9f05-8636b48b9400" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="6">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D17 / Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Pablo Casas
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Kala
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                    <div class="w-1/4 py-1 text-left">
+                      26.00 s
+                    </div>
+                    <div class="w-1/4 py-1 text-center">
+                      0.00 TP
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      5.00 m/s
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      EXC_0
+                    </div>
+                  
+              
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_2038a024-5312-4d98-8d4c-dc10b8e1f6a6" data-phx-component="7">
+  <a class="list-anchor-psets" id="pset_2038a024-5312-4d98-8d4c-dc10b8e1f6a6"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="2038a024-5312-4d98-8d4c-dc10b8e1f6a6" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            4º
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="2038a024-5312-4d98-8d4c-dc10b8e1f6a6" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="7">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D11 / Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Verónica Barroso García
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Ada Lovelace
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                    <div class="w-1/4 py-1 text-left">
+                      26.80 s
+                    </div>
+                    <div class="w-1/4 py-1 text-center">
+                      5.00 TP
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      4.85 m/s
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      EXC
+                    </div>
+                  
+              
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_5954aa27-7b60-403d-a5cc-37bba266f955" data-phx-component="8">
+  <a class="list-anchor-psets" id="pset_5954aa27-7b60-403d-a5cc-37bba266f955"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="5954aa27-7b60-403d-a5cc-37bba266f955" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            5º
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="5954aa27-7b60-403d-a5cc-37bba266f955" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="8">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D27 / Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            María Elena Borjabad Garc…
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Greta
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                    <div class="w-1/4 py-1 text-left">
+                      48.65 s
+                    </div>
+                    <div class="w-1/4 py-1 text-center">
+                      10.00 TP
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      2.67 m/s
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      V_GOOD
+                    </div>
+                  
+              
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_97ed3459-8b77-4565-9fbf-6a52f5d1d371" data-phx-component="9">
+  <a class="list-anchor-psets" id="pset_97ed3459-8b77-4565-9fbf-6a52f5d1d371"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="97ed3459-8b77-4565-9fbf-6a52f5d1d371" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            6º
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="97ed3459-8b77-4565-9fbf-6a52f5d1d371" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="9">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D10 / Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Chema Acebes Cid
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Zeus
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                    <div class="w-1/4 py-1 text-left">
+                      26.94 s
+                    </div>
+                    <div class="w-1/4 py-1 text-center">
+                      15.00 TP
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      4.83 m/s
+                    </div>
+                    <div class="w-1/4 py-1 text-right">
+                      V_GOOD
+                    </div>
+                  
+              
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_515d2d16-72b1-457a-8d10-0af281368d10" data-phx-component="10">
+  <a class="list-anchor-psets" id="pset_515d2d16-72b1-457a-8d10-0af281368d10"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="515d2d16-72b1-457a-8d10-0af281368d10" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="515d2d16-72b1-457a-8d10-0af281368d10" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="10">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D1 / Agility Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Natalia Blanco
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Plomky
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_7746a6a0-d9f0-4a68-867b-73f00fd9668e" data-phx-component="11">
+  <a class="list-anchor-psets" id="pset_7746a6a0-d9f0-4a68-867b-73f00fd9668e"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="7746a6a0-d9f0-4a68-867b-73f00fd9668e" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="7746a6a0-d9f0-4a68-867b-73f00fd9668e" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="11">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D2 / Agility Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Micaela Cano
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Drako
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_f29e66b1-7ff5-445e-a919-001ab710f9cd" data-phx-component="12">
+  <a class="list-anchor-psets" id="pset_f29e66b1-7ff5-445e-a919-001ab710f9cd"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="f29e66b1-7ff5-445e-a919-001ab710f9cd" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="f29e66b1-7ff5-445e-a919-001ab710f9cd" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="12">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D14 / Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Angel García Beltrán
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Freya
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_34f3b1e4-e50a-4de6-ba07-bb99f86b77c4" data-phx-component="13">
+  <a class="list-anchor-psets" id="pset_34f3b1e4-e50a-4de6-ba07-bb99f86b77c4"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="34f3b1e4-e50a-4de6-ba07-bb99f86b77c4" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="34f3b1e4-e50a-4de6-ba07-bb99f86b77c4" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="13">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D19 / Club Agility Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Marta Cristina Rodríguez …
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Neska
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_fa88996d-056b-41e9-a5b9-87a9389692ac" data-phx-component="14">
+  <a class="list-anchor-psets" id="pset_fa88996d-056b-41e9-a5b9-87a9389692ac"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="fa88996d-056b-41e9-a5b9-87a9389692ac" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="fa88996d-056b-41e9-a5b9-87a9389692ac" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="14">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D21 / Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Ines Puente
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Max
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_a798185e-40cf-4d94-8c3d-74b99d4053d8" data-phx-component="15">
+  <a class="list-anchor-psets" id="pset_a798185e-40cf-4d94-8c3d-74b99d4053d8"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="a798185e-40cf-4d94-8c3d-74b99d4053d8" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="a798185e-40cf-4d94-8c3d-74b99d4053d8" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="15">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D28 / Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Diana Sánchez Muñoz
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Nemo
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_04f5b8e0-d73c-4cbd-b2e1-3c1acdbc5aab" data-phx-component="16">
+  <a class="list-anchor-psets" id="pset_04f5b8e0-d73c-4cbd-b2e1-3c1acdbc5aab"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="04f5b8e0-d73c-4cbd-b2e1-3c1acdbc5aab" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="04f5b8e0-d73c-4cbd-b2e1-3c1acdbc5aab" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="16">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D34 / Valladolid
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Jesus Carlos Borjabad
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Ewita
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_1e82eed8-d530-43ce-896a-0a71b430a7ac" data-phx-component="17">
+  <a class="list-anchor-psets" id="pset_1e82eed8-d530-43ce-896a-0a71b430a7ac"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="1e82eed8-d530-43ce-896a-0a71b430a7ac" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="1e82eed8-d530-43ce-896a-0a71b430a7ac" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="17">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D72 / Dog Agility Oviedo
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Nora Ibarlucea Fernandez
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Marea
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+          <div id="pset_row_pset_row_component_3727a47c-ad69-4619-b434-1162160d4294" data-phx-component="18">
+  <a class="list-anchor-psets" id="pset_3727a47c-ad69-4619-b434-1162160d4294"></a>
+  <div class="relative text-sm flex flex-row justify-items-stretch w-full mb-0.5 pl-2 pr-2 pt-2 pb-2 border-b border-gray-400 text-black ">
+    
+    <div class="flex flex-col justify-between">
+      <div class="h-1/3">
+        
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="3727a47c-ad69-4619-b434-1162160d4294" class="cursor-pointer font-bold h-1/3 w-full text-center mb-0">
+        
+            -
+          
+      </div>
+
+      <div phx-click="pset_details_show" phx-value-pset_id="3727a47c-ad69-4619-b434-1162160d4294" class="h-1/3 w-6 h-6 fill-current cursor-pointer text-gray-500">
+        
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"></path></svg>
+          
+      </div>
+    </div>
+
+    <div class="flex flex-col w-full ml-4 " phx-click="playset_app" phx-target="18">
+      
+      <div class="flex flex-row justify-between ">
+        <div class="text-gray-500">
+          D102 / Leonidogs Agility Club
+        </div>
+
+        
+
+        
+
+        
+      </div>
+
+      <div class="flex flex-row justify-between ">
+        <div class="flex flex-col">
+          <div class="font-bold text-base ">
+            Manuela Fernandez Vidal
+          </div>
+
+          <div class="flex flex-row">
+            <div class="font-bold text-sm">
+              Lennon
+            </div>
+            <div class="text-gray-500 font-sm ml-2">
+              
+            </div>
+            
+          </div>
+        </div>
+
+        <div class="flex items-center">
+          
+        </div>
+      </div>
+
+      <div class="flex flex-row pr-2 text-gray-500">
+        
+            
+                
+                  
+                    <div class="w-2/6 py-1 text-left">
+                      DISQ
+                    </div>
+                    <div class="w-1/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                    <div class="w-2/6 py-1 text-right">
+                      &nbsp;
+                    </div>
+                  
+                
+            
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+        
+      </div>
+    
+  </div>
+  <div class="mb-24">&nbsp;</div>
+</main>
+
+<script>
+  if(window.location.hash) {
+    window.location.href = window.location.hash;
+  }
+</script></div>
+
+  
+
+</body></html>

@@ -496,9 +496,39 @@ export class RsceTrackerComponent implements OnInit {
       formattedDate = track.date.split('T')[0];
     }
     
+    // Normalize qualification to match select options
+    let qual = track.qualification || '';
+    const qLower = qual.toLowerCase().trim();
+    if (qLower === 'exc_0' || qLower === 'excelente a 0' || qLower === 'excelente a cero') {
+      qual = 'Excelente a 0';
+    } else if (qLower === 'exc' || qLower === 'excelente') {
+      qual = 'EXCELENTE';
+    } else if (qLower === 'mb' || qLower === 'muy bueno' || qLower === 'muy_bueno') {
+      qual = 'MUY BUENO';
+    } else if (qLower === 'b' || qLower === 'bueno') {
+      qual = 'BUENO';
+    } else if (qLower === 'suf' || qLower === 'suficiente' || qLower === 'no clasificado' || qLower === 'no_clasi') {
+      qual = 'NO CLASIFICADO';
+    } else if (qLower === 'elim' || qLower === 'eliminado') {
+      qual = 'Eliminado';
+    } else if (qLower === 'np' || qLower === 'no presentado' || qLower === 'no_pres') {
+      qual = 'No Presentado';
+    }
+
+    // Normalize manga_type
+    let manga = track.manga_type || '';
+    const mLower = manga.toLowerCase().trim();
+    if (mLower === 'agility') {
+      manga = 'Agility';
+    } else if (mLower === 'jumping') {
+      manga = 'Jumping';
+    }
+
     this.formData.set({
       ...track,
-      date: formattedDate
+      date: formattedDate,
+      qualification: qual,
+      manga_type: manga
     });
     
     // Determine location mode
@@ -573,13 +603,14 @@ export class RsceTrackerComponent implements OnInit {
 
   getQualificationClass(qual: string): string {
     if (!qual) return '';
-    if (qual === 'Excelente a 0') return 'qual-exc0';
-    if (qual.startsWith('EXCEL')) return 'qual-exc';
-    if (qual.startsWith('MUY B')) return 'qual-mb';
-    if (qual.startsWith('BUE')) return 'qual-b';
-    if (qual.startsWith('NO C')) return 'qual-nc';
-    if (qual.startsWith('Elim')) return 'qual-elim';
-    if (qual.startsWith('No P')) return 'qual-np';
+    const qLower = qual.toLowerCase().trim();
+    if (qLower === 'excelente a 0' || qLower === 'exc_0') return 'qual-exc0';
+    if (qLower.startsWith('excel') || qLower === 'exc') return 'qual-exc';
+    if (qLower.startsWith('muy b') || qLower === 'mb') return 'qual-mb';
+    if (qLower.startsWith('bue') || qLower === 'b') return 'qual-b';
+    if (qLower.startsWith('no c') || qLower === 'suf' || qLower === 'suficiente') return 'qual-nc';
+    if (qLower.startsWith('elim') || qLower === 'elim') return 'qual-elim';
+    if (qLower.startsWith('no p') || qLower === 'np') return 'qual-np';
     return '';
   }
 
@@ -631,8 +662,16 @@ export class RsceTrackerComponent implements OnInit {
             return false; // Si falla la conversión de fecha, descartamos
         }
         
-        // Misma manga (Agility, Jumping, Otra)
-        if (video.manga_type !== track.manga_type) return false;
+        // Misma manga (Agility, Jumping, Otra) con normalización para tolerar sufijos " 1"
+        const normalizeManga = (type: string | undefined): string => {
+            if (!type) return '';
+            const cleaned = type.trim().toLowerCase();
+            if (cleaned === 'agility 1') return 'agility';
+            if (cleaned === 'jumping 1') return 'jumping';
+            return cleaned;
+        };
+        
+        if (normalizeManga(video.manga_type) !== normalizeManga(track.manga_type)) return false;
         
         // Si coinciden: Perro + Fecha + Manga, es estadísticamente imposible 
         // que haya dos carreras idénticas el mismo día. Obviamos el nombre del lugar
