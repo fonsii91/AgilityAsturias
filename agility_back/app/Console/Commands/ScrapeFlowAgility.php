@@ -465,6 +465,13 @@ class ScrapeFlowAgility extends Command
         }
 
         $process = new Process(['node', base_path('flowagility_scraper.cjs'), json_encode($config)]);
+        
+        // Configurar la ruta de los navegadores de Playwright para que sea compartida
+        // y accesible tanto por consola (root) como por la web (www-data).
+        $process->setEnv([
+            'PLAYWRIGHT_BROWSERS_PATH' => env('PLAYWRIGHT_BROWSERS_PATH', '/opt/playwright-browsers'),
+        ]);
+
         $process->setTimeout(600); // 10 minutos
         
         $output = '';
