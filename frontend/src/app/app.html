@@ -108,8 +108,7 @@
           <li class="mobile-nav-divider">Explorar</li>
           <li *hasFeature="'salud-canina'"><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">favorite</span> Salud Deportiva</a></li>
-          <li><a routerLink="/explorar/seguimiento-provisional" routerLinkActive="active-route" (click)="sidenav.close()"><span
-                class="material-icons">insights</span> Seguimiento Provisional</a></li>
+
           <li *hasFeature="'modulo-canina'"><a routerLink="/bitacora-rsce" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">analytics</span> Canina (RSCE)</a></li>
           <li *hasFeature="'modulo-caza'"><a routerLink="/bitacora-rfec" routerLinkActive="active-route" (click)="sidenav.close()"><span

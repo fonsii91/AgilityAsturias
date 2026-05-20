@@ -41,6 +41,7 @@ function parseDayTextToDate(dayText, eventDateStr) {
 }
 
 (async () => {
+  const fs = require('fs');
   // 1. Obtener y parsear los argumentos de la línea de comandos
   const args = process.argv.slice(2);
   if (args.length === 0) {
@@ -50,7 +51,12 @@ function parseDayTextToDate(dayText, eventDateStr) {
 
   let config;
   try {
-    config = JSON.parse(args[0]);
+    const arg = args[0];
+    if (arg.endsWith('.json') && fs.existsSync(arg)) {
+      config = JSON.parse(fs.readFileSync(arg, 'utf8'));
+    } else {
+      config = JSON.parse(arg);
+    }
   } catch (err) {
     console.error("ERROR: Error al parsear los argumentos JSON:", err.message);
     process.exit(1);
