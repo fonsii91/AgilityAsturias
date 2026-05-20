@@ -22,6 +22,7 @@ description: Datos para desplegar en producción el proyecto
 - **IP**: 157.173.121.242
 
 ## ESTADO ACTUAL:
+- **[Completado 2026-05-21]** Desplegada versión 1.1.41. Incluye el monitor de scrapers para la administración (últimos 100 registros), y la sección temporal de "Seguimiento Provisional" para que los socios verifiquen los datos de FlowAgility de su club con el binomio perro-guía destacado en color verde.
 - **[Completado 2026-05-10]** Se solucionaron los errores 404 de los componentes de Livewire en producción publicando sus recursos estáticos (`php artisan livewire:publish --assets`), lo cual fue automatizado añadiéndolo al `deploy.sh`.
 - **[Completado 2026-05-10]** Se arregló el error 500 (Class "Filament\Tables\Actions\ViewAction" not found) en el panel de administradores (`ClubLeadsTable`), actualizando los namespaces de acciones de tablas según la nueva versión de Filament v5.
 - **[Completado 2026-05-10]** Configurado servidor Nginx y Certbot SSL para soportar HTTPS en el nuevo subdominio `admin.clubagility.com` y `www.admin.clubagility.com`. Se expandió el certificado existente y se verificó el enrutamiento.
