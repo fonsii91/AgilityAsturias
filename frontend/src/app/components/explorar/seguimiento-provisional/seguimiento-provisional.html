@@ -1,0 +1,173 @@
+<div class="explore-container">
+  <div class="header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+    <div>
+      <h1 style="margin: 0; color: var(--primary-color); font-weight: 800; font-size: 1.8rem; display: flex; align-items: center; gap: 10px;">
+        <span class="material-icons" style="font-size: 32px;">insights</span>
+        Seguimiento Provisional (Mi Club)
+      </h1>
+      <p style="margin: 6px 0 0 0; color: var(--text-secondary); font-size: 0.95rem; max-width: 750px;">
+        Visualiza los últimos resultados provisionales de tu club importados automáticamente de <strong>FlowAgility</strong>.
+      </p>
+    </div>
+    <div>
+      <button class="btn-action btn-secondary" (click)="loadTracks()" [disabled]="isLoading()" style="height: fit-content;">
+        <span class="material-icons" [class.spinning]="isLoading()">refresh</span>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  @if (!isLoading()) {
+    <!-- Temporary Verification Notice Banner -->
+    <div class="alert-banner" style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
+      <div style="display: flex; gap: 12px; align-items: flex-start; text-align: left;">
+        <span class="material-icons" style="color: #d97706; font-size: 24px; margin-top: 2px;">campaign</span>
+        <div>
+          <h3 style="margin: 0 0 6px 0; color: #b45309; font-size: 1rem; font-weight: 700;">Fase de Pruebas: Verificación de Resultados y Perros</h3>
+          <p style="margin: 0; color: #78350f; font-size: 0.9rem; line-height: 1.5;">
+            Esta sección es <strong>temporal (disponible durante 2 semanas)</strong> para ayudarnos a depurar la importación de datos desde <strong>FlowAgility</strong>. 
+            Por favor, revisa tus resultados más recientes y comprueba:
+          </p>
+          <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #78350f; font-size: 0.9rem; line-height: 1.5; list-style-type: disc;">
+            <li>Que tu perro aparece correctamente asignado a tu nombre en la columna <strong>"Perro y Guía"</strong>.</li>
+            <li>Que los registros correspondientes a tu perro se resalten en <strong>color verde</strong> con la etiqueta <strong>"TU PERRO"</strong>.</li>
+            <li>Que las métricas de tus pruebas (velocidad, tiempos, penalizaciones) coinciden con la realidad.</li>
+          </ul>
+          <p style="margin: 8px 0 0 0; color: #78350f; font-size: 0.9rem;">
+            Si detectas algún error de vinculación o datos incorrectos, repórtalo inmediatamente al staff o envía una sugerencia usando la opción <strong>"Sugerencias / Bugs"</strong> en tu menú de perfil. ¡Gracias por tu ayuda!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table for Desktop -->
+    <div class="table-responsive glass-effect desktop-only" style="border-radius: 12px; border: 1px solid #cbd5e1;">
+      <table>
+        <thead>
+          <tr>
+            <th>Perro y Guía</th>
+            <th>Prueba</th>
+            <th>Métricas</th>
+            <th>Calificación</th>
+            <th>Localización</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (track of lastTracks(); track track.id) {
+            <tr [class.my-dog-row]="track.is_my_dog">
+              <td style="font-weight: 600; color: var(--text-main);">
+                <div style="display: flex; flex-direction: column;">
+                  <span>
+                    {{ track.dog_name }}
+                    @if (track.is_my_dog) {
+                      <span class="my-dog-badge">Tu Perro</span>
+                    }
+                  </span>
+                  <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; margin-top: 2px;">
+                    Guía: {{ track.owner_name }}
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div style="display: flex; flex-direction: column;">
+                  <span style="font-weight: 600;">{{ track.manga_type }}</span>
+                  <span style="font-size: 0.75rem; color: #94a3b8;">Fede: {{ track.federation }}</span>
+                </div>
+              </td>
+              <td>
+                <div style="font-size: 0.85rem; line-height: 1.4; color: #475569;">
+                  <div>Vel: <strong style="color: var(--primary-color);">{{ track.speed ? (track.speed + ' m/s') : '-' }}</strong></div>
+                  <div>Tiempo: <strong>{{ track.time ? (track.time + ' s') : '-' }}</strong></div>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                    F: {{ track.faults }} | R: {{ track.refusals }} | Pen: {{ track.total_penalty }}
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge" [class.badge-exc]="track.qualification === 'EXC_0' || track.qualification === 'EXC' || track.qualification === 'Excelente'" [class.badge-mb]="track.qualification === 'MB' || track.qualification === 'Muy Bueno'" [class.badge-b]="track.qualification === 'B' || track.qualification === 'Bueno'" [class.badge-elim]="track.qualification === 'ELIM' || track.qualification === 'Eliminado'" [class.badge-np]="track.qualification === 'NP' || track.qualification === 'No Presentado'">
+                  <span class="material-icons" style="font-size: 14px;">
+                    {{ track.qualification === 'ELIM' || track.qualification === 'Eliminado' ? 'cancel' : 'emoji_events' }}
+                  </span>
+                  {{ track.qualification }}
+                </span>
+              </td>
+              <td style="font-size: 0.85rem; color: var(--text-secondary);">
+                {{ track.location || 'N/A' }}
+              </td>
+            </tr>
+          }
+          @if (lastTracks().length === 0) {
+            <tr>
+              <td colspan="5" style="padding: 48px; text-align: center; color: var(--text-light, #94a3b8);">
+                <span class="material-icons" style="font-size: 56px; color: #cbd5e1; margin-bottom: 12px;">analytics</span>
+                <h3 style="margin: 0 0 6px 0; color: #64748b;">No hay datos provisionales</h3>
+                <p style="margin: 0; font-size: 0.9rem;">No se han encontrado resultados de tu club importados recientemente.</p>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cards for Mobile -->
+    <div class="mobile-only mobile-cards">
+      @for (track of lastTracks(); track track.id) {
+        <div class="track-card glass-effect" [class.my-dog-card]="track.is_my_dog">
+          <div class="track-card-header">
+            <div class="dog-info">
+              <span class="dog-name">
+                {{ track.dog_name }}
+                @if (track.is_my_dog) {
+                  <span class="my-dog-badge">Tu Perro</span>
+                }
+              </span>
+              <span class="owner-name">Guía: {{ track.owner_name }}</span>
+            </div>
+            <span class="badge" [class.badge-exc]="track.qualification === 'EXC_0' || track.qualification === 'EXC' || track.qualification === 'Excelente'" [class.badge-mb]="track.qualification === 'MB' || track.qualification === 'Muy Bueno'" [class.badge-b]="track.qualification === 'B' || track.qualification === 'Bueno'" [class.badge-elim]="track.qualification === 'ELIM' || track.qualification === 'Eliminado'" [class.badge-np]="track.qualification === 'NP' || track.qualification === 'No Presentado'">
+              <span class="material-icons" style="font-size: 14px;">
+                {{ track.qualification === 'ELIM' || track.qualification === 'Eliminado' ? 'cancel' : 'emoji_events' }}
+              </span>
+              {{ track.qualification }}
+            </span>
+          </div>
+          <div class="track-card-body">
+            <div class="track-detail">
+              <span class="label">Prueba:</span>
+              <span class="value"><strong>{{ track.manga_type }}</strong> <span class="fede-tag">({{ track.federation }})</span></span>
+            </div>
+            <div class="track-detail">
+              <span class="label">Localización:</span>
+              <span class="value">{{ track.location || 'N/A' }}</span>
+            </div>
+            <div class="track-metrics-grid">
+              <div class="metric-item">
+                <span class="m-label">Velocidad</span>
+                <span class="m-value" style="color: var(--primary-color);">{{ track.speed ? (track.speed + ' m/s') : '-' }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="m-label">Tiempo</span>
+                <span class="m-value">{{ track.time ? (track.time + ' s') : '-' }}</span>
+              </div>
+              <div class="metric-item">
+                <span class="m-label">Penalizaciones (F | R | Pen)</span>
+                <span class="m-value">F: {{ track.faults }} | R: {{ track.refusals }} | total: {{ track.total_penalty }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+      @if (lastTracks().length === 0) {
+        <div class="empty-state glass-effect">
+          <span class="material-icons">analytics</span>
+          <h3>No hay datos provisionales</h3>
+          <p>No se han encontrado resultados de tu club importados recientemente.</p>
+        </div>
+      }
+    </div>
+  } @else {
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0;">
+      <span class="spinner-small" style="width: 36px; height: 36px; border-width: 4px; border-top-color: var(--primary-color); margin-bottom: 20px;"></span>
+      <p style="color: var(--text-secondary); font-weight: 600; font-size: 1.05rem;">Cargando el seguimiento provisional...</p>
+    </div>
+  }
+</div>
