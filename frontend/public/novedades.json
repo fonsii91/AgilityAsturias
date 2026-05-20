@@ -1,5 +1,13 @@
 [
   {
+    "version": "1.1.41",
+    "date": "2026-05-21",
+    "features": [
+      "¡Nueva herramienta de Seguimiento Provisional! Hemos habilitado un apartado temporal en la sección 'Explorar' para que puedas comprobar las últimas mangas y resultados importados automáticamente de tu club. Para facilitarte la revisión, si tienes perros registrados a tu nombre, verás sus resultados destacados en color verde con el distintivo 'TU PERRO'. ¡Ayúdanos a comprobar que todo esté correcto!",
+      "¡Diseño adaptado para móviles! El nuevo Seguimiento Provisional cuenta con un diseño de tarjetas adaptativas que organiza de forma clara todos tus tiempos, velocidades y penalizaciones directamente en la pantalla de tu móvil."
+    ]
+  },
+  {
     "version": "1.1.40",
     "date": "2026-05-10",
     "bugfixes": [

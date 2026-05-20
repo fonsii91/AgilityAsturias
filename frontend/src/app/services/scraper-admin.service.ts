@@ -17,4 +17,8 @@ export class ScraperAdminService {
   runScraper(competitionId: number): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/run`, { competition_id: competitionId });
   }
+
+  getLastScrapedTracks(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/last-tracks`);
+  }
 }

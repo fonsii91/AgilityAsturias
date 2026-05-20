@@ -279,6 +279,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Salud Deportiva' }
     },
     {
+        path: 'explorar/seguimiento-provisional',
+        loadComponent: () => import('./components/explorar/seguimiento-provisional/seguimiento-provisional').then(m => m.SeguimientoProvisionalComponent),
+        canActivate: [memberGuard],
+        title: titleResolver, data: { pageTitle: 'Seguimiento Provisional' }
+    },
+    {
         path: 'bitacora-rsce',
         loadComponent: () => import('./components/rsce-tracker/rsce-tracker.component').then(m => m.RsceTrackerComponent),
         canActivate: [memberGuard, featureGuard('modulo-canina')],

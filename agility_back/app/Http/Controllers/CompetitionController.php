@@ -295,5 +295,115 @@ class CompetitionController extends Controller
             ], 500);
         }
     }
+
+    public function adminScraperLastTracks(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $rsce = \App\Models\RsceTrack::with(['dog.users', 'club'])
+            ->where('notes', 'like', '%FlowAgility%')
+            ->orderBy('id', 'desc')
+            ->limit(100)
+            ->get()
+            ->map(function ($track) {
+                $track->federation = 'RSCE';
+                return $track;
+            });
+
+        $rfec = \App\Models\RfecTrack::with(['dog.users', 'club'])
+            ->where('notes', 'like', '%FlowAgility%')
+            ->orderBy('id', 'desc')
+            ->limit(100)
+            ->get()
+            ->map(function ($track) {
+                $track->federation = 'RFEC';
+                return $track;
+            });
+
+        $merged = $rsce->concat($rfec)
+            ->sortByDesc('created_at')
+            ->take(100)
+            ->values();
+
+        $formatted = $merged->map(function ($track) {
+            $primaryUser = $track->dog && $track->dog->users ? $track->dog->users->first() : null;
+            return [
+                'id' => $track->id,
+                'federation' => $track->federation,
+                'club_name' => $track->club ? $track->club->name : 'N/A',
+                'dog_name' => $track->dog ? $track->dog->name : 'N/A',
+                'owner_name' => $primaryUser ? $primaryUser->name : 'N/A',
+                'manga_type' => $track->manga_type,
+                'qualification' => $track->qualification,
+                'speed' => $track->speed,
+                'time' => $track->time,
+                'faults' => $track->faults,
+                'refusals' => $track->refusals,
+                'total_penalty' => $track->total_penalty,
+                'is_clean' => $track->is_clean,
+                'location' => $track->location,
+                'date' => $track->date,
+                'created_at' => $track->created_at ? $track->created_at->toDateTimeString() : null,
+                'is_my_dog' => ($track->dog && $track->dog->users ? $track->dog->users->contains('id', auth()->id()) : false),
+            ];
+        });
+
+        return response()->json($formatted);
+    }
+
+    public function memberScraperLastTracks(Request $request)
+    {
+        $rsce = \App\Models\RsceTrack::with(['dog.users', 'club'])
+            ->where('notes', 'like', '%FlowAgility%')
+            ->orderBy('id', 'desc')
+            ->limit(100)
+            ->get()
+            ->map(function ($track) {
+                $track->federation = 'RSCE';
+                return $track;
+            });
+
+        $rfec = \App\Models\RfecTrack::with(['dog.users', 'club'])
+            ->where('notes', 'like', '%FlowAgility%')
+            ->orderBy('id', 'desc')
+            ->limit(100)
+            ->get()
+            ->map(function ($track) {
+                $track->federation = 'RFEC';
+                return $track;
+            });
+
+        $merged = $rsce->concat($rfec)
+            ->sortByDesc('created_at')
+            ->take(100)
+            ->values();
+
+        $formatted = $merged->map(function ($track) {
+            $primaryUser = $track->dog && $track->dog->users ? $track->dog->users->first() : null;
+            return [
+                'id' => $track->id,
+                'federation' => $track->federation,
+                'club_name' => $track->club ? $track->club->name : 'N/A',
+                'dog_name' => $track->dog ? $track->dog->name : 'N/A',
+                'owner_name' => $primaryUser ? $primaryUser->name : 'N/A',
+                'manga_type' => $track->manga_type,
+                'qualification' => $track->qualification,
+                'speed' => $track->speed,
+                'time' => $track->time,
+                'faults' => $track->faults,
+                'refusals' => $track->refusals,
+                'total_penalty' => $track->total_penalty,
+                'is_clean' => $track->is_clean,
+                'location' => $track->location,
+                'date' => $track->date,
+                'created_at' => $track->created_at ? $track->created_at->toDateTimeString() : null,
+                'is_my_dog' => ($track->dog && $track->dog->users ? $track->dog->users->contains('id', auth()->id()) : false),
+            ];
+        });
+
+        return response()->json($formatted);
+    }
 }
 

@@ -1,10 +1,19 @@
 # AgilityAsturias
 
+This project consists of an Angular frontend and a Laravel backend.
+
+## Backend (Laravel Herd)
+
+The backend is located in the [agility_back](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back) directory.
+- It uses **Laravel Herd** to serve the application locally.
+- You do not need to run `php artisan serve` manually.
+- Make sure the `agility_back` directory is linked/parked in Laravel Herd. It will be served at `http://agility_back.test/`.
+
+## Development server (Frontend)
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.1.
 
-## Development server
-
-To start a local development server, run:
+To start a local development server for the frontend, run:
 
 ```bash
 ng serve

@@ -140,6 +140,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Scraper Monitor (Admin)
         Route::get('/admin/scraper/status', [CompetitionController::class, 'adminScraperStatus']);
         Route::post('/admin/scraper/run', [CompetitionController::class, 'adminScraperRun']);
+        Route::get('/admin/scraper/last-tracks', [CompetitionController::class, 'adminScraperLastTracks']);
     });
 
     Route::middleware(['role:admin,manager'])->group(function () {
@@ -237,6 +238,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/personal-events/{id}', [PersonalEventController::class, 'update']);
         Route::delete('/personal-events/{id}', [PersonalEventController::class, 'destroy']);
 
+        // Scraper Tracks for members
+        Route::get('/scraper/last-tracks', [CompetitionController::class, 'memberScraperLastTracks']);
     });
 
 

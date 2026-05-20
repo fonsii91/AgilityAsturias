@@ -6,126 +6,222 @@
         Monitor de Scraping (Admin)
       </h1>
       <p style="margin: 6px 0 0 0; color: var(--text-secondary); font-size: 0.95rem; max-width: 750px;">
-        Supervisión en tiempo real de la extracción automática de resultados desde <strong>FlowAgility</strong>. Puedes forzar la sincronización manual y examinar trazas de error detalladas.
+        Supervisión en tiempo real de la extracción automática de resultados desde <strong>FlowAgility</strong>. Puedes forzar la sincronización manual y examinar trazas de error detalladas o revisar los últimos datos importados.
       </p>
     </div>
     <div>
-      <button class="btn-action btn-secondary" (click)="loadCompetitions()" [disabled]="isLoading()" style="height: fit-content;">
-        <span class="material-icons" [class.spinning]="isLoading()">refresh</span>
-        Actualizar Lista
+      <button class="btn-action btn-secondary" (click)="activeTab() === 'competitions' ? loadCompetitions() : loadLastTracks()" [disabled]="isLoading() || isLoadingTracks()" style="height: fit-content;">
+        <span class="material-icons" [class.spinning]="isLoading() || isLoadingTracks()">refresh</span>
+        Actualizar
       </button>
     </div>
   </div>
 
-  @if (!isLoading()) {
-    <div class="table-responsive glass-effect" style="border-radius: 12px; border: 1px solid #cbd5e1;">
-      <table>
-        <thead>
-          <tr>
-            <th>Competición</th>
-            <th>Fecha Evento</th>
-            <th>Enlace FlowAgility</th>
-            <th style="text-align: center;">Estado</th>
-            <th>Último Scrapeo</th>
-            <th style="text-align: right;">Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (comp of competitions(); track comp.id) {
+  <!-- Navigation Tabs -->
+  <div class="tabs-container" style="display: flex; gap: 8px; border-bottom: 2px solid #e2e8f0; margin-bottom: 24px; padding-bottom: 1px;">
+    <button class="tab-button" [class.active]="activeTab() === 'competitions'" (click)="setTab('competitions')" style="padding: 10px 20px; font-weight: 600; font-size: 0.95rem; border: none; background: none; border-bottom: 2px solid transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;" [style.border-bottom-color]="activeTab() === 'competitions' ? 'var(--primary-color)' : 'transparent'" [style.color]="activeTab() === 'competitions' ? 'var(--primary-color)' : 'var(--text-secondary)'">
+      <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">event_note</span>
+      Competiciones Pasadas
+    </button>
+    <button class="tab-button" [class.active]="activeTab() === 'last-tracks'" (click)="setTab('last-tracks')" style="padding: 10px 20px; font-weight: 600; font-size: 0.95rem; border: none; background: none; border-bottom: 2px solid transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;" [style.border-bottom-color]="activeTab() === 'last-tracks' ? 'var(--primary-color)' : 'transparent'" [style.color]="activeTab() === 'last-tracks' ? 'var(--primary-color)' : 'var(--text-secondary)'">
+      <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">analytics</span>
+      Últimos 100 Registros Scrapeados
+    </button>
+  </div>
+
+  @if (activeTab() === 'competitions') {
+    @if (!isLoading()) {
+      <div class="table-responsive glass-effect" style="border-radius: 12px; border: 1px solid #cbd5e1;">
+        <table>
+          <thead>
             <tr>
-              <td style="font-weight: 600; color: var(--text-main);">
-                <div style="display: flex; flex-direction: column;">
-                  <span>{{ comp.nombre }}</span>
-                  <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; margin-top: 2px;">
-                    <span class="material-icons" style="font-size: 12px; vertical-align: middle;">place</span>
-                    {{ comp.lugar || 'Lugar no especificado' }}
-                  </span>
-                </div>
-              </td>
-              <td>{{ comp.fecha_evento | date:'dd/MM/yyyy' }}</td>
-              <td>
-                @if (hasFlowAgilityLink(comp.enlace)) {
-                  <a [href]="comp.enlace" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary-color); text-decoration: none; font-weight: 500; font-size: 0.9rem;">
-                    <span class="material-icons" style="font-size: 16px;">open_in_new</span>
-                    Ver en FlowAgility
-                  </a>
-                } @else {
-                  <span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Sin enlace externo</span>
-                }
-              </td>
-              <td style="text-align: center;">
-                @if (!hasFlowAgilityLink(comp.enlace)) {
-                  <span class="badge badge-nolink">
-                    <span class="material-icons" style="font-size: 14px;">link_off</span>
-                    Incompatible
-                  </span>
-                } @else if (comp.scrape_status === 'success') {
-                  <span class="badge badge-success">
-                    <span class="material-icons" style="font-size: 14px;">check_circle</span>
-                    Completado
-                  </span>
-                } @else if (comp.scrape_status === 'failed') {
-                  <span class="badge badge-failed">
-                    <span class="material-icons" style="font-size: 14px;">error</span>
-                    Fallido
-                  </span>
-                } @else {
-                  <span class="badge badge-pending">
-                    <span class="material-icons" style="font-size: 14px;">hourglass_empty</span>
-                    Pendiente
-                  </span>
-                }
-              </td>
-              <td>
-                @if (comp.scraped_at) {
-                  {{ comp.scraped_at | date:'dd/MM/yyyy HH:mm' }}
-                } @else {
-                  <span style="color: #94a3b8; font-size: 0.9rem;">Nunca</span>
-                }
-              </td>
-              <td style="text-align: right;">
-                <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
-                  @if (comp.scrape_status === 'failed' && comp.scrape_error) {
-                    <button class="btn-action btn-secondary" (click)="viewError(comp)" style="padding: 6px 12px; font-size: 0.8rem; border-color: #fca5a5; color: #b91c1c; background-color: #fff5f5;">
-                      <span class="material-icons" style="font-size: 16px;">bug_report</span>
-                      Ver Error
-                    </button>
+              <th>Competición</th>
+              <th>Fecha Evento</th>
+              <th>Enlace FlowAgility</th>
+              <th style="text-align: center;">Estado</th>
+              <th>Último Scrapeo</th>
+              <th style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (comp of competitions(); track comp.id) {
+              <tr>
+                <td style="font-weight: 600; color: var(--text-main);">
+                  <div style="display: flex; flex-direction: column;">
+                    <span>{{ comp.nombre }}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; margin-top: 2px;">
+                      <span class="material-icons" style="font-size: 12px; vertical-align: middle;">place</span>
+                      {{ comp.lugar || 'Lugar no especificado' }}
+                    </span>
+                  </div>
+                </td>
+                <td>{{ comp.fecha_evento | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  @if (hasFlowAgilityLink(comp.enlace)) {
+                    <a [href]="comp.enlace" target="_blank" style="display: inline-flex; align-items: center; gap: 4px; color: var(--primary-color); text-decoration: none; font-weight: 500; font-size: 0.9rem;">
+                      <span class="material-icons" style="font-size: 16px;">open_in_new</span>
+                      Ver en FlowAgility
+                    </a>
+                  } @else {
+                    <span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Sin enlace externo</span>
                   }
-                  
-                  <button class="btn-action btn-primary" 
-                          [disabled]="!hasFlowAgilityLink(comp.enlace) || scrapingIds().includes(comp.id)" 
-                          (click)="runScraper(comp)"
-                          style="padding: 6px 14px; font-size: 0.8rem;">
-                    @if (scrapingIds().includes(comp.id)) {
-                      <span class="material-icons spinning" style="font-size: 16px;">sync</span>
-                      Scrapeando...
-                    } @else {
-                      <span class="material-icons" style="font-size: 16px;">play_arrow</span>
-                      Scrapear
+                </td>
+                <td style="text-align: center;">
+                  @if (!hasFlowAgilityLink(comp.enlace)) {
+                    <span class="badge badge-nolink">
+                      <span class="material-icons" style="font-size: 14px;">link_off</span>
+                      Incompatible
+                    </span>
+                  } @else if (comp.scrape_status === 'success') {
+                    <span class="badge badge-success">
+                      <span class="material-icons" style="font-size: 14px;">check_circle</span>
+                      Completado
+                    </span>
+                  } @else if (comp.scrape_status === 'failed') {
+                    <span class="badge badge-failed">
+                      <span class="material-icons" style="font-size: 14px;">error</span>
+                      Fallido
+                    </span>
+                  } @else {
+                    <span class="badge badge-pending">
+                      <span class="material-icons" style="font-size: 14px;">hourglass_empty</span>
+                      Pendiente
+                    </span>
+                  }
+                </td>
+                <td>
+                  @if (comp.scraped_at) {
+                    {{ comp.scraped_at | date:'dd/MM/yyyy HH:mm' }}
+                  } @else {
+                    <span style="color: #94a3b8; font-size: 0.9rem;">Nunca</span>
+                  }
+                </td>
+                <td style="text-align: right;">
+                  <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                    @if (comp.scrape_status === 'failed' && comp.scrape_error) {
+                      <button class="btn-action btn-secondary" (click)="viewError(comp)" style="padding: 6px 12px; font-size: 0.8rem; border-color: #fca5a5; color: #b91c1c; background-color: #fff5f5;">
+                        <span class="material-icons" style="font-size: 16px;">bug_report</span>
+                        Ver Error
+                      </button>
                     }
-                  </button>
-                </div>
-              </td>
-            </tr>
-          }
-          
-          @if (competitions().length === 0) {
+                    
+                    <button class="btn-action btn-primary" 
+                            [disabled]="!hasFlowAgilityLink(comp.enlace) || scrapingIds().includes(comp.id)" 
+                            (click)="runScraper(comp)"
+                            style="padding: 6px 14px; font-size: 0.8rem;">
+                      @if (scrapingIds().includes(comp.id)) {
+                        <span class="material-icons spinning" style="font-size: 16px;">sync</span>
+                        Scrapeando...
+                      } @else {
+                        <span class="material-icons" style="font-size: 16px;">play_arrow</span>
+                        Scrapear
+                      }
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            }
+            
+            @if (competitions().length === 0) {
+              <tr>
+                <td colspan="6" style="padding: 48px; text-align: center; color: var(--text-light, #94a3b8);">
+                  <span class="material-icons" style="font-size: 56px; color: #cbd5e1; margin-bottom: 12px;">event_busy</span>
+                  <h3 style="margin: 0 0 6px 0; color: #64748b;">No hay competiciones pasadas</h3>
+                  <p style="margin: 0; font-size: 0.9rem;">No se encontraron competiciones del tipo "competición" que ya hayan ocurrido.</p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0;">
+        <span class="spinner-small" style="width: 36px; height: 36px; border-width: 4px; border-top-color: var(--primary-color); margin-bottom: 20px;"></span>
+        <p style="color: var(--text-secondary); font-weight: 600; font-size: 1.05rem;">Cargando historial de competiciones y logs del monitor...</p>
+      </div>
+    }
+  }
+
+  @if (activeTab() === 'last-tracks') {
+    @if (!isLoadingTracks()) {
+      <div class="table-responsive glass-effect" style="border-radius: 12px; border: 1px solid #cbd5e1;">
+        <table>
+          <thead>
             <tr>
-              <td colspan="6" style="padding: 48px; text-align: center; color: var(--text-light, #94a3b8);">
-                <span class="material-icons" style="font-size: 56px; color: #cbd5e1; margin-bottom: 12px;">event_busy</span>
-                <h3 style="margin: 0 0 6px 0; color: #64748b;">No hay competiciones pasadas</h3>
-                <p style="margin: 0; font-size: 0.9rem;">No se encontraron competiciones del tipo "competición" que ya hayan ocurrido.</p>
-              </td>
+              <th>Perro y Guía</th>
+              <th>Club</th>
+              <th>Prueba</th>
+              <th>Métricas</th>
+              <th>Calificación</th>
+              <th>Localización</th>
+              <th>Fecha Importación</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  } @else {
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0;">
-      <span class="spinner-small" style="width: 36px; height: 36px; border-width: 4px; border-top-color: var(--primary-color); margin-bottom: 20px;"></span>
-      <p style="color: var(--text-secondary); font-weight: 600; font-size: 1.05rem;">Cargando historial de competiciones y logs del monitor...</p>
-    </div>
+          </thead>
+          <tbody>
+            @for (track of lastTracks(); track track.id) {
+              <tr>
+                <td style="font-weight: 600; color: var(--text-main);">
+                  <div style="display: flex; flex-direction: column;">
+                    <span>{{ track.dog_name }}</span>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400; margin-top: 2px;">
+                      Guía: {{ track.owner_name }}
+                    </span>
+                  </div>
+                </td>
+                <td>
+                  <span style="font-weight: 500; color: #475569;">{{ track.club_name }}</span>
+                </td>
+                <td>
+                  <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 600;">{{ track.manga_type }}</span>
+                    <span style="font-size: 0.75rem; color: #94a3b8;">Fede: {{ track.federation }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div style="font-size: 0.85rem; line-height: 1.4; color: #475569;">
+                    <div>Vel: <strong style="color: var(--primary-color);">{{ track.speed ? (track.speed + ' m/s') : '-' }}</strong></div>
+                    <div>Tiempo: <strong>{{ track.time ? (track.time + ' s') : '-' }}</strong></div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary);">
+                      F: {{ track.faults }} | R: {{ track.refusals }} | Pen: {{ track.total_penalty }}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge" [class.badge-exc]="track.qualification === 'EXC_0' || track.qualification === 'EXC' || track.qualification === 'Excelente'" [class.badge-mb]="track.qualification === 'MB' || track.qualification === 'Muy Bueno'" [class.badge-b]="track.qualification === 'B' || track.qualification === 'Bueno'" [class.badge-elim]="track.qualification === 'ELIM' || track.qualification === 'Eliminado'" [class.badge-np]="track.qualification === 'NP' || track.qualification === 'No Presentado'">
+                    <span class="material-icons" style="font-size: 14px;">
+                      {{ track.qualification === 'ELIM' || track.qualification === 'Eliminado' ? 'cancel' : 'emoji_events' }}
+                    </span>
+                    {{ track.qualification }}
+                  </span>
+                </td>
+                <td style="font-size: 0.85rem; color: var(--text-secondary); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                  <div title="{{ track.location }}">
+                    {{ track.location }}
+                  </div>
+                </td>
+                <td style="font-size: 0.85rem; color: var(--text-secondary);">
+                  {{ track.created_at | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+              </tr>
+            }
+            @if (lastTracks().length === 0) {
+              <tr>
+                <td colspan="7" style="padding: 48px; text-align: center; color: var(--text-light, #94a3b8);">
+                  <span class="material-icons" style="font-size: 56px; color: #cbd5e1; margin-bottom: 12px;">hourglass_empty</span>
+                  <h3 style="margin: 0 0 6px 0; color: #64748b;">No hay datos scrapeados</h3>
+                  <p style="margin: 0; font-size: 0.9rem;">Aún no se ha importado ninguna manga o pista a través del scraper automático.</p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0;">
+        <span class="spinner-small" style="width: 36px; height: 36px; border-width: 4px; border-top-color: var(--primary-color); margin-bottom: 20px;"></span>
+        <p style="color: var(--text-secondary); font-weight: 600; font-size: 1.05rem;">Cargando los últimos 100 registros de mangas scrapeadas...</p>
+      </div>
+    }
   }
 </div>
 
@@ -164,7 +260,7 @@
           <span class="material-icons" style="color: #3b82f6;">terminal</span>
           Salida de Consola: {{ consoleOutput()?.nombre }}
         </h3>
-        <button class="modal-close" (click)="closeConsoleModal()" style="color: #94a3b8; hover: { background-color: #1e293b }">
+        <button class="modal-close" (click)="closeConsoleModal()" style="color: #94a3b8;">
           <span class="material-icons">close</span>
         </button>
       </div>

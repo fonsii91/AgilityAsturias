@@ -19,6 +19,10 @@ export class AdminScraperMonitorComponent implements OnInit {
   scrapingIds = signal<number[]>([]);
   selectedError = signal<{ nombre: string; error: string } | null>(null);
   consoleOutput = signal<{ nombre: string; output: string } | null>(null);
+  
+  activeTab = signal<'competitions' | 'last-tracks'>('competitions');
+  lastTracks = signal<any[]>([]);
+  isLoadingTracks = signal<boolean>(false);
 
   ngOnInit(): void {
     this.loadCompetitions();
@@ -37,6 +41,30 @@ export class AdminScraperMonitorComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  loadLastTracks(): void {
+    this.isLoadingTracks.set(true);
+    this.scraperService.getLastScrapedTracks().subscribe({
+      next: (data) => {
+        this.lastTracks.set(data);
+        this.isLoadingTracks.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading last scraped tracks', err);
+        this.toast.error('Error al cargar los últimos registros scrapeados.');
+        this.isLoadingTracks.set(false);
+      }
+    });
+  }
+
+  setTab(tab: 'competitions' | 'last-tracks'): void {
+    this.activeTab.set(tab);
+    if (tab === 'last-tracks') {
+      this.loadLastTracks();
+    } else {
+      this.loadCompetitions();
+    }
   }
 
   hasFlowAgilityLink(enlace: string): boolean {
