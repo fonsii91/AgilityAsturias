@@ -12,6 +12,10 @@ if [ -d "agility_back" ]; then
     echo "➡️  Actualizando Backend (Laravel)..."
     cd agility_back
     composer install --no-interaction --prefer-dist --optimize-autoloader
+    echo "➡️  Instalando dependencias de Node para el scraper..."
+    npm install
+    echo "➡️  Instalando navegador Chromium para Playwright..."
+    npx playwright install chromium
     php artisan livewire:publish --assets
     php artisan migrate --force
     php artisan optimize:clear
