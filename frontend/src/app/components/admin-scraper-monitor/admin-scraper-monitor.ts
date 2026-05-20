@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ScraperAdminService } from '../../services/scraper-admin.service';
 import { ToastService } from '../../services/toast.service';
@@ -10,7 +10,7 @@ import { ToastService } from '../../services/toast.service';
   templateUrl: './admin-scraper-monitor.html',
   styleUrl: './admin-scraper-monitor.css'
 })
-export class AdminScraperMonitorComponent implements OnInit {
+export class AdminScraperMonitorComponent implements OnInit, OnDestroy {
   private scraperService = inject(ScraperAdminService);
   private toast = inject(ToastService);
 
@@ -24,8 +24,14 @@ export class AdminScraperMonitorComponent implements OnInit {
   lastTracks = signal<any[]>([]);
   isLoadingTracks = signal<boolean>(false);
 
+  private pollInterval: any = null;
+
   ngOnInit(): void {
     this.loadCompetitions();
+  }
+
+  ngOnDestroy(): void {
+    this.stopPolling();
   }
 
   loadCompetitions(): void {
@@ -34,6 +40,7 @@ export class AdminScraperMonitorComponent implements OnInit {
       next: (data) => {
         this.competitions.set(data);
         this.isLoading.set(false);
+        this.checkAndStartPolling();
       },
       error: (err) => {
         console.error('Error loading past competitions', err);
@@ -75,31 +82,59 @@ export class AdminScraperMonitorComponent implements OnInit {
     if (this.scrapingIds().includes(comp.id)) return;
 
     this.scrapingIds.update(ids => [...ids, comp.id]);
-    this.toast.info(`Iniciando extracción para "${comp.nombre}"...`);
+    this.toast.info(`Iniciando extracción para "${comp.nombre}" en segundo plano...`);
 
     this.scraperService.runScraper(comp.id).subscribe({
       next: (res) => {
-        this.toast.success(`Scraping completado con éxito para "${comp.nombre}".`);
+        this.toast.success(`Scraping encolado para "${comp.nombre}".`);
         this.scrapingIds.update(ids => ids.filter(id => id !== comp.id));
         
-        // Mostrar salida de consola en el panel lateral/modal
-        if (res.output) {
-          this.consoleOutput.set({
-            nombre: comp.nombre,
-            output: res.output
-          });
-        }
-        
+        // Recargamos para ver el estado 'processing' e iniciar el polling
         this.loadCompetitions();
       },
       error: (err) => {
         console.error('Error running scraper', err);
         const errMsg = err.error?.message || 'Error desconocido';
-        this.toast.error(`Falló el scraping de "${comp.nombre}": ${errMsg}`);
+        this.toast.error(`Falló el inicio del scraping de "${comp.nombre}": ${errMsg}`);
         this.scrapingIds.update(ids => ids.filter(id => id !== comp.id));
         this.loadCompetitions();
       }
     });
+  }
+
+  refreshCompetitionsSilently(): void {
+    this.scraperService.getPastCompetitions().subscribe({
+      next: (data) => {
+        this.competitions.set(data);
+        this.checkAndStartPolling();
+      },
+      error: (err) => {
+        console.error('Error silently refreshing competitions', err);
+      }
+    });
+  }
+
+  private stopPolling(): void {
+    if (this.pollInterval) {
+      clearInterval(this.pollInterval);
+      this.pollInterval = null;
+    }
+  }
+
+  private checkAndStartPolling(): void {
+    const hasActiveScraping = this.competitions().some(
+      comp => comp.scrape_status === 'processing' || comp.scrape_status === 'running'
+    );
+
+    if (hasActiveScraping) {
+      if (!this.pollInterval) {
+        this.pollInterval = setInterval(() => {
+          this.refreshCompetitionsSilently();
+        }, 5000); // Polling cada 5 segundos
+      }
+    } else {
+      this.stopPolling();
+    }
   }
 
   viewError(comp: any): void {

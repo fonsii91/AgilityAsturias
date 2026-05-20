@@ -72,6 +72,11 @@
                       <span class="material-icons" style="font-size: 14px;">link_off</span>
                       Incompatible
                     </span>
+                  } @else if (comp.scrape_status === 'processing' || comp.scrape_status === 'running') {
+                    <span class="badge badge-processing">
+                      <span class="material-icons spinning" style="font-size: 14px;">sync</span>
+                      Procesando...
+                    </span>
                   } @else if (comp.scrape_status === 'success') {
                     <span class="badge badge-success">
                       <span class="material-icons" style="font-size: 14px;">check_circle</span>
@@ -106,10 +111,10 @@
                     }
                     
                     <button class="btn-action btn-primary" 
-                            [disabled]="!hasFlowAgilityLink(comp.enlace) || scrapingIds().includes(comp.id)" 
+                            [disabled]="!hasFlowAgilityLink(comp.enlace) || scrapingIds().includes(comp.id) || comp.scrape_status === 'processing' || comp.scrape_status === 'running'" 
                             (click)="runScraper(comp)"
                             style="padding: 6px 14px; font-size: 0.8rem;">
-                      @if (scrapingIds().includes(comp.id)) {
+                      @if (scrapingIds().includes(comp.id) || comp.scrape_status === 'processing' || comp.scrape_status === 'running') {
                         <span class="material-icons spinning" style="font-size: 16px;">sync</span>
                         Scrapeando...
                       } @else {

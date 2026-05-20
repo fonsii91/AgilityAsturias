@@ -80,6 +80,12 @@ tr:hover td {
   border: 1px solid #cbd5e1;
 }
 
+.badge-processing {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
 .btn-action {
   display: inline-flex;
   align-items: center;

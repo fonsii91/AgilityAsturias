@@ -276,22 +276,24 @@ class CompetitionController extends Controller
         }
 
         try {
-            \Illuminate\Support\Facades\Artisan::call('flowagility:scrape', [
-                '--competition_id' => $competition->id,
-                '--force' => true
-            ]);
+            $competition->scrape_status = 'processing';
+            $competition->scrape_error = null;
+            $competition->save();
 
-            $output = \Illuminate\Support\Facades\Artisan::output();
-            $competition->refresh();
+            \App\Jobs\ScrapeCompetitionJob::dispatch($competition->id);
 
             return response()->json([
-                'message' => 'Scraping completado.',
-                'output' => $output,
+                'message' => 'Scraping iniciado en segundo plano.',
+                'status' => 'processing',
                 'competition' => $competition
             ]);
         } catch (\Exception $e) {
+            $competition->scrape_status = 'failed';
+            $competition->scrape_error = $e->getMessage();
+            $competition->save();
+
             return response()->json([
-                'message' => 'Error durante el scraping: ' . $e->getMessage()
+                'message' => 'Error al iniciar el scraping: ' . $e->getMessage()
             ], 500);
         }
     }

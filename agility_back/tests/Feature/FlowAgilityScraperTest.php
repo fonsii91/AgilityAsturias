@@ -171,7 +171,7 @@ class FlowAgilityScraperTest extends TestCase
         ]);
 
         $response->assertStatus(200);
-        $response->assertJsonFragment(['message' => 'Scraping completado.']);
+        $response->assertJsonFragment(['message' => 'Scraping iniciado en segundo plano.']);
 
         $comp->refresh();
         $this->assertEquals('success', $comp->scrape_status);
