@@ -339,27 +339,45 @@ class ScrapeFlowAgility extends Command
         foreach ($competitions as $comp) {
             $compUrl = $this->normalizeUrl($comp->enlace);
             if (in_array($compUrl, $seenUrls)) {
+                $startDate = $comp->fecha_evento;
                 $endDate = $comp->fecha_fin_evento ?: $comp->fecha_evento;
                 
-                if (!$endDate) {
+                if (!$endDate || !$startDate) {
                     $isFinished = true;
                 } else {
                     $today = now()->toDateString();
                     if ($today > $endDate) {
-                        // Buscar si tenemos resultados del último día de la competición
-                        $hasLastDayResults = false;
-                        foreach ($results as $item) {
-                            if ($item['eventId'] == $comp->id && isset($item['runDate']) && $item['runDate'] === $endDate) {
-                                $hasLastDayResults = true;
+                        // Generar todas las fechas del evento (inclusive)
+                        $startCarbon = Carbon::parse($startDate);
+                        $endCarbon = Carbon::parse($endDate);
+                        $eventDates = [];
+                        $tempDate = $startCarbon->copy();
+                        while ($tempDate->lte($endCarbon)) {
+                            $eventDates[] = $tempDate->toDateString();
+                            $tempDate->addDay();
+                        }
+
+                        // Comprobar si tenemos resultados para todos los días del evento
+                        $hasResultsForAllDays = true;
+                        foreach ($eventDates as $date) {
+                            $hasResultsForDate = false;
+                            foreach ($results as $item) {
+                                if ($item['eventId'] == $comp->id && isset($item['runDate']) && $item['runDate'] === $date) {
+                                    $hasResultsForDate = true;
+                                    break;
+                                }
+                            }
+                            if (!$hasResultsForDate) {
+                                $hasResultsForAllDays = false;
                                 break;
                             }
                         }
 
-                        if ($hasLastDayResults) {
+                        if ($hasResultsForAllDays) {
                             $isFinished = true;
                         } else {
-                            // Dar un margen de gracia de 3 días tras el fin del evento antes de darlo por cerrado definitivamente
-                            $limitDate = Carbon::parse($endDate)->addDays(3)->toDateString();
+                            // Dar un margen de gracia de 5 días tras el fin del evento antes de darlo por cerrado definitivamente
+                            $limitDate = Carbon::parse($endDate)->addDays(5)->toDateString();
                             $isFinished = $today > $limitDate;
                         }
                     } else {
