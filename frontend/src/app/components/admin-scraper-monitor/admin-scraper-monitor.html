@@ -10,8 +10,11 @@
       </p>
     </div>
     <div>
-      <button class="btn-action btn-secondary" (click)="activeTab() === 'competitions' ? loadCompetitions() : loadLastTracks()" [disabled]="isLoading() || isLoadingTracks()" style="height: fit-content;">
-        <span class="material-icons" [class.spinning]="isLoading() || isLoadingTracks()">refresh</span>
+      <button class="btn-action btn-secondary" 
+              (click)="activeTab() === 'competitions' ? loadCompetitions() : (activeTab() === 'flowagility-events' ? loadGlobalEvents() : loadLastTracks())" 
+              [disabled]="isLoading() || isLoadingTracks() || isLoadingGlobalEvents()" 
+              style="height: fit-content;">
+        <span class="material-icons" [class.spinning]="isLoading() || isLoadingTracks() || isLoadingGlobalEvents()">refresh</span>
         Actualizar
       </button>
     </div>
@@ -22,6 +25,10 @@
     <button class="tab-button" [class.active]="activeTab() === 'competitions'" (click)="setTab('competitions')" style="padding: 10px 20px; font-weight: 600; font-size: 0.95rem; border: none; background: none; border-bottom: 2px solid transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;" [style.border-bottom-color]="activeTab() === 'competitions' ? 'var(--primary-color)' : 'transparent'" [style.color]="activeTab() === 'competitions' ? 'var(--primary-color)' : 'var(--text-secondary)'">
       <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">event_note</span>
       Competiciones Pasadas
+    </button>
+    <button class="tab-button" [class.active]="activeTab() === 'flowagility-events'" (click)="setTab('flowagility-events')" style="padding: 10px 20px; font-weight: 600; font-size: 0.95rem; border: none; background: none; border-bottom: 2px solid transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;" [style.border-bottom-color]="activeTab() === 'flowagility-events' ? 'var(--primary-color)' : 'transparent'" [style.color]="activeTab() === 'flowagility-events' ? 'var(--primary-color)' : 'var(--text-secondary)'">
+      <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">event</span>
+      Eventos de FlowAgility
     </button>
     <button class="tab-button" [class.active]="activeTab() === 'last-tracks'" (click)="setTab('last-tracks')" style="padding: 10px 20px; font-weight: 600; font-size: 0.95rem; border: none; background: none; border-bottom: 2px solid transparent; color: var(--text-secondary); cursor: pointer; transition: all 0.2s;" [style.border-bottom-color]="activeTab() === 'last-tracks' ? 'var(--primary-color)' : 'transparent'" [style.color]="activeTab() === 'last-tracks' ? 'var(--primary-color)' : 'var(--text-secondary)'">
       <span class="material-icons" style="font-size: 18px; vertical-align: middle; margin-right: 6px;">analytics</span>
@@ -143,6 +150,117 @@
       <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0;">
         <span class="spinner-small" style="width: 36px; height: 36px; border-width: 4px; border-top-color: var(--primary-color); margin-bottom: 20px;"></span>
         <p style="color: var(--text-secondary); font-weight: 600; font-size: 1.05rem;">Cargando historial de competiciones y logs del monitor...</p>
+      </div>
+    }
+  }
+
+  @if (activeTab() === 'flowagility-events') {
+    <div class="glass-effect" style="border-radius: 12px; border: 1px solid #cbd5e1; padding: 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h2 style="margin: 0; font-size: 1.15rem; color: var(--text-main); font-weight: 700;">Calendario de Eventos FlowAgility</h2>
+        <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.88rem;">
+          Esta tabla muestra los eventos futuros y recientes de la RSCE y RFEC obtenidos globalmente de FlowAgility. 
+          Los administradores pueden iniciar el scrapeo del calendario completo para actualizar este listado.
+        </p>
+      </div>
+      <div>
+        <button class="btn-action btn-primary" (click)="runCalendarScraper()" [disabled]="isScrapingCalendar() || isLoadingGlobalEvents()">
+          @if (isScrapingCalendar()) {
+            <span class="material-icons spinning" style="font-size: 16px;">sync</span>
+            Scrapeando Calendario...
+          } @else {
+            <span class="material-icons" style="font-size: 16px;">cloud_download</span>
+            Lanzar Scraping de Eventos
+          }
+        </button>
+      </div>
+    </div>
+
+    @if (!isLoadingGlobalEvents()) {
+      <div class="table-responsive glass-effect" style="border-radius: 12px; border: 1px solid #cbd5e1;">
+        <table>
+          <thead>
+            <tr>
+              <th>Evento</th>
+              <th>Fechas</th>
+              <th>Federación</th>
+              <th>Lugar</th>
+              <th>Organizador</th>
+              <th>Juez/Jueces</th>
+              <th style="text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (event of globalEvents(); track event.id) {
+              <tr>
+                <td style="font-weight: 600; color: var(--text-main);">
+                  {{ event.nombre }}
+                </td>
+                <td>
+                  <div style="display: flex; flex-direction: column;">
+                    <span style="font-weight: 500; font-size: 0.9rem;">
+                      {{ event.fecha_evento | date:'dd/MM/yyyy' }}
+                      @if (event.fecha_fin_evento && event.fecha_fin_evento !== event.fecha_evento) {
+                        - {{ event.fecha_fin_evento | date:'dd/MM/yyyy' }}
+                      }
+                    </span>
+                    @if (event.fecha_limite) {
+                      <span style="font-size: 0.75rem; color: #b91c1c; font-weight: 500; margin-top: 2px;">
+                        Límite: {{ event.fecha_limite | date:'dd/MM/yyyy' }}
+                      </span>
+                    }
+                  </div>
+                </td>
+                <td>
+                  @if (event.federacion) {
+                    <span class="badge" [class.badge-exc]="event.federacion.toUpperCase().includes('RSCE')" [class.badge-mb]="event.federacion.toUpperCase().includes('RFEC')" [class.badge-b]="!event.federacion.toUpperCase().includes('RSCE') && !event.federacion.toUpperCase().includes('RFEC')">
+                      <span class="material-icons" style="font-size: 14px;">verified</span>
+                      {{ event.federacion }}
+                    </span>
+                  } @else {
+                    <span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">No especificada</span>
+                  }
+                </td>
+                <td>
+                  @if (event.lugar) {
+                    <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 0.9rem;">
+                      <span class="material-icons" style="font-size: 14px; color: var(--text-secondary);">place</span>
+                      {{ event.lugar }}
+                    </span>
+                  } @else {
+                    <span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">Sin ubicación</span>
+                  }
+                </td>
+                <td>
+                  <span style="font-size: 0.9rem; color: #475569;">{{ event.organizador || 'No especificado' }}</span>
+                </td>
+                <td>
+                  <span style="font-size: 0.9rem; color: #475569;">{{ event.judge_name || 'No especificado' }}</span>
+                </td>
+                <td style="text-align: right;">
+                  <a [href]="event.enlace" target="_blank" class="btn-action btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; text-decoration: none; display: inline-flex; justify-content: center; align-items: center; border-color: #cbd5e1;">
+                    <span class="material-icons" style="font-size: 16px;">open_in_new</span>
+                    Ver en FlowAgility
+                  </a>
+                </td>
+              </tr>
+            }
+            @if (globalEvents().length === 0) {
+              <tr>
+                <td colspan="7" style="padding: 48px; text-align: center; color: var(--text-light, #94a3b8);">
+                  <span class="material-icons" style="font-size: 56px; color: #cbd5e1; margin-bottom: 12px;">event_busy</span>
+                  <h3 style="margin: 0 0 6px 0; color: #64748b;">No hay eventos de FlowAgility</h3>
+                  <p style="margin: 0; font-size: 0.9rem;">No se encontraron eventos en el calendario. Haz clic en "Lanzar Scraping de Eventos" para obtenerlos por primera vez.</p>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 0;">
+        <span class="spinner-small" style="width: 36px; height: 36px; border-width: 4px; border-top-color: var(--primary-color); margin-bottom: 20px;"></span>
+        <p style="color: var(--text-secondary); font-weight: 600; font-size: 1.05rem;">Cargando calendario de eventos de FlowAgility...</p>
       </div>
     }
   }

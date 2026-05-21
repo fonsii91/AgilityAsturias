@@ -20,14 +20,22 @@ export class AdminScraperMonitorComponent implements OnInit, OnDestroy {
   selectedError = signal<{ nombre: string; error: string } | null>(null);
   consoleOutput = signal<{ nombre: string; output: string } | null>(null);
   
-  activeTab = signal<'competitions' | 'last-tracks'>('competitions');
+  activeTab = signal<'competitions' | 'flowagility-events' | 'last-tracks'>('flowagility-events');
   lastTracks = signal<any[]>([]);
   isLoadingTracks = signal<boolean>(false);
+
+  globalEvents = signal<any[]>([]);
+  isLoadingGlobalEvents = signal<boolean>(false);
+  isScrapingCalendar = signal<boolean>(false);
 
   private pollInterval: any = null;
 
   ngOnInit(): void {
-    this.loadCompetitions();
+    if (this.activeTab() === 'flowagility-events') {
+      this.loadGlobalEvents();
+    } else {
+      this.loadCompetitions();
+    }
   }
 
   ngOnDestroy(): void {
@@ -50,6 +58,43 @@ export class AdminScraperMonitorComponent implements OnInit, OnDestroy {
     });
   }
 
+  loadGlobalEvents(): void {
+    this.isLoadingGlobalEvents.set(true);
+    this.scraperService.getGlobalEvents().subscribe({
+      next: (data) => {
+        this.globalEvents.set(data);
+        this.isLoadingGlobalEvents.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading global events', err);
+        this.toast.error('Error al cargar la lista de eventos de FlowAgility.');
+        this.isLoadingGlobalEvents.set(false);
+      }
+    });
+  }
+
+  runCalendarScraper(): void {
+    if (this.isScrapingCalendar()) return;
+    this.isScrapingCalendar.set(true);
+    this.toast.info('Lanzando scraping del calendario de FlowAgility en segundo plano...');
+
+    this.scraperService.runCalendarScraper().subscribe({
+      next: (res) => {
+        this.toast.success('El scraping del calendario ha sido encolado. Los eventos se actualizarán pronto.');
+        this.isScrapingCalendar.set(false);
+        setTimeout(() => {
+          this.loadGlobalEvents();
+        }, 5000);
+      },
+      error: (err) => {
+        console.error('Error running calendar scraper', err);
+        const errMsg = err.error?.message || 'Error desconocido';
+        this.toast.error(`Error al lanzar el scraping: ${errMsg}`);
+        this.isScrapingCalendar.set(false);
+      }
+    });
+  }
+
   loadLastTracks(): void {
     this.isLoadingTracks.set(true);
     this.scraperService.getLastScrapedTracks().subscribe({
@@ -65,10 +110,12 @@ export class AdminScraperMonitorComponent implements OnInit, OnDestroy {
     });
   }
 
-  setTab(tab: 'competitions' | 'last-tracks'): void {
+  setTab(tab: 'competitions' | 'flowagility-events' | 'last-tracks'): void {
     this.activeTab.set(tab);
     if (tab === 'last-tracks') {
       this.loadLastTracks();
+    } else if (tab === 'flowagility-events') {
+      this.loadGlobalEvents();
     } else {
       this.loadCompetitions();
     }

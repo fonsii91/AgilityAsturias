@@ -298,6 +298,26 @@ class CompetitionController extends Controller
         }
     }
 
+    public function adminScraperRunCalendar(Request $request)
+    {
+        if ($request->user()->role !== 'admin') {
+            abort(403, 'Unauthorized action.');
+        }
+
+        try {
+            // Queue the Artisan command flowagility:scrape-calendar
+            \Illuminate\Support\Facades\Artisan::queue('flowagility:scrape-calendar');
+
+            return response()->json([
+                'message' => 'Scraping del calendario de FlowAgility encolado en segundo plano con éxito.'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al encolar el scraping del calendario: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function adminScraperLastTracks(Request $request)
     {
         if ($request->user()->role !== 'admin') {
@@ -407,5 +427,227 @@ class CompetitionController extends Controller
 
         return response()->json($formatted);
     }
+
+    public function globalEvents(Request $request)
+    {
+        if (!in_array($request->user()->role, ['admin', 'manager', 'staff'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $query = \App\Models\GlobalFlowagilityEvent::query();
+
+        if ($request->has('q')) {
+            $q = $request->query('q');
+            $query->where(function($sub) use ($q) {
+                $sub->where('nombre', 'like', "%{$q}%")
+                    ->orWhere('lugar', 'like', "%{$q}%")
+                    ->orWhere('organizador', 'like', "%{$q}%");
+            });
+        }
+
+        // Return future events or events from the last 30 days
+        $query->where('fecha_evento', '>=', now()->subDays(30)->toDateString());
+
+        $events = $query->orderBy('fecha_evento', 'asc')->get();
+
+        return response()->json($events);
+    }
+
+    public function detectEvent(Request $request)
+    {
+        if (!in_array($request->user()->role, ['admin', 'manager', 'staff'])) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $url = $request->query('url');
+        if (empty($url)) {
+            return response()->json(['error' => 'URL is required'], 400);
+        }
+
+        // Extract UUID if present in URL
+        $uuid = null;
+        if (preg_match('/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/i', $url, $matches)) {
+            $uuid = $matches[0];
+        }
+
+        // 1. Check if another club has created this event
+        $existingCompQuery = Competition::withoutGlobalScopes();
+        if ($uuid) {
+            $existingCompQuery->where(function($q) use ($url, $uuid) {
+                $q->where('enlace', 'like', "%{$url}%")
+                  ->orWhere('enlace', 'like', "%{$uuid}%");
+            });
+        } else {
+            $existingCompQuery->where('enlace', 'like', "%{$url}%");
+        }
+        
+        $existingComp = $existingCompQuery->first();
+
+        if ($existingComp) {
+            return response()->json([
+                'source' => 'other_club_competition',
+                'nombre' => $existingComp->nombre,
+                'lugar' => $existingComp->lugar,
+                'fecha_evento' => $existingComp->fecha_evento,
+                'fecha_fin_evento' => $existingComp->fecha_fin_evento,
+                'fecha_limite' => $existingComp->fecha_limite,
+                'forma_pago' => $existingComp->forma_pago,
+                'enlace' => $existingComp->enlace,
+                'tipo' => $existingComp->tipo,
+                'federacion' => $existingComp->federacion,
+                'judge_name' => $existingComp->judge_name,
+                'cartel' => $existingComp->cartel,
+            ]);
+        }
+
+        // 2. Check if it's in our global events table
+        $globalEvent = null;
+        if ($uuid) {
+            $globalEvent = \App\Models\GlobalFlowagilityEvent::where('uuid', $uuid)->first();
+        } else {
+            $globalEvent = \App\Models\GlobalFlowagilityEvent::where('enlace', 'like', "%{$url}%")->first();
+        }
+
+        if ($globalEvent) {
+            // Enrich with judge name and precise location/limits dynamically if not set
+            if (empty($globalEvent->judge_name) && stripos($globalEvent->enlace, 'flowagility.com') !== false) {
+                try {
+                    $process = new \Symfony\Component\Process\Process(['node', base_path('flowagility_single_event_scraper.cjs'), $globalEvent->enlace]);
+                    $process->setEnv([
+                        'PLAYWRIGHT_BROWSERS_PATH' => env('PLAYWRIGHT_BROWSERS_PATH', '/opt/playwright-browsers'),
+                    ]);
+                    $process->setTimeout(35);
+                    $process->run();
+
+                    if ($process->isSuccessful()) {
+                        $output = $process->getOutput();
+                        $jsonStr = '';
+                        foreach (explode("\n", $output) as $line) {
+                            if (str_starts_with(trim($line), 'RESULT_JSON:')) {
+                                $jsonStr = substr(trim($line), 12);
+                                break;
+                            }
+                        }
+
+                        if (!empty($jsonStr)) {
+                            $scraped = json_decode($jsonStr, true);
+                            if ($scraped && is_array($scraped)) {
+                                $globalEvent->update([
+                                    'judge_name' => $scraped['judge_name'] ?? null,
+                                    'lugar' => $scraped['lugar'] ?? $globalEvent->lugar,
+                                    'fecha_limite' => $scraped['fecha_limite'] ?? $globalEvent->fecha_limite,
+                                ]);
+                                // Refresh globalEvent instance
+                                $globalEvent->refresh();
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed dynamic enrich for {$globalEvent->enlace}: " . $e->getMessage());
+                }
+            }
+
+            $mappedFed = 'Otro';
+            if ($globalEvent->federacion) {
+                if (stripos($globalEvent->federacion, 'RSCE') !== false) {
+                    $mappedFed = 'RSCE';
+                } elseif (stripos($globalEvent->federacion, 'RFEC') !== false) {
+                    $mappedFed = 'RFEC';
+                }
+            }
+
+            return response()->json([
+                'source' => 'global_flowagility_events',
+                'nombre' => $globalEvent->nombre,
+                'lugar' => $globalEvent->lugar,
+                'fecha_evento' => $globalEvent->fecha_evento,
+                'fecha_fin_evento' => $globalEvent->fecha_fin_evento,
+                'fecha_limite' => $globalEvent->fecha_limite,
+                'forma_pago' => null,
+                'enlace' => $globalEvent->enlace,
+                'tipo' => 'competicion',
+                'federacion' => $mappedFed,
+                'judge_name' => $globalEvent->judge_name,
+                'cartel' => null,
+            ]);
+        }
+
+        // 3. Fallback: If it's a FlowAgility URL, try to scrape it dynamically
+        if (stripos($url, 'flowagility.com') !== false) {
+            try {
+                $process = new \Symfony\Component\Process\Process(['node', base_path('flowagility_single_event_scraper.cjs'), $url]);
+                $process->setEnv([
+                    'PLAYWRIGHT_BROWSERS_PATH' => env('PLAYWRIGHT_BROWSERS_PATH', '/opt/playwright-browsers'),
+                ]);
+                $process->setTimeout(35);
+                $process->run();
+
+                if ($process->isSuccessful()) {
+                    $output = $process->getOutput();
+                    $jsonStr = '';
+                    foreach (explode("\n", $output) as $line) {
+                        if (str_starts_with(trim($line), 'RESULT_JSON:')) {
+                            $jsonStr = substr(trim($line), 12);
+                            break;
+                        }
+                    }
+
+                    if (!empty($jsonStr)) {
+                        $scraped = json_decode($jsonStr, true);
+                        if ($scraped && is_array($scraped)) {
+                            // Upsert scraped event to global table for future requests
+                            if ($uuid && !empty($scraped['fecha_evento'])) {
+                                \App\Models\GlobalFlowagilityEvent::updateOrCreate(
+                                    ['uuid' => $uuid],
+                                    [
+                                        'nombre' => $scraped['nombre'],
+                                        'lugar' => $scraped['lugar'] ?? null,
+                                        'fecha_evento' => $scraped['fecha_evento'],
+                                        'fecha_fin_evento' => $scraped['fecha_fin_evento'] ?? null,
+                                        'fecha_limite' => $scraped['fecha_limite'] ?? null,
+                                        'enlace' => $scraped['enlace'],
+                                        'federacion' => $scraped['federacion_str'] ?? null,
+                                        'organizador' => $scraped['organizador'] ?? null,
+                                    ]
+                                );
+                            }
+
+                            $mappedFed = 'Otro';
+                            if (!empty($scraped['federacion_str'])) {
+                                if (stripos($scraped['federacion_str'], 'RSCE') !== false) {
+                                    $mappedFed = 'RSCE';
+                                } elseif (stripos($scraped['federacion_str'], 'RFEC') !== false) {
+                                    $mappedFed = 'RFEC';
+                                }
+                            }
+
+                            return response()->json([
+                                'source' => 'dynamic_scraper',
+                                'nombre' => $scraped['nombre'],
+                                'lugar' => $scraped['lugar'] ?? null,
+                                'fecha_evento' => $scraped['fecha_evento'],
+                                'fecha_fin_evento' => $scraped['fecha_fin_evento'] ?? null,
+                                'fecha_limite' => $scraped['fecha_limite'] ?? null,
+                                'forma_pago' => null,
+                                'enlace' => $scraped['enlace'],
+                                'tipo' => 'competicion',
+                                'federacion' => $mappedFed,
+                                'judge_name' => $scraped['judge_name'] ?? null,
+                                'cartel' => null,
+                            ]);
+                        }
+                    }
+                }
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed dynamic scrape for $url: " . $e->getMessage());
+            }
+        }
+
+        return response()->json([
+            'source' => 'not_found',
+            'message' => 'No event detected for this URL.'
+        ]);
+    }
 }
+
 

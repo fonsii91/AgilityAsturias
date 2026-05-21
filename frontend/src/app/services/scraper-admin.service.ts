@@ -21,4 +21,20 @@ export class ScraperAdminService {
   getLastScrapedTracks(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/last-tracks`);
   }
+
+  getGlobalEvents(query?: string): Observable<any[]> {
+    const params: { [key: string]: string } = {};
+    if (query) {
+      params['q'] = query;
+    }
+    return this.http.get<any[]>(`${this.apiUrl}/global-events`, { params });
+  }
+
+  detectEvent(url: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/detect-event`, { params: { url } });
+  }
+
+  runCalendarScraper(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/run-calendar`, {});
+  }
 }

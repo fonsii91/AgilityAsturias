@@ -8,6 +8,7 @@ import { ImageCompressorService } from '../../services/image-compressor.service'
 import { ToastService } from '../../services/toast.service';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 import { OnboardingService } from '../../services/onboarding';
+import { ScraperAdminService } from '../../services/scraper-admin.service';
 
 @Component({
     selector: 'app-crud-competicion',
@@ -20,8 +21,17 @@ export class CrudCompeticionComponent {
     private toastService = inject(ToastService);
     private imageCompressor = inject(ImageCompressorService);
     private onboardingService = inject(OnboardingService);
+    private scraperService = inject(ScraperAdminService);
+    
     proximosEventos: any;
     eventosPasados: any;
+
+    // FlowAgility scraping integration signals
+    searchQuery = signal('');
+    globalEvents = signal<any[]>([]);
+    isSearching = signal(false);
+    isDetecting = signal(false);
+    showAutocomplete = signal(false);
     displayedEvents: any;
     totalPages: any;
     
@@ -141,6 +151,7 @@ export class CrudCompeticionComponent {
         this.resetForm();
         this.showForm.set(true);
         this.isEditing.set(false);
+        this.loadUpcomingGlobalEvents();
     }
 
     // Used to hold the existing cartel when editing, if no new file is selected
@@ -279,5 +290,107 @@ export class CrudCompeticionComponent {
         this.competitionForm.reset({
             tipo: 'competicion'
         });
+    }
+
+    loadUpcomingGlobalEvents() {
+        this.isSearching.set(true);
+        this.scraperService.getGlobalEvents().subscribe({
+            next: (events) => {
+                this.globalEvents.set(events);
+                this.isSearching.set(false);
+            },
+            error: (err) => {
+                console.error('Error loading global events:', err);
+                this.isSearching.set(false);
+            }
+        });
+    }
+
+    onSearchChange(event: Event) {
+        const query = (event.target as HTMLInputElement).value;
+        this.searchQuery.set(query);
+        this.isSearching.set(true);
+        this.scraperService.getGlobalEvents(query).subscribe({
+            next: (events) => {
+                this.globalEvents.set(events);
+                this.isSearching.set(false);
+                this.showAutocomplete.set(true);
+            },
+            error: (err) => {
+                console.error(err);
+                this.isSearching.set(false);
+            }
+        });
+    }
+
+    selectGlobalEvent(event: any) {
+        let mappedFed = 'Otro';
+        if (event.federacion) {
+            if (event.federacion.toUpperCase().includes('RSCE')) {
+                mappedFed = 'RSCE';
+            } else if (event.federacion.toUpperCase().includes('RFEC')) {
+                mappedFed = 'RFEC';
+            }
+        }
+        
+        this.competitionForm.patchValue({
+            nombre: event.nombre,
+            lugar: event.lugar || '',
+            fechaEvento: event.fecha_evento,
+            fechaFinEvento: event.fecha_fin_evento || event.fecha_evento,
+            fechaLimite: event.fecha_limite || '',
+            enlace: event.enlace,
+            tipo: 'competicion',
+            federacion: mappedFed,
+            judge_name: event.judge_name || ''
+        });
+
+        this.showAutocomplete.set(false);
+        this.searchQuery.set('');
+        this.toastService.success('Evento de FlowAgility importado en el formulario');
+    }
+
+    onUrlBlur() {
+        const url = this.competitionForm.get('enlace')?.value;
+        if (!url || !url.includes('flowagility.com')) {
+            return;
+        }
+
+        if (this.isDetecting()) {
+            return;
+        }
+
+        this.isDetecting.set(true);
+        this.toastService.info('Detectando evento en FlowAgility...');
+
+        this.scraperService.detectEvent(url).subscribe({
+            next: (eventData) => {
+                this.isDetecting.set(false);
+                if (eventData) {
+                    this.competitionForm.patchValue({
+                        nombre: eventData.nombre || this.competitionForm.get('nombre')?.value,
+                        lugar: eventData.lugar || this.competitionForm.get('lugar')?.value,
+                        fechaEvento: eventData.fecha_evento || this.competitionForm.get('fechaEvento')?.value,
+                        fechaFinEvento: eventData.fecha_fin_evento || this.competitionForm.get('fechaFinEvento')?.value || eventData.fecha_evento,
+                        fechaLimite: eventData.fecha_limite || this.competitionForm.get('fechaLimite')?.value,
+                        federacion: eventData.federacion || this.competitionForm.get('federacion')?.value || 'Otro',
+                        tipo: 'competicion',
+                        judge_name: eventData.judge_name || this.competitionForm.get('judge_name')?.value
+                    });
+                    this.toastService.success('Datos del evento autocompletados con éxito');
+                }
+            },
+            error: (err) => {
+                console.error('Error detecting event:', err);
+                this.isDetecting.set(false);
+                this.toastService.warning('No se pudo autocompletar desde el enlace, introduce los datos manualmente');
+            }
+        });
+    }
+
+    closeAutocomplete() {
+        setTimeout(() => {
+            this.showAutocomplete.set(false);
+        }, 200);
     }
 }

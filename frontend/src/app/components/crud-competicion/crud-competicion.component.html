@@ -150,6 +150,62 @@
   @if (showForm()) {
     <div class="form-view">
       <h3 class="form-header">{{ isEditing() ? 'Editar Evento' : 'Nuevo Evento' }}</h3>
+      
+      <!-- FlowAgility Scraper Search Autocomplete -->
+      @if (!isEditing()) {
+        <div class="scraper-autocomplete-container">
+          <label class="autocomplete-label">
+            <mat-icon style="vertical-align: middle; font-size: 18px; width: 18px; height: 18px; color: var(--primary-color);">search</mat-icon>
+            Autorellenar desde FlowAgility (RSCE / RFEC)
+          </label>
+          <div class="autocomplete-input-wrapper">
+            <input type="text" 
+                   [value]="searchQuery()"
+                   (input)="onSearchChange($event)"
+                   (focus)="showAutocomplete.set(true)"
+                   (blur)="closeAutocomplete()"
+                   placeholder="Buscar evento por nombre, club, organizador o lugar..." 
+                   class="form-control autocomplete-search-input">
+            @if (isSearching()) {
+              <div class="spinner-inline"></div>
+            }
+          </div>
+          
+          @if (showAutocomplete() && globalEvents().length > 0) {
+            <ul class="autocomplete-dropdown">
+              @for (event of globalEvents(); track event.id) {
+                <li (mousedown)="selectGlobalEvent(event)" class="autocomplete-option">
+                  <div class="option-title">
+                    @if (event.federacion) {
+                      <span class="fed-badge" 
+                            [class.rsce]="event.federacion.toUpperCase().includes('RSCE')" 
+                            [class.rfec]="event.federacion.toUpperCase().includes('RFEC')">
+                        {{ event.federacion }}
+                      </span>
+                    }
+                    <strong>{{ event.nombre }}</strong>
+                  </div>
+                  <div class="option-meta">
+                    <span>📅 {{ event.fecha_evento | date:'dd/MM/yyyy' }}</span>
+                    @if (event.lugar) {
+                      <span>📍 {{ event.lugar }}</span>
+                    }
+                    @if (event.organizador) {
+                      <span>🏢 {{ event.organizador }}</span>
+                    }
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+          @if (showAutocomplete() && searchQuery().length >= 2 && globalEvents().length === 0 && !isSearching()) {
+            <div class="autocomplete-no-results">
+              No se encontraron eventos coincidentes.
+            </div>
+          }
+        </div>
+      }
+
       <form [formGroup]="competitionForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
           <label for="tipo">Tipo de Evento</label>
@@ -225,15 +281,31 @@
                   placeholder="Instrucciones de pago..."></textarea>
                 </div>
                 <div class="form-group">
-                  <label for="enlace">Enlace Inscripción</label>
-                  <input type="url" id="enlace" formControlName="enlace" class="form-control"
-                    [ngClass]="{ 'is-invalid': submitted && f['enlace'].errors }" placeholder="https://...">
-                    @if (submitted && f['enlace'].errors?.['pattern']) {
-                      <div class="invalid-feedback">
-                        Se requiere una URL válida (http:// o https://).
-                      </div>
+                  <label for="enlace" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>Enlace Inscripción</span>
+                    @if (isDetecting()) {
+                      <span class="detecting-label" style="font-size: 0.85rem; color: var(--primary-color); display: flex; align-items: center; gap: 4px; font-weight: 500;">
+                        <span class="spinner-inline"></span> Buscando y extrayendo datos...
+                      </span>
+                    }
+                  </label>
+                  <div style="position: relative;">
+                    <input type="url" id="enlace" formControlName="enlace" class="form-control"
+                      (blur)="onUrlBlur()"
+                      [ngClass]="{ 'is-invalid': submitted && f['enlace'].errors }" placeholder="https://www.flowagility.com/zone/events/...">
+                    @if (isDetecting()) {
+                      <div class="spinner-inside-input"></div>
                     }
                   </div>
+                  @if (submitted && f['enlace'].errors?.['pattern']) {
+                    <div class="invalid-feedback">
+                      Se requiere una URL válida (http:// o https://).
+                    </div>
+                  }
+                  <span style="font-size: 0.8em; color: #64748b; display: block; margin-top: 4px; line-height: 1.3;">
+                    Si pegas un enlace de FlowAgility, al hacer clic fuera del campo se intentará completar automáticamente el formulario.
+                  </span>
+                </div>
                   <div class="form-group">
                     <label for="cartel">Cartel (Imagen)</label>
                     <input type="file" id="cartel" (change)="onFileSelected($event)" accept="image/*" class="form-control">

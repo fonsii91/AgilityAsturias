@@ -59,6 +59,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/competitions', [CompetitionController::class, 'store']);
         Route::post('/competitions/{id}', [CompetitionController::class, 'update']);
         Route::post('/competitions/{id}/delete', [CompetitionController::class, 'destroy']);
+        Route::get('/admin/scraper/global-events', [CompetitionController::class, 'globalEvents']);
+        Route::get('/admin/scraper/detect-event', [CompetitionController::class, 'detectEvent']);
+
 
         // Gallery
         Route::post('/gallery', [GalleryController::class, 'store']);
@@ -140,6 +143,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Scraper Monitor (Admin)
         Route::get('/admin/scraper/status', [CompetitionController::class, 'adminScraperStatus']);
         Route::post('/admin/scraper/run', [CompetitionController::class, 'adminScraperRun']);
+        Route::post('/admin/scraper/run-calendar', [CompetitionController::class, 'adminScraperRunCalendar']);
         Route::get('/admin/scraper/last-tracks', [CompetitionController::class, 'adminScraperLastTracks']);
     });
 

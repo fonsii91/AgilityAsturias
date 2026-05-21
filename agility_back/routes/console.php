@@ -98,3 +98,7 @@ Schedule::command('backup:run --only-db')->dailyAt('05:00')->timezone('Europe/Ma
 
 // Scrape FlowAgility results for closed/finished events
 Schedule::command('flowagility:scrape')->dailyAt('04:00')->timezone('Europe/Madrid');
+
+// Scrape FlowAgility calendar for upcoming events (RSCE/RFEC)
+Schedule::command('flowagility:scrape-calendar')->dailyAt('03:00')->timezone('Europe/Madrid');
+
