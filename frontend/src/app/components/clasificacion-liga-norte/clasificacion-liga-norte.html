@@ -1,0 +1,198 @@
+<div class="clasificacion-container">
+  <!-- Header -->
+  <div class="clasificacion-header">
+    <div class="header-content">
+      <h1 class="header-title">
+        <span class="material-icons-outlined header-icon">emoji_events</span>
+        Clasificación Liga Norte
+      </h1>
+      <p class="header-subtitle">
+        Consulta el estado de la competición y el progreso de los binomios del club en la liga.
+      </p>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state glass-card">
+      <div class="spinner"></div>
+      <p>Cargando clasificación de la Liga Norte...</p>
+    </div>
+  } @else {
+    <!-- Tabs Navigation -->
+    <div class="tabs-container glass-card">
+      <button 
+        class="tab-btn" 
+        [class.active]="activeClassFilter() === null" 
+        (click)="setClassFilter(null)">
+        Todas
+        <span class="tab-badge">{{ standings().length }}</span>
+      </button>
+      @for (c of classes; track c) {
+        <button 
+          class="tab-btn" 
+          [class.active]="activeClassFilter() === c" 
+          (click)="setClassFilter(c)">
+          Clase {{ c }}
+          @if (classCounts()[c] > 0) {
+            <span class="tab-badge">{{ classCounts()[c] }}</span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (filteredStandings().length === 0) {
+      <div class="empty-state glass-card">
+        <span class="material-icons-outlined empty-icon">leaderboard</span>
+        <h3>Clasificación no disponible</h3>
+        <p>No se han encontrado registros cargados en esta clase.</p>
+      </div>
+    } @else {
+      <!-- Desktop Table View -->
+      <div class="table-card glass-card desktop-only">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 70px; text-align: center;">Pos</th>
+                @if (activeClassFilter() === null) {
+                  <th style="width: 80px;">Clase</th>
+                }
+                <th>Perro</th>
+                <th>Guía</th>
+                <th>Club</th>
+                <th style="text-align: center;">Agility Ex (0/5)</th>
+                <th style="text-align: center;">Jumping Ex (0/5)</th>
+                <th style="text-align: center;">Ex. Totales</th>
+                <th style="text-align: center; width: 100px;">Puntos</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of filteredStandings(); track row.id; let idx = $index) {
+                <tr [class.asturias-row]="isAsturias(row)">
+                  <td style="text-align: center;">
+                    @if (row.posicion === 1) {
+                      <span class="medal medal-gold" title="1º Puesto">🥇</span>
+                    } @else if (row.posicion === 2) {
+                      <span class="medal medal-silver" title="2º Puesto">🥈</span>
+                    } @else if (row.posicion === 3) {
+                      <span class="medal medal-bronze" title="3º Puesto">🥉</span>
+                    } @else {
+                      <span class="position-num">{{ row.posicion }}</span>
+                    }
+                  </td>
+                  @if (activeClassFilter() === null) {
+                    <td>
+                      <span class="class-tag">C{{ row.clase }}</span>
+                    </td>
+                  }
+                  <td>
+                    <div class="perro-cell">
+                      @if (row.dog_id) {
+                        <a [routerLink]="['/gestionar-perros', row.dog_id]" class="dog-link" title="Ver perfil de manada">
+                          <span class="material-icons-outlined dog-icon">pets</span>
+                          <strong>{{ row.perro_nombre }}</strong>
+                        </a>
+                      } @else {
+                        <strong>{{ row.perro_nombre }}</strong>
+                      }
+                      
+                      @if (isAsturias(row)) {
+                        <span class="club-badge-asturias">ASTURIAS</span>
+                      }
+                    </div>
+                  </td>
+                  <td>{{ row.guia_nombre }}</td>
+                  <td [class.highlight-club]="isAsturias(row)">{{ row.club_nombre }}</td>
+                  <td style="text-align: center;" class="ex-detail-cols">
+                    <span class="ex-pills">
+                      <span class="pill-zero" title="Excelentes a 0">{{ row.agility_ex_0 }}</span>
+                      <span class="pill-divider">/</span>
+                      <span class="pill-five" title="Excelentes a 5">{{ row.agility_ex_5 }}</span>
+                    </span>
+                  </td>
+                  <td style="text-align: center;" class="ex-detail-cols">
+                    <span class="ex-pills">
+                      <span class="pill-zero" title="Excelentes a 0">{{ row.jumping_ex_0 }}</span>
+                      <span class="pill-divider">/</span>
+                      <span class="pill-five" title="Excelentes a 5">{{ row.jumping_ex_5 }}</span>
+                    </span>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="badge badge-exc">{{ row.excelentes_totales }}</span>
+                  </td>
+                  <td style="text-align: center;">
+                    <span class="total-points">{{ row.puntos_total }} pts</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Mobile Card View -->
+      <div class="mobile-cards mobile-only">
+        @for (row of filteredStandings(); track row.id) {
+          <div class="standing-card glass-card" [class.asturias-card]="isAsturias(row)">
+            <div class="card-header">
+              <div class="rank-badge">
+                @if (row.posicion === 1) { 🥇 }
+                @else if (row.posicion === 2) { 🥈 }
+                @else if (row.posicion === 3) { 🥉 }
+                @else { #{{ row.posicion }} }
+              </div>
+              
+              <div class="dog-info">
+                <div class="dog-header-row">
+                  @if (row.dog_id) {
+                    <a [routerLink]="['/gestionar-perros', row.dog_id]" class="dog-link">
+                      <span class="material-icons-outlined dog-icon">pets</span>
+                      <span class="dog-name">{{ row.perro_nombre }}</span>
+                    </a>
+                  } @else {
+                    <span class="dog-name">{{ row.perro_nombre }}</span>
+                  }
+                  
+                  @if (isAsturias(row)) {
+                    <span class="club-badge-asturias">ASTURIAS</span>
+                  }
+                </div>
+                <span class="owner-name">{{ row.guia_nombre }}</span>
+              </div>
+              
+              <div class="points-badge">
+                {{ row.puntos_total }} pts
+              </div>
+            </div>
+            
+            <div class="card-body">
+              <div class="card-row">
+                <span class="label">Club:</span>
+                <span class="value" [class.text-asturias]="isAsturias(row)">{{ row.club_nombre }}</span>
+              </div>
+              <div class="card-row">
+                <span class="label">Clase:</span>
+                <span class="value"><span class="class-tag">Clase {{ row.clase }}</span></span>
+              </div>
+              
+              <div class="excelentes-summary-grid">
+                <div class="ex-summary-item">
+                  <span class="item-label">Excelentes</span>
+                  <span class="item-val">{{ row.excelentes_totales }}</span>
+                </div>
+                <div class="ex-summary-item">
+                  <span class="item-label">Agility (0/5)</span>
+                  <span class="item-val">{{ row.agility_ex_0 }} / {{ row.agility_ex_5 }}</span>
+                </div>
+                <div class="ex-summary-item">
+                  <span class="item-label">Jumping (0/5)</span>
+                  <span class="item-val">{{ row.jumping_ex_0 }} / {{ row.jumping_ex_5 }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

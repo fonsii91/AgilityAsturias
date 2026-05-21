@@ -1,0 +1,260 @@
+<div class="admin-norte-container">
+  <!-- Header -->
+  <div class="admin-header">
+    <div class="header-left">
+      <h1 class="header-title">
+        <span class="material-icons-outlined header-icon">emoji_events</span>
+        Liga Norte - Control de Capturas
+      </h1>
+      <p class="header-subtitle">
+        Gestiona y digitaliza las clasificaciones de la Liga Norte usando Inteligencia Artificial (Gemini 1.5 Flash)
+      </p>
+    </div>
+    @if (selectedImport()) {
+      <button class="btn btn-secondary back-btn" (click)="deselectImport()">
+        <span class="material-icons-outlined">arrow_back</span>
+        Volver al Listado
+      </button>
+    }
+  </div>
+
+  @if (isLoading() && !isProcessing()) {
+    <div class="loading-state glass-card">
+      <div class="spinner"></div>
+      <p>Cargando información...</p>
+    </div>
+  } @else {
+    <!-- Main Content Grid -->
+    @if (!selectedImport()) {
+      <!-- List View -->
+      <div class="stats-bar">
+        <div class="stat-card glass-card">
+          <span class="stat-num">{{ imports().length }}</span>
+          <span class="stat-label">Total Capturas</span>
+        </div>
+        <div class="stat-card glass-card pending-card">
+          <span class="stat-num">{{ pendingCount() }}</span>
+          <span class="stat-label">Pendientes</span>
+        </div>
+        <div class="stat-card glass-card approved-card">
+          <span class="stat-num">{{ approvedCount() }}</span>
+          <span class="stat-label">Aprobadas</span>
+        </div>
+      </div>
+
+      @if (imports().length === 0) {
+        <div class="empty-state glass-card">
+          <span class="material-icons-outlined empty-icon">cloud_download</span>
+          <h3>No se han encontrado capturas</h3>
+          <p>
+            El scraper automático busca nuevas clasificaciones en el canal de Telegram @liganorte diariamente.
+          </p>
+        </div>
+      } @else {
+        <div class="imports-grid">
+          @for (imp of imports(); track imp.id) {
+            <div class="import-card glass-card" [class.status-approved]="imp.status === 'approved'">
+              <div class="card-image-wrapper">
+                <img [src]="imp.image_url" alt="Captura Liga Norte" class="card-thumb" />
+                <span class="status-badge" [class]="'badge-' + imp.status">
+                  @if (imp.status === 'pending') { Pendiente }
+                  @else if (imp.status === 'processed') { Procesada (IA) }
+                  @else if (imp.status === 'approved') { Aprobada (Activa) }
+                </span>
+              </div>
+              <div class="card-body">
+                <div class="card-meta">
+                  <span class="meta-date">
+                    <span class="material-icons-outlined">calendar_today</span>
+                    {{ imp.created_at | date:'dd/MM/yyyy HH:mm' }}
+                  </span>
+                  <span class="meta-tg">
+                    <span class="material-icons-outlined">telegram</span>
+                    Msg: {{ imp.telegram_message_id }}
+                  </span>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-primary" (click)="selectImport(imp)">
+                    <span class="material-icons-outlined">rate_review</span>
+                    Revisar y Editar
+                  </button>
+                  <button class="btn btn-danger-icon" (click)="deleteImport(imp)" title="Eliminar captura">
+                    <span class="material-icons-outlined">delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      <!-- Editor View -->
+      <div class="editor-grid">
+        <!-- Left: Image Preview & Control -->
+        <div class="preview-column">
+          <div class="glass-card sticky-card">
+            <h3 class="card-section-title">Captura de Telegram Original</h3>
+            <div class="preview-image-container">
+              <a [href]="selectedImport().image_url" target="_blank" class="zoom-overlay" title="Ver imagen en tamaño completo">
+                <span class="material-icons-outlined">open_in_new</span>
+              </a>
+              <img [src]="selectedImport().image_url" alt="Clasificación original" class="preview-image" />
+            </div>
+            
+            <div class="preview-details">
+              <div class="detail-row">
+                <span class="label">Fecha descarga:</span>
+                <span class="value">{{ selectedImport().created_at | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">Estado actual:</span>
+                <span class="status-badge" [class]="'badge-' + selectedImport().status">
+                  @if (selectedImport().status === 'pending') { Pendiente }
+                  @else if (selectedImport().status === 'processed') { Procesada (IA) }
+                  @else if (selectedImport().status === 'approved') { Aprobada (Activa) }
+                </span>
+              </div>
+            </div>
+
+            <div class="action-buttons-group">
+              @if (selectedImport().status === 'pending') {
+                <button class="btn btn-ai-action" [disabled]="isProcessing()" (click)="processWithIA(selectedImport())">
+                  @if (isProcessing()) {
+                    <span class="material-icons-outlined spinning">sync</span>
+                    Digitalizando con IA...
+                  } @else {
+                    <span class="material-icons-outlined">psychology</span>
+                    Procesar con IA (Gemini)
+                  }
+                </button>
+              } @else {
+                <button class="btn btn-ai-action-secondary" [disabled]="isProcessing()" (click)="processWithIA(selectedImport())">
+                  @if (isProcessing()) {
+                    <span class="material-icons-outlined spinning">sync</span>
+                    Procesando...
+                  } @else {
+                    <span class="material-icons-outlined">restart_alt</span>
+                    Reprocesar con IA
+                  }
+                </button>
+                
+                <button class="btn btn-success" (click)="approveAndPublish()">
+                  <span class="material-icons-outlined">publish</span>
+                  Aprobar y Publicar
+                </button>
+              }
+
+              <button class="btn btn-danger" (click)="deleteImport(selectedImport())">
+                <span class="material-icons-outlined">delete</span>
+                Eliminar Captura
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Digitalized Table Editor -->
+        <div class="editor-column">
+          @if (isProcessing()) {
+            <div class="glass-card processing-overlay-card">
+              <div class="ai-loader">
+                <div class="glowing-orb"></div>
+                <div class="glowing-ring"></div>
+              </div>
+              <h3>Gemini Vision AI está leyendo la tabla</h3>
+              <p>
+                Analizando nombres de perros, guías, clubes y puntuaciones de la clasificación... esto tomará unos segundos.
+              </p>
+            </div>
+          } @else if (selectedImport().status === 'pending') {
+            <div class="glass-card pending-instruction-card">
+              <span class="material-icons-outlined ai-intro-icon animate-pulse">psychology</span>
+              <h3>Captura lista para digitalización</h3>
+              <p>
+                Haz clic en el botón <strong>"Procesar con IA"</strong> en el panel de la izquierda para extraer automáticamente todas las filas de la clasificación utilizando Gemini 1.5 Flash.
+              </p>
+              <button class="btn btn-ai-action" (click)="processWithIA(selectedImport())">
+                <span class="material-icons-outlined">psychology</span>
+                Iniciar Procesamiento por IA
+              </button>
+            </div>
+          } @else {
+            <div class="glass-card editor-card">
+              <div class="editor-card-header">
+                <h3 class="card-section-title">Editor de Filas Extraídas</h3>
+                <button class="btn btn-add-row" (click)="addRow()">
+                  <span class="material-icons-outlined">add</span>
+                  Añadir Fila
+                </button>
+              </div>
+
+              <div class="table-container">
+                <table class="editor-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 80px;">Clase</th>
+                      <th style="width: 70px;">Pos</th>
+                      <th>Perro (Clasificación)</th>
+                      <th>Guía (Clasificación)</th>
+                      <th>Club</th>
+                      <th style="width: 90px;">Puntos</th>
+                      <th>Asociar Perro Local (Asturias)</th>
+                      <th style="width: 50px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of editableRows(); track $index) {
+                      <tr [class.highlight-row]="row.club_nombre === 'ASTURIAS' || row.dog_id">
+                        <td>
+                          <select [(ngModel)]="row.clase" class="table-select">
+                            @for (c of classes; track c) {
+                              <option [value]="c">C{{ c }}</option>
+                            }
+                          </select>
+                        </td>
+                        <td>
+                          <input type="number" [(ngModel)]="row.posicion" class="table-input pos-input" min="1" />
+                        </td>
+                        <td>
+                          <input type="text" [(ngModel)]="row.perro_nombre" class="table-input" placeholder="Perro" />
+                        </td>
+                        <td>
+                          <input type="text" [(ngModel)]="row.guia_nombre" class="table-input" placeholder="Guía" />
+                        </td>
+                        <td>
+                          <input type="text" [(ngModel)]="row.club_nombre" class="table-input" placeholder="Club" />
+                        </td>
+                        <td>
+                          <input type="number" [(ngModel)]="row.puntos_total" class="table-input pts-input" />
+                        </td>
+                        <td>
+                          <select [(ngModel)]="row.dog_id" class="table-select dog-select">
+                            <option [value]="null">-- Ninguno / Otro Club --</option>
+                            @for (dog of clubDogs(); track dog.id) {
+                              <option [value]="dog.id">{{ dog.name }} ({{ getOwnerNames(dog) || 'Sin guía' }})</option>
+                            }
+                          </select>
+                        </td>
+                        <td>
+                          <button class="btn-delete-row" (click)="removeRow($index)" title="Eliminar fila">
+                            <span class="material-icons-outlined">delete_outline</span>
+                          </button>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              @if (editableRows().length === 0) {
+                <div class="empty-rows">
+                  <p>No hay filas extraídas en esta clasificación.</p>
+                  <button class="btn btn-secondary" (click)="addRow()">Añadir primera fila</button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

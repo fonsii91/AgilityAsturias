@@ -108,6 +108,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Monitor de Scraping' }
     },
     {
+        path: 'admin/liga-norte',
+        loadComponent: () => import('./components/admin-liga-norte/admin-liga-norte').then(m => m.AdminLigaNorteComponent),
+        canActivate: [staffGuard],
+        title: titleResolver, data: { pageTitle: 'Administrar Liga Norte' }
+    },
+    {
         path: 'admin/avatares',
         loadComponent: () => import('./components/admin-avatares/admin-avatares').then(m => m.AdminAvataresComponent),
         canActivate: [adminGuard],
@@ -283,6 +289,12 @@ export const routes: Routes = [
         loadComponent: () => import('./components/explorar/seguimiento-provisional/seguimiento-provisional').then(m => m.SeguimientoProvisionalComponent),
         canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: 'Seguimiento Provisional' }
+    },
+    {
+        path: 'explorar/liga-norte',
+        loadComponent: () => import('./components/clasificacion-liga-norte/clasificacion-liga-norte').then(m => m.ClasificacionLigaNorteComponent),
+        canActivate: [memberGuard],
+        title: titleResolver, data: { pageTitle: 'Clasificación Liga Norte' }
     },
 
     {

@@ -3,7 +3,8 @@
     "version": "1.1.42",
     "date": "2026-05-22",
     "features": [
-      "¡Creación de competiciones más rápida! A partir de ahora, al añadir un nuevo evento para el club, si pegas un enlace de FlowAgility o buscas el evento por su nombre, la plataforma rellenará automáticamente todos los campos del formulario (fechas, lugar, federación y juez). ¡Menos papeleo y más comodidad para organizar el calendario de tu club!"
+      "¡Creación de competiciones más rápida! A partir de ahora, al añadir un nuevo evento para el club, si pegas un enlace de FlowAgility o buscas el evento por su nombre, la plataforma rellenará automáticamente todos los campos del formulario (fechas, lugar, federación y juez). ¡Menos papeleo y más comodidad para organizar el calendario de tu club!",
+      "¡Nueva sección de Clasificación de la Liga Norte! Ya puedes consultar de manera cómoda y directa la clasificación actual de la Liga Norte desde la sección 'Explorar'. Las clasificaciones están organizadas por alturas (30, 40, 50 y 60) y destacamos en color verde con un distintivo a los binomios de nuestro club. Si el perro está registrado en la app, podrás pulsar sobre su nombre para abrir directamente su ficha de perfil."
     ],
     "bugfixes": [
       "Hemos optimizado la búsqueda y actualización automática del calendario de pruebas federadas para que esté siempre al día."

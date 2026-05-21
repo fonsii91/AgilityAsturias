@@ -102,3 +102,6 @@ Schedule::command('flowagility:scrape')->dailyAt('04:00')->timezone('Europe/Madr
 // Scrape FlowAgility calendar for upcoming events (RSCE/RFEC)
 Schedule::command('flowagility:scrape-calendar')->dailyAt('03:00')->timezone('Europe/Madrid');
 
+// Scrape Telegram Liga Norte channel for classification images
+Schedule::command('liganorte:scrape-telegram')->dailyAt('04:30')->timezone('Europe/Madrid');
+

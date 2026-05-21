@@ -16,6 +16,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\RsceTrackController;
 use App\Http\Controllers\RfecTrackController;
 use App\Http\Controllers\PersonalEventController;
+use App\Http\Controllers\LigaNorteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -106,6 +107,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/videos/daily-history', [VideoController::class, 'dailyHistory']);
         Route::get('/admin/deleted-videos', [VideoController::class, 'deletedHistory']);
         Route::post('/admin/videos/{id}/retry', [VideoController::class, 'retryUpload']);
+
+        // Liga Norte
+        Route::get('/admin/liga-norte/imports', [LigaNorteController::class, 'listImports']);
+        Route::post('/admin/liga-norte/imports/{id}/process', [LigaNorteController::class, 'processImport']);
+        Route::post('/admin/liga-norte/imports/{id}/approve', [LigaNorteController::class, 'approveImport']);
+        Route::post('/admin/liga-norte/imports/{id}/delete', [LigaNorteController::class, 'deleteImport']);
 
     });
 
@@ -244,6 +251,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Scraper Tracks for members
         Route::get('/scraper/last-tracks', [CompetitionController::class, 'memberScraperLastTracks']);
+
+        // Liga Norte Public Standings
+        Route::get('/liga-norte/standings', [LigaNorteController::class, 'getStandings']);
     });
 
 
