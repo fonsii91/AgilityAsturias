@@ -95,3 +95,6 @@ Schedule::call(function () {
 // Database Backups (Local via Spatie)
 Schedule::command('backup:clean')->dailyAt('04:30')->timezone('Europe/Madrid');
 Schedule::command('backup:run --only-db')->dailyAt('05:00')->timezone('Europe/Madrid');
+
+// Scrape FlowAgility results for closed/finished events
+Schedule::command('flowagility:scrape')->dailyAt('04:00')->timezone('Europe/Madrid');

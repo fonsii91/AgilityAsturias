@@ -339,7 +339,10 @@ class ScrapeFlowAgility extends Command
         foreach ($competitions as $comp) {
             $compUrl = $this->normalizeUrl($comp->enlace);
             if (in_array($compUrl, $seenUrls)) {
-                $comp->results_scraped = true;
+                $endDate = $comp->fecha_fin_evento ?: $comp->fecha_evento;
+                $isFinished = $endDate ? (now()->toDateString() > $endDate) : true;
+
+                $comp->results_scraped = $isFinished;
                 $comp->scrape_status = 'success';
                 $comp->scrape_error = null;
                 $comp->scraped_at = now();

@@ -293,4 +293,71 @@ class FlowAgilityScraperTest extends TestCase
         $this->assertEquals(1, $workload->number_of_runs);
         $this->assertTrue((bool)$workload->is_staff_verified);
     }
+
+    public function test_scraper_does_not_set_results_scraped_for_ongoing_events()
+    {
+        // Ongoing competition (starts today, ends in 2 days)
+        $comp = Competition::forceCreate([
+            'club_id' => $this->club->id,
+            'nombre' => 'Ongoing Event',
+            'fecha_evento' => Carbon::now()->toDateString(),
+            'fecha_fin_evento' => Carbon::now()->addDays(2)->toDateString(),
+            'tipo' => 'competicion',
+            'federacion' => 'RSCE',
+            'enlace' => 'https://www.flowagility.com/zone/events/info/uuid-ongoing',
+            'results_scraped' => false,
+            'scrape_status' => 'pending'
+        ]);
+
+        $user = User::factory()->create(['name' => 'John Doe', 'club_id' => $this->club->id]);
+        $dog = Dog::factory()->create(['name' => 'Luna', 'club_id' => $this->club->id, 'user_id' => $user->id]);
+        $dog->users()->attach($user->id, ['is_primary_owner' => true]);
+
+        $fakeScraperOutput = "RESULT_JSON:" . json_encode([
+            [
+                'eventId' => $comp->id,
+                'dogName' => 'Luna',
+                'handlerName' => 'John Doe',
+                'license' => 'RSCE123',
+                'clubName' => 'Agility Asturias',
+                'position' => '1',
+                'runs' => [
+                    [
+                        'mangaType' => 'Agility',
+                        'time' => '30.22',
+                        'speed' => '5.10',
+                        'faults' => '0',
+                        'refusals' => '0',
+                        'timePenalty' => '0.00',
+                        'totalPenalty' => '0.00',
+                        'qualification' => 'EXC_0',
+                        'judge' => 'Mr. Judge',
+                        'courseLength' => '150',
+                        'standardTime' => '40.00'
+                    ]
+                ]
+            ]
+        ]);
+
+        config(['app.fake_scraper_output' => $fakeScraperOutput]);
+
+        // Run with --force since it's ongoing
+        $this->artisan('flowagility:scrape', ['--force' => true]);
+
+        $comp->refresh();
+        $this->assertEquals('success', $comp->scrape_status);
+        // results_scraped MUST be false because the event is not finished yet
+        $this->assertFalse((bool)$comp->results_scraped);
+
+        // Modify date to the past and run again without force
+        $comp->fecha_fin_evento = Carbon::now()->subDay()->toDateString();
+        $comp->save();
+
+        $this->artisan('flowagility:scrape');
+
+        $comp->refresh();
+        $this->assertEquals('success', $comp->scrape_status);
+        // Now it must be true since the event date is in the past
+        $this->assertTrue((bool)$comp->results_scraped);
+    }
 }
