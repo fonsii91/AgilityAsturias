@@ -73,9 +73,9 @@ class ScrapeFlowAgility extends Command
                 return 1;
             }
             
-            $endDate = $target->fecha_fin_evento ?: $target->fecha_evento;
-            if (now()->toDateString() <= $endDate && !$this->option('force')) {
-                $this->warn("La competición con ID: {$target->id} aún no ha finalizado. Usa --force para forzar.");
+            $startDate = $target->fecha_evento;
+            if (now()->toDateString() < $startDate && !$this->option('force')) {
+                $this->warn("La competición con ID: {$target->id} aún no ha comenzado. Usa --force para forzar.");
                 return 0;
             }
 
@@ -84,17 +84,7 @@ class ScrapeFlowAgility extends Command
             $query = Competition::where('enlace', 'like', '%flowagility.com%');
             if (!$this->option('force')) {
                 $query->where('results_scraped', false);
-                
-                $today = now()->toDateString();
-                $query->where(function ($q) use ($today) {
-                    $q->where(function ($sq) use ($today) {
-                        $sq->whereNotNull('fecha_fin_evento')
-                           ->where('fecha_fin_evento', '<', $today);
-                    })->orWhere(function ($sq) use ($today) {
-                        $sq->whereNull('fecha_fin_evento')
-                           ->where('fecha_evento', '<', $today);
-                    });
-                });
+                $query->where('fecha_evento', '<=', now()->toDateString());
             }
             $competitions = $query->get();
         }

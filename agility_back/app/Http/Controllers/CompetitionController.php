@@ -268,10 +268,10 @@ class CompetitionController extends Controller
             ], 422);
         }
 
-        $endDate = $competition->fecha_fin_evento ?: $competition->fecha_evento;
-        if (now()->toDateString() <= $endDate) {
+        $startDate = $competition->fecha_evento;
+        if (now()->toDateString() < $startDate) {
             return response()->json([
-                'message' => 'No se puede realizar el scraping de una competición que aún no ha finalizado.'
+                'message' => 'No se puede realizar el scraping de una competición que aún no ha comenzado.'
             ], 422);
         }
 

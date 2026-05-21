@@ -83,7 +83,7 @@ class FlowAgilityScraperTest extends TestCase
 
     public function test_admin_run_scraper_validations()
     {
-        // Future/ongoing event (invalid)
+        // Future event (invalid)
         $futureComp = Competition::forceCreate([
             'club_id' => $this->club->id,
             'nombre' => 'Future Event',
@@ -109,7 +109,7 @@ class FlowAgilityScraperTest extends TestCase
         ]);
         $response->assertStatus(422);
         $response->assertJsonFragment([
-            'message' => 'No se puede realizar el scraping de una competición que aún no ha finalizado.'
+            'message' => 'No se puede realizar el scraping de una competición que aún no ha comenzado.'
         ]);
 
         // Invalid link request
