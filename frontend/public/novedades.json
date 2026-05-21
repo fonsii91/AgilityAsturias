@@ -5,6 +5,9 @@
     "features": [
       "¡Nueva herramienta de Seguimiento Provisional! Hemos habilitado un apartado temporal en la sección 'Explorar' para que puedas comprobar las últimas mangas y resultados importados automáticamente de tu club. Para facilitarte la revisión, si tienes perros registrados a tu nombre, verás sus resultados destacados en color verde con el distintivo 'TU PERRO'. ¡Ayúdanos a comprobar que todo esté correcto!",
       "¡Diseño adaptado para móviles! El nuevo Seguimiento Provisional cuenta con un diseño de tarjetas adaptativas que organiza de forma clara todos tus tiempos, velocidades y penalizaciones directamente en la pantalla de tu móvil."
+    ],
+    "bugfixes": [
+      "¡Mejoras en la sincronización de resultados! Hemos optimizado el buscador automático para que detecte correctamente los resultados de las competiciones (como las de FlowAgility), incluso si tu nombre o el de tu perro están registrados con pequeñas variaciones de texto o si se utilizan licencias federativas especiales. ¡Ahora tus mangas se sincronizarán mucho mejor en tu perfil!"
     ]
   },
   {

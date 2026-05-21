@@ -1,6 +1,16 @@
-# Documentación: Arquitectura y Gestión de Vídeos
+# ⚠️ Antigua Gestión de Vídeos (Legacy)
 
-Esta documentación describe a fondo el ciclo de vida, arquitectura y la lógica de gestión de los vídeos en la plataforma Agility Asturias.
+> [!WARNING]
+> **DOCUMENTACIÓN DE SISTEMA DEPRECADO**
+> Este documento describe la forma antigua de gestionar los vídeos en la plataforma (basada en almacenamiento local temporal de 3 días y posterior subida mediante tareas cron a la API de YouTube). 
+> 
+> Esta documentación se conserva únicamente para referencia de los vídeos antiguos que fueron gestionados bajo este flujo. Para conocer la nueva arquitectura y flujo implementado, dirígete a: **[[gestion-videos]]**.
+
+---
+
+# Documentación: Arquitectura y Gestión de Vídeos (Legacy)
+
+Esta documentación describe a fondo el ciclo de vida, arquitectura y la lógica de gestión de los vídeos en la plataforma ClubAgility.
 
 ## 1. Subida y Almacenamiento Local (El Inicio)
 Cuando un usuario sube un vídeo desde la plataforma (`upload-video`), ocurre lo siguiente:

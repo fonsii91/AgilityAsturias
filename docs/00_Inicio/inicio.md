@@ -23,12 +23,13 @@ Modelos de monetización, suscripciones SaaS y estrategias comerciales.
 Bases técnicas, seguridad, infraestructura y ciclo de vida de los datos.
 *   **[[arquitectura-multi-tenant]]**: Aislamiento hermético de bases de datos por club mediante subdominios y `TenantScope`.
 *   **[[backups-locales]]**: Programación de copias de seguridad de base de datos vía Cron sin dependencias externas.
-*   **[[gestion-videos]]**: Ciclo de vida de los vídeos locales, subida automática en background a YouTube y SmartPlayer.
 
 ### 🔌 04. Integraciones
 Conexiones externas y analítica.
 *   **[[integracion-flowagility]]**: Web scraping con Playwright para Phoenix LiveView e importación de competiciones y marcas.
 *   **[[estrategia-analytics]]**: Plan de implantación de Google Analytics 4 (GA4) y cumplimiento estricto del GDPR (Consent Mode v2).
+*   **[[gestion-videos]]**: Nueva especificación y flujo para la gestión de vídeos en la plataforma.
+*   **[[antigua-gestion-videos]]**: Legacy de gestión de vídeos (subida local temporal y CRON diario a la API de YouTube).
 
 ### 🎨 05. Diseño y UX/UI
 Reglas de interfaz orientadas al usuario final a pie de pista.

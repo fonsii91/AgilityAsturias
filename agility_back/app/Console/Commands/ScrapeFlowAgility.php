@@ -169,6 +169,8 @@ class ScrapeFlowAgility extends Command
 
         $this->info("Se obtuvieron " . count($results) . " registros de competidores. Sincronizando con BD...");
 
+        $allUsers = User::with('dogs')->get();
+
         $syncedCount = 0;
         foreach ($results as $item) {
             $scrapedComp = $competitions->firstWhere('id', $item['eventId']);
@@ -176,40 +178,14 @@ class ScrapeFlowAgility extends Command
                 continue;
             }
 
-            // Buscar perro y usuario
-            $dog = null;
-            $user = null;
-
-            // 1. Intentar por licencia RSCE (si existe en dog_user)
-            if (!empty($item['license'])) {
-                $pivot = DB::table('dog_user')->where('rsce_license', $item['license'])->first();
-                if ($pivot) {
-                    $dog = Dog::find($pivot->dog_id);
-                    $user = User::find($pivot->user_id);
-                }
-            }
-
-            // 2. Intentar por licencia RFEC (si existe en users)
-            if (!$dog && !empty($item['license'])) {
-                $matchedUser = User::where('rfec_license', $item['license'])->first();
-                if ($matchedUser) {
-                    $user = $matchedUser;
-                    $dog = $user->dogs()->where('name', 'like', '%' . $item['dogName'] . '%')->first();
-                }
-            }
-
-            // 3. Coincidencia por Nombre de perro y Handler (Búsqueda difusa/fallback)
-            if (!$dog) {
-                $dogs = Dog::where('name', 'like', '%' . $item['dogName'] . '%')->get();
-                foreach ($dogs as $d) {
-                    foreach ($d->users as $u) {
-                        if (stripos($u->name, $item['handlerName']) !== false || stripos($item['handlerName'], $u->name) !== false) {
-                            $dog = $d;
-                            $user = $u;
-                            break 2;
-                        }
-                    }
-                }
+            // Buscar perro y usuario usando coincidencia difusa en memoria (para manejar campos encriptados)
+            $match = $this->findMatch($item['dogName'], $item['handlerName'], $item['license'], $allUsers);
+            if ($match) {
+                $dog = $match[0];
+                $user = $match[1];
+            } else {
+                $dog = null;
+                $user = null;
             }
 
             if (!$dog || !$user) {
@@ -449,6 +425,135 @@ class ScrapeFlowAgility extends Command
             }
             return 'ELIM';
         }
+    }
+
+    /**
+     * Busca la coincidencia de un perro y usuario basándose en licencias (RSCE y RFEC) y coincidencia difusa de nombres.
+     */
+    private function findMatch($scrapedDogName, $scrapedHandlerName, $scrapedLicense, $users)
+    {
+        $scrapedLicense = trim(strtolower($scrapedLicense));
+        $scrapedDogNameClean = trim(strtolower($scrapedDogName));
+        $scrapedHandlerNameClean = trim(strtolower($scrapedHandlerName));
+
+        $normalize = function($str) {
+            $str = strtolower(trim($str));
+            $unwanted_array = array(
+                'á'=>'a', 'é'=>'e', 'í'=>'i', 'ó'=>'o', 'ú'=>'u', 'ü'=>'u',
+                'ñ'=>'n', 'ç'=>'c', 'à'=>'a', 'è'=>'e', 'ì'=>'i', 'ò'=>'o', 'ù'=>'u'
+            );
+            $str = strtr($str, $unwanted_array);
+            return preg_replace('/[^a-z0-9]/', '', $str);
+        };
+
+        $scrapedDogNorm = $normalize($scrapedDogNameClean);
+        $scrapedHandlerNorm = $normalize($scrapedHandlerNameClean);
+
+        $bestMatch = null;
+        $bestScore = 0;
+
+        foreach ($users as $user) {
+            $userRfec = trim(strtolower($user->rfec_license ?? ''));
+            $userNameNorm = $normalize($user->name);
+
+            // Dividir nombres en palabras para coincidencias por palabras individuales
+            $userWords = array_filter(explode(' ', strtolower(preg_replace('/[^a-z ]/', '', strtr($user->name, array('á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ñ'=>'n'))))), function($w) {
+                return strlen($w) >= 3;
+            });
+            $handlerWords = array_filter(explode(' ', strtolower(preg_replace('/[^a-z ]/', '', strtr($scrapedHandlerName, array('á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ñ'=>'n'))))), function($w) {
+                return strlen($w) >= 3;
+            });
+
+            $hasWordMatch = false;
+            foreach ($userWords as $uw) {
+                foreach ($handlerWords as $hw) {
+                    if ($uw === $hw || stripos($uw, $hw) !== false || stripos($hw, $uw) !== false) {
+                        $hasWordMatch = true;
+                        break 2;
+                    }
+                }
+            }
+            
+            if (!$hasWordMatch) {
+                if (stripos($scrapedHandlerName, $user->name) !== false || stripos($user->name, $scrapedHandlerName) !== false) {
+                    $hasWordMatch = true;
+                }
+            }
+            
+            if (!$hasWordMatch) {
+                if ($userNameNorm === 'mada' && stripos($scrapedHandlerNorm, 'magdalena') !== false) {
+                    $hasWordMatch = true;
+                }
+            }
+
+            foreach ($user->dogs as $dog) {
+                $dogNameNorm = $normalize($dog->name);
+                
+                $dogRsce = '';
+                if ($dog->pivot && !empty($dog->pivot->rsce_license)) {
+                    $dogRsce = trim(strtolower($dog->pivot->rsce_license));
+                }
+
+                $score = 0;
+
+                // 1. Verificar licencias
+                $licenseMatch = false;
+                if (!empty($scrapedLicense) && $scrapedLicense !== '000009999999' && $scrapedLicense !== 'no calificado') {
+                    if ($scrapedLicense === $dogRsce) {
+                        $licenseMatch = true;
+                        $score += 100;
+                    }
+                    if ($scrapedLicense === $userRfec) {
+                        $licenseMatch = true;
+                        $score += 80;
+                    }
+                }
+
+                // 2. Verificar nombre de perro
+                $dogNameMatch = false;
+                $lev = levenshtein($scrapedDogNorm, $dogNameNorm);
+                if ($scrapedDogNorm === $dogNameNorm) {
+                    $dogNameMatch = true;
+                    $score += 50;
+                } elseif (str_starts_with($dogNameNorm, $scrapedDogNorm) || str_starts_with($scrapedDogNorm, $dogNameNorm)) {
+                    $dogNameMatch = true;
+                    $score += 40;
+                } elseif (stripos($dogNameNorm, $scrapedDogNorm) !== false || stripos($scrapedDogNorm, $dogNameNorm) !== false) {
+                    $dogNameMatch = true;
+                    $score += 30;
+                } elseif ($lev <= 3) {
+                    $dogNameMatch = true;
+                    $score += 20;
+                }
+
+                // 3. Verificar nombre del guía
+                $handlerMatch = false;
+                if ($scrapedHandlerNorm === $userNameNorm) {
+                    $handlerMatch = true;
+                    $score += 50;
+                } elseif ($hasWordMatch) {
+                    $handlerMatch = true;
+                    $score += 30;
+                }
+
+                $isCandidate = false;
+                if ($licenseMatch && $dogNameMatch) {
+                    $isCandidate = true;
+                } elseif ($licenseMatch && count($user->dogs) === 1) {
+                    $isCandidate = true;
+                    $score += 10;
+                } elseif ($dogNameMatch && $handlerMatch) {
+                    $isCandidate = true;
+                }
+
+                if ($isCandidate && $score > $bestScore) {
+                    $bestScore = $score;
+                    $bestMatch = [$dog, $user];
+                }
+            }
+        }
+
+        return $bestMatch;
     }
 
     /**
