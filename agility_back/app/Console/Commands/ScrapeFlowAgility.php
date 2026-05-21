@@ -340,7 +340,33 @@ class ScrapeFlowAgility extends Command
             $compUrl = $this->normalizeUrl($comp->enlace);
             if (in_array($compUrl, $seenUrls)) {
                 $endDate = $comp->fecha_fin_evento ?: $comp->fecha_evento;
-                $isFinished = $endDate ? (now()->toDateString() > $endDate) : true;
+                
+                if (!$endDate) {
+                    $isFinished = true;
+                } else {
+                    $today = now()->toDateString();
+                    if ($today > $endDate) {
+                        // Buscar si tenemos resultados del último día de la competición
+                        $hasLastDayResults = false;
+                        foreach ($results as $item) {
+                            if ($item['eventId'] == $comp->id && isset($item['runDate']) && $item['runDate'] === $endDate) {
+                                $hasLastDayResults = true;
+                                break;
+                            }
+                        }
+
+                        if ($hasLastDayResults) {
+                            $isFinished = true;
+                        } else {
+                            // Dar un margen de gracia de 3 días tras el fin del evento antes de darlo por cerrado definitivamente
+                            $limitDate = Carbon::parse($endDate)->addDays(3)->toDateString();
+                            $isFinished = $today > $limitDate;
+                        }
+                    } else {
+                        // El evento aún no ha finalizado
+                        $isFinished = false;
+                    }
+                }
 
                 $comp->results_scraped = $isFinished;
                 $comp->scrape_status = 'success';

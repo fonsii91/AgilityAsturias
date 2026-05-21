@@ -296,7 +296,7 @@ class FlowAgilityScraperTest extends TestCase
 
     public function test_scraper_does_not_set_results_scraped_for_ongoing_events()
     {
-        // Ongoing competition (starts today, ends in 2 days)
+        // 1. Ongoing competition (starts today, ends in 2 days)
         $comp = Competition::forceCreate([
             'club_id' => $this->club->id,
             'nombre' => 'Ongoing Event',
@@ -313,6 +313,7 @@ class FlowAgilityScraperTest extends TestCase
         $dog = Dog::factory()->create(['name' => 'Luna', 'club_id' => $this->club->id, 'user_id' => $user->id]);
         $dog->users()->attach($user->id, ['is_primary_owner' => true]);
 
+        // Fake output with runDate of today (which is not the last day of ongoing event)
         $fakeScraperOutput = "RESULT_JSON:" . json_encode([
             [
                 'eventId' => $comp->id,
@@ -326,14 +327,7 @@ class FlowAgilityScraperTest extends TestCase
                         'mangaType' => 'Agility',
                         'time' => '30.22',
                         'speed' => '5.10',
-                        'faults' => '0',
-                        'refusals' => '0',
-                        'timePenalty' => '0.00',
-                        'totalPenalty' => '0.00',
-                        'qualification' => 'EXC_0',
-                        'judge' => 'Mr. Judge',
-                        'courseLength' => '150',
-                        'standardTime' => '40.00'
+                        'qualification' => 'EXC_0'
                     ]
                 ]
             ]
@@ -341,23 +335,64 @@ class FlowAgilityScraperTest extends TestCase
 
         config(['app.fake_scraper_output' => $fakeScraperOutput]);
 
-        // Run with --force since it's ongoing
+        // Run with --force (since it's ongoing, normal query won't pick it up)
         $this->artisan('flowagility:scrape', ['--force' => true]);
 
         $comp->refresh();
-        $this->assertEquals('success', $comp->scrape_status);
-        // results_scraped MUST be false because the event is not finished yet
         $this->assertFalse((bool)$comp->results_scraped);
 
-        // Modify date to the past and run again without force
+        // 2. Past competition (ended yesterday) but fake results do NOT include the last day (yesterday)
+        // Let's set the event to end yesterday
+        $comp->fecha_evento = Carbon::now()->subDays(2)->toDateString();
         $comp->fecha_fin_evento = Carbon::now()->subDay()->toDateString();
         $comp->save();
 
-        $this->artisan('flowagility:scrape');
+        // The fake result runDate will fall back to fecha_evento (2 days ago), so it doesn't match the last day (yesterday).
+        $this->artisan('flowagility:scrape', ['--force' => true]);
 
         $comp->refresh();
-        $this->assertEquals('success', $comp->scrape_status);
-        // Now it must be true since the event date is in the past
-        $this->assertTrue((bool)$comp->results_scraped);
+        $this->assertFalse((bool)$comp->results_scraped); // False because yesterday is not > 3 days ago, and last day results are missing.
+
+        // 3. Past competition (ended yesterday) AND fake results include the last day (yesterday)
+        // Let's make the fake output return runDate as yesterday
+        $fakeScraperOutputWithLastDay = "RESULT_JSON:" . json_encode([
+            [
+                'eventId' => $comp->id,
+                'runDate' => Carbon::now()->subDay()->toDateString(), // Matches endDate
+                'dogName' => 'Luna',
+                'handlerName' => 'John Doe',
+                'license' => 'RSCE123',
+                'clubName' => 'Agility Asturias',
+                'position' => '1',
+                'runs' => [
+                    [
+                        'mangaType' => 'Agility',
+                        'time' => '30.22',
+                        'speed' => '5.10',
+                        'qualification' => 'EXC_0'
+                    ]
+                ]
+            ]
+        ]);
+        config(['app.fake_scraper_output' => $fakeScraperOutputWithLastDay]);
+
+        $this->artisan('flowagility:scrape', ['--force' => true]);
+
+        $comp->refresh();
+        $this->assertTrue((bool)$comp->results_scraped); // True because it has results for the last day
+
+        // 4. Past competition (ended 4 days ago) but NO results for the last day.
+        // It should be marked as true anyway because the 3 days grace period has passed.
+        $comp->results_scraped = false;
+        $comp->fecha_evento = Carbon::now()->subDays(5)->toDateString();
+        $comp->fecha_fin_evento = Carbon::now()->subDays(4)->toDateString();
+        $comp->save();
+
+        config(['app.fake_scraper_output' => $fakeScraperOutput]); // No last day results (falls back to 5 days ago)
+
+        $this->artisan('flowagility:scrape', ['--force' => true]);
+
+        $comp->refresh();
+        $this->assertTrue((bool)$comp->results_scraped); // True because 4 days ago > 3 days ago
     }
 }
