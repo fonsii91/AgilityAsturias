@@ -75,7 +75,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### Backend (PHPUnit / Pest)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/PasswordResetTest.php`
-- **Descripción:** Se probó el endpoint `/api/users/{id}/generate-reset-link` asegurando que sólo administradores y staff pueden generar tokens. También se validó `/api/reset-password` para comprobar que el cambio de contraseña funciona con tokens válidos, longitud mínima de clave y coincidencia de confirmación.
+- **Descripción:** Se probó el endpoint `/api/users/{id}/generate-reset-link` asegurando que sólo los Responsables del Club y el staff pueden generar tokens. También se validó `/api/reset-password` para comprobar que el cambio de contraseña funciona con tokens válidos, longitud mínima de clave y coincidencia de confirmación.
 
 ### Frontend (Vitest + Angular TestBed)
 - **Archivos Modificados/Creados:**
@@ -85,7 +85,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### End-to-End (Playwright)
 - **Archivos Modificados/Creados:**
   - `frontend/e2e/tests/password-reset.spec.ts`
-- **Descripción:** Test E2E que inicia sesión como administrador, genera el enlace mediante petición API, y después navega al enlace de recuperación para usar el formulario y resetear la contraseña del usuario `member@agility.com`. Se verificó el flujo de éxito y también el de error con un token no válido.
+- **Descripción:** Test E2E que inicia sesión como Responsable del Club, genera el enlace mediante petición API, y después navega al enlace de recuperación para usar el formulario y resetear la contraseña del usuario `member@agility.com`. Se verificó el flujo de éxito y también el de error con un token no válido.
 
 ---
 
@@ -256,7 +256,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/SuggestionTest.php`
   - `agility_back/database/factories/SuggestionFactory.php`
-- **Descripción:** Se testeó la funcionalidad completa del CRUD de sugerencias, verificando que un miembro pueda crear un ticket y envíe notificaciones a los administradores. Además, se validó el soporte Multi-Tenant limitando la lectura y resolución de tickets a los administradores de su propio club y asegurando que usuarios normales reciban error 403 al intentar acceder a las rutas de admin.
+- **Descripción:** Se testeó la funcionalidad completa del CRUD de sugerencias, verificando que un miembro pueda crear un ticket y envíe notificaciones a los responsables. Además, se validó el soporte Multi-Tenant limitando la lectura y resolución de tickets a los responsables de su propio club y asegurando que usuarios normales reciban error 403 al intentar acceder a las rutas de admin.
 
 ### Frontend (Vitest + Angular TestBed)
 - **Archivos Modificados/Creados:**
@@ -360,7 +360,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
   - `agility_back/tests/Feature/RankingTest.php`
   - `agility_back/tests/Feature/RsceTrackTest.php`
   - `agility_back/database/factories/RsceTrackFactory.php`
-- **Descripción:** Se validó que el endpoint del ranking devuelva los datos con la posición actualizada y la indicación de variaciones ("NEW", o el cálculo del cambio) según las reglas de reservas recientes, y que filtre correctamente los perros con 0 puntos. También se probó exhaustivamente el CRUD de la bitácora RSCE (`RsceTrack`), garantizando que los dueños solo puedan modificar sus propios perros, y el endpoint de monitoreo RSCE reservado solo a administradores.
+- **Descripción:** Se validó que el endpoint del ranking devuelva los datos con la posición actualizada y la indicación de variaciones ("NEW", o el cálculo del cambio) según las reglas de reservas recientes, y que filtre correctamente los perros con 0 puntos. También se probó exhaustivamente el CRUD de la bitácora RSCE (`RsceTrack`), garantizando que los dueños solo puedan modificar sus propios perros, y el endpoint de monitoreo RSCE reservado solo al Administrador Global.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -404,7 +404,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### Backend (PHPUnit)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/StaffReservationMonitorTest.php`
-- **Descripción:** Se validó el endpoint `/api/reservations` para roles de Staff y Administrador, asegurando que devuelva un listado global de todas las reservas activas (ignorando las canceladas). También se verificó la correcta inyección del campo computado `acwr_color` para el estado de salud de cada perro, y se comprobó que un usuario normal siga recibiendo solo sus propias reservas desde el mismo endpoint como fallback.
+- **Descripción:** Se validó el endpoint `/api/reservations` para roles de Staff y Responsable del Club, asegurando que devuelva un listado global de todas las reservas activas (ignorando las canceladas). También se verificó la correcta inyección del campo computado `acwr_color` para el estado de salud de cada perro, y se comprobó que un usuario normal siga recibiendo solo sus propias reservas desde el mismo endpoint como fallback.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -423,7 +423,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### Backend (PHPUnit)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/CompetitionCrudTest.php`
-- **Descripción:** Se validó el endpoint `/api/competitions` para las operaciones CRUD completas sobre las competiciones, asegurando que un administrador o staff pueda crear, editar y eliminar eventos, y bloqueando el acceso a miembros. Se verificó el almacenamiento exitoso y los códigos HTTP 201, 200 y 204.
+- **Descripción:** Se validó el endpoint `/api/competitions` para las operaciones CRUD completas sobre las competiciones, asegurando que el Responsable del Club o el staff puedan crear, editar y eliminar eventos, y bloqueando el acceso a miembros. Se verificó el almacenamiento exitoso y los códigos HTTP 201, 200 y 204.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -461,7 +461,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### Backend (PHPUnit / Pest)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/AnnouncementControllerTest.php` (Ya existente, cubría también la parte del miembro)
-- **Descripción:** Se validó que los administradores y staff puedan crear anuncios, y que se despachen correctamente notificaciones al crear el anuncio (`Notification::assertSentTo`), además de proteger las rutas de borrado/creación frente a usuarios regulares.
+- **Descripción:** Se validó que los Responsables del Club y el staff puedan crear anuncios, y que se despachen correctamente notificaciones al crear el anuncio (`Notification::assertSentTo`), además de proteger las rutas de borrado/creación frente a usuarios regulares.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -482,7 +482,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/UserManagementTest.php`
   - `agility_back/app/Http/Controllers/AuthController.php` (Solución para herencia y protección `user_id` en borrados en cascada)
-- **Descripción:** Se validó el endpoint `/api/users` para listar usuarios con protección de roles (admin/staff). También se probaron exhaustivamente las actualizaciones de roles (validando que el staff no pueda asignar/modificar administradores) y las operaciones de eliminación, asegurando que los perros compartidos no se eliminen si su dueño principal es eliminado.
+- **Descripción:** Se validó el endpoint `/api/users` para listar usuarios con protección de roles (Responsable/staff). También se probaron exhaustivamente las actualizaciones de roles (validando que el staff no pueda asignar/modificar a Responsables del Club) y las operaciones de eliminación, asegurando que los perros compartidos no se eliminen si su dueño principal es eliminado.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -501,7 +501,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### Backend (PHPUnit)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/ResourceControllerTest.php`
-- **Descripción:** Se testeó la funcionalidad de listar, crear y borrar recursos (documentos, vídeos, enlaces). Se validó que solo administradores o staff pueden crear y borrar, y se probó la subida de archivos utilizando `Storage::fake`.
+- **Descripción:** Se testeó la funcionalidad de listar, crear y borrar recursos (documentos, vídeos, enlaces). Se validó que solo los Responsables del Club o el staff pueden crear y borrar, y se probó la subida de archivos utilizando `Storage::fake`.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -521,7 +521,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### Backend (PHPUnit)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/VideoModerationTest.php`
-- **Descripción:** Se validó el endpoint `/api/videos/{id}/toggle-public-gallery` asegurando que los roles de Administrador y Staff pueden modificar la visibilidad de los vídeos en la galería pública mediante el atributo `in_public_gallery`. También se aseguró que los miembros regulares reciban un error 403 al intentar acceder a esta funcionalidad.
+- **Descripción:** Se validó el endpoint `/api/videos/{id}/toggle-public-gallery` asegurando que los roles de Responsable del Club y Staff pueden modificar la visibilidad de los vídeos en la galería pública mediante el atributo `in_public_gallery`. También se aseguró que los miembros regulares reciban un error 403 al intentar acceder a esta funcionalidad.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -541,7 +541,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### Backend (PHPUnit)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/ExtraPointsTest.php`
-- **Descripción:** Se testeó la funcionalidad para que Administradores y Staff puedan asignar (o restar) puntos extra manualmente a un perro. Se validó la restricción para que los miembros normales no puedan usar este endpoint. También se validaron las reglas de negocio (mínimo -3, máximo 3, no cero, categoría requerida) y el envío de notificaciones (`DogExtraPointNotification`) al dueño del perro.
+- **Descripción:** Se testeó la funcionalidad para que los Responsables del Club y el Staff puedan asignar (o restar) puntos extra manualmente a un perro. Se validó la restricción para que los miembros normales no puedan usar este endpoint. También se validaron las reglas de negocio (mínimo -3, máximo 3, no cero, categoría requerida) y el envío de notificaciones (`DogExtraPointNotification`) al dueño del perro.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -570,7 +570,7 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 
 ---
 
-## 27. Gestión Global y Monitorización Avanzada (Administrador) - Panel de Usuarios
+## 27. Gestión Global y Monitorización Avanzada (Administrador Global) - Panel de Usuarios
 **Fecha:** 30/04/2026
 **Capas Cubiertas:** Frontend y Backend
 
@@ -583,21 +583,21 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
   - `frontend/src/app/components/admin-usuarios/admin-usuarios.component.spec.ts`
-- **Descripción:** Se testeó la vista exclusiva del Panel de Usuarios para administradores (`AdminUsuariosComponent`), validando la obtención interactiva de todos los usuarios de la plataforma, actualización en vivo de roles con confirmaciones visuales de éxito, manejo de errores y manipulación del zoom de imágenes de perfiles usando inyección de contexto.
+- **Descripción:** Se testeó la vista exclusiva del Panel de Usuarios para el Administrador Global (`AdminUsuariosComponent`), validando la obtención interactiva de todos los usuarios de la plataforma, actualización en vivo de roles con confirmaciones visuales de éxito, manejo de errores y manipulación del zoom de imágenes de perfiles usando inyección de contexto.
 
 ### End-to-End (Playwright)
 - No requerido (Gestión cubierta a fondo en los test unitarios y de integración de la API).
 
 ---
 
-## 28. Gestión Global y Monitorización Avanzada (Administrador) - Gestión Avanzada de Sugerencias
+## 28. Gestión Global y Monitorización Avanzada (Administrador Global) - Gestión Avanzada de Sugerencias
 **Fecha:** 30/04/2026
 **Capas Cubiertas:** Frontend y Backend
 
 ### Backend (PHPUnit / Pest)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/SuggestionTest.php` (Implementado previamente)
-- **Descripción:** Se validó que el administrador pueda listar todas las sugerencias de la plataforma (solo las de su propio club/tenant) y modificar su estado (resolver y des-resolver), comprobando las notificaciones y los fallos de autorización para miembros estándar (Error 403).
+- **Descripción:** Se validó que el Administrador Global pueda listar todas las sugerencias de la plataforma (solo las de su propio club/tenant) y modificar su estado (resolver y des-resolver), comprobando las notificaciones y los fallos de autorización para miembros estándar (Error 403).
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
@@ -609,52 +609,52 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 
 ---
 
-## 29. Gestión Global y Monitorización Avanzada (Administrador) - Monitorización de Salud (ACWR Global)
+## 29. Gestión Global y Monitorización Avanzada (Administrador Global) - Monitorización de Salud (ACWR Global)
 **Fecha:** 30/04/2026
 **Capas Cubiertas:** Frontend y Backend
 
 ### Backend (PHPUnit / Pest)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/DogWorkloadTest.php`
-- **Descripción:** Se testeó exhaustivamente el endpoint `/api/admin/salud/monitor`. Se validó que el administrador pueda obtener las estadísticas globales de salud de los últimos 28 días, comprobando que se sumen correctamente las métricas (cargas manuales vs automáticas) y que los resultados se devuelvan agrupados por usuario (dueño de los perros). Además, se validó la protección de la ruta, asegurando que los miembros estándar reciban error 403 (Forbidden) al intentar acceder.
+- **Descripción:** Se testeó exhaustivamente el endpoint `/api/admin/salud/monitor`. Se validó que el Administrador Global pueda obtener las estadísticas globales de salud de los últimos 28 días, comprobando que se sumen correctamente las métricas (cargas manuales vs automáticas) y que los resultados se devuelvan agrupados por usuario (dueño de los perros). Además, se validó la protección de la ruta, asegurando que los miembros estándar reciban error 403 (Forbidden) al intentar acceder.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
   - `frontend/src/app/components/admin-salud-monitor/admin-salud-monitor.spec.ts`
-- **Descripción:** Se testeó la vista exclusiva del panel de Monitorización de Salud para administradores (`AdminSaludMonitorComponent`), comprobando la obtención correcta del listado de métricas (cargas totales y perros del usuario), el control de la carga inicial (`isLoading`) y el robusto manejo de errores de red (alertas dinámicas `Toast`) utilizando `runInInjectionContext` y emulando `DogWorkloadService`.
+- **Descripción:** Se testeó la vista exclusiva del panel de Monitorización de Salud para el Administrador Global (`AdminSaludMonitorComponent`), comprobando la obtención correcta del listado de métricas (cargas totales y perros del usuario), el control de la carga inicial (`isLoading`) y el robusto manejo de errores de red (alertas dinámicas `Toast`) utilizando `runInInjectionContext` y emulando `DogWorkloadService`.
 
 ### End-to-End (Playwright)
 - No requerido (Dashboard estático de monitorización validado de manera completa en unitario y capa de red).
 
 ---
 
-## 30. Gestión Global y Monitorización Avanzada (Administrador) - Monitorización RSCE (Licencias y Pistas)
+## 30. Gestión Global y Monitorización Avanzada (Administrador Global) - Monitorización RSCE (Licencias y Pistas)
 **Fecha:** 30/04/2026
 **Capas Cubiertas:** Frontend y Backend
 
 ### Backend (PHPUnit / Pest)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/RsceTrackTest.php`
-- **Descripción:** Se testeó exhaustivamente el endpoint `/api/admin/rsce/monitor`. Se validó que el administrador pueda obtener las estadísticas globales de pistas RSCE, comprobando que se devuelvan los totales de pistas por usuario y listas de perros, y se validó la protección de la ruta, asegurando que los miembros estándar reciban error 403 (Forbidden) al intentar acceder.
+- **Descripción:** Se testeó exhaustivamente el endpoint `/api/admin/rsce/monitor`. Se validó que el Administrador Global pueda obtener las estadísticas globales de pistas RSCE, comprobando que se devuelvan los totales de pistas por usuario y listas de perros, y se validó la protección de la ruta, asegurando que los miembros estándar reciban error 403 (Forbidden) al intentar acceder.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**
   - `frontend/src/app/components/admin-rsce-monitor/admin-rsce-monitor.spec.ts`
-- **Descripción:** Se creó la prueba unitaria exclusiva del panel de Monitorización RSCE para administradores (`AdminRsceMonitorComponent`), comprobando la obtención correcta del listado de pistas RSCE y la carga inicial (`isLoading`), además del robusto manejo de errores de red utilizando inyección de contexto manual (`runInInjectionContext`) y emulando `RsceTrackService`.
+- **Descripción:** Se creó la prueba unitaria exclusiva del panel de Monitorización RSCE para el Administrador Global (`AdminRsceMonitorComponent`), comprobando la obtención correcta del listado de pistas RSCE y la carga inicial (`isLoading`), además del robusto manejo de errores de red utilizando inyección de contexto manual (`runInInjectionContext`) y emulando `RsceTrackService`.
 
 ### End-to-End (Playwright)
 - No requerido (Dashboard estático validado completamente a nivel de componentes aislados y de red).
 
 ---
 
-## 31. Gestión Global y Monitorización Avanzada (Administrador) - Revisar Vídeos
+## 31. Gestión Global y Monitorización Avanzada (Administrador Global) - Revisar Vídeos
 **Fecha:** 30/04/2026
 **Capas Cubiertas:** Frontend y Backend
 
 ### Backend (PHPUnit / Pest)
 - **Archivos Modificados/Creados:**
   - `agility_back/tests/Feature/AdminVideoStatsTest.php`
-- **Descripción:** Se validaron los endpoints para listar estadísticas globales de vídeos, historial de subidas diarias y paginación de vídeos eliminados. Se garantizó que los endpoints solo puedan ser accedidos por el rol de administrador y el rol de staff, y se validó el reintento de subida a YouTube de vídeos fallidos.
+- **Descripción:** Se validaron los endpoints para listar estadísticas globales de vídeos, historial de subidas diarias y paginación de vídeos eliminados. Se garantizó que los endpoints solo puedan ser accedidos por el rol de Administrador Global y el rol de staff, y se validó el reintento de subida a YouTube de vídeos fallidos.
 
 ### Frontend (Vitest + Angular)
 - **Archivos Modificados/Creados:**

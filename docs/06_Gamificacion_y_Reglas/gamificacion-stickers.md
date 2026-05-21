@@ -158,7 +158,7 @@ No descubierto → Pixelado fuerte → Pixelado suave → Nítido completo
 - Los usuarios pueden conseguir stickers principalmente mediante cofres.
 - Los cofres se ganan por acciones positivas dentro del club o de la aplicación.
 - Importante: se consiguen solo cuando la gamificación de stickers está activa
-- Ejemplos de acciones que pueden dar cofres:
+- Ejemplos de acciones que pueden dar cofres (ver detalle en [[funcionalidades]]):
     - Asistir a clase.
     - Asistir a eventos.
     - Recibir puntos extra del staff.
@@ -348,7 +348,7 @@ Los rankings deben tener tono divertido y no excesivamente competitivo.
 
 ## Privacidad y consentimiento
 
-Es imperativo habilitar controles de privacidad dentro del sistema de gamificación. Los administradores del club (y opcionalmente los propietarios) tendrán la capacidad de excluir perros específicos de la colección general si así lo deciden. 
+Es imperativo habilitar controles de privacidad dentro del sistema de gamificación. Los Responsables del Club (y opcionalmente los propietarios) tendrán la capacidad de excluir perros específicos de la colección general si así lo deciden. 
 
 Si un perro se marca como inactivo o se oculta, desaparecerá inmediatamente del álbum y dejará de contabilizar para el número total de stickers de la colección.
 
@@ -378,7 +378,7 @@ Para optimizar el rendimiento y reducir los costes de infraestructura, no se gen
 
 ## Modelo de datos orientativo
 
-Para integrar el sistema de stickers en la base de datos actual de Laravel, se proponen las siguientes modificaciones y nuevas tablas:
+Para integrar el sistema de stickers en la base de datos actual de Laravel, se proponen las siguientes modificaciones y nuevas tablas, respetando los principios de aislamiento definidos en [[arquitectura-multi-tenant]]:
 
 ### 1. Modificaciones a tablas existentes
 
@@ -469,7 +469,7 @@ Recomendaciones:
 - Caducidad de solicitudes.
 - Registro completo de transacciones.
 - Posibilidad de desactivar intercambios por club.
-- Posibilidad de que gestores y staff reviertan o auditen actividad sospechosa.
+- Posibilidad de que los Responsables del Club y el staff reviertan o auditen actividad sospechosa.
 
 ## MVP recomendado
 

@@ -49,7 +49,7 @@ Tras inspeccionar y consultar directamente el sitio de FlowAgility en vivo utili
    - **Paso 3: Listado de Participantes y Whitelist:**
      Al navegar a la URL de resultados de una categoría específica, se renderiza la lista de participantes dentro del contenedor `#results_list`.
      - Cada fila de competidor está contenida en un elemento con un ID de tipo `pset_row_pset_row_component_{uuid}` y tiene un componente `data-phx-component`.
-     - Se puede obtener el nombre del club leyendo el header de la fila (ej. `D20 / Agility Asturias`). Esto nos permite aplicar la **whitelist de clubs** de nuestra BD de forma eficiente antes de proceder a la expansión de detalles.
+     - Se puede obtener el nombre del club leyendo el header de la fila (ej. `D20 / Agility Asturias`). Esto nos permite aplicar la **whitelist de clubs** de nuestra BD de forma eficiente antes de proceder a la expansión de detalles. El alcance multi-tenant y aislamiento de esta lista se detalla en [[arquitectura-multi-tenant]].
    - **Paso 4: Expandir Detalles del Competidor (Métricas de Mangas):**
      Para ver y capturar la información detallada de tiempos, faltas y rehuses, se debe hacer clic en la flecha de expansión del competidor:
      - *Selector:* `div[phx-click="pset_details_show"]` dentro de la fila del participante.
@@ -110,7 +110,7 @@ Analizando la estructura de la base de datos de **AgilityAsturias**, realizaremo
      - *Regla de conversión:* Reemplazar `events/info` por `event` y añadir `/group_runs` al final.
 
 2. **Whitelist de Clubs:**
-   - Para no expandir ni procesar innecesariamente a todos los competidores de la prueba, consultaremos los clubs registrados en nuestra aplicación desde el modelo [Club](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/Club.php) (ej. `Agility Asturias`, etc.).
+   - Para no expandir ni procesar innecesariamente a todos los competidores de la prueba, consultaremos los clubs registrados en nuestra aplicación desde el modelo [Club](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/Club.php) (ej. `Agility Asturias`, etc.). La whitelist respeta el aislamiento por tenant definido en [[arquitectura-multi-tenant]].
    - Solo si el nombre o el slug del club del competidor coincide con nuestra lista, procederemos a desplegar sus detalles.
 
 3. **Asociación del Binomio (Guía y Perro):**
@@ -152,7 +152,7 @@ Podemos aprovechar la información de la sección **Binomial Info** y **Characte
 2. **Altura en cm (`dogs.height_cm`)**: Si el campo `height_cm` es nulo, se rellena con el valor exacto medido en FlowAgility (ej: `53.4`).
 3. **Fecha de Nacimiento Estimada (`dogs.birth_date`)**: Si el perro no tiene registrada su fecha de nacimiento, podemos restar la edad indicada (ej. `6 years` -> restar 6 años a la fecha actual) para guardar un `birth_date` aproximado (ej: `2020-05-20`), permitiendo calcular estadísticas de fatiga y ACWR correctas según grupo de edad.
 4. **Grado y Categoría de Altura (`rsce_grade` / `rsce_category` o `rfec_grade` / `rfec_category`)**: 
-   - El campo `Characteristics` (ej. `INI / 40` o `G1 / 30`) contiene el nivel y rango de altura de salto.
+   - El campo `Characteristics` (ej. `INI / 40` o `G1 / 30`) contiene el nivel y rango de altura de salto. El mapeo de estas categorías de altura y la estructura de grados se realiza conforme a las reglas federativas recogidas en [[normativa-rfec]].
    - Si detectamos que la competición es RSCE, podemos mapear `INI` a `Iniciación` para auto-actualizar `dog_user.rsce_grade`, y `40` como categoría de salto (L).
 5. **Licencia (`rsce_license` / `rfec_license`)**: Si la vinculación en la tabla `dog_user` no posee una licencia registrada, la rellenamos con la licencia federativa extraída de FlowAgility de forma automática.
 
@@ -580,14 +580,14 @@ Comando ejecutable vía `php artisan flowagility:scrape` que gestiona todo el pr
 * **Corrección de Asociación de Licencias**: Garantiza que las licencias de RSCE se actualicen en `dog_user` y las RFEC en la tabla de usuarios (`users`) correctamente.
 * **Mapeo de Nombres de Evento y Jueces**: El campo `location` (Competición) y `judge_name` (Juez) se rellenan automáticamente usando la información de la base de datos local de la competición, garantizando que el historial del perro esté completamente detallado.
 
-## 4. Panel de Monitoreo del Administrador (Frontend y API)
+## 4. Panel de Monitoreo del Administrador Global (Frontend y API)
 * **Endpoints API creados (`RsceTrackController` / `routes/api.php`)**:
   - `GET /api/admin/scraper/status`: Obtiene todas las competiciones finalizadas junto con su estado y error de scraping.
   - `POST /api/admin/scraper/run`: Ejecuta manualmente el comando Artisan para una competición finalizada individual, transmitiendo los logs en vivo del terminal a la API.
 * **Panel de Control Angular (`AdminScraperMonitorComponent`)**:
   - Interfaz de administración premium con tablas de estados, badges de colores semánticos (`Completado`, `Fallido`, `Pendiente`), indicador de fecha de scrapeo y visor de logs de error en modal.
   - Botón para lanzar el scraping individual y visualizador del buffer del terminal (`stdout`/`stderr`) en tiempo real.
-  - Protegido por el guard de administrador y enlazado en el navbar superior de escritorio y menú lateral móvil.
+  - Protegido por el guard de Administrador Global y enlazado en el navbar superior de escritorio y menú lateral móvil.
 
 ## 5. Normalización en la Ficha y Edición de Bitácoras
 * Se ha implementado un normalizador automático en `openEditForm` (`rsce-tracker.component.ts`) y `editTrack` (`rfec-tracker.component.ts`) que mapea de forma inteligente los códigos del scraper (ej: `EXC_0`, `ELIM`, `EXC` o mangas sin números) a las opciones textuales en español del selector.

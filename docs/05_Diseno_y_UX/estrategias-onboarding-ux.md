@@ -12,12 +12,12 @@ En lugar de mostrar un panel de resumen genérico y vacío, el primer inicio de 
 
 ### Progresión de los Tutoriales (Flujo en Cascada)
 Para garantizar que los usuarios con mayores privilegios dominen todas las áreas de la aplicación, los checklists se encadenan de forma secuencial:
-*   **Gestores:** Comienzan con el tutorial de *Gestor*. Al finalizarlo, se activará el de *Staff*, y tras este, completarán el de *Miembro*.
+*   **Responsables del Club:** Comienzan con el tutorial de *Responsable*. Al finalizarlo, se activará el de *Staff*, y tras este, completarán el de *Miembro*.
 *   **Staff:** Comienzan con el tutorial de *Staff* y, al terminar, continúan con el de *Miembro*.
 *   **Miembros:** Únicamente completan el tutorial de *Miembro*.
 
-### A. Dashboard para Gestores (Directiva / Administrador del Club)
-El Gestor es el responsable de inicializar el entorno del club. Su checklist debe centrarse en la configuración base y en abrir las puertas al resto del equipo.
+### A. Dashboard para Responsables del Club (Directiva / Responsable del Club)
+El Responsable del Club es quien se encarga de inicializar el entorno del club. Su checklist debe centrarse en la configuración base y en abrir las puertas al resto del equipo.
 
 *   **Paso 1: Personaliza tu Club.** (Desde configurar club sube el logotipo, el eslogan, las imagenes principales y define los colores corporativos).
 *   **Paso 2: Configura el Horario Base.** (Desde Gestión de horarios, establece las franjas horarias de las clases semanales, crea al menos una clase de prueba para que los usuarios puedan inscribirse).
@@ -55,7 +55,7 @@ El checklist de onboarding se implementará utilizando un patrón de **Widget Fl
 *   **Estados del Widget:**
     *   *Minimizado:* Muestra un indicador circular de progreso discreto (ej. "1/4" tareas completadas o un gráfico de anillo).
     *   *Expandido:* Al hacer clic, despliega un *popover* o panel flotante inferior con la lista interactiva de tareas del checklist.
-*   **Persistencia y Contexto:** La gran ventaja de este enfoque es que el widget acompaña al usuario durante su navegación. Si el gestor hace clic en "Personaliza tu Club" desde el checklist, será redirigido a la página de Ajustes, pero el widget flotante seguirá a la vista. Esto le permite completar la acción sin olvidar qué paso del tutorial estaba realizando.
+*   **Persistencia y Contexto:** La gran ventaja de este enfoque es que el widget acompaña al usuario durante su navegación. Si el Responsable del Club hace clic en "Personaliza tu Club" desde el checklist, será redirigido a la página de Ajustes, pero el widget flotante seguirá a la vista. Esto le permite completar la acción sin olvidar qué paso del tutorial estaba realizando.
 *   **Finalización:** Una vez alcanzado el 100%, el widget mostrará una pequeña animación de celebración (ej. confeti) y se ocultará permanentemente, dando por concluido el proceso de onboarding.
 
 ---
@@ -71,7 +71,7 @@ Ninguna sección de la aplicación debe mostrar tablas vacías, calendarios en b
 
 ### Ejemplos Prácticos por Módulo
 
-*   **Módulo de Competiciones (Vista Staff/Gestor):**
+*   **Módulo de Competiciones (Vista Staff/Responsable del Club):**
     *   *Ilustración:* Podio o escarapela.
     *   *Texto:* "Aún no hay eventos programados en el calendario. Planifica tu primera competición para abrir las inscripciones."
     *   *CTA:* `[ + Crear nueva Competición ]`
@@ -90,5 +90,5 @@ Ninguna sección de la aplicación debe mostrar tablas vacías, calendarios en b
 ### Consideraciones Técnicas y de Diseño (Multi-Tenant)
 
 *   **Componentización:** Se desarrollará un componente reutilizable en Angular (ej. `<app-empty-state>`) que reciba por `@Input` los textos, el icono o imagen a mostrar, y emita un evento para el botón de acción, estandarizando así la experiencia en toda la plataforma.
-*   **Theming Dinámico (Paleta de Colores):** Para el diseño de todas estas estrategias (iconos de los Empty States, botones de CTA, barra de progreso del Widget Flotante, confeti de celebración, etc.), es **imperativo** utilizar las variables CSS globales inyectadas por el sistema (ej. `var(--primary-color)`). Los colores de la paleta de cada club se obtienen de la base de datos en tiempo de ejecución al iniciar el tenant, por lo que no se deben utilizar colores "hardcodeados" (fijos) en las hojas de estilo de estos componentes para garantizar que la UI se adapte instantáneamente a la identidad corporativa del club activo.
+*   **Theming Dinámico (Paleta de Colores):** Para el diseño de todas estas estrategias (iconos de los Empty States, botones de CTA, barra de progreso del Widget Flotante, confeti de celebración, etc.), es **imperativo** utilizar las variables CSS globales inyectadas por el sistema (ej. `var(--primary-color)`). Los colores de la paleta de cada club se obtienen de la base de datos en tiempo de ejecución al iniciar el tenant (como se detalla en [[arquitectura-multi-tenant]]), por lo que no se deben utilizar colores "hardcodeados" (fijos) en las hojas de estilo de estos componentes para garantizar que la UI se adapte instantáneamente a la identidad corporativa del club activo (ver reglas en [[sistema-diseno]] y lista de [[funcionalidades]] a mapear).
 *   **Iconografía Consistente:** Para todos los elementos visuales interactivos (como los pasos del checklist) y representativos (como los *Empty States*), se debe priorizar el uso de iconos de **Angular Material** (`<mat-icon>`) o ilustraciones en formato SVG, evitando por completo el uso de emojis en la interfaz para mantener un acabado profesional y uniforme.

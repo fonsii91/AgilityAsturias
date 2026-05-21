@@ -1,12 +1,12 @@
 # Funcionalidades de la Aplicación
 
-Este documento detalla todas las funcionalidades disponibles en la plataforma, clasificadas según el perfil de usuario que tiene acceso a ellas. Se excluyen de este documento las funcionalidades exclusivas del perfil de Administrador (gestión global, monitorización avanzada y configuración del sistema).
+Este documento detalla todas las funcionalidades disponibles en la plataforma, clasificadas según el perfil de usuario que tiene acceso a ellas. Se excluyen de este documento las funcionalidades exclusivas del perfil de Administrador Global (gestión global, monitorización avanzada y configuración del sistema). Para más información sobre la definición y responsabilidades de cada rol de usuario, consulte [[usuarios]].
 
 ---
 
 ## 1. Funcionalidades Públicas (Presencia Web)
 
-La plataforma cuenta con una cara pública orientada a visitantes y posibles nuevos socios. Actúa como la carta de presentación o landing page del club:
+La plataforma cuenta con una cara pública orientada a visitantes, invitados o usuarios registrados que se encuentran inactivos. Actúa como la carta de presentación o landing page del club:
 * **Bienvenida:** Página de inicio (Home) con información general del club, filosofía, quiénes somos y qué ofrecemos.
 * **Galería:** Visor de las fotografías y momentos destacados seleccionados por el club de forma pública.
 * **Videoteca (Vídeos Públicos):** Espacio para mostrar los vídeos de entrenamientos o competiciones que el Staff ha decidido compartir con el público.
@@ -35,7 +35,7 @@ Módulo central para la gestión integral de cada perro que posee el miembro:
 * **Compartir Perros:** Capacidad para "compartir" un perro con otros usuarios (por ejemplo, familiares u otros guías del club) y retirar este acceso cuando sea necesario.
 
 ### Salud Deportiva (Monitor ACWR)
-Herramienta avanzada para la prevención de lesiones y monitorización del rendimiento:
+Herramienta avanzada para la prevención de lesiones y monitorización del rendimiento (ver arquitectura en [[arquitectura-multi-tenant]]):
 * **Registro de Cargas:** Introducir datos sobre la carga de trabajo de los entrenamientos y competiciones (minutos de actividad, intensidad percibida, etc.).
 * **Visualización de Carga (Ratio ACWR):** Consultar el estado físico y nivel de riesgo de lesión del perro basado en los algoritmos de carga aguda frente a la crónica.
 * **Revisiones Pendientes:** Ver listado de registros de actividad a la espera de confirmación.
@@ -57,16 +57,16 @@ Herramienta avanzada para la prevención de lesiones y monitorización del rendi
 
 ### Comunicación y Tablones
 * **Tablón de Anuncios:** Consultar los anuncios, avisos importantes y circulares enviados por la directiva o el staff del club. Opción de marcar los anuncios como "leídos".
-* **Sugerencias:** Enviar tickets, reportes o ideas de mejora de forma privada al Staff y Administración del club.
+* **Sugerencias:** Enviar tickets, reportes o ideas de mejora de forma privada al Staff y Responsables del club.
 * **Notificaciones:** Sistema de alertas para avisos (ej. cambios en las reservas, nuevas funciones). Permite marcar individualmente o globalmente las notificaciones como leídas.
 * **Novedades:** Pantalla para descubrir las últimas actualizaciones incorporadas al propio software de la plataforma.
 
 ### Competiciones y Ranking
 * **Visualización de Competiciones:** Ver las próximas competiciones y eventos oficiales en los que el club va a participar.
 * **Asistencia a Competiciones:** Confirmar la inscripción o asistencia a una competición determinada ("apuntarse") o cancelar dicha inscripción ("desapuntarse"). Ver la lista de otros miembros que también van a asistir.
-* **Ranking Comunitario:** Consultar la clasificación de la liga interna o ranking del club para ver la posición de los perros en las diferentes categorías.
+* **Ranking Comunitario:** Consultar la clasificación de la liga interna o ranking del club para ver la posición de los perros en las diferentes categorías (ver mecánica de gamificación en [[gamificacion-stickers]]).
 * **Bitácora RSCE:** Herramienta para realizar un seguimiento personal de las pistas RSCE realizadas, guardar resultados, registrar puntos y llevar un control del grado de competición.
-* **Bitácora RFEC:** Herramienta paralela para el seguimiento de clasificaciones, resultados y progresión en la normativa de la Real Federación Española de Caza (RFEC).
+* **Bitácora RFEC:** Herramienta paralela para el seguimiento de clasificaciones, resultados y progresión en la normativa de la Real Federación Española de Caza (RFEC) (ver [[normativa-rfec]]).
 
 ---
 
@@ -86,7 +86,7 @@ Los miembros con el rol de "Staff" (monitores, entrenadores, directiva) tienen a
 ### Gestión de Comunidad y Comunicación
 * **Gestión de Miembros:** Ver el listado completo de usuarios registrados en el club y sus datos de contacto básicos.
 * **Generar Enlaces de Reseteo:** Capacidad para enviar o generar un enlace para restablecer la contraseña en caso de que un miembro no pueda acceder.
-* **Actualización de Roles:** (Sujeto a confirmación por el admin) Posibilidad de asignar, cambiar o revocar roles (ej. pasar a un usuario de Miembro a Staff).
+* **Actualización de Roles:** (Sujeto a confirmación por el Responsable del Club) Posibilidad de asignar, cambiar o revocar roles (ej. pasar a un usuario de Miembro a Staff).
 * **Redacción de Anuncios:** Crear, editar y publicar nuevas comunicaciones en el Tablón de Anuncios que serán visibles para todos los miembros. Eliminar anuncios antiguos.
 
 ### Gestión de Recursos y Multimedia

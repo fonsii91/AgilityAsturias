@@ -4,7 +4,7 @@ Este documento describe la arquitectura técnica implementada en **Club Agility*
 
 ## Concepto General
 
-El sistema permite que distintos clubes deportivos utilicen la plataforma compartiendo el código fuente y la base de datos, pero garantizando el **aislamiento total de la información**. Un usuario de un club no puede ver ni interactuar con los datos (perros, reservas, socios) de otro club, salvo que sea un usuario con rol de Administrador Global (`admin`).
+El sistema permite que distintos clubes deportivos utilicen la plataforma compartiendo el código fuente y la base de datos, pero garantizando el **aislamiento total de la información**. Un usuario de un club no puede ver ni interactuar con los datos (perros, reservas, socios) de otro club, salvo que sea un usuario con rol de Administrador Global (`admin`). Para la gestión de respaldos e integridad de esta base de datos compartida, consultar [[backups-locales]].
 
 El acceso a cada club se determina mediante **subdominios** (ej. `clubnorte.clubagility.com`).
 
@@ -16,7 +16,7 @@ El aislamiento comienza en el navegador del usuario:
 
 *   **Detección por URL:** Angular (`TenantService`) analiza el `window.location.hostname`. Si detecta un subdominio válido (por ejemplo, `patitas` en `patitas.localhost` o `patitas.clubagility.com`), lo establece como el "slug" del club activo.
 *   **Solicitud Inicial:** Antes de arrancar la aplicación completa, el frontend envía una petición a `/api/tenant/info` con el slug detectado para obtener la configuración básica del club (nombre, logotipo, colores corporativos). Esta petición se hace con `fetch` nativo para evitar dependencias circulares con el sistema de autenticación de Angular.
-*   **Theming Dinámico:** Los colores recibidos (`primary_color`, `accent_color`) se inyectan como variables CSS globales (`--primary-color`), personalizando la interfaz visual instantáneamente.
+*   **Theming Dinámico:** Los colores recibidos (`primary_color`, `accent_color`) se inyectan como variables CSS globales (`--primary-color`), personalizando la interfaz visual instantáneamente según las pautas del [[sistema-diseno]].
 *   **Interceptor de Red:** Todas las peticiones HTTP subsiguientes realizadas desde Angular inyectan la cabecera `X-Club-Slug: {slug}` mediante el `AuthInterceptor`.
 
 ---
@@ -95,8 +95,11 @@ Esto significa que es **imposible** que un usuario de "Agility Asturias" (ID 1) 
 
 ---
 
-## 5. Gestión Global (Administrador)
+## 5. Gestión Global (Administrador Global)
 
-Para gestionar la plataforma SaaS, el rol `admin` actúa de forma especial:
-*   El Middleware de validación de roles (`RoleMiddleware`) ha sido adaptado para que los administradores pasen las validaciones de las distintas rutas, garantizando que un `admin` nunca se quede "encerrado" fuera de módulos operativos.
-*   Existe un CRUD protegido (Accesible solo por `admin`) para la gestión, creación, modificación de slugs y colores de todos los clubes de la plataforma.
+Para gestionar la plataforma SaaS, el rol `admin` (Administrador Global) actúa de forma especial:
+*   El Middleware de validación de roles (`RoleMiddleware`) ha sido adaptado para que los administradores globales pasen las validaciones de las distintas rutas, garantizando que un `admin` nunca se quede "encerrado" fuera de módulos operativos.
+*   Existe un CRUD protegido (Accesible solo por `admin`/Administrador Global) para la gestión, creación, modificación de slugs y colores de todos los clubes de la plataforma.
+
+
+

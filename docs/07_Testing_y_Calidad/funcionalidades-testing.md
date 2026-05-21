@@ -1,8 +1,8 @@
 # Hoja de Ruta de Pruebas (Testing Roadmap)
 
-Este documento desglosa las funcionalidades descritas en `funcionalidades.md` en "lotes" de trabajo con el tamaño y alcance ideal para ser solicitados a la IA mediante el workflow `testing_premium.md`.
+Este documento desglosa las funcionalidades descritas en [[funcionalidades]] en "lotes" de trabajo con el tamaño y alcance ideal para ser solicitados a la IA mediante el workflow `testing_premium.md`.
 
-Puedes ir marcando las casillas (`[x]`) a medida que completemos las pruebas de cada bloque y las registremos en `testing_registry.md`.
+Puedes ir marcando las casillas (`[x]`) a medida que completemos las pruebas de cada bloque y las registremos en [[registro-tests]].
 
 ---
 
@@ -70,7 +70,7 @@ Puedes ir marcando las casillas (`[x]`) a medida que completemos las pruebas de 
 
 ---
 
-## 4. Funcionalidades para Administrador
+## 4. Funcionalidades para Administrador Global
 
 ### Gestión Global y Monitorización Avanzada
 - [x] **Panel de Usuarios:** Control total sobre las cuentas y roles de la plataforma.
@@ -82,4 +82,4 @@ Puedes ir marcando las casillas (`[x]`) a medida que completemos las pruebas de 
 ---
 
 ## 5. Experiencia de Usuario (UX) Global
-- [x] **Onboarding:** Tutorial multipaso interactivo para nuevos usuarios (Gestor, Staff, Miembro).
+- [x] **Onboarding:** Tutorial multipaso interactivo para nuevos usuarios (Responsable, Staff, Miembro).

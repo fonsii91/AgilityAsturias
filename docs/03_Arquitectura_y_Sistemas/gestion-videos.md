@@ -6,7 +6,7 @@ Esta documentación describe a fondo el ciclo de vida, arquitectura y la lógica
 Cuando un usuario sube un vídeo desde la plataforma (`upload-video`), ocurre lo siguiente:
 - **Restricciones:** El backend (`VideoController@store`) valida que sea un formato de vídeo válido (MP4, MOV, AVI, etc.) y no exceda los **500MB**.
 - **Guardado Local:** El vídeo siempre se guarda de forma local en el servidor dentro de la ruta `/storage/app/public/videos`.
-- **Registro en BBDD:** Se crea el registro del vídeo asociándolo a un perro (`dog_id`) de manera obligatoria y, opcionalmente, a una competición (`competition_id`). En la base de datos se le asigna el estado **`status = 'local'`**.
+- **Registro en BBDD:** Se crea el registro del vídeo asociándolo a un perro (`dog_id`) de manera obligatoria y, opcionalmente, a una competición (`competition_id`). En la base de datos se le asigna el estado **`status = 'local'`**, siempre bajo el ámbito y aislamiento del club correspondiente conforme a la [[arquitectura-multi-tenant]].
 
 ## 2. Proceso en Segundo Plano: Ahorro de espacio (YouTube CRON)
 Para evitar que el disco del servidor se llene, el sistema implementa una delegación de los recursos multimedia:
@@ -27,11 +27,11 @@ A nivel de frontend en Angular, los vídeos se abstraen detrás de **`SmartVideo
 
 ## 4. Permisos, Privacidad y Galería Pública
 Hay un estricto control de acceso respecto a la visualización de los recursos:
-- **Privacidad Base (`is_public`):** Al subirlo se define la privacidad. A nivel de API, si un vídeo no es público y **no soy** administrador ni el dueño del perro etiquetado, el backend me bloquea la visualización automáticamente.
+- **Privacidad Base (`is_public`):** Al subirlo se define la privacidad. A nivel de API, si un vídeo no es público y **no soy** el Responsable del Club, un miembro del Staff ni el dueño del perro etiquetado, el backend me bloquea la visualización automáticamente, respetando el alcance del tenant en la [[arquitectura-multi-tenant]]. Adicionalmente, el procesamiento y etiquetado inteligente de estos vídeos para el análisis técnico de pistas se documenta en [[analisis-videos-insights]].
 - **Galería Pública (`in_public_gallery`):** Existe una galería para difusión al exterior de la comunidad. Solamente los vídeos que tengan marcado el valor "Aparecer en galería pública" y simultáneamente sean de privacidad pública aparecerán aquí de cara a la web pública.
-- **Permisos de Staff:** Cualquier empleado/administrador que tenga rol `staff` o `admin` tiene controles sobre cualquier vídeo y cuenta con accesos directos (`video-list`) para meterlos/sacarlos rápidamente de la galería pública.
+- **Permisos del Staff y Responsable:** Cualquier miembro del staff o el Responsable del Club (así como el Administrador Global) tiene controles sobre cualquier vídeo y cuenta con accesos directos (`video-list`) para meterlos/sacarlos rápidamente de la galería pública.
 
 ## 5. Descargas y Administración (Video Stats)
 - **Descargas:** Los dueños o el personal pueden descargar los vídeos con el botón de descarga, que sirve el archivo `.mp4` (esto sólo funciona mientras el vídeo esté local, lo que es correcto al cabo que a futuro desaparece del servidor y se sirve solo vía streaming de Google).
-- **Gestión de fallos:** Existe un apartado de métricas (`admin-videos-stats`), donde los administradores consultan cómo fluye el proceso (cuántos vídeos en YouTube, Locales, en Cola o Fallidos). Los roles de staff tienen la posibilidad de re-encolar manualmente los vídeos reseteando el estado de `'failed'` a `'local'` para que el Cron vuelva a disparar su subida esta noche.
+- **Gestión de fallos:** Existe un apartado de métricas (`admin-videos-stats`), donde los Responsables del Club y el Administrador Global consultan cómo fluye el proceso (cuántos vídeos en YouTube, Locales, en Cola o Fallidos). Los roles de staff tienen la posibilidad de re-encolar manualmente los vídeos reseteando el estado de `'failed'` a `'local'` para que el Cron vuelva a disparar su subida esta noche.
 - **Interactividad:** Los usuarios pueden utilizar la integración social (`VideoLike`), permitiendo reaccionar a los vídeos, cuyo conteo luego se emplea para su ordenación por 'popularidad' (Trending).
