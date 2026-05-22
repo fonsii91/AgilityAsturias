@@ -1,20 +1,4 @@
 <div class="clasificacion-container">
-  <!-- Header -->
-  <div class="clasificacion-header">
-    <div class="header-content">
-      <h1 class="header-title">
-        <span class="material-icons-outlined header-icon">emoji_events</span>
-        Clasificación Liga Norte
-      </h1>
-      <p class="header-subtitle">
-        @if (activeType() === 'liga') {
-          Consulta la clasificación general de la guía en la Liga Norte y el progreso de los binomios del club.
-        } @else {
-          Consulta la clasificación por excelentes de la Liga Norte para el Campeonato de España.
-        }
-      </p>
-    </div>
-  </div>
 
   @if (isLoading()) {
     <div class="loading-state glass-card">
@@ -243,7 +227,7 @@
               @if (selectedDog().club) {
                 <div class="info-item">
                   <span class="info-label">Club</span>
-                  <span class="info-value club-name-val">{{ selectedDog().club.name }}</span>
+                  <span class="info-value club-name-val" [style.color]="getClubColor(selectedDog().club)">{{ selectedDog().club.name }}</span>
                 </div>
               }
             </div>

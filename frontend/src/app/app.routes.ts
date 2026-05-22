@@ -285,12 +285,6 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Salud Deportiva' }
     },
     {
-        path: 'explorar/seguimiento-provisional',
-        loadComponent: () => import('./components/explorar/seguimiento-provisional/seguimiento-provisional').then(m => m.SeguimientoProvisionalComponent),
-        canActivate: [memberGuard],
-        title: titleResolver, data: { pageTitle: 'Seguimiento Provisional' }
-    },
-    {
         path: 'explorar/liga-norte',
         loadComponent: () => import('./components/clasificacion-liga-norte/clasificacion-liga-norte').then(m => m.ClasificacionLigaNorteComponent),
         canActivate: [memberGuard],

@@ -9,36 +9,42 @@
 
 <mat-dialog-content class="mat-typography">
 
-  <div class="pending-list-container" style="display: flex; flex-direction: column; padding-bottom: 1rem;">
+  <div class="pending-list-container" [class.pt-4]="isManual()" style="display: flex; flex-direction: column; padding-bottom: 1rem;">
     @if (currentPending(); as currentItem) {
     @if (!isManual()) {
-    <div class="progress-indicator mb-3 d-flex align-items-center justify-content-between fade-in"
-      style="animation-duration: 0.3s;">
-      <span class="text-secondary font-weight-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">SESIÓN {{
-        currentIndex() }} DE {{ totalPending() }}</span>
-      <div class="progress-bar-wrapper"
-        style="flex: 1; height: 6px; background-color: rgba(0,0,0,0.05); border-radius: 4px; margin-left: 1rem; overflow: hidden;">
-        <div class="progress-bar-fill" [style.width]="(currentIndex() / totalPending() * 100) + '%'"
-          style="height: 100%; background-color: var(--primary-main, #3b82f6); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 4px;">
+    <div class="sticky-session-header fade-in" style="animation-duration: 0.3s;">
+      <div class="progress-indicator mb-3 d-flex align-items-center justify-content-between">
+        <span class="text-secondary font-weight-bold" style="font-size: 0.85rem; letter-spacing: 0.5px;">SESIÓN {{
+          currentIndex() }} DE {{ totalPending() }}</span>
+        <div class="progress-bar-wrapper"
+          style="flex: 1; height: 6px; background-color: rgba(0,0,0,0.05); border-radius: 4px; margin-left: 1rem; overflow: hidden;">
+          <div class="progress-bar-fill" [style.width]="(currentIndex() / totalPending() * 100) + '%'"
+            style="height: 100%; background-color: var(--primary-main, #3b82f6); transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 4px;">
+          </div>
+        </div>
+      </div>
+
+      <div class="pending-header">
+        <div class="date"><mat-icon class="text-success align-middle mr-1"
+            style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">event_available</mat-icon> {{ currentItem.date |
+          date:'dd MMM yyyy' }}</div>
+        <div class="source-badge">
+          <mat-icon class="text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">sell</mat-icon>
+          <span class="source-text-desktop">{{ currentItem.source_type === 'auto_attendance' ? 'Entrenamiento' : 'Competición' }}</span>
+          <span class="source-text-mobile">{{ currentItem.source_type === 'auto_attendance' ? 'Entreno' : 'Compet.' }}</span>
         </div>
       </div>
     </div>
     }
 
     @for (pending of [currentItem]; track pending.id) {
-    <div class="form-card bento-card fade-in-up m-0"
-      style="animation-duration: 0.4s; animation-fill-mode: both; border-radius: 12px; border: none; box-shadow: none;">
+    <div class="form-card bento-card m-0 form-card-container"
+      [class.transition-out]="isTransitioning()"
+      [class.transition-in]="!isTransitioning()"
+      style="border-radius: 12px; border: none; box-shadow: none;">
       <div class="form-card-body" style="padding: 0.5rem 0.25rem; background: #fcfcfc;">
-        <div class="pending-header mb-3" [class.flex-column]="isManual()" [class.align-items-start]="isManual()">
-          @if (!isManual()) {
-          <div class="date"><mat-icon class="text-success align-middle mr-1"
-              style="font-size: 1.2rem; height: 1.2rem; width: 1.2rem;">event_available</mat-icon> {{ pending.date |
-            date:'dd MMM yyyy' }}</div>
-          <div class="source-badge">
-            <mat-icon class="text-small mr-1" style="font-size: 1rem; height: 1rem; width: 1rem;">sell</mat-icon>
-            {{ pending.source_type === 'auto_attendance' ? 'Entrenamiento' : 'Competición' }}
-          </div>
-          } @else {
+        @if (isManual()) {
+        <div class="pending-header mb-3 flex-column align-items-start">
              <div class="form-group w-100 mb-2 mt-2" style="background: #ffffff; padding: 1.25rem; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                 <label class="d-flex align-items-center mb-3" style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
                   Fecha de la sesión
@@ -47,8 +53,8 @@
                 <input type="date" class="custom-input" [(ngModel)]="pending.date"
                   style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; font-family: 'Inter', sans-serif; font-size: 1rem; color: var(--text-main); background: #f8fafc; cursor: pointer;">
              </div>
-          }
         </div>
+        }
 
         <div class="mb-4 mt-3" style="width: 100%; text-align: center; position: relative;">
           <div

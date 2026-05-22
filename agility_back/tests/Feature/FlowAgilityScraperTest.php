@@ -264,6 +264,7 @@ class FlowAgilityScraperTest extends TestCase
         $comp->refresh();
         $this->assertEquals('success', $comp->scrape_status);
         $this->assertEquals(1, $comp->results_scraped);
+        $this->assertTrue((bool)$comp->attendance_verified);
 
         // Check RsceTrack creation
         $this->assertDatabaseHas('rsce_tracks', [
@@ -286,6 +287,14 @@ class FlowAgilityScraperTest extends TestCase
         $dog->refresh();
         $pivotUser = $dog->users()->find($user->id);
         $this->assertEquals('RSCE123', $pivotUser->pivot->rsce_license);
+        $this->assertEquals(2, $dog->points); // 2 points for 3rd place!
+
+        // Check Point History creation
+        $this->assertDatabaseHas('point_histories', [
+            'dog_id' => $dog->id,
+            'points' => 2,
+            'category' => 'Tercero en ' . $comp->nombre
+        ]);
 
         // Check workload enrichment (it should reuse the pre-existing workload and update counts)
         $workload->refresh();

@@ -32,6 +32,18 @@ class RfecTrack extends Model
         'standard_time'
     ];
 
+    protected $casts = [
+        'speed' => 'float',
+        'time' => 'float',
+        'faults' => 'integer',
+        'refusals' => 'integer',
+        'time_penalty' => 'float',
+        'total_penalty' => 'float',
+        'is_clean' => 'boolean',
+        'course_length' => 'float',
+        'standard_time' => 'float',
+    ];
+
     public function dog()
     {
         return $this->belongsTo(Dog::class);

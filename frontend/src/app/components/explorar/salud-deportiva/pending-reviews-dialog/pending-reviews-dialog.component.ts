@@ -41,6 +41,7 @@ export class PendingReviewsDialogComponent {
 
   currentRpe = signal<number>(5);
   isManual = signal<boolean>(false);
+  isTransitioning = signal<boolean>(false);
 
   getSafeAvatarUrl(level: number): string {
     const d = this.dog();
@@ -192,15 +193,28 @@ export class PendingReviewsDialogComponent {
         this.confirmingIds.update(ids => ids.filter(id => id !== workload.id));
         this.toast.success('Entrenamiento validado con éxito');
         
-        // Remove from local list
-        this.pendingReviews.update(list => list.filter(w => w.id !== workload.id));
-        
-        // Close if empty
-        if (this.pendingReviews().length === 0) {
-            this.dialogRef.close(true); // true means data was changed
-        } else {
+        if (this.pendingReviews().length > 1) {
+          this.isTransitioning.set(true);
+          
+          setTimeout(() => {
+            // Scroll dialog content back to top instantly while invisible
+            const dialogContent = document.querySelector('mat-dialog-content');
+            if (dialogContent) {
+              dialogContent.scrollTo({ top: 0, behavior: 'auto' });
+            }
+            
+            // Remove from local list
+            this.pendingReviews.update(list => list.filter(w => w.id !== workload.id));
             const next = this.currentPending();
             if (next) this.currentRpe.set(next.intensity_rpe || 5);
+            
+            this.isTransitioning.set(false);
+          }, 200); // matches the transition-out duration in CSS
+        } else {
+          this.pendingReviews.update(list => list.filter(w => w.id !== workload.id));
+          if (this.pendingReviews().length === 0) {
+            this.dialogRef.close(true);
+          }
         }
       },
       error: () => {

@@ -8,6 +8,14 @@ export interface RsceTrack {
     judge_name?: string | null;
     location?: string | null;
     notes?: string | null;
+    time?: number | null;
+    faults?: number | null;
+    refusals?: number | null;
+    time_penalty?: number | null;
+    total_penalty?: number | null;
+    is_clean?: boolean | number | null;
+    course_length?: number | null;
+    standard_time?: number | null;
     created_at?: Date | string;
     updated_at?: Date | string;
 }

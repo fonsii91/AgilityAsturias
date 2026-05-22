@@ -381,6 +381,65 @@ class ScrapeFlowAgility extends Command
                 $comp->scrape_error = null;
                 $comp->scraped_at = now();
                 $comp->save();
+
+                // Automate attendance verification and points scoring if scraping is complete
+                // and attendance has not been verified yet.
+                if ($isFinished && !$comp->attendance_verified) {
+                    $this->info("Asignando puntos de asistencia automáticamente para la competición: {$comp->nombre}...");
+                    
+                    DB::transaction(function () use ($comp) {
+                        // Reload attending dogs with position
+                        $attendingDogs = $comp->attendingDogs()->withPivot('position')->get();
+                        
+                        foreach ($attendingDogs as $dog) {
+                            $position = $dog->pivot->position;
+                            $pointsToAdd = 0;
+                            $categoryName = 'Asistencia a competición ' . $comp->nombre;
+                            
+                            switch ($position) {
+                                case '1':
+                                    $pointsToAdd = 4;
+                                    $categoryName = 'Primero en ' . $comp->nombre;
+                                    break;
+                                case '2':
+                                    $pointsToAdd = 3;
+                                    $categoryName = 'Segundo en ' . $comp->nombre;
+                                    break;
+                                case '3':
+                                    $pointsToAdd = 2;
+                                    $categoryName = 'Tercero en ' . $comp->nombre;
+                                    break;
+                                default:
+                                    // 4, 5, 10, ELIM, etc. or null position get 1 attendance point
+                                    $pointsToAdd = 1;
+                                    break;
+                            }
+                            
+                            if ($pointsToAdd > 0) {
+                                $dog->increment('points', $pointsToAdd);
+                                \App\Models\PointHistory::create([
+                                    'dog_id' => $dog->id,
+                                    'club_id' => $dog->club_id,
+                                    'points' => $pointsToAdd,
+                                    'category' => $categoryName
+                                ]);
+                                
+                                // Notify owners
+                                $dog->load('users');
+                                if ($dog->users) {
+                                    foreach ($dog->users as $owner) {
+                                        \Illuminate\Support\Facades\Notification::send($owner, new \App\Notifications\DogPointNotification($dog));
+                                    }
+                                }
+                            }
+                        }
+                        
+                        $comp->attendance_verified = true;
+                        $comp->save();
+                    });
+                    
+                    $this->info("Asistencia automatizada completada para la competición ID: {$comp->id}");
+                }
             }
         }
 

@@ -158,6 +158,30 @@ export class ClasificacionLigaNorteComponent implements OnInit {
     return dog.users.map((u: any) => u.name).join(' & ');
   }
 
+  getClubColor(club: any): string {
+    if (!club) return 'var(--primary-color, #2563eb)';
+    
+    let settings = club.settings;
+    if (typeof settings === 'string') {
+      try {
+        settings = JSON.parse(settings);
+      } catch (e) {
+        settings = null;
+      }
+    }
+    
+    if (settings) {
+      if (settings.colors?.primary) {
+        return settings.colors.primary;
+      }
+      if (settings.primary_color) {
+        return settings.primary_color;
+      }
+    }
+    
+    return 'var(--primary-color, #2563eb)';
+  }
+
   isAsturias(row: any): boolean {
     const activeClubId = this.tenantService.tenantInfo()?.id;
     if (row.dog && activeClubId) {

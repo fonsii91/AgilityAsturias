@@ -30,6 +30,14 @@ class RfecTrackController extends Controller
             'location' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
             'grade' => 'nullable|string|max:50',
+            'time' => 'nullable|numeric|between:0,999.99',
+            'faults' => 'nullable|integer|min:0',
+            'refusals' => 'nullable|integer|min:0',
+            'time_penalty' => 'nullable|numeric|between:0,999.99',
+            'total_penalty' => 'nullable|numeric|between:0,999.99',
+            'is_clean' => 'nullable|boolean',
+            'course_length' => 'nullable|integer|min:0',
+            'standard_time' => 'nullable|numeric|between:0,999.99',
         ]);
 
         // Security check: ensure the user owns the dog
@@ -63,6 +71,14 @@ class RfecTrackController extends Controller
             'location' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
             'grade' => 'nullable|string|max:50',
+            'time' => 'nullable|numeric|between:0,999.99',
+            'faults' => 'nullable|integer|min:0',
+            'refusals' => 'nullable|integer|min:0',
+            'time_penalty' => 'nullable|numeric|between:0,999.99',
+            'total_penalty' => 'nullable|numeric|between:0,999.99',
+            'is_clean' => 'nullable|boolean',
+            'course_length' => 'nullable|integer|min:0',
+            'standard_time' => 'nullable|numeric|between:0,999.99',
         ]);
 
         $rfecTrack->update($validated);

@@ -464,6 +464,46 @@ export class RsceTrackerComponent implements OnInit {
     }
   }
 
+  onMetricChange() {
+    const data = this.formData();
+    const qualification = data.qualification || '';
+    const isElim = this.isEliminated(qualification);
+
+    const time = (data.time !== undefined && data.time !== null && (data.time as any) !== '') ? parseFloat(data.time.toString()) : null;
+    const length = (data.course_length !== undefined && data.course_length !== null && (data.course_length as any) !== '') ? parseFloat(data.course_length.toString()) : null;
+    const standardTime = (data.standard_time !== undefined && data.standard_time !== null && (data.standard_time as any) !== '') ? parseFloat(data.standard_time.toString()) : null;
+    const faults = (data.faults !== undefined && data.faults !== null && (data.faults as any) !== '') ? parseInt(data.faults.toString(), 10) : 0;
+    const refusals = (data.refusals !== undefined && data.refusals !== null && (data.refusals as any) !== '') ? parseInt(data.refusals.toString(), 10) : 0;
+
+    const updates: Partial<RsceTrack> = {};
+
+    // 1. Calculate speed
+    if (time && time > 0 && length && length > 0) {
+      updates.speed = parseFloat((length / time).toFixed(2));
+    } else {
+      updates.speed = null;
+    }
+
+    // 2. Calculate time penalty
+    let timePenalty = 0;
+    if (time && standardTime && time > standardTime) {
+      timePenalty = parseFloat((time - standardTime).toFixed(2));
+    }
+    updates.time_penalty = timePenalty;
+
+    // 3. Calculate total penalty
+    const totalPenalty = (faults * 5) + (refusals * 5) + timePenalty;
+    updates.total_penalty = totalPenalty;
+
+    // 4. Calculate is_clean
+    updates.is_clean = !isElim && (time !== null && totalPenalty === 0 && faults === 0 && refusals === 0);
+
+    this.formData.update(current => ({
+      ...current,
+      ...updates
+    }));
+  }
+
   openAddForm() {
     if (!this.selectedDogId()) {
       this.toastService.error('Debes seleccionar un perro primero');
@@ -482,7 +522,15 @@ export class RsceTrackerComponent implements OnInit {
       speed: null,
       judge_name: '',
       location: '',
-      notes: ''
+      notes: '',
+      time: null,
+      faults: 0,
+      refusals: 0,
+      time_penalty: 0,
+      total_penalty: 0,
+      is_clean: false,
+      course_length: null,
+      standard_time: null
     });
     this.locationSelectMode.set('');
     this.isFormOpen.set(true);
@@ -528,7 +576,15 @@ export class RsceTrackerComponent implements OnInit {
       ...track,
       date: formattedDate,
       qualification: qual,
-      manga_type: manga
+      manga_type: manga,
+      time: track.time ?? null,
+      faults: track.faults ?? 0,
+      refusals: track.refusals ?? 0,
+      time_penalty: track.time_penalty ?? 0,
+      total_penalty: track.total_penalty ?? 0,
+      is_clean: track.is_clean === true || track.is_clean === 1,
+      course_length: track.course_length ?? null,
+      standard_time: track.standard_time ?? null
     });
     
     // Determine location mode
@@ -559,9 +615,48 @@ export class RsceTrackerComponent implements OnInit {
       return;
     }
 
-    // Force speed to standard number correctly decimal
-    if (data.speed) {
-        data.speed = parseFloat(data.speed.toString());
+    // Safely parse metrics before sending to API
+    if (data.speed !== undefined && data.speed !== null && (data.speed as any) !== '') {
+      data.speed = parseFloat(data.speed.toString());
+    } else {
+      data.speed = null;
+    }
+    if (data.time !== undefined && data.time !== null && (data.time as any) !== '') {
+      data.time = parseFloat(data.time.toString());
+    } else {
+      data.time = null;
+    }
+    if (data.faults !== undefined && data.faults !== null && (data.faults as any) !== '') {
+      data.faults = parseInt(data.faults.toString(), 10);
+    } else {
+      data.faults = 0;
+    }
+    if (data.refusals !== undefined && data.refusals !== null && (data.refusals as any) !== '') {
+      data.refusals = parseInt(data.refusals.toString(), 10);
+    } else {
+      data.refusals = 0;
+    }
+    if (data.time_penalty !== undefined && data.time_penalty !== null && (data.time_penalty as any) !== '') {
+      data.time_penalty = parseFloat(data.time_penalty.toString());
+    } else {
+      data.time_penalty = 0;
+    }
+    if (data.total_penalty !== undefined && data.total_penalty !== null && (data.total_penalty as any) !== '') {
+      data.total_penalty = parseFloat(data.total_penalty.toString());
+    } else {
+      data.total_penalty = 0;
+    }
+    data.is_clean = data.is_clean ? 1 : 0;
+    
+    if (data.course_length !== undefined && data.course_length !== null && (data.course_length as any) !== '') {
+      data.course_length = parseInt(data.course_length.toString(), 10);
+    } else {
+      data.course_length = null;
+    }
+    if (data.standard_time !== undefined && data.standard_time !== null && (data.standard_time as any) !== '') {
+      data.standard_time = parseFloat(data.standard_time.toString());
+    } else {
+      data.standard_time = null;
     }
 
     if (this.isEditing() && data.id) {
@@ -612,6 +707,27 @@ export class RsceTrackerComponent implements OnInit {
     if (qLower.startsWith('elim') || qLower === 'elim') return 'qual-elim';
     if (qLower.startsWith('no p') || qLower === 'np') return 'qual-np';
     return '';
+  }
+
+  isEliminated(qualification: string | undefined): boolean {
+    if (!qualification) return false;
+    const qLower = qualification.toLowerCase().trim();
+    return qLower.startsWith('elim') || qLower === 'np' || qLower.startsWith('no pres') || qLower.startsWith('no clas');
+  }
+
+  isCleanRun(track: RsceTrack): boolean {
+    if (this.isEliminated(track.qualification)) return false;
+    const qLower = (track.qualification || '').toLowerCase().trim();
+    return qLower === 'excelente a 0' || qLower === 'exc_0' || qLower === 'excelente a cero' || qLower === 'exc a 0';
+  }
+
+  getComputedPenalty(track: RsceTrack): number {
+    const faults = track.faults ?? 0;
+    const refusals = track.refusals ?? 0;
+    const timePenalty = track.time_penalty ?? 0;
+    const calculated = (faults * 5) + (refusals * 5) + timePenalty;
+    const dbVal = track.total_penalty !== null && track.total_penalty !== undefined ? parseFloat(track.total_penalty.toString()) : 0;
+    return Math.max(calculated, dbVal);
   }
 
   getFilledSlotsA(): number {
@@ -686,5 +802,43 @@ export class RsceTrackerComponent implements OnInit {
 
   closeVideo() {
     this.videoToPlay.set(null);
+  }
+
+  expandedTrackIds = signal<Set<number>>(new Set());
+
+  toggleTrackExpand(trackId: number) {
+    const current = this.expandedTrackIds();
+    const next = new Set(current);
+    if (next.has(trackId)) {
+      next.delete(trackId);
+    } else {
+      next.add(trackId);
+    }
+    this.expandedTrackIds.set(next);
+  }
+
+  shortenManga(type: string): string {
+    if (!type) return '';
+    const lower = type.toLowerCase();
+    if (lower.includes('agility')) {
+      return type.replace(/agility/gi, 'AG');
+    }
+    if (lower.includes('jumping')) {
+      return type.replace(/jumping/gi, 'JP');
+    }
+    return type;
+  }
+
+  shortenQualification(qual: string): string {
+    if (!qual) return '';
+    const qLower = qual.toLowerCase().trim();
+    if (qLower === 'excelente a 0' || qLower === 'exc_0') return 'EXC 0';
+    if (qLower === 'excelente' || qLower === 'exc') return 'EXC';
+    if (qLower === 'muy bueno' || qLower === 'mb') return 'M. BUENO';
+    if (qLower === 'bueno' || qLower === 'b') return 'BUENO';
+    if (qLower === 'no clasificado' || qLower === 'nc') return 'NO CLAS.';
+    if (qLower === 'eliminado' || qLower === 'elim') return 'ELIM';
+    if (qLower === 'no presentado' || qLower === 'np') return 'N.P.';
+    return qual;
   }
 }

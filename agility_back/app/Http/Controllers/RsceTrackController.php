@@ -28,6 +28,14 @@ class RsceTrackController extends Controller
             'judge_name' => 'nullable|string|max:100',
             'location' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
+            'time' => 'nullable|numeric|between:0,999.99',
+            'faults' => 'nullable|integer|min:0',
+            'refusals' => 'nullable|integer|min:0',
+            'time_penalty' => 'nullable|numeric|between:0,999.99',
+            'total_penalty' => 'nullable|numeric|between:0,999.99',
+            'is_clean' => 'nullable|boolean',
+            'course_length' => 'nullable|integer|min:0',
+            'standard_time' => 'nullable|numeric|between:0,999.99',
         ]);
 
         // Security check: ensure the user owns the dog
@@ -60,6 +68,14 @@ class RsceTrackController extends Controller
             'judge_name' => 'nullable|string|max:100',
             'location' => 'nullable|string|max:100',
             'notes' => 'nullable|string',
+            'time' => 'nullable|numeric|between:0,999.99',
+            'faults' => 'nullable|integer|min:0',
+            'refusals' => 'nullable|integer|min:0',
+            'time_penalty' => 'nullable|numeric|between:0,999.99',
+            'total_penalty' => 'nullable|numeric|between:0,999.99',
+            'is_clean' => 'nullable|boolean',
+            'course_length' => 'nullable|integer|min:0',
+            'standard_time' => 'nullable|numeric|between:0,999.99',
         ]);
 
         $rsceTrack->update($validated);

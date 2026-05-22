@@ -777,7 +777,7 @@ input:checked + .slider:before { transform: translateX(24px); }
     }
 }
 
-@media (max-width: 500px) {
+@media (max-width: 600px) {
     .acwr-header {
         flex-direction: column;
         align-items: flex-start;
@@ -819,16 +819,6 @@ input:checked + .slider:before { transform: translateX(24px); }
         white-space: nowrap;
     }
 
-    .pending-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .source-badge {
-        width: 100%;
-        justify-content: center;
-    }
     
     .help-btn {
         width: 100%;
@@ -1253,6 +1243,40 @@ input:checked + .slider:before { transform: translateX(24px); }
     .alert-icon-wrapper {
         margin-bottom: 0.5rem;
     }
+
+    .pending-header {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        gap: 8px !important;
+    }
+
+    .date {
+        font-size: 0.9rem !important;
+    }
+
+    .date mat-icon {
+        font-size: 1.05rem !important;
+        height: 1.05rem !important;
+        width: 1.05rem !important;
+    }
+
+    .source-badge {
+        width: auto !important;
+        padding: 4px 10px !important;
+        font-size: 0.75rem !important;
+        justify-content: center !important;
+    }
+
+    .source-text-desktop {
+        display: none !important;
+    }
+
+    .source-text-mobile {
+        display: inline !important;
+    }
 }
 
 /* Premium Enhancements */
@@ -1291,3 +1315,50 @@ input:checked + .slider:before { transform: translateX(24px); }
 .warning-text {
     color: #d97706 !important;
 }
+
+mat-dialog-content {
+    padding-top: 0 !important;
+}
+
+/* Sticky Header & Animations for Pending Reviews Dialog */
+.sticky-session-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: #ffffff;
+    padding: 1rem 1.5rem;
+    margin-left: -24px; /* Offset the left padding of mat-dialog-content */
+    margin-right: -24px; /* Offset the right padding of mat-dialog-content */
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 1.5rem;
+}
+
+.form-card-container {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.transition-out {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.98);
+    pointer-events: none;
+}
+
+.transition-in {
+    animation: cardFadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes cardFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.source-text-mobile {
+    display: none;
+}
+

@@ -47,42 +47,44 @@
       } @else {
   
         <div class="progress-dashboard no-print" style="margin-bottom: 2rem;">
-          <div class="grade-progression-widget" style="display: flex; align-items: center; justify-content: center; gap: 1rem; background: white; padding: 1.5rem; border-radius: 12px; border: 1px dashed #cbd5e1; margin-bottom: 1.5rem;">
-            <div class="grade-card current" style="border: 1px solid var(--primary-color); padding: 1rem 1.5rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem; background: #f8fafc;">
-              <div class="grade-icon" style="background-color: color-mix(in srgb, var(--primary-color) 20%, transparent); color: var(--primary-color); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+          <div class="grade-progression-widget">
+            <div class="grade-card current" style="border-color: var(--primary-color);">
+              <div class="grade-icon" style="background-color: color-mix(in srgb, var(--primary-color) 20%, transparent); color: var(--primary-color);">
                 <span class="material-icons">military_tech</span>
               </div>
               <div class="grade-text">
-                <span class="label" style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700;">Grado Actual</span>
-                <span class="value" style="display: block; font-size: 1.25rem; font-weight: 800; color: #0f172a;">{{ selectedDog()?.rfec_grade || 'Iniciación' }}</span>
+                <span class="label">Grado Actual</span>
+                <span class="value">{{ selectedDog()?.rfec_grade || 'Iniciación' }}</span>
               </div>
             </div>
 
             @if (selectedDog()?.rfec_grade === 'Iniciación' || !selectedDog()?.rfec_grade || selectedDog()?.rfec_grade === 'Promoción') {
-              <div class="progression-arrow" style="display: flex; align-items: center; gap: 0.5rem;">
-                <span class="material-icons" style="color: var(--primary-color); font-size: 2rem;">arrow_forward</span>
+              <div class="progression-arrow">
+                <div class="line" style="background-color: var(--primary-color);"></div>
+                <div class="pulse-ring" style="border-color: var(--primary-color);"></div>
+                <span class="material-icons" style="color: var(--primary-color);">arrow_forward</span>
               </div>
 
-              <div class="grade-card target" style="border: 1px dashed #cbd5e1; padding: 1rem 1.5rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem; background: #f8fafc; opacity: 0.7;">
-                <div class="grade-icon" style="background-color: #e2e8f0; color: #64748b; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+              <div class="grade-card target">
+                <div class="grade-icon">
                   <span class="material-icons">emoji_events</span>
                 </div>
                 <div class="grade-text">
-                  <span class="label" style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700;">Próximo Objetivo</span>
-                  <span class="value" style="display: block; font-size: 1.25rem; font-weight: 800; color: #334155;">{{ (selectedDog()?.rfec_grade === 'Iniciación' || !selectedDog()?.rfec_grade) ? 'Promoción' : 'Competición' }}</span>
+                  <span class="label">Próximo Objetivo</span>
+                  <span class="value">{{ (selectedDog()?.rfec_grade === 'Iniciación' || !selectedDog()?.rfec_grade) ? 'Promoción' : 'Competición' }}</span>
                 </div>
               </div>
             } @else {
-              <div class="progression-arrow" style="display: flex; align-items: center; gap: 0.5rem;">
+              <div class="progression-arrow">
                 <span class="material-icons" style="color: #10b981; font-size: 2rem;">check_circle</span>
               </div>
-              <div class="grade-card target achieved" style="border: 1px solid #10b981; background-color: #f0fdf4; padding: 1rem 1.5rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem;">
-                <div class="grade-icon" style="background-color: #dcfce7; color: #10b981; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+              <div class="grade-card target achieved" style="border-color: #10b981; background-color: #f0fdf4;">
+                <div class="grade-icon" style="background-color: #dcfce7; color: #10b981;">
                   <span class="material-icons">workspace_premium</span>
                 </div>
                 <div class="grade-text">
-                  <span class="label" style="display: block; font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 700;">Pico de Progreso</span>
-                  <span class="value" style="display: block; font-size: 1.25rem; font-weight: 800; color: #15803d;">Grado Máximo</span>
+                  <span class="label">Pico de Progreso</span>
+                  <span class="value" style="color: #15803d;">Grado Máximo</span>
                 </div>
               </div>
             }
@@ -234,33 +236,109 @@
             <p style="color: #64748b; text-align: center; padding: 2rem 0;">No hay mangas registradas todavía.</p>
           } @else {
             <div class="table-responsive">
-              <table>
+              <table class="tracks-table">
                 <thead>
                   <tr>
                     <th>Fecha</th>
-                    <th>Evento / Lugar</th>
                     <th>Manga</th>
-                    <th>Juez</th>
                     <th>Calificación</th>
+                    <th>Tiempo / TRS</th>
                     <th>Velocidad</th>
-                    <th class="no-print">Acciones</th>
+                    <th>Penalizaciones</th>
+                    <th>Competición</th>
+                    <th class="no-print" style="text-align: right;">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (track of dogTracks(); track track.id) {
                     <tr>
-                      <td>{{ track.date | date:'dd/MM/yyyy' }}</td>
-                      <td>{{ track.location || '-' }}</td>
-                      <td>{{ track.manga_type }}</td>
-                      <td>{{ track.judge_name || '-' }}</td>
+                      <td style="font-weight: 500;">{{ track.date | date:'dd/MM/yyyy' }}</td>
                       <td>
-                        <span class="badge" [ngClass]="track.qualification.toLowerCase().replaceAll(' ', '')">
-                          {{ track.qualification }}
-                        </span>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                          <span class="badge" [class.agility]="track.manga_type.toLowerCase().includes('agility')"
+                            [class.jumping]="track.manga_type.toLowerCase().includes('jumping')">
+                            {{ shortenManga(track.manga_type) }}
+                          </span>
+                          @if (track.judge_name) {
+                            <span style="font-size: 0.8rem; color: #64748b; display: inline-flex; align-items: center; gap: 2px;" title="Juez">
+                              <span class="material-icons" style="font-size: 11px;">gavel</span> {{ track.judge_name }}
+                            </span>
+                          }
+                        </div>
                       </td>
-                      <td>{{ track.speed }}</td>
-                      <td class="no-print">
-                        <div class="actions-cell">
+                      <td>
+                        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                          <span class="badge" [ngClass]="getQualificationClass(track.qualification)">
+                            {{ track.qualification }}
+                          </span>
+                          @if (isCleanRun(track)) {
+                            <span style="display: inline-flex; align-items: center; gap: 2px; background-color: #dcfce7; color: #15803d; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                              <span class="material-icons" style="font-size: 12px; color: #16a34a;">task_alt</span> Pista Limpia
+                            </span>
+                          }
+                        </div>
+                      </td>
+                      <td>
+                        @if (track.time) {
+                          <div>
+                            <span style="font-weight: 600; color: #0f172a;">{{ track.time | number:'1.2-2' }}s</span>
+                            @if (track.standard_time) {
+                              <div style="color: #64748b; font-size: 0.8rem; margin-top: 2px;">TRS: {{ track.standard_time | number:'1.2-2' }}s</div>
+                            }
+                          </div>
+                        } @else {
+                          <span style="color: #94a3b8;">-</span>
+                        }
+                      </td>
+                      <td>
+                        @if (track.speed) {
+                          <div>
+                            <span style="font-weight: 600; color: #0f172a;">{{ track.speed | number:'1.2-2' }} m/s</span>
+                            @if (track.course_length) {
+                              <div style="color: #64748b; font-size: 0.8rem; margin-top: 2px;">{{ track.course_length }}m</div>
+                            }
+                          </div>
+                        } @else {
+                          @if (track.course_length) {
+                            <span style="font-weight: 500; color: #475569;">{{ track.course_length }}m</span>
+                          } @else {
+                            <span style="color: #94a3b8;">-</span>
+                          }
+                        }
+                      </td>
+                      <td>
+                        @if (isEliminated(track.qualification)) {
+                          <span style="color: #94a3b8;">-</span>
+                        } @else {
+                          <div style="font-size: 0.85rem; line-height: 1.4; color: #334155;">
+                            <div style="white-space: nowrap;">
+                              Faltas: <span style="font-weight: 600;">{{ track.faults ?? 0 }}</span> | 
+                              Rehuses: <span style="font-weight: 600;">{{ track.refusals ?? 0 }}</span>
+                            </div>
+                            @if (getComputedPenalty(track) > 0) {
+                              <div style="font-size: 0.8rem; font-weight: 700; margin-top: 2px; color: #ef4444;">
+                                Penalización: {{ getComputedPenalty(track) | number:'1.2-2' }} ptos
+                                @if (track.time_penalty && track.time_penalty > 0) {
+                                  <span style="font-size: 0.75rem; color: #dc2626; font-weight: normal;"> (+{{ track.time_penalty | number:'1.2-2' }}s)</span>
+                                }
+                              </div>
+                            } @else {
+                              <div style="font-size: 0.8rem; font-weight: 500; margin-top: 2px; color: #16a34a;">
+                                0,00 ptos
+                              </div>
+                            }
+                          </div>
+                        }
+                      </td>
+                      <td>
+                        @if (track.location) {
+                          <span style="font-size: 0.85rem; color: #475569; font-weight: 500;">{{ track.location }}</span>
+                        } @else {
+                          <span style="color: #94a3b8;">-</span>
+                        }
+                      </td>
+                      <td class="no-print" style="text-align: right;">
+                        <div class="actions-cell" style="display:inline-flex; gap: 4px; justify-content: flex-end;">
                           <button class="icon-btn edit" (click)="editTrack(track)" title="Editar">
                             <span class="material-icons">edit</span>
                           </button>
@@ -274,6 +352,141 @@
                 </tbody>
               </table>
             </div>
+
+            <!-- Mobile Cards View -->
+            <div class="tracks-cards-list no-print">
+              @for (track of dogTracks(); track track.id) {
+              <div class="track-card" [class.expanded]="expandedTrackIds().has(track.id!)">
+                <div class="card-collapsed-header" (click)="toggleTrackExpand(track.id!)">
+                  <div class="header-left">
+                    <span class="card-date">{{ track.date | date:'dd/MM/yyyy' }}</span>
+                    <span class="badge" [class.agility]="track.manga_type.toLowerCase().includes('agility')"
+                      [class.jumping]="track.manga_type.toLowerCase().includes('jumping')">
+                      {{ shortenManga(track.manga_type) }}
+                    </span>
+                    <span class="badge" [ngClass]="getQualificationClass(track.qualification)">
+                      {{ shortenQualification(track.qualification) }}
+                    </span>
+                  </div>
+                  <div class="header-right">
+                    @if (track.location) {
+                      <span class="card-comp-name" [title]="track.location">{{ track.location.split(' - ')[0] }}</span>
+                    }
+                    <span class="material-icons expand-icon">{{ expandedTrackIds().has(track.id!) ? 'expand_less' : 'expand_more' }}</span>
+                  </div>
+                </div>
+                
+                <div class="card-expanded-content">
+                  @if (track.judge_name || isCleanRun(track)) {
+                    <div class="card-qual-row" style="margin-top: 0.25rem; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                      @if (track.judge_name) {
+                        <span class="card-judge" title="Juez" style="font-size: 0.85rem; color: #64748b; display: inline-flex; align-items: center; gap: 2px;">
+                          <span class="material-icons" style="font-size: 14px;">gavel</span> {{ track.judge_name }}
+                        </span>
+                      }
+                      @if (isCleanRun(track)) {
+                        <span class="clean-run-badge">
+                          <span class="material-icons">task_alt</span> Pista Limpia
+                        </span>
+                      }
+                    </div>
+                  }
+
+                  <div class="card-metrics-grid">
+                    <div class="metric-item">
+                      <span class="metric-label">Tiempo / TRS</span>
+                      <span class="metric-value">
+                        @if (track.time) {
+                          <span class="main-val">{{ track.time | number:'1.2-2' }}s</span>
+                          @if (track.standard_time) {
+                            <span class="sub-val">TRS: {{ track.standard_time | number:'1.2-2' }}s</span>
+                          }
+                        } @else {
+                          <span class="empty-val">-</span>
+                        }
+                      </span>
+                    </div>
+
+                    <div class="metric-item">
+                      <span class="metric-label">Velocidad / Longitud</span>
+                      <span class="metric-value">
+                        @if (track.speed) {
+                          <span class="main-val">{{ track.speed | number:'1.2-2' }} m/s</span>
+                          @if (track.course_length) {
+                            <span class="sub-val">{{ track.course_length }}m</span>
+                          }
+                        } @else {
+                          @if (track.course_length) {
+                            <span class="main-val">{{ track.course_length }}m</span>
+                          } @else {
+                            <span class="empty-val">-</span>
+                          }
+                        }
+                      </span>
+                    </div>
+
+                    <div class="metric-item">
+                      <span class="metric-label">Penalizaciones</span>
+                      <div class="metric-value">
+                        @if (isEliminated(track.qualification)) {
+                          <span class="empty-val">-</span>
+                        } @else {
+                          <div class="penalties-detail">
+                            <div class="faults-refs">Faltas: <strong>{{ track.faults ?? 0 }}</strong> | Rehuses: <strong>{{ track.refusals ?? 0 }}</strong></div>
+                            @if (getComputedPenalty(track) > 0) {
+                              <div class="penalty-pts text-danger">
+                                {{ getComputedPenalty(track) | number:'1.2-2' }} ptos
+                                @if (track.time_penalty && track.time_penalty > 0) {
+                                  <span class="time-penalty-sub"> (+{{ track.time_penalty | number:'1.2-2' }}s)</span>
+                                }
+                              </div>
+                            } @else {
+                              <div class="penalty-pts text-success">
+                                0,00 ptos
+                              </div>
+                            }
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                    <div class="metric-item">
+                      <span class="metric-label">Competición</span>
+                      <span class="metric-value card-location">
+                        @if (track.location) {
+                          {{ track.location }}
+                        } @else {
+                          <span class="empty-val">-</span>
+                        }
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="card-actions">
+                    <div class="actions-left"></div>
+                    <div class="actions-right">
+                      <button class="btn-card-action edit" (click)="editTrack(track)">
+                        <span class="material-icons">edit</span>
+                        <span>Editar</span>
+                      </button>
+                      <button class="btn-card-action delete" (click)="deleteTrack(track.id!)">
+                        <span class="material-icons">delete</span>
+                        <span>Eliminar</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+            </div>
+            
+            @if (dogTracks().length > 0) {
+              <div class="export-actions no-print" style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+                <button class="btn-add" (click)="printPassport()" style="background-color: var(--primary-color);">
+                  <span class="material-icons">print</span> Imprimir / Exportar PDF
+                </button>
+              </div>
+            }
           }
         </div>
       }
@@ -290,78 +503,155 @@
           <button class="close-btn" (click)="closeForm()">&times;</button>
         </div>
         
-        <form (submit)="submitForm(); $event.preventDefault();">
-          <div class="form-group">
-            <label>Competición (Opcional)</label>
-            <select [(ngModel)]="formData.competition_id" (ngModelChange)="onCompetitionChange($event)" name="comp_id">
-              <option [ngValue]="null">-- Registro Manual --</option>
-              @for (comp of pastAndCurrentCompetitions(); track comp.id) {
-                <option [value]="comp.id">{{ comp.nombre }} ({{ comp.fechaEvento | date:'dd/MM' }})</option>
+        <form (submit)="submitForm(); $event.preventDefault();" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div class="modal-body" style="padding: 0; max-height: 70vh; overflow-y: auto;">
+            
+            <div class="form-section">
+              <h4 class="section-title">
+                <span class="material-icons" style="vertical-align: middle; margin-right: 6px;">event_note</span>
+                Datos Básicos
+              </h4>
+              
+              <div class="form-group" style="margin-bottom: 1.25rem;">
+                <label>Competición (Opcional)</label>
+                <select [(ngModel)]="formData.competition_id" (ngModelChange)="onCompetitionChange($event)" name="comp_id">
+                  <option [ngValue]="null">-- Registro Manual --</option>
+                  @for (comp of pastAndCurrentCompetitions(); track comp.id) {
+                    <option [value]="comp.id">{{ comp.nombre }} ({{ comp.fechaEvento | date:'dd/MM' }})</option>
+                  }
+                </select>
+                <small style="color: #64748b; font-size: 0.8rem;">Solo se muestran competiciones Caza pasadas/actuales.</small>
+              </div>
+
+              @if (!formData.competition_id) {
+                <div class="form-grid" style="margin-bottom: 1.25rem;">
+                  <div class="form-group">
+                    <label>Fecha *</label>
+                    <input type="date" [(ngModel)]="formData.manual_date" name="m_date" required>
+                  </div>
+                  <div class="form-group">
+                    <label>Lugar</label>
+                    <input type="text" [(ngModel)]="formData.manual_location" name="m_loc" placeholder="Ej. Club Agility...">
+                  </div>
+                </div>
               }
-            </select>
-            <small style="color: #64748b; font-size: 0.8rem;">Solo se muestran competiciones Caza pasadas/actuales.</small>
-          </div>
-  
-          @if (!formData.competition_id) {
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Tipo de Manga *</label>
+                  <select [(ngModel)]="formData.manga_type" name="m_type" required>
+                    <option value="Agility 1">Agility 1</option>
+                    <option value="Agility 2">Agility 2</option>
+                    <option value="Agility">Agility</option>
+                    <option value="Jumping 1">Jumping 1</option>
+                    <option value="Jumping 2">Jumping 2</option>
+                    <option value="Jumping">Jumping</option>
+                    <option value="Otra">Otra</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Juez *</label>
+                  <input type="text" [(ngModel)]="formData.judge_name" name="j_name" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="section-title">
+                <span class="material-icons" style="vertical-align: middle; margin-right: 6px;">emoji_events</span>
+                Resultados de la Carrera
+              </h4>
+
+              <div class="form-grid" style="margin-bottom: 1.25rem;">
+                <div class="form-group">
+                  <label>Calificación *</label>
+                  <select [(ngModel)]="formData.qualification" (ngModelChange)="onMetricChange()" name="qual" required>
+                    <option value="Excelente a 0">EXCELENTE a 0</option>
+                    <option value="Excelente">EXCELENTE (hasta 5.99 ptos)</option>
+                    <option value="Muy Bueno">MUY BUENO (hasta 15.99 ptos)</option>
+                    <option value="Bueno">BUENO (hasta 25.99 ptos)</option>
+                    <option value="No Clasificado">NO CLASIFICADO (+26 ptos)</option>
+                    <option value="Eliminado">Eliminado</option>
+                    <option value="No Presentado">No Presentado</option>
+                  </select>
+                </div>
+
+                <div class="form-group" style="justify-content: center; align-items: flex-start; padding-top: 1.5rem;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none;">
+                    <input type="checkbox" [(ngModel)]="formData.is_clean" name="is_clean" style="width: 20px; height: 20px; accent-color: var(--primary-color);">
+                    <span style="font-weight: 600; color: #1e293b;">Pista Limpia (A cero)</span>
+                  </label>
+                </div>
+              </div>
+
+              <div style="border-top: 1px dashed #cbd5e1; margin: 1.25rem 0; padding-top: 1.25rem;">
+                <h5 style="margin: 0 0 0.75rem 0; color: #475569; font-size: 0.9rem; font-weight: 700;">Medidas de Pista & Tiempos</h5>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Longitud de Pista (m)</label>
+                    <input type="number" [(ngModel)]="formData.course_length" (ngModelChange)="onMetricChange()" name="c_length" placeholder="Ej. 180">
+                  </div>
+                  
+                  <div class="form-group">
+                    <label>TRS / Tiempo Estándar (s)</label>
+                    <input type="number" step="0.01" [(ngModel)]="formData.standard_time" (ngModelChange)="onMetricChange()" name="std_time" placeholder="Ej. 45.00">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Tiempo del Perro (s)</label>
+                    <input type="number" step="0.01" [(ngModel)]="formData.time" (ngModelChange)="onMetricChange()" name="t_time" placeholder="Ej. 38.45">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Velocidad (m/s)</label>
+                    <div style="position: relative;">
+                      <input type="number" step="0.01" [(ngModel)]="formData.speed" name="speed" placeholder="Ej. 4.68" style="padding-right: 3rem;">
+                      <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9em; pointer-events: none;">m/s</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="border-top: 1px dashed #cbd5e1; margin: 1.25rem 0; padding-top: 1.25rem;">
+                <h5 style="margin: 0 0 0.75rem 0; color: #475569; font-size: 0.9rem; font-weight: 700;">Penalizaciones & Faltas</h5>
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label>Faltas</label>
+                    <input type="number" min="0" [(ngModel)]="formData.faults" (ngModelChange)="onMetricChange()" name="faults_count" placeholder="0">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Rehuses</label>
+                    <input type="number" min="0" [(ngModel)]="formData.refusals" (ngModelChange)="onMetricChange()" name="refusals_count" placeholder="0">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Penalización de Tiempo (s)</label>
+                    <input type="number" step="0.01" [(ngModel)]="formData.time_penalty" name="t_penalty" placeholder="0.00">
+                  </div>
+
+                  <div class="form-group">
+                    <label>Penalización Total (ptos)</label>
+                    <input type="number" step="0.01" [(ngModel)]="formData.total_penalty" name="tot_penalty" placeholder="0.00">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4 class="section-title">
+                <span class="material-icons" style="vertical-align: middle; margin-right: 6px;">description</span>
+                Notas
+              </h4>
               <div class="form-group">
-                <label>Fecha</label>
-                <input type="date" [(ngModel)]="formData.manual_date" name="m_date" required>
-              </div>
-              <div class="form-group">
-                <label>Lugar</label>
-                <input type="text" [(ngModel)]="formData.manual_location" name="m_loc" placeholder="Ej. Club Agility...">
+                <label>Notas (son únicamente para ti)</label>
+                <textarea [(ngModel)]="formData.notes" name="notes" rows="2" placeholder="Sensaciones, errores, etc."></textarea>
               </div>
             </div>
-          }
-  
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div class="form-group">
-              <label>Tipo de Manga</label>
-              <select [(ngModel)]="formData.manga_type" name="m_type" required>
-                <option value="Agility 1">Agility 1</option>
-                <option value="Agility 2">Agility 2</option>
-                <option value="Agility">Agility</option>
-                <option value="Jumping 1">Jumping 1</option>
-                <option value="Jumping 2">Jumping 2</option>
-                <option value="Jumping">Jumping</option>
-                <option value="Otra">Otra</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Juez</label>
-              <input type="text" [(ngModel)]="formData.judge_name" name="j_name" required>
-            </div>
+
           </div>
-  
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div class="form-group">
-              <label>Calificación</label>
-              <select [(ngModel)]="formData.qualification" name="qual" required>
-                <option value="Excelente a 0">EXCELENTE a 0</option>
-                <option value="Excelente">EXCELENTE (hasta 5.99 ptos)</option>
-                <option value="Muy Bueno">MUY BUENO (hasta 15.99 ptos)</option>
-                <option value="Bueno">BUENO (hasta 25.99 ptos)</option>
-                <option value="No Clasificado">NO CLASIFICADO (+26 ptos)</option>
-                <option value="Eliminado">Eliminado</option>
-                <option value="No Presentado">No Presentado</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>Velocidad (m/s)</label>
-              <div style="position: relative;">
-                <input type="number" step="0.1" min="0" [(ngModel)]="formData.speed" name="speed" class="form-control" placeholder="Ej. 4.56" style="padding-right: 3rem;">
-                <span style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 0.9em; pointer-events: none;">m/s</span>
-              </div>
-            </div>
-          </div>
-  
-          <div class="form-group">
-            <label>Notas (Opcional)</label>
-            <textarea [(ngModel)]="formData.notes" name="notes" rows="2" placeholder="Sensaciones, errores, etc."></textarea>
-          </div>
-  
-          <div class="form-actions">
+
+          <div class="form-actions" style="margin-top: 1rem;">
             <button type="button" class="btn-cancel" (click)="closeForm()">Cancelar</button>
             <button type="submit" class="btn-add" style="background: var(--primary-color);">Guardar Manga</button>
           </div>

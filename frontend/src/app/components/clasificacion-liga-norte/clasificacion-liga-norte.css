@@ -491,9 +491,64 @@ tr.asturias-row .total-points {
   .clasificacion-container {
     padding: 12px;
   }
+
+  /* Premium horizontal scrollable class selector pills for mobile */
+  .tabs-container {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 8px !important;
+    margin-bottom: 20px !important;
+    padding: 8px 16px !important;
+    margin-left: -12px !important;
+    margin-right: -12px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    scrollbar-width: none !important; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none !important; /* Hide scrollbar for IE/Edge */
+    scroll-padding: 16px;
+  }
   
-  .header-title {
-    font-size: 1.4rem;
+  .tabs-container::-webkit-scrollbar {
+    display: none !important; /* Hide scrollbar for Chrome/Safari */
+  }
+
+  .tabs-container .tab-btn {
+    flex-shrink: 0 !important;
+    background-color: #ffffff !important;
+    border: 1px solid rgba(226, 232, 240, 0.8) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04) !important;
+    padding: 8px 16px !important;
+    font-size: 0.85rem !important;
+    border-radius: 9999px !important; /* Full pill styling */
+    color: #64748b !important;
+    font-weight: 700 !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  .tabs-container .tab-badge {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+    border-radius: 99px !important;
+    font-size: 0.7rem !important;
+    padding: 2px 6px !important;
+    min-width: 18px !important;
+    transition: all 0.2s ease !important;
+  }
+
+  .tabs-container .tab-btn.active {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+  }
+
+  .tabs-container .tab-btn.active .tab-badge {
+    background-color: #ffffff !important;
+    color: #2563eb !important;
   }
 }
 

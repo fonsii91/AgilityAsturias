@@ -10,6 +10,14 @@ export interface RfecTrack {
     location?: string | null;
     notes?: string | null;
     grade?: string | null;
+    time?: number | null;
+    faults?: number | null;
+    refusals?: number | null;
+    time_penalty?: number | null;
+    total_penalty?: number | null;
+    is_clean?: boolean | number | null;
+    course_length?: number | null;
+    standard_time?: number | null;
     created_at?: string;
     updated_at?: string;
 }

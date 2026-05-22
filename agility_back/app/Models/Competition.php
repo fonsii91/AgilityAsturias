@@ -37,6 +37,6 @@ class Competition extends Model
 
     public function attendingDogs()
     {
-        return $this->belongsToMany(Dog::class, 'competition_dog')->withPivot('user_id', 'dias_asistencia')->withTimestamps();
+        return $this->belongsToMany(Dog::class, 'competition_dog')->withPivot('user_id', 'dias_asistencia', 'position', 'dorsal')->withTimestamps();
     }
 }

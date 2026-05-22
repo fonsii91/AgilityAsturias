@@ -11,6 +11,7 @@ class PointHistory extends Model
     use HasClub;
     protected $fillable = [
         'dog_id',
+        'club_id',
         'points',
         'category',
     ];
