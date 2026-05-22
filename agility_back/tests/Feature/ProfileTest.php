@@ -149,11 +149,14 @@ class ProfileTest extends TestCase
     public function test_calcula_automaticamente_la_categoria_rsce_para_los_perros_del_usuario_al_actualizar_nacimiento()
     {
         $user = $this->createUser();
-        $dog = \App\Models\Dog::create([
+        $dog = new \App\Models\Dog([
             'name' => 'Test Dog',
-            'user_id' => $user->id,
             'club_id' => $this->club->id
         ]);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('dogs', 'user_id')) {
+            $dog->user_id = $user->id;
+        }
+        $dog->save();
         $user->dogs()->attach($dog->id, ['is_primary_owner' => true]);
 
         // J15: Edad 13 años (Asumiendo año actual 2026 -> 2013)

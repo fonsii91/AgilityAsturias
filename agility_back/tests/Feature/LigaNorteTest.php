@@ -85,11 +85,15 @@ class LigaNorteTest extends TestCase
         ]);
 
         // Create a local dog to test fuzzy-matching mapping
-        $dog = Dog::create([
+        $dog = new Dog([
             'name' => 'Toby',
-            'user_id' => $this->admin->id,
             'club_id' => $this->club->id
         ]);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('dogs', 'user_id')) {
+            $dog->user_id = $this->admin->id;
+        }
+        $dog->save();
+        $dog->users()->attach($this->admin->id);
 
         // Mock Gemini service
         $mockGemini = $this->createMock(GeminiVisionService::class);
@@ -258,11 +262,14 @@ class LigaNorteTest extends TestCase
         ]);
 
         // 2. Create the dog "NARCEA" associated to the user and club
-        $dog = Dog::create([
+        $dog = new Dog([
             'name' => 'NARCEA',
-            'user_id' => $user->id,
             'club_id' => $this->club->id
         ]);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('dogs', 'user_id')) {
+            $dog->user_id = $user->id;
+        }
+        $dog->save();
         $dog->users()->attach($user->id);
 
         // Setup the LigaNorteService
@@ -307,11 +314,14 @@ class LigaNorteTest extends TestCase
             'club_id' => $otherClub->id
         ]);
 
-        $otherDog = Dog::create([
+        $otherDog = new Dog([
             'name' => 'Fido',
-            'user_id' => $otherUser->id,
             'club_id' => $otherClub->id
         ]);
+        if (\Illuminate\Support\Facades\Schema::hasColumn('dogs', 'user_id')) {
+            $otherDog->user_id = $otherUser->id;
+        }
+        $otherDog->save();
         $otherDog->users()->attach($otherUser->id);
 
         // 3. Create standing linked to this other club's dog
