@@ -143,17 +143,18 @@ class ScrapeTelegramLigaNorte extends Command
                 } catch (Exception $e) {
                     $this->error("Gemini extraction failed for post {$telegramMessageId}: " . $e->getMessage());
                     Log::error("Gemini extraction failed for post {$telegramMessageId}: " . $e->getMessage());
-                    // We proceed to import anyway as pending, without raw data, so that they can retry manually
+                    // Skip and try again next run, since user wants 100% automated flow without admin review fallback
+                    continue;
                 }
 
-                // Create the single global import record
+                // Create the single global import record as approved directly
                 $import = LigaNorteImport::create([
                     'telegram_message_id' => $telegramMessageId,
                     'image_path' => $fileName,
-                    'status' => 'pending',
+                    'status' => 'approved',
                 ]);
 
-                // Automatically process and publish using pre-extracted raw data (or let it try Gemini if not extracted)
+                // Automatically process and publish using pre-extracted raw data
                 try {
                     $this->info("Automatically processing and publishing post {$telegramMessageId}...");
                     Log::info("Automatically processing and publishing post {$telegramMessageId}...");
@@ -163,16 +164,17 @@ class ScrapeTelegramLigaNorte extends Command
                     
                     $this->info("Successfully published standings.");
                     Log::info("Successfully published standings.");
+                    $importedCount++;
                 } catch (Exception $e) {
                     $this->error("Failed auto-publishing post {$telegramMessageId}: " . $e->getMessage());
                     Log::error("Failed auto-publishing post {$telegramMessageId}: " . $e->getMessage());
+                    // Clean up import so it can be retried next time
+                    $import->delete();
                 }
-
-                $importedCount++;
             }
 
-            $this->info("Scrape finished. Imported {$importedCount} new pending items globally.");
-            Log::info("Scrape finished. Imported {$importedCount} new pending items.");
+            $this->info("Scrape finished. Imported {$importedCount} new items globally.");
+            Log::info("Scrape finished. Imported {$importedCount} new items.");
             return 0;
 
         } catch (Exception $e) {
