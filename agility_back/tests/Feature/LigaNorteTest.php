@@ -276,12 +276,12 @@ class LigaNorteTest extends TestCase
         /** @var \App\Services\LigaNorteService $service */
         $service = $this->app->make(\App\Services\LigaNorteService::class);
 
-        // Input row with typo "NARCIA", correct guide "IVAN PEREZ", club "ASTURIAS TEST"
+        // Input row with typo "NARCIA", correct guide "IVAN PEREZ", and incorrect club
         $rows = [
             [
                 'clase' => 60,
                 'posicion' => 9,
-                'club_nombre' => 'ASTURIAS TEST',
+                'club_nombre' => 'INCORRECT CLUB',
                 'guia_nombre' => 'IVAN PEREZ',
                 'perro_nombre' => 'NARCIA',
                 'puntos_total' => 69
@@ -293,6 +293,7 @@ class LigaNorteTest extends TestCase
         $this->assertEquals($dog->id, $enriched[0]['dog_id']);
         $this->assertEquals('NARCEA', $enriched[0]['suggested_dog_name']);
         $this->assertEquals('NARCEA', $enriched[0]['perro_nombre']); // Name should be corrected!
+        $this->assertEquals('Asturias Test', $enriched[0]['club_nombre']); // Club name should be corrected!
     }
 
     public function test_cross_club_owner_name_visible_and_email_hidden()

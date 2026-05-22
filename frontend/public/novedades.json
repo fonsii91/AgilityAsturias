@@ -3,6 +3,7 @@
     "version": "1.1.42",
     "date": "2026-05-22",
     "features": [
+      "¡Clasificaciones de la Liga Norte más precisas! Hemos mejorado la lectura automática de las planillas de resultados para que detecte correctamente los nombres oficiales de los clubes y los puntos obtenidos por tu perro, evitando erratas y asegurando información 100% exacta.",
       "¡Puntos y asistencia automáticos en pruebas de FlowAgility! Ahora, cuando finalice una competición que se sincronice con FlowAgility, la plataforma pasará asistencia de forma automática y cargará los puntos correspondientes directamente al perfil de tu perro sin necesidad de que el staff lo valide manualmente.",
       "¡Creación de competiciones más rápida! A partir de ahora, al añadir un nuevo evento para el club, si pegas un enlace de FlowAgility o buscas el evento por su nombre, la plataforma rellenará automáticamente todos los campos del formulario (fechas, lugar, federación y juez). ¡Menos papeleo y más comodidad para organizar el calendario de tu club!",
       "¡Nueva sección de Clasificación de la Liga Norte! Ya puedes consultar de manera cómoda y directa la clasificación actual de la Liga Norte desde la sección 'Explorar'. Las clasificaciones están organizadas por alturas (30, 40, 50 y 60) y destacamos en color verde con un distintivo a los binomios de nuestro club.",

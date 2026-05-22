@@ -32,7 +32,8 @@ class LigaNorteService
     {
         // 1. Extract raw data using Gemini Vision (or use pre-extracted data)
         $rawResult = $rawExtractedData ?? $this->geminiService->extractTableFromImage(
-            Storage::disk('public')->path($import->image_path)
+            Storage::disk('public')->path($import->image_path),
+            $this->getOcrContext()
         );
 
         // Normalize structure (support both new nested format and legacy flat format)
@@ -223,6 +224,9 @@ class LigaNorteService
                 $row['dog_id'] = $bestDog->id;
                 $row['suggested_dog_name'] = $bestDog->name;
                 $row['perro_nombre'] = $bestDog->name;
+                if ($bestDog->club) {
+                    $row['club_nombre'] = $bestDog->club->name;
+                }
             }
 
             return $row;
@@ -266,5 +270,36 @@ class LigaNorteService
         ];
         $str = str_replace(array_keys($replacements), array_values($replacements), $str);
         return preg_replace('/[^a-z0-9]/', '', $str); // Remove spaces and punctuation
+    }
+
+    /**
+     * Get unique clubs, dogs, and guides to use as OCR reference context.
+     *
+     * @return array
+     */
+    public function getOcrContext(): array
+    {
+        try {
+            $clubs = DB::table('clubs')->pluck('name')->filter()->unique()->toArray();
+            $dbDogs = DB::table('dogs')->pluck('name')->filter()->unique()->toArray();
+            $dbGuides = DB::table('users')->pluck('name')->filter()->unique()->toArray();
+
+            $standingClubs = DB::table('liga_norte_standings')->pluck('club_nombre')->filter()->unique()->toArray();
+            $standingDogs = DB::table('liga_norte_standings')->pluck('perro_nombre')->filter()->unique()->toArray();
+            $standingGuides = DB::table('liga_norte_standings')->pluck('guia_nombre')->filter()->unique()->toArray();
+
+            $allClubs = array_values(array_filter(array_unique(array_merge($clubs, $standingClubs))));
+            $allDogs = array_values(array_filter(array_unique(array_merge($dbDogs, $standingDogs))));
+            $allGuides = array_values(array_filter(array_unique(array_merge($dbGuides, $standingGuides))));
+
+            return [
+                'clubs' => array_slice($allClubs, 0, 200),
+                'dogs' => array_slice($allDogs, 0, 500),
+                'guides' => array_slice($allGuides, 0, 500),
+            ];
+        } catch (Exception $e) {
+            Log::warning("Failed to build OCR context: " . $e->getMessage());
+            return [];
+        }
     }
 }

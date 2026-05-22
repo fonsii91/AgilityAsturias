@@ -139,7 +139,10 @@ class ScrapeTelegramLigaNorte extends Command
                     
                     $imagePath = Storage::disk('public')->path($fileName);
                     $geminiService = app(\App\Services\GeminiVisionService::class);
-                    $rawExtractedData = $geminiService->extractTableFromImage($imagePath);
+                    $ligaNorteService = app(\App\Services\LigaNorteService::class);
+                    $ocrContext = $ligaNorteService->getOcrContext();
+                    
+                    $rawExtractedData = $geminiService->extractTableFromImage($imagePath, $ocrContext);
                 } catch (Exception $e) {
                     $this->error("Gemini extraction failed for post {$telegramMessageId}: " . $e->getMessage());
                     Log::error("Gemini extraction failed for post {$telegramMessageId}: " . $e->getMessage());
