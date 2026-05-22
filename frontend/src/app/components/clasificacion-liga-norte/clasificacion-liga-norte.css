@@ -171,32 +171,34 @@ tr.asturias-row:hover td {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #2563eb;
+  color: #3b82f6;
   text-decoration: none;
   transition: all 0.2s ease;
   cursor: pointer;
 }
 
 .dog-link:hover {
-  color: #1d4ed8;
+  color: #2563eb;
 }
 
 .dog-link .dog-name,
 .dog-link .dog-name-clickable {
-  color: #2563eb;
-  text-decoration: underline dotted;
-  transition: color 0.2s;
+  color: #3b82f6;
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(59, 130, 246, 0.4);
+  transition: all 0.2s;
 }
 
 .dog-link:hover .dog-name,
 .dog-link:hover .dog-name-clickable {
-  color: #1d4ed8;
-  text-decoration: underline;
+  color: #2563eb;
+  border-bottom-color: #2563eb;
 }
 
 .dog-icon {
   font-size: 1.1rem;
   color: #3b82f6;
+  vertical-align: middle;
 }
 
 .dog-no-link {
@@ -232,6 +234,56 @@ tr.asturias-row:hover td {
   font-weight: 700;
   color: #64748b;
   font-size: 0.95rem;
+}
+
+/* Rank Badges */
+.rank-badge-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1;
+  text-align: center;
+}
+
+/* Rank 1 - Gold */
+.rank-badge-new.rank-1 {
+  background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.5);
+  position: relative;
+}
+
+/* Rank 2 - Silver */
+.rank-badge-new.rank-2 {
+  background: linear-gradient(135deg, #f1f5f9 0%, #94a3b8 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(148, 163, 184, 0.3);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(203, 213, 225, 0.5);
+}
+
+/* Rank 3 - Bronze */
+.rank-badge-new.rank-3 {
+  background: linear-gradient(135deg, #fed7aa 0%, #b45309 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(180, 83, 9, 0.3);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(253, 186, 116, 0.5);
+}
+
+/* Rank Default (4+) */
+.rank-badge-new.rank-default {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  font-weight: 700;
 }
 
 .class-tag {
@@ -287,13 +339,24 @@ tr.asturias-row:hover td {
 }
 
 .total-points {
-  font-size: 1rem;
-  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
   color: #1e293b;
+  border: 1px solid #e2e8f0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  min-width: 65px;
+  white-space: nowrap;
 }
 
-.asturias-row .total-points {
-  color: #065f46;
+tr.asturias-row .total-points {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #047857;
+  border-color: rgba(16, 185, 129, 0.25);
 }
 
 /* Loading & Empty States */
@@ -369,18 +432,36 @@ tr.asturias-row:hover td {
 }
 
 .standing-card {
-  padding: 12px 16px;
+  padding: 14px 18px;
   border-radius: 16px;
   display: flex;
   flex-direction: column;
   gap: 0;
-  transition: all 0.3s ease;
+  background: var(--surface-card, rgba(255, 255, 255, 0.85));
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.standing-card:hover {
+  transform: translateY(-2px);
+  background: #ffffff;
+  border-color: rgba(203, 213, 225, 0.8);
+  box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
 }
 
 .standing-card.asturias-card {
-  background-color: #f0fdf4;
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.6) 0%, rgba(255, 255, 255, 0.95) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-left: 4px solid #10b981;
+  box-shadow: 0 4px 20px -2px rgba(16, 185, 129, 0.06), 0 2px 4px -1px rgba(16, 185, 129, 0.04);
+}
+
+.standing-card.asturias-card:hover {
+  background: linear-gradient(135deg, rgba(240, 253, 244, 0.8) 0%, rgba(255, 255, 255, 0.95) 100%);
   border-color: rgba(16, 185, 129, 0.3);
-  border-left: 5px solid #10b981;
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.12), 0 8px 10px -6px rgba(16, 185, 129, 0.08);
 }
 
 .card-header {
@@ -426,9 +507,9 @@ tr.asturias-row:hover td {
 }
 
 .rank-badge {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   min-width: 32px;
 }
 
@@ -441,31 +522,53 @@ tr.asturias-row:hover td {
 .dog-header-row {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .dog-name {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 1.05rem;
   color: #1e293b;
 }
 
 .owner-name {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 2px;
 }
 
 .points-badge {
-  background-color: #1e293b;
-  color: white;
-  font-weight: 800;
-  font-size: 0.9rem;
-  padding: 4px 8px;
-  border-radius: 8px;
+  background: #f8fafc;
+  color: #1e293b;
+  border: 1px solid #e2e8f0;
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.points-badge .pts-suffix {
+  font-weight: 500;
+  color: #64748b;
 }
 
 .asturias-card .points-badge {
-  background-color: #059669;
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.asturias-card .points-badge .pts-suffix {
+  color: #059669;
+  opacity: 0.8;
 }
 
 .card-row {
@@ -491,35 +594,49 @@ tr.asturias-row:hover td {
 .excelentes-summary-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
   background-color: #f8fafc;
-  padding: 8px;
-  border-radius: 8px;
-  margin-top: 6px;
+  padding: 10px;
+  border-radius: 12px;
+  margin-top: 12px;
   text-align: center;
+  border: 1px solid #f1f5f9;
 }
 
 .asturias-card .excelentes-summary-grid {
-  background-color: #e6fcf0;
+  background-color: rgba(240, 253, 244, 0.5);
+  border-color: rgba(16, 185, 129, 0.15);
 }
 
 .ex-summary-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+}
+
+.ex-summary-item:not(:last-child) {
+  border-right: 1px solid #e2e8f0;
+}
+
+.asturias-card .ex-summary-item:not(:last-child) {
+  border-right-color: rgba(16, 185, 129, 0.15);
 }
 
 .item-label {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: #64748b;
   font-weight: 700;
+  letter-spacing: 0.05em;
 }
 
 .item-val {
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: #334155;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+.asturias-card .item-val {
+  color: #065f46;
 }
 
 /* Modal Photo Viewer */
