@@ -76,8 +76,8 @@ class ScrapeTelegramLigaNorte extends Command
             $this->info("Found " . count($posts) . " posts with images.");
             Log::info("Found " . count($posts) . " posts with images in Liga Norte channel.");
 
-            // Limit to the 5 most recent posts with images (newest are at the end)
-            $posts = array_slice($posts, -5);
+            // Limit to the 10 most recent posts with images (newest are at the end)
+            $posts = array_slice($posts, -10);
             $this->info("Limiting to the " . count($posts) . " most recent posts.");
             Log::info("Limiting to the " . count($posts) . " most recent posts.");
 

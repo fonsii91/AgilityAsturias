@@ -68,6 +68,7 @@ class LigaNorteController extends Controller
     {
         $import = LigaNorteImport::findOrFail($id);
         $rows = $request->input('rows');
+        $tipo = $request->input('tipo', $import->tipo ?? 'excelentes');
 
         if (empty($rows) || !is_array($rows)) {
             return response()->json([
@@ -77,17 +78,20 @@ class LigaNorteController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($import, $rows) {
-                // Delete previous standings for the height classes that are present in the approved data
+            DB::transaction(function () use ($import, $rows, $tipo) {
+                // Delete previous standings for the height classes that are present in the approved data for this specific tipo
                 $classesToUpdate = collect($rows)->pluck('clase')->unique()->filter()->toArray();
                 
                 if (!empty($classesToUpdate)) {
-                    LigaNorteStanding::whereIn('clase', $classesToUpdate)->delete();
+                    LigaNorteStanding::where('tipo', $tipo)
+                        ->whereIn('clase', $classesToUpdate)
+                        ->delete();
                 }
 
                 // Insert the new standings
                 foreach ($rows as $index => $row) {
                     LigaNorteStanding::create([
+                        'tipo' => $tipo,
                         'clase' => $row['clase'],
                         'posicion' => $row['posicion'] ?? ($index + 1),
                         'club_nombre' => $row['club_nombre'],
@@ -107,9 +111,10 @@ class LigaNorteController extends Controller
                     ]);
                 }
 
-                // Update the import status to approved
+                // Update the import status to approved and save tipo
                 $import->update([
                     'status' => 'approved',
+                    'tipo' => $tipo,
                     'extracted_data' => $rows // Save the final approved version
                 ]);
             });
@@ -165,6 +170,7 @@ class LigaNorteController extends Controller
     public function getStandings(Request $request)
     {
         $clase = $request->query('clase');
+        $tipo = $request->query('tipo', 'liga');
 
         $query = LigaNorteStanding::with([
             'dog' => function ($q) {
@@ -173,6 +179,7 @@ class LigaNorteController extends Controller
             'dog.users',
             'dog.club'
         ])
+            ->where('tipo', $tipo)
             ->orderBy('clase', 'desc')
             ->orderBy('posicion', 'asc');
 

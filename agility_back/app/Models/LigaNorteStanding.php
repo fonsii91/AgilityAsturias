@@ -12,6 +12,7 @@ class LigaNorteStanding extends Model
     protected $table = 'liga_norte_standings';
 
     protected $fillable = [
+        'tipo',
         'clase',
         'posicion',
         'club_nombre',

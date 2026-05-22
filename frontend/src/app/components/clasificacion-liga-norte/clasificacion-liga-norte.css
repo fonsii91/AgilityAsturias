@@ -97,6 +97,79 @@
   color: white;
 }
 
+/* Type Selector Segmented Control */
+.type-selector-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+  padding: 10px;
+}
+
+.segmented-control {
+  display: flex;
+  background-color: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px;
+  gap: 4px;
+}
+
+.control-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background-color: transparent;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.control-btn:hover {
+  color: #334155;
+  background-color: rgba(226, 232, 240, 0.5);
+}
+
+.control-btn.active {
+  background-color: #ffffff;
+  color: #2563eb;
+  box-shadow: 0 4px 10px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+}
+
+.control-icon {
+  font-size: 1.25rem;
+  transition: transform 0.25s ease;
+}
+
+.control-btn.active .control-icon {
+  color: #3b82f6;
+  transform: scale(1.1);
+}
+
+@media (max-width: 600px) {
+  .segmented-control {
+    max-width: 100%;
+  }
+  
+  .control-btn {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+    gap: 4px;
+  }
+  
+  .control-icon {
+    font-size: 1.1rem;
+  }
+}
+
 /* Table Card */
 .table-card {
   padding: 0;

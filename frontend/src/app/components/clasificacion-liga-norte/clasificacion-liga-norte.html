@@ -7,7 +7,11 @@
         Clasificación Liga Norte
       </h1>
       <p class="header-subtitle">
-        Consulta el estado de la competición y el progreso de los binomios del club en la liga.
+        @if (activeType() === 'liga') {
+          Consulta la clasificación general de la guía en la Liga Norte y el progreso de los binomios del club.
+        } @else {
+          Consulta la clasificación por excelentes de la Liga Norte para el Campeonato de España.
+        }
       </p>
     </div>
   </div>
@@ -18,6 +22,26 @@
       <p>Cargando clasificación de la Liga Norte...</p>
     </div>
   } @else {
+    <!-- Type Selector Segmented Control -->
+    <div class="type-selector-container glass-card">
+      <div class="segmented-control">
+        <button 
+          class="control-btn" 
+          [class.active]="activeType() === 'liga'" 
+          (click)="setType('liga')">
+          <span class="material-icons-outlined control-icon">emoji_events</span>
+          Clasificación de Liga
+        </button>
+        <button 
+          class="control-btn" 
+          [class.active]="activeType() === 'excelentes'" 
+          (click)="setType('excelentes')">
+          <span class="material-icons-outlined control-icon">stars</span>
+          Clasificación por Excelentes
+        </button>
+      </div>
+    </div>
+
     <!-- Tabs Navigation -->
     <div class="tabs-container glass-card">
       <button 
@@ -60,9 +84,11 @@
                 <th>Perro</th>
                 <th>Guía</th>
                 <th>Club</th>
-                <th style="text-align: center;">Agility Ex (0/5)</th>
-                <th style="text-align: center;">Jumping Ex (0/5)</th>
-                <th style="text-align: center;">Ex. Totales</th>
+                @if (activeType() === 'excelentes') {
+                  <th style="text-align: center;">Agility Ex (0/5)</th>
+                  <th style="text-align: center;">Jumping Ex (0/5)</th>
+                  <th style="text-align: center;">Ex. Totales</th>
+                }
                 <th style="text-align: center; width: 100px;">Puntos</th>
               </tr>
             </thead>
@@ -97,23 +123,25 @@
                   </td>
                   <td>{{ row.guia_nombre }}</td>
                   <td [class.highlight-club]="isAsturias(row)">{{ row.club_nombre }}</td>
-                  <td style="text-align: center;" class="ex-detail-cols">
-                    <span class="ex-pills">
-                      <span class="pill-zero" title="Excelentes a 0">{{ row.agility_ex_0 }}</span>
-                      <span class="pill-divider">/</span>
-                      <span class="pill-five" title="Excelentes a 5">{{ row.agility_ex_5 }}</span>
-                    </span>
-                  </td>
-                  <td style="text-align: center;" class="ex-detail-cols">
-                    <span class="ex-pills">
-                      <span class="pill-zero" title="Excelentes a 0">{{ row.jumping_ex_0 }}</span>
-                      <span class="pill-divider">/</span>
-                      <span class="pill-five" title="Excelentes a 5">{{ row.jumping_ex_5 }}</span>
-                    </span>
-                  </td>
-                  <td style="text-align: center;">
-                    <span class="badge badge-exc">{{ row.excelentes_totales }}</span>
-                  </td>
+                  @if (activeType() === 'excelentes') {
+                    <td style="text-align: center;" class="ex-detail-cols">
+                      <span class="ex-pills">
+                        <span class="pill-zero" title="Excelentes a 0">{{ row.agility_ex_0 }}</span>
+                        <span class="pill-divider">/</span>
+                        <span class="pill-five" title="Excelentes a 5">{{ row.agility_ex_5 }}</span>
+                      </span>
+                    </td>
+                    <td style="text-align: center;" class="ex-detail-cols">
+                      <span class="ex-pills">
+                        <span class="pill-zero" title="Excelentes a 0">{{ row.jumping_ex_0 }}</span>
+                        <span class="pill-divider">/</span>
+                        <span class="pill-five" title="Excelentes a 5">{{ row.jumping_ex_5 }}</span>
+                      </span>
+                    </td>
+                    <td style="text-align: center;">
+                      <span class="badge badge-exc">{{ row.excelentes_totales }}</span>
+                    </td>
+                  }
                   <td style="text-align: center;">
                     <span class="total-points">{{ row.puntos_total }} pts</span>
                   </td>
@@ -173,20 +201,22 @@
                 </div>
               }
               
-              <div class="excelentes-summary-grid">
-                <div class="ex-summary-item">
-                  <span class="item-label">Excelentes</span>
-                  <span class="item-val">{{ row.excelentes_totales }}</span>
+              @if (activeType() === 'excelentes') {
+                <div class="excelentes-summary-grid">
+                  <div class="ex-summary-item">
+                    <span class="item-label">Excelentes</span>
+                    <span class="item-val">{{ row.excelentes_totales }}</span>
+                  </div>
+                  <div class="ex-summary-item">
+                    <span class="item-label">Agility (0/5)</span>
+                    <span class="item-val">{{ row.agility_ex_0 }} / {{ row.agility_ex_5 }}</span>
+                  </div>
+                  <div class="ex-summary-item">
+                    <span class="item-label">Jumping (0/5)</span>
+                    <span class="item-val">{{ row.jumping_ex_0 }} / {{ row.jumping_ex_5 }}</span>
+                  </div>
                 </div>
-                <div class="ex-summary-item">
-                  <span class="item-label">Agility (0/5)</span>
-                  <span class="item-val">{{ row.agility_ex_0 }} / {{ row.agility_ex_5 }}</span>
-                </div>
-                <div class="ex-summary-item">
-                  <span class="item-label">Jumping (0/5)</span>
-                  <span class="item-val">{{ row.jumping_ex_0 }} / {{ row.jumping_ex_5 }}</span>
-                </div>
-              </div>
+              }
             </div>
           </div>
         }

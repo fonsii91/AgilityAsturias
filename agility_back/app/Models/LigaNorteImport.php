@@ -10,6 +10,7 @@ class LigaNorteImport extends Model
     use HasFactory;
 
     protected $fillable = [
+        'tipo',
         'telegram_message_id',
         'image_path',
         'status', // pending, processed, approved

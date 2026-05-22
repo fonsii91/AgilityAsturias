@@ -27,10 +27,13 @@ export class LigaNorteService {
     return this.http.post<any>(`${this.adminApiUrl}/imports/${id}/delete`, {});
   }
 
-  getStandings(clase?: number): Observable<any[]> {
+  getStandings(clase?: number, tipo?: string): Observable<any[]> {
     const params: { [key: string]: string } = {};
     if (clase) {
       params['clase'] = clase.toString();
+    }
+    if (tipo) {
+      params['tipo'] = tipo;
     }
     return this.http.get<any[]>(`${this.publicApiUrl}/standings`, { params });
   }

@@ -20,6 +20,9 @@ export class ClasificacionLigaNorteComponent implements OnInit {
   standings = signal<any[]>([]);
   isLoading = signal<boolean>(true);
   
+  // Active type filter: 'liga' or 'excelentes'
+  activeType = signal<'liga' | 'excelentes'>('liga');
+
   // Active class filter tab: null means "All"
   activeClassFilter = signal<number | null>(null);
 
@@ -64,7 +67,7 @@ export class ClasificacionLigaNorteComponent implements OnInit {
 
   loadStandings(): void {
     this.isLoading.set(true);
-    this.ligaNorteService.getStandings().subscribe({
+    this.ligaNorteService.getStandings(undefined, this.activeType()).subscribe({
       next: (data) => {
         this.standings.set(data);
         this.isLoading.set(false);
@@ -75,6 +78,11 @@ export class ClasificacionLigaNorteComponent implements OnInit {
         this.isLoading.set(false);
       }
     });
+  }
+
+  setType(tipo: 'liga' | 'excelentes'): void {
+    this.activeType.set(tipo);
+    this.loadStandings();
   }
 
   setClassFilter(clase: number | null): void {

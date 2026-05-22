@@ -96,14 +96,17 @@ class LigaNorteTest extends TestCase
         $mockGemini->expects($this->once())
             ->method('extractTableFromImage')
             ->willReturn([
-                [
-                    'clase' => 60,
-                    'posicion' => 1,
-                    'club_nombre' => 'ASTURIAS',
-                    'guia_nombre' => 'Juan Garcia',
-                    'perro_nombre' => 'Toby',
-                    'puntos_total' => 100,
-                    'excelentes_totales' => 3
+                'tipo' => 'excelentes',
+                'clase' => 60,
+                'rows' => [
+                    [
+                        'posicion' => 1,
+                        'club_nombre' => 'ASTURIAS',
+                        'guia_nombre' => 'Juan Garcia',
+                        'perro_nombre' => 'Toby',
+                        'puntos_total' => 100,
+                        'excelentes_totales' => 3
+                    ]
                 ]
             ]);
         
@@ -216,6 +219,7 @@ class LigaNorteTest extends TestCase
     public function test_member_can_get_standings()
     {
         LigaNorteStanding::create([
+            'tipo' => 'liga',
             'clase' => 60,
             'posicion' => 1,
             'club_nombre' => 'ASTURIAS',

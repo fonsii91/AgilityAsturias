@@ -35,23 +35,28 @@ class GeminiVisionService
         $imageData = base64_encode(file_get_contents($imagePath));
         $mimeType = mime_content_type($imagePath) ?: 'image/png';
 
-        $prompt = "Actúa como un extractor de datos OCR de alta precisión. Analiza esta imagen que contiene la tabla de clasificación de agility (Liga Norte).\n" .
-            "Extrae la tabla completa de resultados en formato JSON.\n" .
-            "El JSON de salida debe ser estrictamente un array de objetos con las siguientes propiedades:\n" .
-            "- clase: número entero de la altura (ej: 60, 50, 40, 30, 20). Si no está claro, deduce por el título de la sección de la tabla (ej. CLASE 60 o CLASE 20).\n" .
-            "- club_nombre: nombre del club en mayúsculas (ej: ASTURIAS, OVIEDO, CANTABRIA).\n" .
-            "- guia_nombre: nombre completo del guía (ej: IVAN PEREZ, ALFREDO SANTAMARIA).\n" .
-            "- perro_nombre: nombre del perro en mayúsculas (ej: NARCEA, VALKYRIA).\n" .
-            "- agility_ex_0: número de excelentes a cero en agility.\n" .
-            "- agility_ex_5: número de excelentes a 5 en agility.\n" .
-            "- jumping_ex_0: número de excelentes a cero en jumping.\n" .
-            "- jumping_ex_5: número de excelentes a 5 en jumping.\n" .
-            "- total_agility: puntos totales en agility.\n" .
-            "- total_jumping: puntos totales en jumping.\n" .
-            "- puntos_total: puntos totales acumulados.\n" .
-            "- excelentes_totales: número total de excelentes.\n" .
-            "- excelentes_cero: número total de excelentes a cero.\n" .
-            "- excelentes_cinco: número total de excelentes a 5.\n\n" .
+        $prompt = "Actúa como un extractor de datos OCR de alta precisión. Analiza esta imagen que contiene una clasificación de agility de la Liga Norte.\n" .
+            "Primero, clasifica la tabla en uno de estos dos tipos:\n" .
+            "1. 'liga': si es la clasificación general/guía (contiene columnas con meses/fechas de pruebas, columna 'Total' y columna 'pos.').\n" .
+            "2. 'excelentes': si es la clasificación de excelentes para el campeonato de España (contiene columnas de Agility/Jumping, excelentes, 'Nº TOTAL EXCELENTES' y 'PUNTOS TOTAL').\n\n" .
+            "El JSON de salida debe ser un objeto con las siguientes propiedades de primer nivel:\n" .
+            "- tipo: string ('liga' o 'excelentes') según corresponda.\n" .
+            "- clase: número entero de la altura (ej: 60, 50, 40, 30, 20) deducido por el título de la sección de la tabla (ej. CLASE 60 o CLASE 20).\n" .
+            "- rows: un array de objetos (las filas de la clasificación) con las siguientes propiedades:\n" .
+            "  - posicion: número entero con la posición (ej: 1, 2, 3...).\n" .
+            "  - club_nombre: nombre del club en mayúsculas.\n" .
+            "  - guia_nombre: nombre completo del guía.\n" .
+            "  - perro_nombre: nombre del perro en mayúsculas.\n" .
+            "  - puntos_total: puntos totales acumulados (para tipo 'liga' es el valor de la columna 'Total'; para tipo 'excelentes' es el valor de 'PUNTOS TOTAL').\n" .
+            "  - agility_ex_0: (solo para tipo 'excelentes') número de excelentes a cero en agility.\n" .
+            "  - agility_ex_5: (solo para tipo 'excelentes') número de excelentes a 5 en agility.\n" .
+            "  - jumping_ex_0: (solo para tipo 'excelentes') número de excelentes a cero en jumping.\n" .
+            "  - jumping_ex_5: (solo para tipo 'excelentes') número de excelentes a 5 en jumping.\n" .
+            "  - total_agility: (solo para tipo 'excelentes') puntos totales en agility.\n" .
+            "  - total_jumping: (solo para tipo 'excelentes') puntos totales en jumping.\n" .
+            "  - excelentes_totales: (solo para tipo 'excelentes') número total de excelentes (columna TOTALES).\n" .
+            "  - excelentes_cero: (solo para tipo 'excelentes') número total de excelentes a cero (columna EXCELENTES 0).\n" .
+            "  - excelentes_cinco: (solo para tipo 'excelentes') número total de excelentes a 5 (columna EX 5).\n\n" .
             "Asegúrate de ignorar el texto explicativo exterior y céntrate únicamente en las filas de la clasificación. Si algún valor numérico está vacío, guárdalo como 0.";
 
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $this->apiKey;

@@ -31,25 +31,53 @@ class LigaNorteService
     public function processAndPublish(LigaNorteImport $import, ?array $rawExtractedData = null): array
     {
         // 1. Extract raw data using Gemini Vision (or use pre-extracted data)
-        $extractedData = $rawExtractedData ?? $this->geminiService->extractTableFromImage(
+        $rawResult = $rawExtractedData ?? $this->geminiService->extractTableFromImage(
             Storage::disk('public')->path($import->image_path)
         );
 
+        // Normalize structure (support both new nested format and legacy flat format)
+        $tipo = 'excelentes';
+        $clase = null;
+        $rows = [];
+
+        if (isset($rawResult['rows']) && is_array($rawResult['rows'])) {
+            $tipo = $rawResult['tipo'] ?? 'excelentes';
+            $clase = $rawResult['clase'] ?? null;
+            $rows = $rawResult['rows'];
+        } else {
+            $rows = $rawResult;
+            if (!empty($rows)) {
+                $clase = $rows[0]['clase'] ?? null;
+                // If it is legacy but it has excellent fields, it is 'excelentes';
+                // we can also detect 'tipo' if present in the first row.
+                $tipo = $rows[0]['tipo'] ?? 'excelentes';
+            }
+        }
+
+        // Ensure every row has the class attribute
+        foreach ($rows as $index => &$row) {
+            $row['clase'] = $row['clase'] ?? $clase;
+        }
+        unset($row);
+
         // 2. Enrich rows with dog suggestions using fuzzy matching
-        $enrichedData = $this->enrichWithDogSuggestions($extractedData);
+        $enrichedData = $this->enrichWithDogSuggestions($rows);
 
         // 3. Save standings in a database transaction
-        DB::transaction(function () use ($import, $enrichedData) {
-            // Delete previous standings for the height classes present in the data
+        DB::transaction(function () use ($import, $enrichedData, $tipo) {
+            // Delete previous standings for the height classes present in the data for this specific tipo
             $classesToUpdate = collect($enrichedData)->pluck('clase')->unique()->filter()->toArray();
             
             if (!empty($classesToUpdate)) {
-                LigaNorteStanding::whereIn('clase', $classesToUpdate)->delete();
+                LigaNorteStanding::where('tipo', $tipo)
+                    ->whereIn('clase', $classesToUpdate)
+                    ->delete();
             }
 
             // Insert new standings
             foreach ($enrichedData as $index => $row) {
                 LigaNorteStanding::create([
+                    'tipo' => $tipo,
                     'clase' => $row['clase'],
                     'posicion' => $row['posicion'] ?? ($index + 1),
                     'club_nombre' => $row['club_nombre'],
@@ -69,9 +97,10 @@ class LigaNorteService
                 ]);
             }
 
-            // Mark import as approved/published
+            // Mark import as approved/published and save detected tipo
             $import->update([
                 'status' => 'approved',
+                'tipo' => $tipo,
                 'extracted_data' => $enrichedData
             ]);
         });
