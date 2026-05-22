@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { LigaNorteService } from '../../services/liga-norte.service';
 import { ToastService } from '../../services/toast.service';
 import { TenantService } from '../../services/tenant.service';
+import { DogService } from '../../services/dog.service';
 
 @Component({
   selector: 'app-clasificacion-liga-norte',
@@ -16,6 +17,7 @@ export class ClasificacionLigaNorteComponent implements OnInit {
   private ligaNorteService = inject(LigaNorteService);
   private toast = inject(ToastService);
   public tenantService = inject(TenantService);
+  private dogService = inject(DogService);
 
   standings = signal<any[]>([]);
   isLoading = signal<boolean>(true);
@@ -58,6 +60,40 @@ export class ClasificacionLigaNorteComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStandings();
+    this.initializeDefaultClassFromFirstDog();
+  }
+
+  initializeDefaultClassFromFirstDog(): void {
+    this.dogService.loadUserDogs().then((dogs) => {
+      if (dogs && dogs.length > 0) {
+        const firstDog = dogs[0];
+        let defaultClass = 60;
+        
+        if (firstDog.rfec_category) {
+          const parsed = parseInt(firstDog.rfec_category, 10);
+          if ([20, 30, 40, 50, 60].includes(parsed)) {
+            defaultClass = parsed;
+          }
+        } else if (firstDog.height_cm) {
+          const height = Number(firstDog.height_cm);
+          if (height < 28) defaultClass = 20;
+          else if (height < 35) defaultClass = 30;
+          else if (height < 43) defaultClass = 40;
+          else if (height < 51) defaultClass = 50;
+          else defaultClass = 60;
+        } else if (firstDog.rsce_category) {
+          const cat = firstDog.rsce_category;
+          if (cat === 'S') defaultClass = 30;
+          else if (cat === 'M') defaultClass = 40;
+          else if (cat === 'I') defaultClass = 50;
+          else if (cat === 'L') defaultClass = 60;
+        }
+        
+        this.activeClassFilter.set(defaultClass);
+      }
+    }).catch(err => {
+      console.error('Error loading user dogs for defaulting category:', err);
+    });
   }
 
   loadStandings(): void {
