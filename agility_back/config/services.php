@@ -41,4 +41,8 @@ return [
         'refresh_token' => env('YOUTUBE_REFRESH_TOKEN'),
     ],
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
 ];
