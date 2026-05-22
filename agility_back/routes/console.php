@@ -103,5 +103,5 @@ Schedule::command('flowagility:scrape')->dailyAt('04:00')->timezone('Europe/Madr
 Schedule::command('flowagility:scrape-calendar')->dailyAt('03:00')->timezone('Europe/Madrid');
 
 // Scrape Telegram Liga Norte channel for classification images
-Schedule::command('liganorte:scrape-telegram')->dailyAt('04:30')->timezone('Europe/Madrid');
+Schedule::command('liganorte:scrape-telegram')->dailyAt('03:15')->timezone('Europe/Madrid');
 
