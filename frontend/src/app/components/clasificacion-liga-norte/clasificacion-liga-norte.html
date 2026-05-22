@@ -90,10 +90,13 @@
                       @if (row.dog) {
                         <a href="javascript:void(0)" (click)="openPhotoModal(row); $event.preventDefault()" class="dog-link" title="Ver foto de {{ row.perro_nombre }}">
                           <span class="material-icons-outlined dog-icon">pets</span>
-                          <strong>{{ row.perro_nombre }}</strong>
+                          <strong class="dog-name-clickable">{{ row.perro_nombre }}</strong>
                         </a>
                       } @else {
-                        <strong>{{ row.perro_nombre }}</strong>
+                        <span class="dog-no-link">
+                          <span class="material-icons-outlined dog-icon-disabled">pets</span>
+                          <strong class="dog-name-disabled-txt">{{ row.perro_nombre }}</strong>
+                        </span>
                       }
                       
                       @if (isAsturias(row)) {
@@ -150,7 +153,10 @@
                       <span class="dog-name">{{ row.perro_nombre }}</span>
                     </a>
                   } @else {
-                    <span class="dog-name">{{ row.perro_nombre }}</span>
+                    <span class="dog-no-link">
+                      <span class="material-icons-outlined dog-icon-disabled">pets</span>
+                      <span class="dog-name-disabled">{{ row.perro_nombre }}</span>
+                    </span>
                   }
                   
                   @if (isAsturias(row)) {

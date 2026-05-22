@@ -162,6 +162,9 @@ tr.asturias-row:hover td {
   padding: 2px 6px;
   border-radius: 4px;
   letter-spacing: 0.05em;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
 }
 
 .dog-link {
@@ -170,16 +173,52 @@ tr.asturias-row:hover td {
   gap: 6px;
   color: #2563eb;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
 .dog-link:hover {
+  color: #1d4ed8;
+}
+
+.dog-link .dog-name,
+.dog-link .dog-name-clickable {
+  color: #2563eb;
+  text-decoration: underline dotted;
+  transition: color 0.2s;
+}
+
+.dog-link:hover .dog-name,
+.dog-link:hover .dog-name-clickable {
   color: #1d4ed8;
   text-decoration: underline;
 }
 
 .dog-icon {
   font-size: 1.1rem;
+  color: #3b82f6;
+}
+
+.dog-no-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dog-icon-disabled {
+  font-size: 1.1rem;
+  color: #cbd5e1;
+}
+
+.dog-name-disabled,
+.dog-name-disabled-txt {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #334155;
+}
+
+.dog-name-disabled-txt {
+  font-size: 0.95rem; /* Matches normal desktop text size */
 }
 
 /* Medals & Position */

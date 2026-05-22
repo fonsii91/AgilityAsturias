@@ -174,8 +174,7 @@ class LigaNorteController extends Controller
             'dog.club'
         ])
             ->orderBy('clase', 'desc')
-            ->orderBy('puntos_total', 'desc')
-            ->orderBy('excelentes_cero', 'desc');
+            ->orderBy('posicion', 'asc');
 
         if ($clase) {
             $query->where('clase', $clase);

@@ -31,11 +31,17 @@ export class ClasificacionLigaNorteComponent implements OnInit {
     const all = this.standings();
     const filter = this.activeClassFilter();
     
-    if (filter === null) {
-      return all;
-    }
-    
-    return all.filter(s => s.clase === filter);
+    const filtered = filter === null 
+      ? all 
+      : all.filter(s => s.clase === filter);
+
+    // Sort by class descending (for the 'All' tab), then by position ascending
+    return [...filtered].sort((a, b) => {
+      if (a.clase !== b.clase) {
+        return b.clase - a.clase;
+      }
+      return (a.posicion || 0) - (b.posicion || 0);
+    });
   });
 
   // Count entries per class for badges
