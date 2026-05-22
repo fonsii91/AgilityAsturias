@@ -14,10 +14,10 @@ Este documento detalla el diseño, la arquitectura y el flujo técnico del siste
 El proceso está completamente automatizado en el backend (Laravel) y se ejecuta en segundo plano. A grandes rasgos, sigue los siguientes pasos:
 
 1. **Scraping del Canal de Telegram**: Se descarga el HTML público de la vista web del canal de la Liga Norte y se buscan nuevos posts que contengan imágenes de clasificaciones.
-2. **Descarga e Importación**: Si hay posts con imágenes no procesadas, se descargan localmente y se registra una importación en estado `pending`.
-3. **Digitalización con Gemini Vision AI**: Se envía la imagen a la API de Gemini (modelo `gemini-2.5-flash`) mediante un prompt estructurado para realizar OCR y estructurar las clasificaciones en un array JSON.
-4. **Mapeo Difuso de Binomios (Fuzzy Matching)**: Se analizan los registros digitalizados y se buscan coincidencias con la base de datos de perros y guías locales de la aplicación utilizando criterios de puntuación (nombres normalizados, pertenencia a club y coincidencia de nombres de guías).
-5. **Transacción y Publicación**: Se limpian las clasificaciones antiguas de las alturas procesadas, se guardan los nuevos resultados (con el enlace al `dog_id` correspondiente en caso de coincidencia) y se marca la importación como aprobada.
+2. **Descarga e Intento de Digitalización**: Si hay posts con imágenes no procesadas, se descargan localmente y se envía la imagen a la API de Gemini (modelo `gemini-2.5-flash`) mediante un prompt estructurado para realizar OCR y estructurar las clasificaciones en un array JSON.
+3. **Control de Fallos Autocurativo**: Si la llamada a la API de Gemini falla por cualquier motivo (p. ej. error temporal o límite de cuota), se registra el error y **no** se guarda ningún registro en la base de datos. De esta forma, el scraper volverá a intentar digitalizarla automáticamente en la siguiente ejecución programada.
+4. **Mapeo Difuso de Binomios (Fuzzy Matching)**: Si la digitalización tiene éxito, se crea el registro de importación directamente con estado `approved`. Luego, se analizan los registros digitalizados y se buscan coincidencias con la base de datos de perros y guías locales de la aplicación utilizando criterios de puntuación (nombres normalizados, pertenencia a club y coincidencia de nombres de guías).
+5. **Transacción y Publicación Automática**: Se limpian las clasificaciones antiguas de las alturas procesadas y se guardan los nuevos resultados (con el enlace al `dog_id` correspondiente en caso de coincidencia). Si esta fase de guardado fallara, el registro de importación se elimina para permitir un reintento automático.
 
 ```mermaid
 sequenceDiagram
@@ -26,10 +26,10 @@ sequenceDiagram
     participant TG as Telegram Web Preview (t.me/s/liganorte)
     participant Storage as Almacenamiento Local (Public Disk)
     participant Gemini as Gemini Vision AI API
-    participant Service as LigaNorteService
     participant DB as Base de Datos (MySQL)
+    participant Service as LigaNorteService
 
-    Sched->>Command: Ejecución diaria (04:30 AM)
+    Sched->>Command: Ejecución diaria (03:15 AM)
     Command->>TG: Petición GET web preview
     TG-->>Command: HTML de la página web preview
     Command->>Command: Parsea posts y busca imágenes de clasificación
@@ -38,11 +38,12 @@ sequenceDiagram
         Command->>TG: Descarga imagen de la clasificación
         TG-->>Command: Datos binarios de la imagen
         Command->>Storage: Guarda imagen en public/liganorte/
-        Command->>DB: Crea registro de importación (status: pending)
         
         Command->>Gemini: Envía imagen + Prompt estructurado (OCR a JSON)
         Gemini-->>Command: Clasificación estructurada en JSON
+        Note over Command: Si Gemini falla, continúa sin crear registro (auto-reintento)
         
+        Command->>DB: Crea registro de importación (status: approved)
         Command->>Service: Procesa y publica (processAndPublish)
         Service->>DB: Consulta perros registrados y guías asociados
         DB-->>Service: Lista de perros locales
@@ -54,7 +55,7 @@ sequenceDiagram
             Note over Service: Transacción de Guardado
             Service->>DB: Elimina clasificaciones previas de la misma Clase/Altura
             Service->>DB: Inserta nuevos registros de clasificación (liga_norte_standings)
-            Service->>DB: Actualiza importación (status: approved, extracted_data: JSON)
+            Service->>DB: Guarda datos enriquecidos (extracted_data: JSON)
         end
     end
     Command-->>Sched: Finalización de la tarea programada
@@ -66,11 +67,11 @@ sequenceDiagram
 
 El comando Artisan que ejecuta el scraper es `liganorte:scrape-telegram` (implementado en [ScrapeTelegramLigaNorte.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Console/Commands/ScrapeTelegramLigaNorte.php)). 
 
-Está configurado en el programador de Laravel ([console.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/routes/console.php)) para ejecutarse de forma diaria a las **04:30 AM** (Hora de Madrid):
+Está configurado en el programador de Laravel ([console.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/routes/console.php)) para ejecutarse de forma diaria a las **03:15 AM** (Hora de Madrid):
 
 ```php
 // Scrape Telegram Liga Norte channel for classification images
-Schedule::command('liganorte:scrape-telegram')->dailyAt('04:30')->timezone('Europe/Madrid');
+Schedule::command('liganorte:scrape-telegram')->dailyAt('03:15')->timezone('Europe/Madrid');
 ```
 
 ---
