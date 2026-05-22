@@ -16,7 +16,8 @@
       "¡Nombres de guías de otros clubes en la Liga Norte! Hemos mejorado la ficha de información de los perros de otros clubes en las clasificaciones de la Liga Norte para que muestre el nombre de su guía o propietario en lugar de figurar como no especificado, protegiendo en todo momento su correo electrónico y datos privados de contacto."
     ],
     "bugfixes": [
-      "Hemos optimizado la búsqueda y actualización automática del calendario de pruebas federadas para que esté siempre al día."
+      "Hemos optimizado la búsqueda y actualización automática del calendario de pruebas federadas para que esté siempre al día.",
+      "Hemos solucionado un problema visual en el Monitor de Caza que provocaba que el texto y los iconos de progreso de grado de tu perro aparecieran desalineados y encabalgados."
     ]
   },
   {

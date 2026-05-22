@@ -86,8 +86,120 @@
     color: #cbd5e1;
     margin-bottom: 1rem;
   }
-  
+
   /* Progreso RFEC */
+  .progress-dashboard {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* WIDGET DE GRADOS */
+  .grade-progression-widget {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  
+  .grade-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background: #f8fafc;
+    min-width: 200px;
+  }
+  
+  .grade-card.current {
+    background: white;
+  }
+  
+  .grade-card.target {
+    border: 2px dashed #cbd5e1;
+  }
+  
+  .grade-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    color: #64748b;
+  }
+  
+  .grade-icon .material-icons {
+    font-size: 28px;
+  }
+  
+  .grade-text {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .grade-text .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    font-weight: 700;
+  }
+  
+  .grade-text .value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  
+  .progression-arrow {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 60px;
+    justify-content: center;
+  }
+  
+  .progression-arrow .line {
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    z-index: 1;
+  }
+  
+  .progression-arrow .material-icons {
+    z-index: 2;
+    background: #f8fafc;
+    padding: 0 4px;
+  }
+  
+  @keyframes pulseBorder {
+    0% { transform: scale(0.8); opacity: 0.8; }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+  
+  .pulse-ring {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border: 2px solid;
+    border-radius: 50%;
+    animation: pulseBorder 1.5s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    z-index: 1;
+  }
+
   .progress-card {
     background: white;
     border-radius: 16px;
