@@ -287,4 +287,62 @@ class LigaNorteTest extends TestCase
         $this->assertEquals('NARCEA', $enriched[0]['suggested_dog_name']);
         $this->assertEquals('NARCEA', $enriched[0]['perro_nombre']); // Name should be corrected!
     }
+
+    public function test_cross_club_owner_name_visible_and_email_hidden()
+    {
+        // 1. Create another club
+        $otherClub = Club::create([
+            'name' => 'Other Club',
+            'subdomain' => 'other',
+            'slug' => 'other',
+            'db_connection' => 'sqlite'
+        ]);
+
+        // 2. Create owner and dog in that other club
+        $otherUser = User::create([
+            'name' => 'John Doe',
+            'email' => 'john@other.com',
+            'password' => bcrypt('password'),
+            'role' => 'member',
+            'club_id' => $otherClub->id
+        ]);
+
+        $otherDog = Dog::create([
+            'name' => 'Fido',
+            'user_id' => $otherUser->id,
+            'club_id' => $otherClub->id
+        ]);
+        $otherDog->users()->attach($otherUser->id);
+
+        // 3. Create standing linked to this other club's dog
+        LigaNorteStanding::create([
+            'tipo' => 'liga',
+            'clase' => 60,
+            'posicion' => 1,
+            'club_nombre' => 'Other Club',
+            'guia_nombre' => 'John Doe',
+            'perro_nombre' => 'Fido',
+            'dog_id' => $otherDog->id,
+            'puntos_total' => 100
+        ]);
+
+        // 4. Bind active club context to ASTURIAS (current club under test)
+        app()->instance('active_club_id', $this->club->id);
+
+        // 5. Query standings as member of Asturias club
+        Sanctum::actingAs($this->member);
+
+        $response = $this->getJson('/api/liga-norte/standings');
+
+        $response->assertStatus(200);
+        $response->assertJsonCount(1);
+
+        // Assert dog users are loaded (not filtered out by TenantScope)
+        $data = $response->json();
+        $this->assertNotEmpty($data[0]['dog']['users']);
+        $this->assertEquals('John Doe', $data[0]['dog']['users'][0]['name']);
+        
+        // Assert email is hidden/null because user belongs to another club
+        $this->assertArrayNotHasKey('email', $data[0]['dog']['users'][0]);
+    }
 }

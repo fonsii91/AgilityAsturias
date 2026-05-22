@@ -176,7 +176,9 @@ class LigaNorteController extends Controller
             'dog' => function ($q) {
                 $q->withoutGlobalScopes();
             },
-            'dog.users',
+            'dog.users' => function ($q) {
+                $q->withoutGlobalScope(\App\Models\Scopes\TenantScope::class);
+            },
             'dog.club'
         ])
             ->where('tipo', $tipo)
@@ -188,6 +190,22 @@ class LigaNorteController extends Controller
         }
 
         $standings = $query->get();
+
+        // Hide emails of users from other clubs
+        $activeClubId = app()->bound('active_club_id') ? app('active_club_id') : (auth()->check() ? auth()->user()->club_id : null);
+        
+        if ($activeClubId) {
+            $standings->each(function ($standing) use ($activeClubId) {
+                if ($standing->dog && $standing->dog->users) {
+                    $standing->dog->users->each(function ($user) use ($activeClubId) {
+                        if ($user->club_id !== $activeClubId) {
+                            $user->makeHidden(['email']);
+                            $user->email = null;
+                        }
+                    });
+                }
+            });
+        }
 
         return response()->json($standings);
     }

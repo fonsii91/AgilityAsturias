@@ -15,10 +15,27 @@ class SuggestionController extends Controller
     {
         try {
             $suggestions = Suggestion::withoutGlobalScope(\App\Models\Scopes\TenantScope::class)
-                ->with(['user:id,name,email', 'club:id,name'])
+                ->with([
+                    'user' => function ($q) {
+                        $q->withoutGlobalScope(\App\Models\Scopes\TenantScope::class);
+                    },
+                    'club:id,name'
+                ])
                 ->orderByRaw("CASE WHEN status = 'pending' THEN 1 WHEN status = 'unresolved' THEN 2 WHEN status = 'resolved' THEN 3 ELSE 4 END")
                 ->orderBy('created_at', 'desc')
                 ->get();
+
+            // Hide emails of suggestion senders from other clubs
+            $activeClubId = app()->bound('active_club_id') ? app('active_club_id') : (auth()->check() ? auth()->user()->club_id : null);
+
+            if ($activeClubId) {
+                $suggestions->each(function ($suggestion) use ($activeClubId) {
+                    if ($suggestion->user && $suggestion->user->club_id !== $activeClubId) {
+                        $suggestion->user->makeHidden(['email']);
+                        $suggestion->user->email = null;
+                    }
+                });
+            }
 
             return response()->json($suggestions, 200);
         } catch (\Exception $e) {

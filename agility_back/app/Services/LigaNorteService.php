@@ -116,7 +116,12 @@ class LigaNorteService
      */
     public function enrichWithDogSuggestions(array $rows): array
     {
-        $clubDogs = Dog::withoutGlobalScopes()->with(['users', 'club'])->get();
+        $clubDogs = Dog::withoutGlobalScopes()->with([
+            'users' => function ($q) {
+                $q->withoutGlobalScope(\App\Models\Scopes\TenantScope::class);
+            },
+            'club'
+        ])->get();
 
         return array_map(function ($row) use ($clubDogs) {
             $row['dog_id'] = null;

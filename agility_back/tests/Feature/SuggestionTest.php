@@ -149,7 +149,11 @@ class SuggestionTest extends TestCase
             'slug' => 'otherclub',
             'db_connection' => 'sqlite'
         ]);
-        $otherUser = User::factory()->create(['club_id' => $otherClub->id]);
+        $otherUser = User::factory()->create([
+            'name' => 'Foreign Scriptor',
+            'email' => 'foreign@other.com',
+            'club_id' => $otherClub->id
+        ]);
         Suggestion::factory()->create([
             'user_id' => $otherUser->id,
             'club_id' => $otherClub->id,
@@ -163,6 +167,27 @@ class SuggestionTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(2);
+
+        $data = $response->json();
+        
+        // Find the suggestion from the foreign user
+        $foreignSuggestion = collect($data)->first(function ($s) use ($otherUser) {
+            return $s['user_id'] === $otherUser->id;
+        });
+
+        // Find the suggestion from the local user
+        $localSuggestion = collect($data)->first(function ($s) {
+            return $s['user_id'] === $this->user->id;
+        });
+
+        $this->assertNotNull($foreignSuggestion);
+        $this->assertEquals('Foreign Scriptor', $foreignSuggestion['user']['name']);
+        $this->assertArrayNotHasKey('email', $foreignSuggestion['user']);
+
+        $this->assertNotNull($localSuggestion);
+        $this->assertEquals($this->user->name, $localSuggestion['user']['name']);
+        $this->assertArrayHasKey('email', $localSuggestion['user']);
+        $this->assertEquals($this->user->email, $localSuggestion['user']['email']);
     }
 
     public function test_permite_a_un_administrador_marcar_una_sugerencia_como_resuelta_y_notifica_al_usuario()
