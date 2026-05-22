@@ -58,8 +58,7 @@ class LigaNorteTest extends TestCase
         LigaNorteImport::create([
             'telegram_message_id' => 123,
             'image_path' => 'imports/test1.jpg',
-            'status' => 'pending',
-            'club_id' => $this->club->id
+            'status' => 'pending'
         ]);
 
         Sanctum::actingAs($this->admin);
@@ -82,8 +81,7 @@ class LigaNorteTest extends TestCase
         $import = LigaNorteImport::create([
             'telegram_message_id' => 123,
             'image_path' => 'imports/test1.jpg',
-            'status' => 'pending',
-            'club_id' => $this->club->id
+            'status' => 'pending'
         ]);
 
         // Create a local dog to test fuzzy-matching mapping
@@ -118,10 +116,10 @@ class LigaNorteTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonPath('success', true);
         
-        // Assert import was updated to processed with enriched suggestions
+        // Assert import was updated to approved with enriched suggestions
         $this->assertDatabaseHas('liga_norte_imports', [
             'id' => $import->id,
-            'status' => 'processed'
+            'status' => 'approved'
         ]);
 
         $updatedImport = LigaNorteImport::find($import->id);
@@ -136,7 +134,6 @@ class LigaNorteTest extends TestCase
             'telegram_message_id' => 123,
             'image_path' => 'imports/test1.jpg',
             'status' => 'processed',
-            'club_id' => $this->club->id,
             'extracted_data' => []
         ]);
 
@@ -147,8 +144,7 @@ class LigaNorteTest extends TestCase
             'club_nombre' => 'OTHER',
             'guia_nombre' => 'Someone',
             'perro_nombre' => 'Fido',
-            'puntos_total' => 50,
-            'club_id' => $this->club->id
+            'puntos_total' => 50
         ]);
 
         Sanctum::actingAs($this->admin);
@@ -188,8 +184,7 @@ class LigaNorteTest extends TestCase
             'clase' => 60,
             'perro_nombre' => 'Toby',
             'club_nombre' => 'ASTURIAS',
-            'puntos_total' => 100,
-            'club_id' => $this->club->id
+            'puntos_total' => 100
         ]);
     }
 
@@ -200,8 +195,7 @@ class LigaNorteTest extends TestCase
         $import = LigaNorteImport::create([
             'telegram_message_id' => 123,
             'image_path' => 'imports/test1.jpg',
-            'status' => 'pending',
-            'club_id' => $this->club->id
+            'status' => 'pending'
         ]);
 
         Sanctum::actingAs($this->admin);
@@ -227,8 +221,7 @@ class LigaNorteTest extends TestCase
             'club_nombre' => 'ASTURIAS',
             'guia_nombre' => 'Juan Garcia',
             'perro_nombre' => 'Toby',
-            'puntos_total' => 100,
-            'club_id' => $this->club->id
+            'puntos_total' => 100
         ]);
 
         Sanctum::actingAs($this->member);

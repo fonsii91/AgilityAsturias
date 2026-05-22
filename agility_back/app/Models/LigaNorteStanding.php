@@ -2,18 +2,16 @@
 
 namespace App\Models;
 
-use App\Traits\HasClub;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class LigaNorteStanding extends Model
 {
-    use HasClub, HasFactory;
+    use HasFactory;
 
     protected $table = 'liga_norte_standings';
 
     protected $fillable = [
-        'club_id',
         'clase',
         'posicion',
         'club_nombre',

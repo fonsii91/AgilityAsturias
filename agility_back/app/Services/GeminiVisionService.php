@@ -38,7 +38,7 @@ class GeminiVisionService
         $prompt = "Actúa como un extractor de datos OCR de alta precisión. Analiza esta imagen que contiene la tabla de clasificación de agility (Liga Norte).\n" .
             "Extrae la tabla completa de resultados en formato JSON.\n" .
             "El JSON de salida debe ser estrictamente un array de objetos con las siguientes propiedades:\n" .
-            "- clase: número entero de la altura (ej: 60, 50, 40, 30). Si no está claro, deduce por el título de la sección de la tabla (ej. CLASE 60).\n" .
+            "- clase: número entero de la altura (ej: 60, 50, 40, 30, 20). Si no está claro, deduce por el título de la sección de la tabla (ej. CLASE 60 o CLASE 20).\n" .
             "- club_nombre: nombre del club en mayúsculas (ej: ASTURIAS, OVIEDO, CANTABRIA).\n" .
             "- guia_nombre: nombre completo del guía (ej: IVAN PEREZ, ALFREDO SANTAMARIA).\n" .
             "- perro_nombre: nombre del perro en mayúsculas (ej: NARCEA, VALKYRIA).\n" .
@@ -54,7 +54,7 @@ class GeminiVisionService
             "- excelentes_cinco: número total de excelentes a 5.\n\n" .
             "Asegúrate de ignorar el texto explicativo exterior y céntrate únicamente en las filas de la clasificación. Si algún valor numérico está vacío, guárdalo como 0.";
 
-        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" . $this->apiKey;
+        $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $this->apiKey;
 
         try {
             $response = Http::timeout(60)->post($url, [

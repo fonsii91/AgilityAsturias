@@ -87,8 +87,8 @@
                   }
                   <td>
                     <div class="perro-cell">
-                      @if (row.dog_id) {
-                        <a [routerLink]="['/gestionar-perros', row.dog_id]" class="dog-link" title="Ver perfil de manada">
+                      @if (row.dog) {
+                        <a href="javascript:void(0)" (click)="openPhotoModal(row); $event.preventDefault()" class="dog-link" title="Ver foto de {{ row.perro_nombre }}">
                           <span class="material-icons-outlined dog-icon">pets</span>
                           <strong>{{ row.perro_nombre }}</strong>
                         </a>
@@ -97,7 +97,7 @@
                       }
                       
                       @if (isAsturias(row)) {
-                        <span class="club-badge-asturias">ASTURIAS</span>
+                        <span class="club-badge-asturias">{{ tenantService.tenantInfo()?.name || 'ASTURIAS' }}</span>
                       }
                     </div>
                   </td>
@@ -133,8 +133,8 @@
       <!-- Mobile Card View -->
       <div class="mobile-cards mobile-only">
         @for (row of filteredStandings(); track row.id) {
-          <div class="standing-card glass-card" [class.asturias-card]="isAsturias(row)">
-            <div class="card-header">
+          <div class="standing-card glass-card" [class.asturias-card]="isAsturias(row)" [class.expanded]="isRowExpanded(row.id)">
+            <div class="card-header" (click)="toggleRow(row.id)">
               <div class="rank-badge">
                 @if (row.posicion === 1) { 🥇 }
                 @else if (row.posicion === 2) { 🥈 }
@@ -144,8 +144,8 @@
               
               <div class="dog-info">
                 <div class="dog-header-row">
-                  @if (row.dog_id) {
-                    <a [routerLink]="['/gestionar-perros', row.dog_id]" class="dog-link">
+                  @if (row.dog) {
+                    <a href="javascript:void(0)" (click)="openPhotoModal(row); $event.stopPropagation(); $event.preventDefault()" class="dog-link" title="Ver foto de {{ row.perro_nombre }}">
                       <span class="material-icons-outlined dog-icon">pets</span>
                       <span class="dog-name">{{ row.perro_nombre }}</span>
                     </a>
@@ -154,7 +154,7 @@
                   }
                   
                   @if (isAsturias(row)) {
-                    <span class="club-badge-asturias">ASTURIAS</span>
+                    <span class="club-badge-asturias">{{ tenantService.tenantInfo()?.name || 'ASTURIAS' }}</span>
                   }
                 </div>
                 <span class="owner-name">{{ row.guia_nombre }}</span>
@@ -163,9 +163,13 @@
               <div class="points-badge">
                 {{ row.puntos_total }} pts
               </div>
+
+              <span class="material-icons-outlined expand-icon" [class.rotated]="isRowExpanded(row.id)">
+                expand_more
+              </span>
             </div>
             
-            <div class="card-body">
+            <div class="card-body" [class.expanded]="isRowExpanded(row.id)" (click)="$event.stopPropagation()">
               <div class="card-row">
                 <span class="label">Club:</span>
                 <span class="value" [class.text-asturias]="isAsturias(row)">{{ row.club_nombre }}</span>
@@ -194,5 +198,52 @@
         }
       </div>
     }
+  }
+
+  <!-- Dog Photo Modal -->
+  @if (isPhotoModalOpen() && selectedDog()) {
+    <div class="modal-overlay" (click)="closePhotoModal()">
+      <div class="modal-content photo-viewer-card" (click)="$event.stopPropagation()">
+        <button class="close-btn" (click)="closePhotoModal()">&times;</button>
+        
+        <div class="photo-viewer-body">
+          <div class="photo-container">
+            @if (selectedDog().photo_url) {
+              <img [src]="selectedDog().photo_url" alt="Foto de {{ selectedDog().name }}" class="dog-photo-img">
+            } @else {
+              <div class="dog-photo-placeholder">
+                <span class="material-icons-outlined placeholder-icon">pets</span>
+                <p>Este perro no tiene foto asignada</p>
+              </div>
+            }
+          </div>
+          
+          <div class="dog-meta-info">
+            <h2 class="dog-name-title">{{ selectedDog().name }}</h2>
+            
+            <div class="info-grid">
+              @if (selectedDog().breed) {
+                <div class="info-item">
+                  <span class="info-label">Raza</span>
+                  <span class="info-value">{{ selectedDog().breed }}</span>
+                </div>
+              }
+              
+              <div class="info-item">
+                <span class="info-label">Guía / Propietario</span>
+                <span class="info-value">{{ getOwnerNames(selectedDog()) || 'No especificado' }}</span>
+              </div>
+              
+              @if (selectedDog().club) {
+                <div class="info-item">
+                  <span class="info-label">Club</span>
+                  <span class="info-value club-name-val">{{ selectedDog().club.name }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   }
 </div>

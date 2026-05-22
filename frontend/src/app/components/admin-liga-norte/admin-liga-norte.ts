@@ -28,7 +28,7 @@ export class AdminLigaNorteComponent implements OnInit {
   approvedCount = computed(() => this.imports().filter(i => i.status === 'approved').length);
 
   // Available classes for dropdown
-  classes = [30, 40, 50, 60];
+  classes = [20, 30, 40, 50, 60];
 
   // Load all club dogs for mapping
   clubDogs = computed(() => {
@@ -92,7 +92,7 @@ export class AdminLigaNorteComponent implements OnInit {
     if (this.isProcessing()) return;
     
     this.isProcessing.set(true);
-    this.toast.info('Procesando imagen con Gemini 1.5 Flash Vision AI...');
+    this.toast.info('Procesando imagen con Gemini 2.5 Flash Vision AI...');
     
     this.ligaNorteService.processImport(imp.id).subscribe({
       next: (res) => {

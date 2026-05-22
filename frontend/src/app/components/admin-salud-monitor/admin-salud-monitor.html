@@ -51,7 +51,7 @@
               </td>
               <td style="padding: 15px 20px; color: var(--text-secondary);">
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                  @for (dog of stat.dogs_list; track dog) {
+                  @for (dog of stat.dogs_list; track $index) {
                     <span style="background: #f1f5f9; border: 1px solid #cbd5e1; padding: 3px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 500;">
                       <span class="material-icons" style="font-size: 12px; vertical-align: text-top; margin-right: 2px;">pets</span>
                       {{ dog }}

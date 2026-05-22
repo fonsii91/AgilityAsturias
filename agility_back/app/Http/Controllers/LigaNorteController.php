@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Dog;
 use App\Models\LigaNorteImport;
 use App\Models\LigaNorteStanding;
-use App\Services\GeminiVisionService;
+use App\Services\LigaNorteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,11 +13,11 @@ use Exception;
 
 class LigaNorteController extends Controller
 {
-    protected GeminiVisionService $geminiService;
+    protected LigaNorteService $ligaNorteService;
 
-    public function __construct(GeminiVisionService $geminiService)
+    public function __construct(LigaNorteService $ligaNorteService)
     {
-        $this->geminiService = $geminiService;
+        $this->ligaNorteService = $ligaNorteService;
     }
 
     /**
@@ -38,24 +37,14 @@ class LigaNorteController extends Controller
     }
 
     /**
-     * Process an import image using Gemini Vision AI.
+     * Process an import image using Gemini Vision AI and publish immediately.
      */
     public function processImport($id)
     {
         $import = LigaNorteImport::findOrFail($id);
 
         try {
-            $imagePath = Storage::disk('public')->path($import->image_path);
-            
-            $extractedData = $this->geminiService->extractTableFromImage($imagePath);
-
-            // Add suggestions for dog_id using fuzzy matching
-            $enrichedData = $this->enrichWithDogSuggestions($extractedData);
-
-            $import->update([
-                'status' => 'processed',
-                'extracted_data' => $enrichedData
-            ]);
+            $enrichedData = $this->ligaNorteService->processAndPublish($import);
 
             return response()->json([
                 'success' => true,
@@ -73,7 +62,7 @@ class LigaNorteController extends Controller
     }
 
     /**
-     * Approve and publish the standings.
+     * Approve and publish the standings (manual correction / override).
      */
     public function approveImport(Request $request, $id)
     {
@@ -149,8 +138,7 @@ class LigaNorteController extends Controller
         try {
             if (Storage::disk('public')->exists($import->image_path)) {
                 // Check if other imports use this image (unlikely but safe)
-                $count = LigaNorteImport::withoutGlobalScopes()
-                    ->where('image_path', $import->image_path)
+                $count = LigaNorteImport::where('image_path', $import->image_path)
                     ->count();
                 if ($count <= 1) {
                     Storage::disk('public')->delete($import->image_path);
@@ -178,7 +166,13 @@ class LigaNorteController extends Controller
     {
         $clase = $request->query('clase');
 
-        $query = LigaNorteStanding::with(['dog.users', 'dog.club'])
+        $query = LigaNorteStanding::with([
+            'dog' => function ($q) {
+                $q->withoutGlobalScopes();
+            },
+            'dog.users',
+            'dog.club'
+        ])
             ->orderBy('clase', 'desc')
             ->orderBy('puntos_total', 'desc')
             ->orderBy('excelentes_cero', 'desc');
@@ -190,70 +184,5 @@ class LigaNorteController extends Controller
         $standings = $query->get();
 
         return response()->json($standings);
-    }
-
-    /**
-     * Helper: Enrich extracted table rows with dog_id suggestions using fuzzy matching.
-     */
-    protected function enrichWithDogSuggestions(array $rows): array
-    {
-        $clubDogs = Dog::with('users')->get();
-
-        return array_map(function ($row) use ($clubDogs) {
-            $row['dog_id'] = null;
-            $row['suggested_dog_name'] = null;
-
-            $normalizedRowPerro = $this->normalize($row['perro_nombre'] ?? '');
-            $normalizedRowGuia = $this->normalize($row['guia_nombre'] ?? '');
-
-            if (empty($normalizedRowPerro)) {
-                return $row;
-            }
-
-            foreach ($clubDogs as $dog) {
-                $normalizedDogName = $this->normalize($dog->name);
-                
-                // 1. Check if dog name matches
-                if ($normalizedDogName === $normalizedRowPerro) {
-                    // 2. Check if owner name matches or overlaps
-                    $ownerMatches = false;
-                    foreach ($dog->users as $user) {
-                        $normalizedUser = $this->normalize($user->name);
-                        // Check if guide name contains user name or vice versa, or if they are very close
-                        if (
-                            str_contains($normalizedRowGuia, $normalizedUser) ||
-                            str_contains($normalizedUser, $normalizedRowGuia)
-                        ) {
-                            $ownerMatches = true;
-                            break;
-                        }
-                    }
-
-                    // If we match both dog and handler, or if the dog name is unique enough in our club
-                    if ($ownerMatches || $dog->users->isEmpty()) {
-                        $row['dog_id'] = $dog->id;
-                        $row['suggested_dog_name'] = $dog->name;
-                        break;
-                    }
-                }
-            }
-
-            return $row;
-        }, $rows);
-    }
-
-    /**
-     * Clean text strings for name comparisons.
-     */
-    protected function normalize(string $str): string
-    {
-        $str = mb_strtolower($str, 'UTF-8');
-        $replacements = [
-            'á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u',
-            'ü' => 'u', 'ñ' => 'n', 'à' => 'a', 'è' => 'e', 'ì' => 'i',
-            'ò' => 'o', 'ù' => 'u'
-        ];
-        $str = str_replace(array_keys($replacements), array_values($replacements), $str);
-        return preg_replace('/[^a-z0-9]/', '', $str); // Remove spaces and punctuation
     }
 }

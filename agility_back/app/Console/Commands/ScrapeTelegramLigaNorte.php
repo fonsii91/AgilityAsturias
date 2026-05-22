@@ -76,15 +76,31 @@ class ScrapeTelegramLigaNorte extends Command
             $this->info("Found " . count($posts) . " posts with images.");
             Log::info("Found " . count($posts) . " posts with images in Liga Norte channel.");
 
+            // Limit to the 5 most recent posts with images (newest are at the end)
+            $posts = array_slice($posts, -5);
+            $this->info("Limiting to the " . count($posts) . " most recent posts.");
+            Log::info("Limiting to the " . count($posts) . " most recent posts.");
+
             if (empty($posts)) {
                 return 0;
             }
 
-            // Get all clubs to support multi-tenancy
-            $clubs = Club::all();
-            if ($clubs->isEmpty()) {
-                $this->warn("No clubs registered in the system.");
-                return 0;
+            // Clean up old pending imports that are not in the latest 3
+            $latestPostIds = collect($posts)->pluck('id')->toArray();
+            $pendingImportsToDelete = LigaNorteImport::where('status', 'pending')
+                ->whereNotIn('telegram_message_id', $latestPostIds)
+                ->get();
+
+            foreach ($pendingImportsToDelete as $importToDelete) {
+                $imagePath = $importToDelete->image_path;
+                $importToDelete->delete();
+
+                $stillReferenced = LigaNorteImport::where('image_path', $imagePath)
+                    ->exists();
+
+                if (!$stillReferenced && Storage::disk('public')->exists($imagePath)) {
+                    Storage::disk('public')->delete($imagePath);
+                }
             }
 
             $importedCount = 0;
@@ -93,8 +109,13 @@ class ScrapeTelegramLigaNorte extends Command
                 $telegramMessageId = $post['id'];
                 $imageUrl = $post['image_url'];
 
-                // Check if this post has already been imported for ANY club
-                // (to avoid downloading the same image multiple times, we can use a shared local file name based on the post ID)
+                // Check if this post has already been imported
+                $exists = LigaNorteImport::where('telegram_message_id', $telegramMessageId)->exists();
+
+                if ($exists) {
+                    continue;
+                }
+
                 $cleanPostId = str_replace('/', '_', $telegramMessageId);
                 $fileName = "liganorte/{$cleanPostId}.jpg";
 
@@ -110,26 +131,47 @@ class ScrapeTelegramLigaNorte extends Command
                     }
                 }
 
-                // Check and import for each club individually (maintaining isolation)
-                foreach ($clubs as $club) {
-                    $exists = LigaNorteImport::withoutGlobalScopes()
-                        ->where('club_id', $club->id)
-                        ->where('telegram_message_id', $telegramMessageId)
-                        ->exists();
-
-                    if (!$exists) {
-                        LigaNorteImport::create([
-                            'club_id' => $club->id,
-                            'telegram_message_id' => $telegramMessageId,
-                            'image_path' => $fileName,
-                            'status' => 'pending',
-                        ]);
-                        $importedCount++;
-                    }
+                // Call Gemini Vision ONCE per post to get raw classifications
+                $rawExtractedData = null;
+                try {
+                    $this->info("Calling Gemini Vision OCR for post {$telegramMessageId}...");
+                    Log::info("Calling Gemini Vision OCR for post {$telegramMessageId}...");
+                    
+                    $imagePath = Storage::disk('public')->path($fileName);
+                    $geminiService = app(\App\Services\GeminiVisionService::class);
+                    $rawExtractedData = $geminiService->extractTableFromImage($imagePath);
+                } catch (Exception $e) {
+                    $this->error("Gemini extraction failed for post {$telegramMessageId}: " . $e->getMessage());
+                    Log::error("Gemini extraction failed for post {$telegramMessageId}: " . $e->getMessage());
+                    // We proceed to import anyway as pending, without raw data, so that they can retry manually
                 }
+
+                // Create the single global import record
+                $import = LigaNorteImport::create([
+                    'telegram_message_id' => $telegramMessageId,
+                    'image_path' => $fileName,
+                    'status' => 'pending',
+                ]);
+
+                // Automatically process and publish using pre-extracted raw data (or let it try Gemini if not extracted)
+                try {
+                    $this->info("Automatically processing and publishing post {$telegramMessageId}...");
+                    Log::info("Automatically processing and publishing post {$telegramMessageId}...");
+                    
+                    $service = app(\App\Services\LigaNorteService::class);
+                    $service->processAndPublish($import, $rawExtractedData);
+                    
+                    $this->info("Successfully published standings.");
+                    Log::info("Successfully published standings.");
+                } catch (Exception $e) {
+                    $this->error("Failed auto-publishing post {$telegramMessageId}: " . $e->getMessage());
+                    Log::error("Failed auto-publishing post {$telegramMessageId}: " . $e->getMessage());
+                }
+
+                $importedCount++;
             }
 
-            $this->info("Scrape finished. Imported {$importedCount} new pending items across " . $clubs->count() . " clubs.");
+            $this->info("Scrape finished. Imported {$importedCount} new pending items globally.");
             Log::info("Scrape finished. Imported {$importedCount} new pending items.");
             return 0;
 
