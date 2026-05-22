@@ -44,13 +44,6 @@
 
     <!-- Tabs Navigation -->
     <div class="tabs-container glass-card">
-      <button 
-        class="tab-btn" 
-        [class.active]="activeClassFilter() === null" 
-        (click)="setClassFilter(null)">
-        Todas
-        <span class="tab-badge">{{ standings().length }}</span>
-      </button>
       @for (c of classes; track c) {
         <button 
           class="tab-btn" 
@@ -78,9 +71,7 @@
             <thead>
               <tr>
                 <th style="width: 70px; text-align: center;">Pos</th>
-                @if (activeClassFilter() === null) {
-                  <th style="width: 80px;">Clase</th>
-                }
+
                 <th>Perro</th>
                 <th>Guía</th>
                 <th>Club</th>
@@ -100,11 +91,7 @@
                       {{ row.posicion }}
                     </span>
                   </td>
-                  @if (activeClassFilter() === null) {
-                    <td>
-                      <span class="class-tag">C{{ row.clase }}</span>
-                    </td>
-                  }
+
                   <td>
                     <div class="perro-cell">
                       @if (row.dog) {
@@ -194,12 +181,7 @@
                 <span class="label">Club:</span>
                 <span class="value" [class.text-asturias]="isAsturias(row)">{{ row.club_nombre }}</span>
               </div>
-              @if (activeClassFilter() === null) {
-                <div class="card-row">
-                  <span class="label">Clase:</span>
-                  <span class="value"><span class="class-tag">Clase {{ row.clase }}</span></span>
-                </div>
-              }
+
               
               @if (activeType() === 'excelentes') {
                 <div class="excelentes-summary-grid">

@@ -23,8 +23,8 @@ export class ClasificacionLigaNorteComponent implements OnInit {
   // Active type filter: 'liga' or 'excelentes'
   activeType = signal<'liga' | 'excelentes'>('liga');
 
-  // Active class filter tab: null means "All"
-  activeClassFilter = signal<number | null>(null);
+  // Active class filter tab
+  activeClassFilter = signal<number>(60);
 
   // Available height classes
   classes = [60, 50, 40, 30, 20];
@@ -34,15 +34,10 @@ export class ClasificacionLigaNorteComponent implements OnInit {
     const all = this.standings();
     const filter = this.activeClassFilter();
     
-    const filtered = filter === null 
-      ? all 
-      : all.filter(s => s.clase === filter);
+    const filtered = all.filter(s => s.clase === filter);
 
-    // Sort by class descending (for the 'All' tab), then by position ascending
+    // Sort by position ascending
     return [...filtered].sort((a, b) => {
-      if (a.clase !== b.clase) {
-        return b.clase - a.clase;
-      }
       return (a.posicion || 0) - (b.posicion || 0);
     });
   });
@@ -85,7 +80,7 @@ export class ClasificacionLigaNorteComponent implements OnInit {
     this.loadStandings();
   }
 
-  setClassFilter(clase: number | null): void {
+  setClassFilter(clase: number): void {
     this.activeClassFilter.set(clase);
   }
 

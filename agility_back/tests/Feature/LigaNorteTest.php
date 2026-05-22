@@ -245,4 +245,46 @@ class LigaNorteTest extends TestCase
         $response = $this->getJson('/api/liga-norte/standings');
         $response->assertStatus(401);
     }
+
+    public function test_fuzzy_matching_and_name_correction_during_enrichment()
+    {
+        // 1. Create a user
+        $user = User::create([
+            'name' => 'IVAN PEREZ',
+            'email' => 'ivan@test.com',
+            'password' => bcrypt('password'),
+            'role' => 'member',
+            'club_id' => $this->club->id
+        ]);
+
+        // 2. Create the dog "NARCEA" associated to the user and club
+        $dog = Dog::create([
+            'name' => 'NARCEA',
+            'user_id' => $user->id,
+            'club_id' => $this->club->id
+        ]);
+        $dog->users()->attach($user->id);
+
+        // Setup the LigaNorteService
+        /** @var \App\Services\LigaNorteService $service */
+        $service = $this->app->make(\App\Services\LigaNorteService::class);
+
+        // Input row with typo "NARCIA", correct guide "IVAN PEREZ", club "ASTURIAS TEST"
+        $rows = [
+            [
+                'clase' => 60,
+                'posicion' => 9,
+                'club_nombre' => 'ASTURIAS TEST',
+                'guia_nombre' => 'IVAN PEREZ',
+                'perro_nombre' => 'NARCIA',
+                'puntos_total' => 69
+            ]
+        ];
+
+        $enriched = $service->enrichWithDogSuggestions($rows);
+
+        $this->assertEquals($dog->id, $enriched[0]['dog_id']);
+        $this->assertEquals('NARCEA', $enriched[0]['suggested_dog_name']);
+        $this->assertEquals('NARCEA', $enriched[0]['perro_nombre']); // Name should be corrected!
+    }
 }

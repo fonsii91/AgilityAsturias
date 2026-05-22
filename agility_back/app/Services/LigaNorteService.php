@@ -137,8 +137,23 @@ class LigaNorteService
             foreach ($clubDogs as $dog) {
                 $normalizedDogName = $this->normalize($dog->name);
                 
-                if ($normalizedDogName === $normalizedRowPerro) {
-                    $score = 1;
+                $lev = levenshtein($normalizedDogName, $normalizedRowPerro);
+                $isMatch = false;
+                $startingScore = 0;
+
+                if ($lev === 0) {
+                    $isMatch = true;
+                    $startingScore = 1;
+                } else {
+                    $len = strlen($normalizedDogName);
+                    if (($len === 4 && $lev === 1) || ($len >= 5 && $lev <= 2)) {
+                        $isMatch = true;
+                        $startingScore = -10;
+                    }
+                }
+
+                if ($isMatch) {
+                    $score = $startingScore;
 
                     // 1. Club match check
                     if ($dog->club) {
@@ -166,7 +181,7 @@ class LigaNorteService
                             // Direct containment
                             if (
                                 str_contains($normalizedRowGuia, $normalizedUser) ||
-                                str_contains($normalizedUser, $normalizedRowGuia)
+                                str_contains($user, $normalizedRowGuia)
                             ) {
                                 $score += 20;
                                 break;
@@ -202,6 +217,7 @@ class LigaNorteService
             if ($bestDog) {
                 $row['dog_id'] = $bestDog->id;
                 $row['suggested_dog_name'] = $bestDog->name;
+                $row['perro_nombre'] = $bestDog->name;
             }
 
             return $row;
