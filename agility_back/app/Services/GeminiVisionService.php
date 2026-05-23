@@ -78,34 +78,72 @@ class GeminiVisionService
 
         $url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" . $this->apiKey;
 
-        try {
-            $response = Http::timeout(60)->post($url, [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt],
-                            [
-                                'inlineData' => [
-                                    'mimeType' => $mimeType,
-                                    'data' => $imageData
+        $maxRetries = 3;
+        $retryDelay = 5; // seconds
+        $response = null;
+
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                $response = Http::timeout(60)->post($url, [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt],
+                                [
+                                    'inlineData' => [
+                                        'mimeType' => $mimeType,
+                                        'data' => $imageData
+                                    ]
                                 ]
                             ]
                         ]
+                    ],
+                    'generationConfig' => [
+                        'responseMimeType' => 'application/json'
                     ]
-                ],
-                'generationConfig' => [
-                    'responseMimeType' => 'application/json'
-                ]
-            ]);
-
-            if ($response->failed()) {
-                Log::error("Gemini API request failed", [
-                    'status' => $response->status(),
-                    'error' => $response->body()
                 ]);
-                throw new Exception("Gemini API error: Status " . $response->status() . " - " . $response->body());
-            }
 
+                if ($response->status() === 429 || $response->status() === 503) {
+                    $errorBody = $response->body();
+                    $errorJson = json_decode($errorBody, true);
+                    $waitSecs = $retryDelay * $attempt; // exponential backoff: 5s, 10s...
+                    
+                    // If the API tells us exactly how long to wait, we use it
+                    if ($response->status() === 429 && isset($errorJson['error']['message']) && preg_match('/retry in ([\d\.]+)s/i', $errorJson['error']['message'], $matches)) {
+                        $waitSecs = (int)ceil((float)$matches[1]);
+                    }
+                    
+                    Log::warning("Gemini API returned status {$response->status()}. Attempt {$attempt} of {$maxRetries}. Retrying in {$waitSecs} seconds...");
+                    sleep($waitSecs);
+                    continue;
+                }
+
+                if ($response->failed()) {
+                    Log::error("Gemini API request failed", [
+                        'status' => $response->status(),
+                        'error' => $response->body()
+                    ]);
+                    throw new Exception("Gemini API error: Status " . $response->status() . " - " . $response->body());
+                }
+                
+                break; // Success! Break out of retry loop
+
+            } catch (Exception $e) {
+                if ($attempt === $maxRetries) {
+                    throw $e;
+                }
+                Log::warning("Gemini API request failed with exception: " . $e->getMessage() . ". Attempt {$attempt} of {$maxRetries}. Retrying in {$retryDelay} seconds...");
+                sleep($retryDelay);
+            }
+        }
+
+        if (!$response || $response->failed()) {
+            $status = $response ? $response->status() : 'unknown';
+            $body = $response ? $response->body() : 'No response';
+            throw new Exception("Gemini API request failed after {$maxRetries} attempts. Status: {$status} - {$body}");
+        }
+
+        try {
             $responseJson = $response->json();
             
             if (!isset($responseJson['candidates'][0]['content']['parts'][0]['text'])) {

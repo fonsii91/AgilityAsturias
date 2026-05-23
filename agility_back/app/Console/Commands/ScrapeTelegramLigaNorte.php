@@ -174,6 +174,10 @@ class ScrapeTelegramLigaNorte extends Command
                     // Clean up import so it can be retried next time
                     $import->delete();
                 }
+
+                // Pause for 3 seconds between requests to avoid hitting API rate limits
+                $this->info("Waiting 3 seconds before next request...");
+                sleep(3);
             }
 
             $this->info("Scrape finished. Imported {$importedCount} new items globally.");
