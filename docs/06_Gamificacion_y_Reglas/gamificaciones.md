@@ -1,3 +1,8 @@
+---
+aliases: [Sistema de Gamificación, Gamificación]
+tags: [gamificación, index, clubagility]
+status: completo
+---
 # 🏆 Sistema de Gamificación (ClubAgility)
 
 El sistema de gamificación de **ClubAgility** está diseñado para incentivar la participación de los socios en la vida diaria del club y en el uso de la aplicación, promoviendo el compañerismo, el aprendizaje colaborativo y el reconocimiento positivo.
@@ -29,9 +34,9 @@ Para evitar la saturación de los usuarios y mantener el interés a largo plazo,
 ### 🔄 Dinámicas Rotativas por Temporada
 
 #### 1. Ranking de perros
-* **Descripción:** Tabla de clasificación competitiva que posiciona a los perros según los puntos acumulados por asistencia y mérito deportivo.
-* **Mecánica:** Los perros suman puntos de forma automática al asistir a entrenamientos (+3 puntos) y competiciones (+1 a +4 puntos según su clasificación). El staff también puede asignar manualmente bonificaciones (hasta +3 puntos) o penalizaciones (hasta -3 puntos) por comportamiento.
-* **Sistemas Anti-Frustración:** Equilibrio en la obtención de puntos que premia enormemente la regularidad en la asistencia, permitiendo competir en la tabla a perros constantes de todos los niveles, además de bonificaciones actitudinales dadas manualmente por el staff.
+* **Descripción:** Tabla de clasificación competitiva que posiciona a los perros según los puntos acumulados por asistencia y mérito deportivo. Incluye la extensión opcional del **Tablón de Cazarrecompensas** (Bounty Board), la cual puede ser activada/desactivada por los gestores.
+* **Mecánica:** Los perros suman puntos de forma automática por asistencia (+3 puntos) y competiciones (+1 a +4 puntos). Si el Tablón de Cazarrecompensas está activo, los guías pueden gastar estos puntos para comprar contratos anónimos sobre sus rivales y realizar misiones divertidas a pie de pista validadas por testigos cruzados.
+* **Sistemas Anti-Frustración:** Equilibrio en la obtención de puntos que premia la constancia en asistencia y comportamiento. En el Tablón, se emplean periodos de inmunidad (cooldown) y validaciones comunitarias descentralizadas para evitar discusiones y trampas.
 * **Detalle completo:** Ver especificación detallada en [[gamificacion-ranking-perros]].
 
 #### 2. Álbum de Stickers del Club (Cromos Coleccionables)

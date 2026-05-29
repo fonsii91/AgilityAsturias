@@ -18,7 +18,8 @@ class UserAndDogSeeder extends Seeder
             [
                 'name' => 'Admin User',
                 'password' => bcrypt('password'),
-                'role' => 'admin'
+                'role' => 'admin',
+                'club_id' => 1
             ]
         );
 
@@ -39,7 +40,8 @@ class UserAndDogSeeder extends Seeder
             [
                 'name' => 'Staff User',
                 'password' => bcrypt('password'),
-                'role' => 'staff'
+                'role' => 'staff',
+                'club_id' => 1
             ]
         );
 
@@ -49,7 +51,8 @@ class UserAndDogSeeder extends Seeder
             [
                 'name' => 'Test Member',
                 'password' => bcrypt('password'),
-                'role' => 'member'
+                'role' => 'member',
+                'club_id' => 1
             ]
         );
 
@@ -65,7 +68,7 @@ class UserAndDogSeeder extends Seeder
                 $dog = \App\Models\Dog::create([
                     'name' => \Faker\Factory::create()->firstName . ' (Perro)',
                     'breed' => $breeds[array_rand($breeds)],
-                    'age' => rand(1, 10),
+                    'birth_date' => now()->subYears(rand(1, 10))->format('Y-m-d'),
                     'points' => rand(0, 50), // seed with some points for testing
                     'club_id' => 1
                 ]);

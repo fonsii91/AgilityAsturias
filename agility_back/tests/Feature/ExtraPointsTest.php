@@ -31,6 +31,7 @@ class ExtraPointsTest extends TestCase
 
         // Create an active ranking season
         \App\Models\GamificationSeason::create([
+            'club_id' => $this->club->id,
             'name' => 'Temporada de Test',
             'gamification_type' => 'ranking',
             'start_date' => now()->toDateString(),

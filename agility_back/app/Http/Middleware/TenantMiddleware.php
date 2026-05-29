@@ -43,6 +43,11 @@ class TenantMiddleware
         }
         if (!$club && $clubSlug) {
             $club = Club::where('slug', $clubSlug)->first();
+            if (!$club) {
+                // Try matching by stripping hyphens to support both agilityasturias and agility-asturias
+                $normalizedSlug = str_replace('-', '', $clubSlug);
+                $club = Club::whereRaw("REPLACE(slug, '-', '') = ?", [$normalizedSlug])->first();
+            }
         }
         
         if ($club) {

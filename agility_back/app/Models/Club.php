@@ -12,11 +12,13 @@ class Club extends Model
         'domain',
         'logo_url',
         'settings',
+        'settings_ranking',
         'plan_id',
     ];
 
     protected $casts = [
         'settings' => 'array',
+        'settings_ranking' => 'array',
     ];
 
     public function users()

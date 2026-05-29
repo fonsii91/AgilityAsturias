@@ -30,6 +30,15 @@ class StaffAttendanceTest extends TestCase
         parent::setUp();
         
         $this->club = Club::create(['name' => 'Test Club', 'slug' => 'test-club']);
+
+        // Create an active ranking season for this club
+        \App\Models\GamificationSeason::create([
+            'club_id' => $this->club->id,
+            'name' => 'Temporada de Test',
+            'gamification_type' => 'ranking',
+            'start_date' => now()->toDateString(),
+            'status' => 'active'
+        ]);
         
         $this->staff = User::factory()->create([
             'role' => 'staff',

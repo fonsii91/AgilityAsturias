@@ -17,6 +17,7 @@ use App\Http\Controllers\RsceTrackController;
 use App\Http\Controllers\RfecTrackController;
 use App\Http\Controllers\PersonalEventController;
 use App\Http\Controllers\LigaNorteController;
+use App\Http\Controllers\BountyController;
 
 /*
 |--------------------------------------------------------------------------
@@ -121,9 +122,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas protegidas EXCLUSIVAMENTE por rol admin
     Route::middleware(['role:admin'])->group(function () {
-        // Seasons Management (System Admin Only)
-        Route::post('/admin/seasons/start', [\App\Http\Controllers\SeasonController::class, 'start']);
-        Route::post('/admin/seasons/end', [\App\Http\Controllers\SeasonController::class, 'endCurrent']);
 
         // Resources (Admin)
         Route::put('/resources/{id}/toggle-global', [ResourceController::class, 'toggleGlobal']);
@@ -162,6 +160,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::middleware(['role:admin,manager'])->group(function () {
+        // Seasons Management (Admin & Manager)
+        Route::post('/admin/seasons/start', [\App\Http\Controllers\SeasonController::class, 'start']);
+        Route::post('/admin/seasons/end', [\App\Http\Controllers\SeasonController::class, 'endCurrent']);
+
         Route::get('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'show']);
         Route::put('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']);
         Route::post('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']); // Some forms might send POST with _method
@@ -274,6 +276,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/trades/{id}/accept', [\App\Http\Controllers\StickerTradeController::class, 'accept']);
         Route::post('/trades/{id}/reject', [\App\Http\Controllers\StickerTradeController::class, 'reject']);
         Route::post('/trades/{id}/cancel', [\App\Http\Controllers\StickerTradeController::class, 'cancel']);
+
+        // Bounty Board (Cazarrecompensas) Routes
+        Route::get('/bounty/posters', [BountyController::class, 'getPosters']);
+        Route::post('/bounty/contracts', [BountyController::class, 'buyContract']);
+        Route::get('/bounty/my-contracts', [BountyController::class, 'getMyContracts']);
+        Route::post('/bounty/contracts/{id}/confirm', [BountyController::class, 'confirmCaza']);
+        Route::post('/bounty/contracts/{id}/validate', [BountyController::class, 'validateCaza']);
+        Route::post('/bounty/contracts/{id}/reroll', [BountyController::class, 'reroll']);
+        Route::get('/bounty/feed', [BountyController::class, 'getFeed']);
+        Route::post('/bounty/settings', [BountyController::class, 'updateSettings']);
+        Route::post('/admin/bounty/toggle', [BountyController::class, 'toggleBountyBoard']);
     });
 
 

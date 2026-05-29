@@ -71,7 +71,7 @@ Herramienta avanzada para la prevención de lesiones y monitorización del rendi
 ### Gamificación
 Dinámicas recreativas y colaborativas diseñadas para incentivar la participación activa en el club y la app (ver [[gamificaciones]]):
 * **Dinámicas Rotativas por Temporada (Alternas):**
-    * **Ranking de Perros:** Sistema de puntuación acumulativo por asistencia y rendimiento deportivo (ver [[gamificacion-ranking-perros]]).
+    * **Ranking de Perros:** Sistema de puntuación acumulativo por asistencia y rendimiento deportivo. Admite la extensión opcional del **Tablón de Cazarrecompensas** (Bounty Board) para retar anónimamente a compañeros mediante misiones reales validadas por testigos (ver [[gamificacion-ranking-perros]]).
     * **Álbum de Stickers del Club:** Colección digital de cromos de los perros del club obtenibles mediante cofres, con revelado visual e intercambios regulados (ver [[gamificacion-stickers]]).
 * **Funcionalidades Permanentes:**
     * **Agility Insights:** Herramienta pedagógica de validación gestual de errores (tipo "Tinder") en vídeos de pistas para miembros experimentados (ver [[analisis-videos-insights]]).
@@ -102,6 +102,7 @@ Los miembros con el rol de "Staff" (monitores, entrenadores, directiva) tienen a
 * **Administración de la Galería:** Subir nuevas imágenes a la galería del club y borrar fotografías.
 * **Aprobación de Vídeos Públicos:** Alternar la visibilidad de los vídeos subidos por los usuarios para decidir si deben o no mostrarse en la galería pública.
 
-### Gestión Deportiva
+### Gestión Deportiva y Gamificación
 * **Asignación de Puntos Extra:** Otorgar puntos adicionales de forma manual a los perros en el sistema de Ranking para premiar acciones, méritos especiales o resultados en ligas externas.
-* **Gestión de Salud Deportiva (Si aplica):** Supervisar los registros introducidos por los usuarios si requieren confirmación adicional.
+* **Gestión del Tablón de Cazarrecompensas:** Habilitar o deshabilitar la extensión del Tablón de Cazarrecompensas y auditar la veracidad de validaciones de testigos sospechosas desde el panel de control.
+* **Gestión de Salud Deportiva (Si aplica):** Supervisar los registros de carga física (ACWR) introducidos por los usuarios si requieren confirmación adicional.

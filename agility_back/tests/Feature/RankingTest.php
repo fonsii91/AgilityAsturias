@@ -28,6 +28,7 @@ class RankingTest extends TestCase
 
         // Create an active ranking season
         \App\Models\GamificationSeason::create([
+            'club_id' => $this->club->id,
             'name' => 'Temporada de Test',
             'gamification_type' => 'ranking',
             'start_date' => now()->toDateString(),
@@ -48,6 +49,7 @@ class RankingTest extends TestCase
         $dog->users()->attach($user->id, ['is_primary_owner' => true]);
 
         $activeSeason = \App\Models\GamificationSeason::where('status', 'active')
+            ->where('club_id', $this->club->id)
             ->first();
 
         if ($activeSeason && $points > 0) {
@@ -64,6 +66,7 @@ class RankingTest extends TestCase
     protected function createPointHistory($dogId, $points, $hoursAgo)
     {
         $activeSeason = \App\Models\GamificationSeason::where('status', 'active')
+            ->where('club_id', $this->club->id)
             ->first();
 
         return \App\Models\PointHistory::create([

@@ -14,7 +14,7 @@
         <span class="material-icons select-chevron">expand_more</span>
       </div>
     }
-    @if (authService.isAdmin()) {
+    @if (authService.isManager()) {
       <button class="btn-manage-seasons" (click)="openSeasonManager()">
         <span class="material-icons" style="font-size: 1.2rem;">date_range</span> Temporadas
       </button>
@@ -88,98 +88,346 @@
   </div>
   }
 
-  @if (!isLoading() && !isStickersSeason() && ranking().length === 0) {
-  <div class="empty-state">
-    <p>Aún no hay puntos registrados. ¡Sé el primero!</p>
-  </div>
+  @if (!isLoading() && !isStickersSeason() && bountyBoardEnabled()) {
+    <div class="sticker-tabs" style="margin-bottom: 20px;">
+      <button class="tab-btn" [class.active]="activeRankingTab() === 'clasificacion'" (click)="setRankingTab('clasificacion')">
+        <span class="material-icons">emoji_events</span> Clasificación
+      </button>
+      <button class="tab-btn" [class.active]="activeRankingTab() === 'bounty'" (click)="setRankingTab('bounty')">
+        <span class="material-icons">military_tech</span> Tablón de Cazarrecompensas
+      </button>
+    </div>
   }
 
-  @if (!isLoading() && !isStickersSeason() && ranking().length > 0) {
-  <div class="ranking-content">
-    <div class="ranking-list glass-effect">
-      @for (dog of ranking(); track dog; let i = $index) {
-      <div class="ranking-row" [class.top-rank]="i < 3"
-        [class.highlight-user-dog]="hasDogUser(dog, authService.currentUserSignal()?.id)" (click)="openFicha(dog)"
-        style="cursor: pointer;">
+  @if (!isLoading() && !isStickersSeason() && activeRankingTab() === 'clasificacion') {
+    @if (ranking().length === 0) {
+      <div class="empty-state">
+        <p>Aún no hay puntos registrados. ¡Sé el primero!</p>
+      </div>
+    } @else {
+      <div class="ranking-content">
+        <div class="ranking-list glass-effect">
+          @for (dog of ranking(); track dog; let i = $index) {
+          <div class="ranking-row" [class.top-rank]="i < 3"
+            [class.highlight-user-dog]="hasDogUser(dog, authService.currentUserSignal()?.id)" (click)="openFicha(dog)"
+            style="cursor: pointer;">
 
-        <div class="rank-position">
-          @if (i === 0) {
-          <span class="medal-icon">🥇</span>
-          }
-          @if (i === 1) {
-          <span class="medal-icon">🥈</span>
-          }
-          @if (i === 2) {
-          <span class="medal-icon">🥉</span>
-          }
-          @if (i > 2) {
-          <span class="number">{{ i + 1 }}</span>
-          }
-        </div>
+            <div class="rank-position">
+              @if (i === 0) {
+              <span class="medal-icon">🥇</span>
+              }
+              @if (i === 1) {
+              <span class="medal-icon">🥈</span>
+              }
+              @if (i === 2) {
+              <span class="medal-icon">🥉</span>
+              }
+              @if (i > 2) {
+              <span class="number">{{ i + 1 }}</span>
+              }
+            </div>
 
-        <div class="user-avatar-small">
-          <!-- Standard size for everyone -->
-          <img [src]="dog.photo_url || 'ClubAgilityBlue.png'" alt="Dog"
-            onError="this.src='ClubAgilityBlue.png'">
-        </div>
+            <div class="user-avatar-small">
+              <img [src]="dog.photo_url || 'ClubAgilityBlue.png'" alt="Dog"
+                onError="this.src='ClubAgilityBlue.png'">
+            </div>
 
-        <div class="user-info">
-          <div class="name-container">
-            <span class="user-name" [class.bold]="i < 3">{{ dog.name }}</span>
-            @if (dog.position_change !== 0 && dog.position_change !== 'NEW') {
-            <!-- Position Up -->
-            @if (dog.position_change > 0) {
-            <div class="position-badge position-up" title="Puestos subidos en el último día">
-              <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
-                  clip-rule="evenodd" />
-              </svg>
-              <span>+{{ dog.position_change }}</span>
+            <div class="user-info">
+              <div class="name-container">
+                <span class="user-name" [class.bold]="i < 3">{{ dog.name }}</span>
+                @if (dog.position_change !== 0 && dog.position_change !== 'NEW') {
+                @if (dog.position_change > 0) {
+                <div class="position-badge position-up" title="Puestos subidos en el último día">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                      clip-rule="evenodd" />
+                  </svg>
+                  <span>+{{ dog.position_change }}</span>
+                </div>
+                }
+                @if (dog.position_change < 0) {
+                <div class="position-badge position-down" title="Puestos bajados en el último día">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                      d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z"
+                      clip-rule="evenodd" />
+                  </svg>
+                  <span>{{ dog.position_change }}</span>
+                </div>
+                }
+                }
+                @if (dog.position_change === 'NEW') {
+                <div class="position-badge position-new" title="Nueva entrada en el ranking">
+                  <span>NUEVO</span>
+                </div>
+                }
+              </div>
+              @if (dog.users) {
+              <span class="owner-name">{{ getOwnerNames(dog) }}</span>
+              }
+            </div>
+
+            @if (dog.recentEmojis && dog.recentEmojis.length > 0) {
+            <div class="recent-emojis">
+              @for (item of dog.recentEmojis; track item) {
+              <span class="recent-emoji" [matTooltip]="item.category" matTooltipPosition="above">
+                {{ item.emoji }}
+              </span>
+              }
             </div>
             }
-            <!-- Position Down -->
-            @if (dog.position_change < 0) { <div class="position-badge position-down"
-              title="Puestos bajados en el último día">
-              <svg xmlns="http://www.w3.org/2000/svg" class="trend-icon" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd"
-                  d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586l-4.293-4.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z"
-                  clip-rule="evenodd" />
-              </svg>
-              <span>{{ dog.position_change }}</span>
-          </div>
-          }
-          }
-          @if (dog.position_change === 'NEW') {
-          <div class="position-badge position-new" title="Nueva entrada en el ranking">
-            <span>NUEVO</span>
-          </div>
-          }
-        </div> <!-- Cierra name-container -->
-        @if (dog.users) {
-        <span class="owner-name">{{ getOwnerNames(dog) }}</span>
-        }
-      </div> <!-- Cierra user-info -->
 
-      @if (dog.recentEmojis && dog.recentEmojis.length > 0) {
-      <div class="recent-emojis">
-        @for (item of dog.recentEmojis; track item) {
-        <span class="recent-emoji" [matTooltip]="item.category" matTooltipPosition="above">
-          {{ item.emoji }}
-        </span>
-        }
+            <div class="points-badge">
+              <span class="points">{{ dog.points }}</span>
+            </div>
+
+          </div>
+          }
+        </div>
       </div>
+    }
+  }
+
+  <!-- Bounty Board View -->
+  @if (!isLoading() && !isStickersSeason() && activeRankingTab() === 'bounty') {
+    <div class="bounty-view fade-in">
+      
+      <!-- Privacy Panel -->
+      <div class="bounty-privacy-card">
+        <div class="privacy-info-group">
+          <span class="material-icons">lock</span>
+          <div class="privacy-texts">
+            <h5>Participación y Privacidad</h5>
+            <p>Si desactivas tu participación, tus perros no aparecerán en el tablón y no recibirás contratos de otros usuarios.</p>
+          </div>
+        </div>
+        <div class="switch-container">
+          <input type="checkbox" id="privacy-optin" [checked]="bountyPrivacyOptIn()" (change)="onBountyPrivacyChange($event)">
+          <label for="privacy-optin" class="switch-btn-label">Participar en el Tablón</label>
+        </div>
+      </div>
+
+      <!-- Bounty Subtabs -->
+      <div class="sticker-tabs" style="margin-bottom: 20px;">
+        <button class="tab-btn" [class.active]="activeBountyTab() === 'tablon'" (click)="setBountyTab('tablon')">
+          <span class="material-icons">assignment</span> El Tablón
+        </button>
+        <button class="tab-btn" [class.active]="activeBountyTab() === 'mis_contratos'" (click)="setBountyTab('mis_contratos')">
+          <span class="material-icons">military_tech</span> Mis Contratos
+        </button>
+        <button class="tab-btn" [class.active]="activeBountyTab() === 'feed'" (click)="setBountyTab('feed')">
+          <span class="material-icons">history</span> Historial de Cazas
+        </button>
+      </div>
+
+      @if (activeBountyTab() === 'tablon' && myDogs().length > 1) {
+        <div class="hunter-selector-card">
+          <div class="hunter-selector-left">
+            <span class="material-icons hunter-icon">pets</span>
+            <div class="hunter-selector-texts">
+              <span class="hunter-label">Cazador Activo:</span>
+              <p class="hunter-desc">Selecciona cuál de tus perros comprará el cartel y recibirá el botín.</p>
+            </div>
+          </div>
+          <select [ngModel]="selectedHunterDogId()" (ngModelChange)="selectedHunterDogId.set($event)" class="hunter-select-dropdown">
+            @for (dog of myDogs(); track dog.id) {
+              <option [value]="dog.id">{{ dog.name }}</option>
+            }
+          </select>
+        </div>
       }
 
-      <div class="points-badge">
-        <span class="points">{{ dog.points }}</span>
-      </div>
+      <!-- Bounty Subview: TABLON -->
+      @if (activeBountyTab() === 'tablon') {
+        @if (!bountyPrivacyOptIn()) {
+          <div class="empty-state-optout">
+            <span class="material-icons optout-icon">visibility_off</span>
+            <h4>Participación Desactivada</h4>
+            <p>Has desactivado tu participación en el Tablón de Cazarrecompensas. Activa tu participación arriba para poder ver los carteles de recompensa y aceptar contratos.</p>
+          </div>
+        } @else if (bountyPosters().length === 0) {
+          <div class="empty-state">
+            <p>No hay carteles de "Se Busca" disponibles en este momento. El suelo de protección para figurar es de 20 puntos.</p>
+          </div>
+        } @else {
+          <div class="bounty-posters-grid">
+            @for (poster of bountyPosters(); track poster.dog_id) {
+              <div class="bounty-poster-card glass-effect" [class.targeted]="poster.has_active_contract">
+                <div class="wanted-stamp">WANTED</div>
+                
+                <div class="poster-img-container">
+                  @if (poster.photo_url) {
+                    <img [src]="poster.photo_url" alt="Dog Image" class="poster-img" onError="this.src='ClubAgilityBlue.png'">
+                  } @else {
+                    <div class="poster-placeholder"><span class="material-icons">pets</span></div>
+                  }
+                  @if (poster.has_active_contract) {
+                    <div class="targeted-overlay">CONTRATO EN CURSO</div>
+                  }
+                </div>
 
-    </div> <!-- Cierra ranking-row -->
-    }
-  </div> <!-- Cierra ranking-list -->
-</div> <!-- Cierra ranking-content -->
-} <!-- Cierra if de len > 0 -->
+                <div class="poster-details">
+                  <h4 class="poster-title">{{ poster.name }}</h4>
+                  <p class="poster-owners">De: {{ poster.owners }}</p>
+
+                  <div class="poster-bounty-details">
+                    <div class="bounty-detail-col">
+                      <span class="detail-label">Coste</span>
+                      <span class="detail-value cost">-{{ poster.carteles[poster.active_cartel_type]?.cost }} pts</span>
+                    </div>
+                    <div class="bounty-detail-col">
+                      <span class="detail-label">Botín</span>
+                      <span class="detail-value bounty">+{{ poster.carteles[poster.active_cartel_type]?.bounty }} pts</span>
+                    </div>
+                  </div>
+
+                  @if (!poster.has_active_contract) {
+                    <div class="cartel-actions">
+                      <button class="btn-cartel" [disabled]="isBuyingBounty()" (click)="buyBounty(poster, poster.active_cartel_type)">
+                        Aceptar Contrato
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      <!-- Bounty Subview: MIS CONTRATOS -->
+      @if (activeBountyTab() === 'mis_contratos') {
+        @if (!bountyPrivacyOptIn()) {
+          <div class="empty-state-optout">
+            <span class="material-icons optout-icon">visibility_off</span>
+            <h4>Participación Desactivada</h4>
+            <p>Has desactivado tu participación en el Tablón de Cazarrecompensas. Activa tu participación arriba para poder ver y gestionar tus contratos.</p>
+          </div>
+        } @else {
+          <div class="my-contracts-view fade-in">
+          
+          <!-- HAUTING SECTION -->
+          <div class="contracts-section-title">Contratos que tienes activos (Como Cazador)</div>
+          @if (!myBountyContracts()?.hunting || myBountyContracts()?.hunting?.length === 0) {
+            <div class="empty-section-note">No tienes ningún contrato activo sobre un rival en este momento.</div>
+          } @else {
+            <div class="contracts-grid">
+              @for (c of myBountyContracts()?.hunting; track c.id) {
+                <div class="contract-card glass-effect">
+                  <div class="contract-header">
+                    <span class="contract-target">Objetivo: <strong>{{ c.victim_dog?.name }}</strong></span>
+                    <span class="contract-type-badge" [class]="c.cartel_type">{{ c.cartel_type.replace('_', ' ') }}</span>
+                  </div>
+                  <div class="contract-body">
+                    <p class="contract-mission"><strong>Misión Secreta:</strong> "{{ c.action_description }}"</p>
+                    <p class="contract-bounty">Botín al cobrar: <strong>+{{ c.bounty }} puntos</strong></p>
+                    <p class="contract-witnesses"><strong>Testigos / Víctima (Asigna uno al confirmar):</strong></p>
+                    <ul class="witnesses-list">
+                      @for (w of c.witnesses; track w.id) {
+                        <li>{{ w.name }}</li>
+                      }
+                    </ul>
+                    <p class="contract-expires">Expira el: {{ c.expires_at | date:'dd/MM/yyyy HH:mm' }}</p>
+                  </div>
+                  <div class="contract-footer" style="gap: 10px;">
+                    <button class="btn-reroll-caza" [disabled]="c.rerolls_used >= 2" (click)="rerollCaza(c.id)" title="Re-roll Misión (máximo 2 veces)">
+                      <span class="material-icons" style="font-size: 1.1rem; vertical-align: middle; margin-right: 4px;">autorenew</span> Reroll ({{ c.rerolls_used }}/2)
+                    </button>
+                    <button class="btn-confirm-caza" (click)="openConfirmCazaModal(c)">
+                      <span class="material-icons" style="font-size: 1.1rem; vertical-align: middle; margin-right: 4px;">check_circle</span> Declarar Caza
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- TARGETED SECTION -->
+          <div class="contracts-section-title" style="margin-top: 30px;">Alertas Activas sobre tus Perros (Como Víctima)</div>
+          @if (!myBountyContracts()?.targeted || myBountyContracts()?.targeted?.length === 0) {
+            <div class="empty-section-note">No hay contratos activos sobre tus perros. ¡Estás a salvo de momento!</div>
+          } @else {
+            <div class="contracts-grid">
+              @for (c of myBountyContracts()?.targeted; track c.id) {
+                <div class="contract-card glass-effect victim-alert">
+                  <div class="contract-header">
+                    <span class="contract-target" style="color: #991b1b; display: flex; align-items: center; gap: 6px;">
+                      <span class="material-icons">warning</span> ¡Estás en la mira!
+                    </span>
+                    <span class="contract-type-badge hachazo">ALERTA</span>
+                  </div>
+                  <div class="contract-body">
+                    <p>Un cazador misterioso ha activado un contrato de tipo <strong>{{ c.cartel_type.replace('_', ' ') }}</strong> contra tu perro.</p>
+                    <p>Si sobrevives (no logran la acción ante los testigos en 30 días), recibirás un <strong>20% de recompensa de supervivencia</strong> del coste del contrato.</p>
+                    <p class="contract-expires">Expira el: {{ c.expires_at | date:'dd/MM/yyyy HH:mm' }}</p>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- WITNESSING SECTION -->
+          <div class="contracts-section-title" style="margin-top: 30px;">Peticiones de Validación (Como Testigo)</div>
+          @if (!myBountyContracts()?.witnessing || myBountyContracts()?.witnessing?.length === 0) {
+            <div class="empty-section-note">No tienes validaciones pendientes asignadas.</div>
+          } @else {
+            <div class="contracts-grid">
+              @for (c of myBountyContracts()?.witnessing; track c.id) {
+                <div class="contract-card glass-effect witness-request">
+                  <div class="contract-header">
+                    <span class="contract-target">Petición de Testigo Cruzado</span>
+                    <span class="contract-type-badge pending">PENDIENTE</span>
+                  </div>
+                  <div class="contract-body">
+                    <p>Te han designado como testigo del siguiente reto en la pista:</p>
+                    <p class="contract-mission" style="background-color: #f8fafc; padding: 12px; border-radius: 8px; border-left: 4px solid var(--primary-color);">
+                      ¿Has presenciado a <strong>{{ c.hunter_dog?.name }}</strong> (o a su guía) conseguir que el perro de <strong>{{ c.victim_dog?.name }}</strong> haga la acción: <em>"{{ c.action_description }}"</em>?
+                    </p>
+                    <p class="contract-expires">Expira el: {{ c.expires_at | date:'dd/MM/yyyy HH:mm' }}</p>
+                  </div>
+                  @if (c.is_selected_for_validation) {
+                    <div class="contract-actions">
+                      <button class="btn-trade-accept" (click)="validateCaza(c.id, true)">SÍ, lo confirmo</button>
+                      <button class="btn-trade-reject" (click)="validateCaza(c.id, false)">NO, no es verdad</button>
+                    </div>
+                  } @else {
+                    <p style="font-size: 0.85rem; color: #64748b; font-style: italic; margin-top: 10px; text-align: center;">El cazador aún no te ha seleccionado en su App para validar este logro.</p>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+        </div>
+        }
+      }
+
+      <!-- Bounty Subview: FEED -->
+      @if (activeBountyTab() === 'feed') {
+        <div class="feed-content fade-in">
+          <div class="feed-header-cazarrecompensas">
+            <h4 style="margin-top: 0; font-weight: 700;">Diario de Cazas del Club</h4>
+            <p style="font-size: 0.9rem;">El historial público de contratos cobrados, fallidos o expirados.</p>
+          </div>
+          
+          @if (bountyFeed().length === 0) {
+            <div class="empty-state"><p>Aún no hay contratos registrados en esta temporada.</p></div>
+          } @else {
+            <div class="history-list glass-effect">
+              @for (item of bountyFeed(); track item.id) {
+                <div class="history-row" style="padding: 18px 15px; display: flex; flex-direction: column; gap: 4px;">
+                  <span class="history-text" style="font-size: 0.95rem; color: #1e293b; line-height: 1.4;">{{ item.message }}</span>
+                  <span class="history-date" style="font-size: 0.8rem; color: #94a3b8; font-weight: 500;">{{ item.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  }
 
 <!-- Stickers View -->
 @if (!isLoading() && isStickersSeason()) {
@@ -534,7 +782,7 @@
 }
 
 <!-- Season Manager Modal -->
-@if (isSeasonModalOpen() && authService.isAdmin()) {
+@if (isSeasonModalOpen() && authService.isManager()) {
   <div class="modal-overlay season-manager-modal" (click)="closeSeasonManager()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -559,6 +807,20 @@
               <p><strong>Tipo de Juego:</strong> {{ activeSeason().gamification_type === 'ranking' ? 'Clasificación de Perros (Ranking)' : 'Álbum de Stickers' }}</p>
               <p><strong>Fecha de Inicio:</strong> {{ activeSeason().start_date | date:'dd/MM/yyyy' }}</p>
             </div>
+            
+            @if (activeSeason().gamification_type === 'ranking') {
+              <div class="bounty-toggle-admin" style="margin: 15px 0; padding-top: 15px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-weight: 600; color: #1e293b; font-size: 0.95rem;">Tablón de Cazarrecompensas</span>
+                  <span style="font-size: 0.8rem; color: #64748b;">Habilita el juego de robos de puntos y misiones anónimas.</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" [checked]="bountyBoardEnabled()" (change)="toggleBountyBoardState($event)">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            }
+
             <button class="btn-end-season" (click)="endCurrentSeason()">
               <span class="material-icons" style="font-size: 1.1rem;">block</span> Finalizar Temporada Actual
             </button>
@@ -606,6 +868,55 @@
             <span class="material-icons">play_circle</span> Iniciar Temporada
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Confirm Caza Witness Modal -->
+@if (isConfirmingCaza()) {
+  <div class="modal-overlay" (click)="closeConfirmCazaModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span class="material-icons title-icon">gavel</span>
+          Declarar Caza
+        </h3>
+        <button class="close-button" (click)="closeConfirmCazaModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="confirm-caza-details">
+          <p>Vas a declarar que has cumplido con éxito la misión contra el perro <strong>{{ isConfirmingCaza().victim_dog?.name }}</strong>.</p>
+          <div class="mission-callout">
+            <span class="material-icons mission-icon">psychology</span>
+            <div class="mission-text">
+              <strong>Misión Secreta:</strong>
+              <p>"{{ isConfirmingCaza().action_description }}"</p>
+            </div>
+          </div>
+          <p style="margin-top: 15px; font-size: 0.9rem;">Para validar esta caza, debes seleccionar a uno de los 5 testigos asignados aleatoriamente o a la propia víctima que haya presenciado la hazaña en vivo:</p>
+          
+          <div class="form-group-custom" style="margin-top: 15px;">
+            <label for="witness-select" style="font-weight: 700;">Selecciona el Testigo:</label>
+            <select id="witness-select" [(ngModel)]="selectedConfirmWitnessId" class="form-control-custom" style="margin-top: 5px;">
+              <option [value]="null" disabled selected>-- Elige un testigo --</option>
+              @for (w of isConfirmingCaza().witnesses; track w.id) {
+                <option [value]="w.id">{{ w.name }}</option>
+              }
+            </select>
+          </div>
+          
+          <div class="warning-note" style="color: #b45309; font-size: 0.85rem; margin-top: 15px; display: flex; align-items: flex-start; gap: 6px;">
+            <span class="material-icons" style="font-size: 1.1rem; margin-top: 2px;">info</span>
+            <span>Se enviará una notificación al testigo seleccionado para que valide o rechace tu reclamación en su panel. Si la rechaza o expira, se considerará fallida y la víctima recibirá la fianza.</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px; padding: 1.25rem 1.75rem; border-top: 1px solid #e2e8f0; background: #f8fafc; border-radius: 0 0 16px 16px;">
+        <button class="btn-cancel" (click)="closeConfirmCazaModal()">Cancelar</button>
+        <button class="btn-submit-caza" [disabled]="!selectedConfirmWitnessId()" (click)="confirmCazaSubmission()">
+          <span class="material-icons" style="font-size: 1rem; vertical-align: middle; margin-right: 4px;">send</span> Enviar a Validar
+        </button>
       </div>
     </div>
   </div>

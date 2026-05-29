@@ -1,3 +1,8 @@
+---
+aliases: [Álbum de Stickers, Stickers, Cromos Coleccionables]
+tags: [gamificación, stickers, cromos, coleccionismo]
+status: completo
+---
 # Gamificación de stickers para aplicación de clubs de agility
 
 ## 1. Contexto y Objetivos

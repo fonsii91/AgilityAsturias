@@ -85,22 +85,20 @@ class SeasonController extends Controller
         $season->end_date = Carbon::now()->toDateString();
         $season->save();
 
-        // If it was a ranking season, freeze the final positions per club
+        // If it was a ranking season, freeze the final positions for the season's club
         if ($season->gamification_type === 'ranking') {
-            $clubs = \App\Models\Club::all();
+            $clubId = $season->club_id;
 
-            foreach ($clubs as $club) {
-                $points = DogSeasonPoint::select('dog_season_points.*')
-                    ->join('dogs', 'dog_season_points.dog_id', '=', 'dogs.id')
-                    ->where('dogs.club_id', $club->id)
-                    ->where('dog_season_points.season_id', $season->id)
-                    ->orderByDesc('dog_season_points.points')
-                    ->get();
+            $points = DogSeasonPoint::select('dog_season_points.*')
+                ->join('dogs', 'dog_season_points.dog_id', '=', 'dogs.id')
+                ->where('dogs.club_id', $clubId)
+                ->where('dog_season_points.season_id', $season->id)
+                ->orderByDesc('dog_season_points.points')
+                ->get();
 
-                foreach ($points as $index => $row) {
-                    $row->final_position = $index + 1;
-                    $row->save();
-                }
+            foreach ($points as $index => $row) {
+                $row->final_position = $index + 1;
+                $row->save();
             }
         }
     }

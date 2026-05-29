@@ -1,3 +1,8 @@
+---
+aliases: [Inicio, Dashboard, Mapa de Documentación, Bóveda Principal]
+tags: [inicio, index, mapa, documentación]
+status: completo
+---
 # 🐾 Panel de Control y Mapa de Documentación: ClubAgility
 
 ¡Bienvenido a la bóveda de documentación oficial de **ClubAgility**! Este espacio está diseñado como una base de conocimiento viva para guiar el desarrollo técnico, las reglas de negocio, el diseño UX/UI y el control de calidad de la plataforma.
@@ -40,7 +45,7 @@ Reglas de interfaz orientadas al usuario final a pie de pista.
 ### 🏆 06. Gamificación y Reglas Deportivas
 Algoritmos y dinámicas recreativas para incentivar el uso de la aplicación.
 *   **[[gamificaciones]]**: Filosofía del sistema de gamificación rotativo, temporadas y resumen de módulos.
-*   **[[gamificacion-ranking-perros]]**: Clasificación competitiva del club basada en puntos acumulados por asistencia y competición.
+*   **[[gamificacion-ranking-perros]]**: Clasificación competitiva del club basada en puntos acumulados por asistencia y competición (incluye extensión del Tablón de Cazarrecompensas).
 *   **[[gamificacion-stickers]]**: Mecánica de cromos coleccionables (stickers), cofres, monedas anti-frustración e intercambios regulados.
 *   **[[analisis-videos-insights]]**: Validación colaborativa gamificada (interfaz tipo Tinder) de errores en pistas de agility.
 *   **[[analisis-sistema-temporadas]]**: Plan técnico y de arquitectura para migrar a un modelo de gamificación rotativo por temporadas.

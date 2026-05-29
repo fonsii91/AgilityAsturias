@@ -15,7 +15,7 @@ return new class extends Migration
         // First, create the default club if it doesn't exist
         $defaultClubId = DB::table('clubs')->insertGetId([
             'name' => 'Agility Asturias',
-            'slug' => 'agility-asturias',
+            'slug' => 'agilityasturias',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -44,6 +44,6 @@ return new class extends Migration
             $table->dropColumn('club_id');
         });
         
-        DB::table('clubs')->where('slug', 'agility-asturias')->delete();
+        DB::table('clubs')->where('slug', 'agilityasturias')->delete();
     }
 };

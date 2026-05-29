@@ -32,6 +32,7 @@ class StickersTest extends TestCase
         ]);
 
         $this->season = GamificationSeason::create([
+            'club_id' => $this->club->id,
             'name' => 'Temporada de Stickers 1',
             'gamification_type' => 'stickers',
             'start_date' => now()->toDateString(),

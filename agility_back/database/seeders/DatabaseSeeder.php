@@ -8,13 +8,14 @@ use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Seed the application's database.
      */
     public function run(): void
     {
+        // Bind default club ID to 1 during console seeding so HasClub trait works
+        app()->instance('active_club_id', 1);
+
         // Call all seeders in a logical order
         $this->call([
             UserAndDogSeeder::class,

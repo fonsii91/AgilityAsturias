@@ -21,6 +21,7 @@ export interface TenantInfo {
   slug: string;
   logo_url: string | null;
   settings: ClubSettings | null;
+  settings_ranking?: any | null;
   plan_id?: number | null;
   features?: string[];
 }

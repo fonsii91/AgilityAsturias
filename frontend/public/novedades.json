@@ -1,5 +1,18 @@
 [
   {
+    "version": "1.1.43",
+    "date": "2026-05-30",
+    "features": [
+      "¡Nuevos iconos temáticos para tus contratos! Para que sea más divertido e intuitivo, ahora cada acción de caza tiene su propio icono dedicado: verás un pergamino al adquirir un contrato, un escudo al sobrevivir y recibir una fianza, una diana al estar en el punto de mira de otro cazador, y un saco de monedas al cobrar tu botín.",
+      "¡Nuevo aspecto de pergamino para tus contratos! Hemos rediseñado el fondo de las tarjetas de tus contratos activos, del selector de cazador y del historial para que utilicen un elegante diseño de papel envejecido con bordes punteados, totalmente a juego con la estética de los carteles del Tablón de Cazarrecompensas.",
+      "¡Mejoras de lectura en las pestañas del Tablón! Hemos aumentado el contraste, el grosor y adaptado los colores de las pestañas para que se lean de forma clara y sin esfuerzo sobre el fondo de madera del Tablón, destacando en rojo brillante la pestaña activa.",
+      "Hemos reorganizado los títulos de las secciones para hacerlos más limpios e integrados con la temática del club, renombrando la pestaña de actividad a 'Historial de Cazas' y el diario público a 'Diario de Cazas del Club'."
+    ],
+    "bugfixes": [
+      "Corregido un comportamiento que seguía mostrando el botón 'Aceptar Contrato' en los carteles de perros que tú ya estabas cazando activamente. Ahora verás directamente el indicativo de 'CONTRATO EN CURSO' para evitar compras duplicadas por error."
+    ]
+  },
+  {
     "version": "1.1.42",
     "date": "2026-05-22",
     "features": [

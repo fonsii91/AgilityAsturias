@@ -13,6 +13,8 @@ import { getEmojiForCategory } from '../../utils/point-categories';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { OnboardingService } from '../../services/onboarding';
+import { TenantService } from '../../services/tenant.service';
+import { BountyService } from '../../services/bounty.service';
 
 @Component({
     selector: 'app-ranking',
@@ -23,11 +25,31 @@ import { OnboardingService } from '../../services/onboarding';
 })
 export class RankingComponent {
     private reservationService = inject(ReservationService);
+    private bountyService = inject(BountyService);
     private analytics = inject(AnalyticsService);
     authService = inject(AuthService);
     dogService = inject(DogService);
     toastService = inject(ToastService);
     onboardingService = inject(OnboardingService);
+    tenantService = inject(TenantService);
+
+    // Bounty Board signals
+    activeRankingTab = signal<'clasificacion' | 'bounty'>('clasificacion');
+    activeBountyTab = signal<'tablon' | 'mis_contratos' | 'feed'>('tablon');
+    bountyPosters = signal<any[]>([]);
+    myBountyContracts = signal<any | null>(null);
+    bountyFeed = signal<any[]>([]);
+    isBountyLoading = signal(false);
+    isBuyingBounty = signal(false);
+    isConfirmingCaza = signal<any | null>(null);
+    selectedConfirmWitnessId = signal<number | null>(null);
+    bountyPrivacyOptIn = signal(true);
+    myDogs = this.dogService.getDogs();
+    selectedHunterDogId = signal<number | null>(null);
+
+    bountyBoardEnabled = computed(() => {
+        return !!this.tenantService.tenantInfo()?.settings_ranking?.bounty_board_enabled;
+    });
 
     ranking = signal<any[]>([]);
     isLoading = signal(true);
@@ -73,6 +95,11 @@ export class RankingComponent {
 
     constructor() {
         this.loadSeasons();
+        this.dogService.loadUserDogs().then(dogs => {
+            if (dogs && dogs.length > 0) {
+                this.selectedHunterDogId.set(dogs[0].id);
+            }
+        });
         this.analytics.logSystemAction('ranking_viewed');
     }
 
@@ -518,5 +545,170 @@ export class RankingComponent {
     onInstructionsOpened() {
         this.onboardingService.markStepCompleted('staff_asistencia');
         this.onboardingService.markStepCompleted('miembro_clasificacion');
+    }
+
+    // Bounty Board Methods
+    loadBountyData() {
+        this.isBountyLoading.set(true);
+        // Load posters
+        this.bountyService.getBountyPosters().subscribe({
+            next: (data: any) => {
+                this.bountyPosters.set(data.posters || []);
+                this.bountyPrivacyOptIn.set(data.opt_in !== false);
+                this.isBountyLoading.set(false);
+            },
+            error: (err: any) => {
+                console.error('Error loading posters', err);
+                this.isBountyLoading.set(false);
+            }
+        });
+
+        // Load my contracts
+        this.bountyService.getMyBountyContracts().subscribe({
+            next: (data: any) => {
+                this.myBountyContracts.set(data);
+            },
+            error: (err: any) => console.error('Error loading my contracts', err)
+        });
+
+        // Load feed
+        this.bountyService.getBountyFeed().subscribe({
+            next: (data: any[]) => {
+                this.bountyFeed.set(data || []);
+            },
+            error: (err: any) => console.error('Error loading feed', err)
+        });
+    }
+
+    setRankingTab(tab: 'clasificacion' | 'bounty') {
+        this.activeRankingTab.set(tab);
+        if (tab === 'bounty') {
+            this.loadBountyData();
+        }
+    }
+
+    setBountyTab(tab: 'tablon' | 'mis_contratos' | 'feed') {
+        this.activeBountyTab.set(tab);
+        this.loadBountyData();
+    }
+
+    buyBounty(poster: any, type: string) {
+        const cost = poster.carteles[type].cost;
+        const bounty = poster.carteles[type].bounty;
+        const msg = `¿Estás seguro de que deseas comprar el cartel de ${poster.name} (${type.replace('_', ' ')}) por ${cost} puntos del ranking? Si tienes éxito robarás ${bounty} puntos. Si fallas o expira a los 30 días, perderás la fianza y se le ingresará el 20% (${Math.floor(cost * 0.2)} puntos) a la víctima.`;
+        if (confirm(msg)) {
+            this.isBuyingBounty.set(true);
+
+            const payload: any = {
+                victim_dog_id: poster.dog_id,
+                cartel_type: type
+            };
+            if (this.selectedHunterDogId()) {
+                payload.hunter_dog_id = this.selectedHunterDogId();
+            }
+
+            this.bountyService.buyBountyContract(payload).subscribe({
+                next: (res: any) => {
+                    this.toastService.success(res.message || 'Contrato adquirido con éxito');
+                    this.loadBountyData();
+                    this.isBuyingBounty.set(false);
+                },
+                error: (err: any) => {
+                    console.error(err);
+                    this.toastService.error(err.error?.message || 'Error al comprar contrato');
+                    this.isBuyingBounty.set(false);
+                }
+            });
+        }
+    }
+
+    openConfirmCazaModal(contract: any) {
+        this.isConfirmingCaza.set(contract);
+        this.selectedConfirmWitnessId.set(null);
+    }
+
+    closeConfirmCazaModal() {
+        this.isConfirmingCaza.set(null);
+        this.selectedConfirmWitnessId.set(null);
+    }
+
+    confirmCazaSubmission() {
+        const contract = this.isConfirmingCaza();
+        const witnessId = this.selectedConfirmWitnessId();
+        if (!contract || !witnessId) return;
+
+        this.bountyService.confirmBountyCaza(contract.id, witnessId).subscribe({
+            next: (res: any) => {
+                this.toastService.success(res.message || 'Caza confirmada. Esperando validación del testigo.');
+                this.closeConfirmCazaModal();
+                this.loadBountyData();
+            },
+            error: (err: any) => {
+                console.error(err);
+                this.toastService.error(err.error?.message || 'Error al confirmar caza');
+            }
+        });
+    }
+
+    validateCaza(contractId: number, approved: boolean) {
+        const actionText = approved ? 'confirmar' : 'denegar';
+        if (confirm(`¿Estás seguro de que deseas ${actionText} esta caza?`)) {
+            this.bountyService.validateBountyCaza(contractId, approved).subscribe({
+                next: (res: any) => {
+                    this.toastService.success(res.message || 'Contrato validado correctamente.');
+                    this.loadBountyData();
+                },
+                error: (err: any) => {
+                    console.error(err);
+                    this.toastService.error(err.error?.message || 'Error al validar contrato');
+                }
+            });
+        }
+    }
+
+    toggleBountyBoardState(event: any) {
+        const enabled = event.target.checked;
+        this.bountyService.toggleBountyBoard(enabled).subscribe({
+            next: (res: any) => {
+                this.toastService.success(res.message || 'Ajuste guardado con éxito');
+                this.tenantService.reload();
+            },
+            error: (err: any) => {
+                console.error(err);
+                this.toastService.error(err.error?.message || 'Error al guardar ajuste');
+            }
+        });
+    }
+
+    onBountyPrivacyChange(event: any) {
+        const optIn = event.target.checked;
+        this.bountyService.updateBountySettings(optIn).subscribe({
+            next: (res: any) => {
+                this.toastService.success(res.message || 'Configuración de privacidad guardada');
+                this.bountyPrivacyOptIn.set(optIn);
+                this.loadBountyData();
+            },
+            error: (err: any) => {
+                console.error(err);
+                this.toastService.error('Error al guardar privacidad');
+                // Revert toggle in case of error
+                event.target.checked = !optIn;
+            }
+        });
+    }
+
+    rerollCaza(contractId: number) {
+        if (confirm('¿Estás seguro de que deseas cambiar la misión de este contrato? Puedes hacerlo un máximo de 2 veces en total.')) {
+            this.bountyService.rerollBountyContract(contractId).subscribe({
+                next: (res: any) => {
+                    this.toastService.success(res.message || 'Misión cambiada con éxito.');
+                    this.loadBountyData();
+                },
+                error: (err: any) => {
+                    console.error(err);
+                    this.toastService.error(err.error?.message || 'Error al cambiar la misión');
+                }
+            });
+        }
     }
 }

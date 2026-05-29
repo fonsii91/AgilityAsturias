@@ -41,6 +41,20 @@ export function getEmojiForCategory(category: string, points?: number): string {
         return '🏆';
     }
 
+    // Bounty board related categories
+    if (lowerCategory.includes('compra de contrato')) {
+        return '📜';
+    }
+    if (lowerCategory.includes('contrato cobrado')) {
+        return '💰';
+    }
+    if (lowerCategory.includes('supervivencia de contrato')) {
+        return '🛡️';
+    }
+    if (lowerCategory.includes('cazado por')) {
+        return '🎯';
+    }
+
     // Default fallback for custom or unknown categories
     if (points !== undefined) {
          return points > 0 ? '⭐' : '⚠️';

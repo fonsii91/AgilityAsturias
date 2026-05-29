@@ -3,12 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasClub;
 
 class GamificationSeason extends Model
 {
+    use HasClub;
+
     protected $table = 'gamification_seasons';
 
     protected $fillable = [
+        'club_id',
         'name',
         'gamification_type',
         'start_date',

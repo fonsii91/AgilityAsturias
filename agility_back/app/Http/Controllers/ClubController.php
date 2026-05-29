@@ -20,6 +20,7 @@ class ClubController extends Controller
                     'domain' => $club->domain,
                     'logo_url' => $club->logo_url,
                     'settings' => $club->settings,
+                    'settings_ranking' => $club->settings_ranking,
                     'plan_id' => $club->plan_id,
                     'features' => $club->plan ? $club->plan->features->pluck('slug') : [],
                 ]);

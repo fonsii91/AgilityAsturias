@@ -7,14 +7,20 @@ import { ToastService } from '../../services/toast.service';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
+import { signal } from '@angular/core';
+
 class MockReservationService {
   getRanking(seasonId?: number) { return of([]); }
   getSeasons() { return of([]); }
   startSeason(payload: any) { return of({ message: 'Success' }); }
   endSeason() { return of({ message: 'Success' }); }
 }
-class MockAuthService { currentUser = { id: 1, name: 'Test User' }; }
-class MockDogService { updateDog(id: number, data: any) { return Promise.resolve(data); } }
+class MockAuthService { currentUser = { id: 1, name: 'Test User' }; currentUserSignal = signal({ id: 1, name: 'Test User' }); }
+class MockDogService {
+  updateDog(id: number, data: any) { return Promise.resolve(data); }
+  getDogs() { return signal([]); }
+  loadUserDogs() { return Promise.resolve([]); }
+}
 class MockToastService { success(msg: string) {} error(msg: string) {} }
 
 describe('RankingComponent', () => {
