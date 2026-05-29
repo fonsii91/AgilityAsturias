@@ -416,12 +416,27 @@ class ScrapeFlowAgility extends Command
                             }
                             
                             if ($pointsToAdd > 0) {
+                                $activeSeason = \App\Models\GamificationSeason::where('status', 'active')
+                                    ->where('gamification_type', 'ranking')
+                                    ->first();
+
+                                $seasonId = $activeSeason ? $activeSeason->id : null;
+
+                                if ($activeSeason) {
+                                    $seasonPoint = \App\Models\DogSeasonPoint::firstOrCreate([
+                                        'dog_id' => $dog->id,
+                                        'season_id' => $seasonId,
+                                    ]);
+                                    $seasonPoint->increment('points', $pointsToAdd);
+                                }
+
                                 $dog->increment('points', $pointsToAdd);
                                 \App\Models\PointHistory::create([
                                     'dog_id' => $dog->id,
                                     'club_id' => $dog->club_id,
                                     'points' => $pointsToAdd,
-                                    'category' => $categoryName
+                                    'category' => $categoryName,
+                                    'season_id' => $seasonId,
                                 ]);
                                 
                                 // Notify owners

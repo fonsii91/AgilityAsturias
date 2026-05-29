@@ -18,6 +18,7 @@ Concepto de la aplicación, mapa de características y funcionalidades.
 Modelos de monetización, suscripciones SaaS y estrategias comerciales.
 *   **[[planes-suscripcion-saas]]**: Modelos de precios y características incluidas (Planes Básico, Pro y Élite).
 *   **[[marketing-aislamiento]]**: Nota de valor sobre despliegue aislado y seguridad multi-tenant.
+*   **[[normativa-rfec]]**: Reglas, clases, grados autonómicos y criterios de ascenso de la Real Federación Española de Caza (RFEC).
 
 ### 🏗️ 03. Arquitectura y Sistemas
 Bases técnicas, seguridad, infraestructura y ciclo de vida de los datos.
@@ -38,9 +39,11 @@ Reglas de interfaz orientadas al usuario final a pie de pista.
 
 ### 🏆 06. Gamificación y Reglas Deportivas
 Algoritmos y dinámicas recreativas para incentivar el uso de la aplicación.
+*   **[[gamificaciones]]**: Filosofía del sistema de gamificación rotativo, temporadas y resumen de módulos.
+*   **[[gamificacion-ranking-perros]]**: Clasificación competitiva del club basada en puntos acumulados por asistencia y competición.
 *   **[[gamificacion-stickers]]**: Mecánica de cromos coleccionables (stickers), cofres, monedas anti-frustración e intercambios regulados.
 *   **[[analisis-videos-insights]]**: Validación colaborativa gamificada (interfaz tipo Tinder) de errores en pistas de agility.
-*   **[[normativa-rfec]]**: Reglas, clases, grados autonómicos y criterios de ascenso de la Real Federación Española de Caza (RFEC).
+*   **[[analisis-sistema-temporadas]]**: Plan técnico y de arquitectura para migrar a un modelo de gamificación rotativo por temporadas.
 
 ### 🧪 07. Testing y Calidad
 Bitácora de pruebas automatizadas y cobertura.

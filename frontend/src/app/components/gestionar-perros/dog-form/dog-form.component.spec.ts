@@ -91,7 +91,8 @@ describe('DogFormComponent', () => {
     expect(mockDogService.addDog).toHaveBeenCalledWith({
       name: 'Toby',
       breed: 'Border Collie',
-      birth_date: null
+      birth_date: null,
+      club_entry_year: null
     });
     
     expect(mockToastService.success).toHaveBeenCalledWith('Perro registrado');

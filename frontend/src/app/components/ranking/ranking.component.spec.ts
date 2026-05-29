@@ -8,7 +8,10 @@ import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
 class MockReservationService {
-  getRanking() { return of([]); }
+  getRanking(seasonId?: number) { return of([]); }
+  getSeasons() { return of([]); }
+  startSeason(payload: any) { return of({ message: 'Success' }); }
+  endSeason() { return of({ message: 'Success' }); }
 }
 class MockAuthService { currentUser = { id: 1, name: 'Test User' }; }
 class MockDogService { updateDog(id: number, data: any) { return Promise.resolve(data); } }
@@ -48,6 +51,7 @@ describe('RankingComponent', () => {
     ];
     vi.spyOn(reservationService, 'getRanking').mockReturnValue(of(mockRankingData));
 
+    component.selectedSeasonId.set(1);
     component.loadRanking();
 
     expect(component.ranking().length).toBe(2);
@@ -78,17 +82,87 @@ describe('RankingComponent', () => {
     vi.spyOn(reservationService, 'getRanking').mockReturnValue(throwError(() => new Error('API Error')));
     vi.spyOn(console, 'error').mockImplementation(() => {});
 
+    component.selectedSeasonId.set(1);
     component.loadRanking();
 
     expect(console.error).toHaveBeenCalled();
     expect(component.isLoading()).toBe(false);
   });
 
+  it('should load seasons and set selectedSeasonId on init', () => {
+    const mockSeasons = [
+      { id: 1, name: 'Temporada 1', status: 'active', gamification_type: 'ranking' },
+      { id: 2, name: 'Temporada 2', status: 'finished', gamification_type: 'ranking' }
+    ];
+    vi.spyOn(reservationService, 'getSeasons').mockReturnValue(of(mockSeasons));
+    vi.spyOn(reservationService, 'getRanking').mockReturnValue(of([]));
+
+    component.loadSeasons();
+
+    expect(component.seasons()).toEqual(mockSeasons);
+    expect(component.activeSeason()).toEqual(mockSeasons[0]);
+    expect(component.selectedSeasonId()).toBe(1);
+  });
+
+  it('should handle season change', () => {
+    vi.spyOn(component, 'loadRanking').mockImplementation(() => {});
+    
+    component.onSeasonChange({ target: { value: '2' } });
+
+    expect(component.selectedSeasonId()).toBe(2);
+    expect(component.loadRanking).toHaveBeenCalled();
+  });
+
+  it('should open and close season manager modal', () => {
+    document.body.style.overflow = '';
+    
+    component.openSeasonManager();
+    expect(component.isSeasonModalOpen()).toBe(true);
+    expect(document.body.style.overflow).toBe('hidden');
+
+    component.closeSeasonManager();
+    expect(component.isSeasonModalOpen()).toBe(false);
+    expect(document.body.style.overflow).toBe('auto');
+  });
+
+  it('should start new season successfully', () => {
+    component.newSeasonName = 'Nueva Temporada';
+    component.newSeasonType = 'ranking';
+    component.newSeasonStartDate = '2026-06-01';
+
+    const startSpy = vi.spyOn(reservationService, 'startSeason').mockReturnValue(of({ message: 'Temporada creada' }));
+    const loadSpy = vi.spyOn(component, 'loadSeasons').mockImplementation(() => {});
+    const closeSpy = vi.spyOn(component, 'closeSeasonManager').mockImplementation(() => {});
+    
+    component.startNewSeason();
+
+    expect(startSpy).toHaveBeenCalledWith({
+      name: 'Nueva Temporada',
+      gamification_type: 'ranking',
+      start_date: '2026-06-01'
+    });
+    expect(component.newSeasonName).toBe('');
+    expect(loadSpy).toHaveBeenCalled();
+    expect(closeSpy).toHaveBeenCalled();
+  });
+
+  it('should end current season successfully', () => {
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const endSpy = vi.spyOn(reservationService, 'endSeason').mockReturnValue(of({ message: 'Temporada finalizada' }));
+    const loadSpy = vi.spyOn(component, 'loadSeasons').mockImplementation(() => {});
+    const closeSpy = vi.spyOn(component, 'closeSeasonManager').mockImplementation(() => {});
+
+    component.endCurrentSeason();
+
+    expect(endSpy).toHaveBeenCalled();
+    expect(loadSpy).toHaveBeenCalled();
+    expect(closeSpy).toHaveBeenCalled();
+  });
+
   it('should open and close modal manually', () => {
     const dog = { id: 1, name: 'Buddy' };
     
-    // Mock the body to not throw when changing styles
-    Object.defineProperty(document, 'body', { value: { style: { overflow: '' } } });
+    document.body.style.overflow = '';
 
     component.openFicha(dog);
 

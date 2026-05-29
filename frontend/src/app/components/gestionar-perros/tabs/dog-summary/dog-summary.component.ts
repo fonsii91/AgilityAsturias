@@ -37,6 +37,10 @@ import { environment } from '../../../../../environments/environment';
               <input type="date" [(ngModel)]="formData.birth_date" (ngModelChange)="checkChanges()">
             </div>
             
+            <div class="form-group">
+              <label>Año de Entrada al Club</label>
+              <input type="number" [(ngModel)]="formData.club_entry_year" (ngModelChange)="checkChanges()" placeholder="Año (por defecto: año de creación)">
+            </div>
           </div>
         </div>
         
@@ -112,7 +116,8 @@ export class DogSummaryComponent {
   formData = {
     name: this.dog()?.name || '',
     breed: this.dog()?.breed || '',
-    birth_date: this.dog()?.birth_date ? this.dog()!.birth_date!.split('T')[0] : ''
+    birth_date: this.dog()?.birth_date ? this.dog()!.birth_date!.split('T')[0] : '',
+    club_entry_year: this.dog()?.club_entry_year || null
   };
   initialData = { ...this.formData };
   
@@ -162,7 +167,8 @@ export class DogSummaryComponent {
         ...currentDog,
         name: this.formData.name,
         breed: this.formData.breed || null,
-        birth_date: this.formData.birth_date || null
+        birth_date: this.formData.birth_date || null,
+        club_entry_year: this.formData.club_entry_year || null
       };
 
       const updated = await this.dogService.updateDog(currentDog.id, payload as any);

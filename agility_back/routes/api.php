@@ -85,6 +85,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/attendance/pending-competitions', [AttendanceController::class, 'pendingCompetitions']);
         Route::post('/admin/attendance/confirm-competition', [AttendanceController::class, 'confirmCompetition']);
 
+        // Seasons (Admin/Staff)
+        Route::get('/admin/seasons', [\App\Http\Controllers\SeasonController::class, 'index']);
+
         // Extra Points (Admin/Staff)
         Route::post('/dogs/{id}/extra-points', [DogController::class, 'giveExtraPoints']);
 
@@ -118,6 +121,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas protegidas EXCLUSIVAMENTE por rol admin
     Route::middleware(['role:admin'])->group(function () {
+        // Seasons Management (System Admin Only)
+        Route::post('/admin/seasons/start', [\App\Http\Controllers\SeasonController::class, 'start']);
+        Route::post('/admin/seasons/end', [\App\Http\Controllers\SeasonController::class, 'endCurrent']);
+
         // Resources (Admin)
         Route::put('/resources/{id}/toggle-global', [ResourceController::class, 'toggleGlobal']);
         // Dog Workloads Monitor
@@ -168,6 +175,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Ranking
         Route::get('/ranking', [RankingController::class, 'index']);
+        Route::get('/seasons', [\App\Http\Controllers\SeasonController::class, 'index']);
 
         // Users for sharing
         Route::get('/users/minimal', [\App\Http\Controllers\AuthController::class, 'minimalIndex']);
@@ -254,6 +262,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Liga Norte Public Standings
         Route::get('/liga-norte/standings', [LigaNorteController::class, 'getStandings']);
+
+        // Sticker Album & Trades Routes
+        Route::get('/album', [\App\Http\Controllers\StickerAlbumController::class, 'getAlbum']);
+        Route::post('/album/open-chest', [\App\Http\Controllers\StickerAlbumController::class, 'openChest']);
+        Route::post('/album/buy-pack', [\App\Http\Controllers\StickerAlbumController::class, 'buyStickerPack']);
+        Route::post('/album/claim-promotion', [\App\Http\Controllers\StickerAlbumController::class, 'claimPromotionReward']);
+
+        Route::get('/trades', [\App\Http\Controllers\StickerTradeController::class, 'index']);
+        Route::post('/trades', [\App\Http\Controllers\StickerTradeController::class, 'store']);
+        Route::post('/trades/{id}/accept', [\App\Http\Controllers\StickerTradeController::class, 'accept']);
+        Route::post('/trades/{id}/reject', [\App\Http\Controllers\StickerTradeController::class, 'reject']);
+        Route::post('/trades/{id}/cancel', [\App\Http\Controllers\StickerTradeController::class, 'cancel']);
     });
 
 

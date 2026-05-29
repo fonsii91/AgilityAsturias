@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "04_Integraciones/scrapping-liga.md",
+                "file": "00_Inicio/inicio.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "scrapping-liga"
+              "title": "inicio"
             }
           }
         ]
@@ -185,12 +185,20 @@
   },
   "active": "3ab77ac0fbb3ad47",
   "lastOpenFiles": [
+    "06_Gamificacion_y_Reglas/analisis-sistema-temporadas.md",
+    "06_Gamificacion_y_Reglas/gamificacion-ranking-perros.md",
+    "06_Gamificacion_y_Reglas/gamificaciones.md",
+    "02_Negocio/normativa-rfec.md",
+    "01_Producto/funcionalidades.md",
+    "02_Negocio/marketing-aislamiento.md",
+    "02_Negocio/planes-suscripcion-saas.md",
+    "00_Inicio/inicio.md",
+    "04_Integraciones/scrapping-liga.md",
     "06_Gamificacion_y_Reglas/analisis-videos-insights.md",
     "04_Integraciones/integracion-flowagility.md",
     "04_Integraciones/gestion-videos.md",
     "01_Producto/usuarios.md",
     "06_Gamificacion_y_Reglas/gamificacion-stickers.md",
-    "00_Inicio/inicio.md",
     "03_Arquitectura_y_Sistemas/gestion-videos.md",
     "03_Arquitectura_y_Sistemas/backups-locales.md",
     "03_Arquitectura_y_Sistemas/arquitectura-multi-tenant.md",
@@ -205,19 +213,11 @@
     "07_Testing_y_Calidad/registro-tests.md",
     "07_Testing_y_Calidad/funcionalidades-testing.md",
     "07_Testing_y_Calidad",
-    "02_Negocio/planes-suscripcion-saas.md",
-    "02_Negocio/marketing-aislamiento.md",
     "01_Producto/lineas-futuras-roadmap.md",
-    "01_Producto/funcionalidades.md",
     "02_Negocio",
     "01_Producto",
     "01_Producto_y_Negocio/funcionalidades.md",
     "06_Testing_y_Calidad/registro-tests.md",
-    "06_Testing_y_Calidad/funcionalidades-testing.md",
-    "05_Gamificacion_y_Reglas/analisis-videos-insights.md",
-    "05_Gamificacion_y_Reglas/normativa-rfec.md",
-    "05_Gamificacion_y_Reglas/gamificacion-stickers.md",
-    "04_Diseno_y_UX/estrategias-onboarding-ux.md",
     "06_Testing_y_Calidad",
     "05_Gamificacion_y_Reglas",
     "04_Diseno_y_UX"

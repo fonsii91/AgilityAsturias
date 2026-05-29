@@ -28,6 +28,14 @@ class ExtraPointsTest extends TestCase
             'slug' => 'testclub',
             'db_connection' => 'sqlite'
         ]);
+
+        // Create an active ranking season
+        \App\Models\GamificationSeason::create([
+            'name' => 'Temporada de Test',
+            'gamification_type' => 'ranking',
+            'start_date' => now()->toDateString(),
+            'status' => 'active'
+        ]);
     }
 
     protected function createUser($attributes = [])

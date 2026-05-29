@@ -2,6 +2,7 @@ export interface Dog {
     id: number;
     name: string;
     breed?: string; // Raza opcional
+    club_entry_year?: number;
     birth_date?: string;
     rsce_category?: string;
     microchip?: string;

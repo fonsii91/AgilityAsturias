@@ -29,6 +29,11 @@ class Club extends Model
         return $this->belongsTo(Plan::class);
     }
 
+    public function gamificationSeasons()
+    {
+        return $this->hasMany(GamificationSeason::class);
+    }
+
     /**
      * Check if the club's current plan includes a specific feature.
      */

@@ -171,8 +171,64 @@ export class ReservationService {
     }
 
     // Ranking
-    getRanking() {
-        return this.http.get<any[]>(`${environment.apiUrl}/ranking`);
+    getRanking(seasonId?: number) {
+        const url = seasonId ? `${environment.apiUrl}/ranking?season_id=${seasonId}` : `${environment.apiUrl}/ranking`;
+        return this.http.get<any[]>(url);
+    }
+
+    getSeasons() {
+        return this.http.get<any[]>(`${environment.apiUrl}/seasons`);
+    }
+
+    startSeason(payload: { name: string, gamification_type: string, start_date?: string }) {
+        return this.http.post<any>(`${environment.apiUrl}/admin/seasons/start`, payload);
+    }
+
+    endSeason() {
+        return this.http.post<any>(`${environment.apiUrl}/admin/seasons/end`, {});
+    }
+
+    // Sticker Album API
+    getStickerAlbum(seasonId?: number) {
+        const url = seasonId ? `${environment.apiUrl}/album?season_id=${seasonId}` : `${environment.apiUrl}/album`;
+        return this.http.get<any>(url);
+    }
+
+    openChest() {
+        return this.http.post<any>(`${environment.apiUrl}/album/open-chest`, {});
+    }
+
+    buyStickerPack() {
+        return this.http.post<any>(`${environment.apiUrl}/album/buy-pack`, {});
+    }
+
+    claimPromotionReward(year: number) {
+        return this.http.post<any>(`${environment.apiUrl}/album/claim-promotion`, { year });
+    }
+
+    // Sticker Trades API
+    getStickerTrades() {
+        return this.http.get<any[]>(`${environment.apiUrl}/trades`);
+    }
+
+    proposeStickerTrade(receiverId: number, offeredDogId: number, requestedDogId: number) {
+        return this.http.post<any>(`${environment.apiUrl}/trades`, {
+            receiver_id: receiverId,
+            offered_dog_id: offeredDogId,
+            requested_dog_id: requestedDogId
+        });
+    }
+
+    acceptStickerTrade(tradeId: number) {
+        return this.http.post<any>(`${environment.apiUrl}/trades/${tradeId}/accept`, {});
+    }
+
+    rejectStickerTrade(tradeId: number) {
+        return this.http.post<any>(`${environment.apiUrl}/trades/${tradeId}/reject`, {});
+    }
+
+    cancelStickerTrade(tradeId: number) {
+        return this.http.post<any>(`${environment.apiUrl}/trades/${tradeId}/cancel`, {});
     }
 
     // Mapper methods

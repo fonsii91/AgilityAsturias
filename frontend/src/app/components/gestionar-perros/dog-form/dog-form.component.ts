@@ -66,9 +66,17 @@ import { OnboardingService } from '../../../services/onboarding';
             </div>
           </div>
 
-          <div class="form-group full-width">
+          <div class="form-group">
             <label>Fecha de Nacimiento</label>
             <input type="date" [(ngModel)]="formData.birth_date">
+          </div>
+
+          <div class="form-group">
+            <label>Año de Entrada al Club (Opcional)</label>
+            <div class="input-with-icon">
+              <span class="material-icons-outlined input-icon">calendar_today</span>
+              <input type="number" [(ngModel)]="formData.club_entry_year" placeholder="Año (por defecto: año actual)">
+            </div>
           </div>
         </div>
         
@@ -146,7 +154,8 @@ export class DogFormComponent {
   formData = {
     name: '',
     breed: '',
-    birth_date: ''
+    birth_date: '',
+    club_entry_year: null as number | null
   };
 
   selectedFile: File | null = null;
@@ -182,7 +191,8 @@ export class DogFormComponent {
       const payload = {
         name: this.formData.name,
         breed: this.formData.breed?.trim() || null,
-        birth_date: this.formData.birth_date || null
+        birth_date: this.formData.birth_date || null,
+        club_entry_year: this.formData.club_entry_year || null
       };
 
       const newDog = await this.dogService.addDog(payload as any);

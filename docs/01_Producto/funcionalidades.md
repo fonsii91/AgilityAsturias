@@ -64,9 +64,17 @@ Herramienta avanzada para la prevención de lesiones y monitorización del rendi
 ### Competiciones y Ranking
 * **Visualización de Competiciones:** Ver las próximas competiciones y eventos oficiales en los que el club va a participar.
 * **Asistencia a Competiciones:** Confirmar la inscripción o asistencia a una competición determinada ("apuntarse") o cancelar dicha inscripción ("desapuntarse"). Ver la lista de otros miembros que también van a asistir.
-* **Ranking Comunitario:** Consultar la clasificación de la liga interna o ranking del club para ver la posición de los perros en las diferentes categorías (ver mecánica de gamificación en [[gamificacion-stickers]]).
+* **Ranking Comunitario:** Consultar la clasificación de la liga interna o ranking del club para ver la posición de los perros en las diferentes categorías (ver mecánica de gamificación en [[gamificacion-ranking-perros]]).
 * **Bitácora RSCE:** Herramienta para realizar un seguimiento personal de las pistas RSCE realizadas, guardar resultados, registrar puntos y llevar un control del grado de competición.
 * **Bitácora RFEC:** Herramienta paralela para el seguimiento de clasificaciones, resultados y progresión en la normativa de la Real Federación Española de Caza (RFEC) (ver [[normativa-rfec]]).
+
+### Gamificación
+Dinámicas recreativas y colaborativas diseñadas para incentivar la participación activa en el club y la app (ver [[gamificaciones]]):
+* **Dinámicas Rotativas por Temporada (Alternas):**
+    * **Ranking de Perros:** Sistema de puntuación acumulativo por asistencia y rendimiento deportivo (ver [[gamificacion-ranking-perros]]).
+    * **Álbum de Stickers del Club:** Colección digital de cromos de los perros del club obtenibles mediante cofres, con revelado visual e intercambios regulados (ver [[gamificacion-stickers]]).
+* **Funcionalidades Permanentes:**
+    * **Agility Insights:** Herramienta pedagógica de validación gestual de errores (tipo "Tinder") en vídeos de pistas para miembros experimentados (ver [[analisis-videos-insights]]).
 
 ---
 

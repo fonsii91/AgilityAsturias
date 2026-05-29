@@ -57,6 +57,7 @@ class DogController extends Controller
             'height_cm' => 'nullable|numeric|min:10',
             'rfec_grade' => 'nullable|string|max:20',
             'rfec_category' => 'nullable|string|max:20',
+            'club_entry_year' => 'nullable|integer|min:1900|max:' . (now()->year + 1),
         ]);
 
         $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade', 'rsce_handler_category'])->toArray();
@@ -120,6 +121,7 @@ class DogController extends Controller
             'avatar_cansancio_5_url' => 'nullable|url',
             'rfec_grade' => 'nullable|string|max:20',
             'rfec_category' => 'nullable|string|max:20',
+            'club_entry_year' => 'nullable|integer|min:1900|max:' . (now()->year + 1),
         ]);
 
         $dogData = collect($validated)->except(['rsce_license', 'rsce_expiration_date', 'rsce_grade', 'rsce_handler_category'])->toArray();
@@ -215,18 +217,57 @@ class DogController extends Controller
             'category' => 'required|string|max:50',
         ]);
 
+        $activeSeason = \App\Models\GamificationSeason::where('status', 'active')
+            ->where('gamification_type', 'ranking')
+            ->first();
+
+        $activeStickersSeason = \App\Models\GamificationSeason::where('status', 'active')
+            ->where('gamification_type', 'stickers')
+            ->first();
+
+        if (!$activeSeason && !$activeStickersSeason) {
+            return response()->json([
+                'message' => 'No se pueden modificar los puntos porque no hay ninguna temporada de ranking o stickers activa.'
+            ], 422);
+        }
+
         $dog = Dog::findOrFail($id);
-        $dog->points += $request->points;
-        $dog->save();
+        
+        if ($activeSeason) {
+            $seasonPoint = \App\Models\DogSeasonPoint::firstOrCreate([
+                'dog_id' => $dog->id,
+                'season_id' => $activeSeason->id,
+            ]);
+            $seasonPoint->points += $request->points;
+            $seasonPoint->save();
 
-        PointHistory::create([
-            'dog_id' => $dog->id,
-            'points' => $request->points,
-            'category' => $request->category
-        ]);
+            $dog->points += $request->points;
+            $dog->save();
 
-        foreach ($dog->users as $owner) {
-            $owner->notify(new DogExtraPointNotification($dog, $request->points, $request->category));
+            PointHistory::create([
+                'dog_id' => $dog->id,
+                'points' => $request->points,
+                'category' => $request->category,
+                'season_id' => $activeSeason->id,
+            ]);
+
+            foreach ($dog->users as $owner) {
+                $owner->notify(new DogExtraPointNotification($dog, $request->points, $request->category));
+            }
+        } else if ($activeStickersSeason) {
+            foreach ($dog->users as $owner) {
+                $profile = \App\Models\UserStickerProfile::firstOrCreate([
+                    'user_id' => $owner->id,
+                    'season_id' => $activeStickersSeason->id
+                ], [
+                    'coins' => 0,
+                    'unopened_chests_count' => 0,
+                    'claimed_promotions' => []
+                ]);
+                $profile->increment('unopened_chests_count', 1);
+
+                $owner->notify(new DogExtraPointNotification($dog, 0, $request->category . ' (¡Cofre obtenido!)'));
+            }
         }
 
         $dog->load(['users:id,name,email', 'pointHistories' => function ($query) {

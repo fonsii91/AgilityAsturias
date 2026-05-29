@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
-use App\Traits\HasClub;
-
 use Illuminate\Database\Eloquent\Model;
 
-class PointHistory extends Model
+class DogSeasonPoint extends Model
 {
-    use HasClub;
+    protected $table = 'dog_season_points';
+
     protected $fillable = [
         'dog_id',
-        'club_id',
-        'points',
-        'category',
         'season_id',
+        'points',
+        'final_position',
     ];
 
     public function dog()

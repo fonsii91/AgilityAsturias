@@ -1,9 +1,26 @@
 <div class="ranking-container">
 
   <div class="ranking-header-actions"
-    style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-top: 10px; gap: 10px;">
+    style="display: flex; justify-content: flex-end; margin-bottom: 15px; padding-top: 10px; gap: 10px; flex-wrap: wrap;">
+    @if (seasons().length > 0) {
+      <div class="season-selector-wrapper">
+        <select class="season-select" [value]="selectedSeasonId()" (change)="onSeasonChange($event)">
+          @for (season of seasons(); track season.id) {
+            <option [value]="season.id">
+              {{ season.name }} ({{ season.gamification_type === 'ranking' ? 'Clasificación' : 'Stickers' }}){{ season.status === 'active' ? ' - Activa' : '' }}
+            </option>
+          }
+        </select>
+        <span class="material-icons select-chevron">expand_more</span>
+      </div>
+    }
+    @if (authService.isAdmin()) {
+      <button class="btn-manage-seasons" (click)="openSeasonManager()">
+        <span class="material-icons" style="font-size: 1.2rem;">date_range</span> Temporadas
+      </button>
+    }
     @if (authService.isStaff()) {
-      <button class="btn-primary" routerLink="/admin/puntos-extra" style="background-color: var(--primary-color, #3b82f6); color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: fit-content;">
+      <button class="btn-primary" routerLink="/admin/puntos-extra" style="background-color: var(--primary-color, #3b82f6); color: white; border: none; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: 38px;">
         <span class="material-icons" style="font-size: 1.2rem;">military_tech</span> Dar Puntos
       </button>
     }
@@ -67,17 +84,17 @@
   @if (isLoading()) {
   <div class="loading-state">
     <div class="spinner"></div>
-    <p>Cargando clasificación...</p>
+    <p>Cargando datos...</p>
   </div>
   }
 
-  @if (!isLoading() && ranking().length === 0) {
+  @if (!isLoading() && !isStickersSeason() && ranking().length === 0) {
   <div class="empty-state">
     <p>Aún no hay puntos registrados. ¡Sé el primero!</p>
   </div>
   }
 
-  @if (!isLoading() && ranking().length > 0) {
+  @if (!isLoading() && !isStickersSeason() && ranking().length > 0) {
   <div class="ranking-content">
     <div class="ranking-list glass-effect">
       @for (dog of ranking(); track dog; let i = $index) {
@@ -164,6 +181,311 @@
 </div> <!-- Cierra ranking-content -->
 } <!-- Cierra if de len > 0 -->
 
+<!-- Stickers View -->
+@if (!isLoading() && isStickersSeason()) {
+  <div class="stickers-view fade-in">
+    <!-- Stickers Dashboard / Stats Top Bar -->
+    <div class="stickers-dashboard glass-effect">
+      <div class="sticker-stats">
+        <div class="stat-box">
+          <span class="stat-emoji">🪙</span>
+          <div class="stat-details">
+            <span class="stat-value">{{ albumData()?.profile?.coins || 0 }}</span>
+            <span class="stat-label">Monedas</span>
+          </div>
+        </div>
+        <div class="stat-box">
+          <span class="stat-emoji">📦</span>
+          <div class="stat-details">
+            <span class="stat-value">{{ albumData()?.profile?.unopened_chests_count || 0 }}</span>
+            <span class="stat-label">Cofres pendientes</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sticker-actions">
+        <button class="btn-open-chest" [class.glow]="(albumData()?.profile?.unopened_chests_count || 0) > 0" 
+                [disabled]="isOpeningChest() || (albumData()?.profile?.unopened_chests_count || 0) <= 0" 
+                (click)="openStickerChest()">
+          <span class="material-icons">redeem</span>
+          <span>{{ isOpeningChest() ? 'Abriendo...' : 'Abrir Cofre' }}</span>
+        </button>
+        
+        <button class="btn-buy-pack" [disabled]="isBuyingPack() || (albumData()?.profile?.coins || 0) < 100" 
+                (click)="buyPack()">
+          <span class="material-icons">shopping_cart</span>
+          <span>Comprar Cofre (100 🪙)</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="sticker-tabs">
+      <button class="tab-btn" [class.active]="activeTradeTab() === 'album'" (click)="setTradeTab('album')">
+        <span class="material-icons">auto_stories</span> Mi Álbum
+      </button>
+      <button class="tab-btn" [class.active]="activeTradeTab() === 'trades'" (click)="setTradeTab('trades')">
+        <span class="material-icons">swap_horiz</span> Intercambios
+        @if (getPendingTradesCount() > 0) {
+          <span class="pending-badge">{{ getPendingTradesCount() }}</span>
+        }
+      </button>
+    </div>
+
+    <!-- Tab Content: ALBUM -->
+    @if (activeTradeTab() === 'album') {
+      <div class="album-content">
+        <!-- Album Overall Progress -->
+        <div class="album-progress-card glass-effect">
+          <div class="progress-info">
+            <h3>Álbum del Club</h3>
+            <span class="progress-fraction">{{ getAlbumCompletedCount() }} / {{ getAlbumTotalCount() }} completados</span>
+          </div>
+          <div class="progress-bar-container-custom">
+            <div class="progress-bar-fill-custom" [style.width.%]="getAlbumTotalCount() > 0 ? (getAlbumCompletedCount() / getAlbumTotalCount() * 100) : 0"></div>
+          </div>
+        </div>
+
+        <!-- Promotions / Years Lists -->
+        @for (promo of albumData()?.promotions; track promo.year) {
+          <div class="promotion-section">
+            <div class="promotion-header">
+              <h4>Promoción {{ promo.year }}</h4>
+              <div class="promotion-meta">
+                <span class="meta-count">{{ promo.completed }} / {{ promo.total }} completados</span>
+                
+                @if (promo.completed === promo.total && promo.total > 0) {
+                  @if (isPromotionClaimed(promo.year)) {
+                    <span class="claimed-reward-badge">Recompensa Cobrada ✓</span>
+                  } @else {
+                    <button class="btn-claim-reward" [disabled]="isClaimingReward()" (click)="claimPromotion(promo.year)">
+                      Reclamar Recompensa (100🪙 + 📦)
+                    </button>
+                  }
+                }
+              </div>
+            </div>
+
+            <!-- Cards Grid -->
+            <div class="stickers-grid">
+              @for (dog of promo.dogs; track dog.id) {
+                <div class="sticker-card" [class.unlocked-1]="dog.level === 1" 
+                     [class.unlocked-2]="dog.level === 2" [class.unlocked-3]="dog.level === 3" 
+                     [class.locked]="dog.level === 0">
+                  
+                  <!-- Sticker Image -->
+                  <div class="sticker-img-container">
+                    @if (dog.level === 0) {
+                      <div class="locked-overlay">
+                        <span class="material-icons lock-icon">help_outline</span>
+                        <span class="lock-text">¿Quién será?</span>
+                      </div>
+                    } @else {
+                      <img [src]="dog.photo_url || 'ClubAgilityBlue.png'" alt="Dog Image" 
+                           [class.pixelated-strong]="dog.level === 1" 
+                           [class.pixelated-soft]="dog.level === 2" 
+                           onError="this.src='ClubAgilityBlue.png'">
+                    }
+
+                    @if (dog.duplicates_count > 0) {
+                      <span class="duplicates-badge">x{{ dog.duplicates_count }}</span>
+                    }
+                  </div>
+
+                  <!-- Sticker Details -->
+                  <div class="sticker-details">
+                    @if (dog.level === 0) {
+                      <h5 class="dog-name-locked">Bloqueado</h5>
+                    } @else {
+                      <h5 class="dog-name-unlocked" (click)="openFicha(dog)" style="cursor: pointer; text-decoration: underline;">{{ dog.name }}</h5>
+                    }
+
+                    <!-- Star rating representation of levels -->
+                    <div class="star-rating">
+                      <span class="star" [class.filled]="dog.level >= 1">★</span>
+                      <span class="star" [class.filled]="dog.level >= 2">★</span>
+                      <span class="star" [class.filled]="dog.level >= 3">★</span>
+                    </div>
+
+                    <span class="sticker-status-text">
+                      @if (dog.level === 0) { No descubierto }
+                      @if (dog.level === 1) { Pixelado Fuerte }
+                      @if (dog.level === 2) { Pixelado Suave }
+                      @if (dog.level === 3) { Nítido Completo }
+                    </span>
+                  </div>
+
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Tab Content: TRADES -->
+    @if (activeTradeTab() === 'trades') {
+      <div class="trades-content fade-in">
+        
+        <!-- Propose Trade Card -->
+        <div class="propose-trade-card glass-effect">
+          <h3><span class="material-icons">add_comment</span> Proponer Nuevo Intercambio</h3>
+          <p class="trade-desc">Intercambia un cromo repetido que tengas por un cromo repetido de otro usuario.</p>
+          
+          <div class="trade-form-grid">
+            <div class="form-group-custom">
+              <label>Selecciona Compañero</label>
+              <select class="form-control-custom" [(ngModel)]="selectedReceiverId">
+                <option [value]="null" disabled selected>-- Elige un usuario --</option>
+                @for (u of usersMinimalList(); track u.id) {
+                  <option [value]="u.id">{{ u.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group-custom">
+              <label>Tu Cromo Repetido (Ofreces)</label>
+              <select class="form-control-custom" [(ngModel)]="selectedOfferedDogId">
+                <option [value]="null" disabled selected>-- Elige tu cromo --</option>
+                @for (d of getMyDuplicates(); track d.id) {
+                  <option [value]="d.id">{{ d.name }} (x{{ d.duplicates_count }} repetidos)</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-group-custom">
+              <label>Cromo que Quieres (Pides)</label>
+              <select class="form-control-custom" [(ngModel)]="selectedRequestedDogId">
+                <option [value]="null" disabled selected>-- Elige cromo a pedir --</option>
+                @for (d of getAllDogsList(); track d.id) {
+                  <option [value]="d.id">{{ d.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <button class="btn-propose-trade" [disabled]="isSubmittingTrade() || !selectedReceiverId() || !selectedOfferedDogId() || !selectedRequestedDogId()" (click)="proposeTrade()">
+            <span class="material-icons">swap_horiz</span>
+            <span>{{ isSubmittingTrade() ? 'Enviando...' : 'Enviar Propuesta' }}</span>
+          </button>
+        </div>
+
+        <!-- Pending Trades Lists -->
+        <div class="trades-lists-section">
+          
+          <!-- Incoming Requests -->
+          <div class="trade-list-container">
+            <h4>Solicitudes Recibidas (Pendientes)</h4>
+            
+            @if (getIncomingPendingTrades().length === 0) {
+              <div class="empty-trades-note"><p>No tienes solicitudes recibidas pendientes.</p></div>
+            } @else {
+              <div class="trades-grid">
+                @for (trade of getIncomingPendingTrades(); track trade.id) {
+                  <div class="trade-card glass-effect pending">
+                    <div class="trade-card-header">
+                      <span class="sender-name">De: <strong>{{ trade.sender?.name }}</strong></span>
+                      <span class="trade-date">{{ trade.created_at | date:'dd/MM HH:mm' }}</span>
+                    </div>
+                    <div class="trade-exchange-details">
+                      <div class="exchange-item offered">
+                        <span class="item-label">Te Ofrece</span>
+                        <div class="item-dog">
+                          <img [src]="trade.offered_dog?.photo_url || 'ClubAgilityBlue.png'" alt="Offered Dog" onError="this.src='ClubAgilityBlue.png'">
+                          <strong>{{ trade.offered_dog?.name }}</strong>
+                        </div>
+                      </div>
+                      <span class="exchange-arrow">➔</span>
+                      <div class="exchange-item requested">
+                        <span class="item-label">Te Pide</span>
+                        <div class="item-dog">
+                          <img [src]="trade.requested_dog?.photo_url || 'ClubAgilityBlue.png'" alt="Requested Dog" onError="this.src='ClubAgilityBlue.png'">
+                          <strong>{{ trade.requested_dog?.name }}</strong>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="trade-actions">
+                      <button class="btn-trade-accept" (click)="acceptTrade(trade.id)">Aceptar</button>
+                      <button class="btn-trade-reject" (click)="rejectTrade(trade.id)">Rechazar</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Outgoing Requests -->
+          <div class="trade-list-container" style="margin-top: 2rem;">
+            <h4>Tus Solicitudes Enviadas</h4>
+            
+            @if (getOutgoingPendingTrades().length === 0) {
+              <div class="empty-trades-note"><p>No has enviado solicitudes pendientes.</p></div>
+            } @else {
+              <div class="trades-grid">
+                @for (trade of getOutgoingPendingTrades(); track trade.id) {
+                  <div class="trade-card glass-effect pending">
+                    <div class="trade-card-header">
+                      <span class="sender-name">Para: <strong>{{ trade.receiver?.name }}</strong></span>
+                      <span class="trade-date">{{ trade.created_at | date:'dd/MM HH:mm' }}</span>
+                    </div>
+                    <div class="trade-exchange-details">
+                      <div class="exchange-item offered">
+                        <span class="item-label">Ofreces</span>
+                        <div class="item-dog">
+                          <img [src]="trade.offered_dog?.photo_url || 'ClubAgilityBlue.png'" alt="Offered Dog" onError="this.src='ClubAgilityBlue.png'">
+                          <strong>{{ trade.offered_dog?.name }}</strong>
+                        </div>
+                      </div>
+                      <span class="exchange-arrow">➔</span>
+                      <div class="exchange-item requested">
+                        <span class="item-label">Pides</span>
+                        <div class="item-dog">
+                          <img [src]="trade.requested_dog?.photo_url || 'ClubAgilityBlue.png'" alt="Requested Dog" onError="this.src='ClubAgilityBlue.png'">
+                          <strong>{{ trade.requested_dog?.name }}</strong>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="trade-actions-single">
+                      <button class="btn-trade-cancel" (click)="cancelTrade(trade.id)">Cancelar Solicitud</button>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Trade History -->
+          <div class="trade-list-container" style="margin-top: 2rem;">
+            <h4>Historial de Intercambios</h4>
+            
+            @if (getTradeHistory().length === 0) {
+              <div class="empty-trades-note"><p>No hay intercambios finalizados.</p></div>
+            } @else {
+              <div class="history-list glass-effect">
+                @for (trade of getTradeHistory(); track trade.id) {
+                  <div class="history-row">
+                    <span class="history-status" [class]="trade.status">
+                      @if (trade.status === 'accepted') { Completado ✓ }
+                      @if (trade.status === 'rejected') { Rechazado ✗ }
+                      @if (trade.status === 'cancelled') { Cancelado }
+                    </span>
+                    <span class="history-text">
+                      <strong>{{ trade.sender?.name }}</strong> intercambió a <strong>{{ trade.offered_dog?.name }}</strong> por <strong>{{ trade.requested_dog?.name }}</strong> de <strong>{{ trade.receiver?.name }}</strong>
+                    </span>
+                    <span class="history-date">{{ trade.updated_at | date:'dd/MM HH:mm' }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+        </div>
+      </div>
+    }
+
+  </div>
+}
+
 <!-- Ficha Perro Modal -->
 @if (selectedDogModal()) {
 <app-ficha-perro [dog]="selectedDogModal()" [isOpen]="fichaModalOpen()" (close)="closeFicha()"
@@ -171,5 +493,122 @@
 </app-ficha-perro>
 }
 
+<!-- Chest Opening Revealed Sticker Modal -->
+@if (revealedSticker()) {
+  <div class="modal-overlay revealed-sticker-modal" (click)="closeRevealedStickerModal()">
+    <div class="modal-content reveal-animation" (click)="$event.stopPropagation()" style="max-width: 400px; text-align: center;">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span class="material-icons title-icon">redeem</span>
+          ¡Cofre Abierto!
+        </h3>
+        <button class="close-button" (click)="closeRevealedStickerModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="display: flex; flex-direction: column; align-items: center; gap: 1.5rem; padding: 2rem;">
+        <div class="reward-coins-reveal" style="font-size: 1.3rem; font-weight: 700; color: #eab308; background: #fef8e7; padding: 8px 16px; border-radius: 20px; border: 1px solid #fef3c7; display: flex; align-items: center; gap: 6px;">
+          <span class="coins-emoji">🪙</span>
+          <span class="coins-value">+{{ revealedSticker().coins_reward }} Monedas</span>
+        </div>
+
+        <div class="sticker-reveal-card" style="width: 220px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+          <div style="width: 100%; height: 200px; border-radius: 12px; overflow: hidden; background: #f1f5f9; position: relative;">
+            <img [src]="revealedSticker().dog?.photo_url || 'ClubAgilityBlue.png'" alt="Dog revealed" style="width: 100%; height: 100%; object-fit: cover;" onError="this.src='ClubAgilityBlue.png'">
+            <div class="reveal-badge" style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(15,23,42,0.85); color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; white-space: nowrap;">
+              @if (revealedSticker().is_new) { ¡Nuevo! }
+              @else if (revealedSticker().is_duplicate) { ¡Repetido! }
+              @else { ¡Mejora! }
+            </div>
+          </div>
+          <h4 style="margin: 0; font-size: 1.2rem; color: #0f172a; font-weight: 700;">{{ revealedSticker().dog?.name }}</h4>
+          <div class="star-rating">
+            <span class="star" style="font-size: 1.3rem; color: #cbd5e1; margin: 0 2px;" [class.filled]="revealedSticker().level >= 1">★</span>
+            <span class="star" style="font-size: 1.3rem; color: #cbd5e1; margin: 0 2px;" [class.filled]="revealedSticker().level >= 2">★</span>
+            <span class="star" style="font-size: 1.3rem; color: #cbd5e1; margin: 0 2px;" [class.filled]="revealedSticker().level >= 3">★</span>
+          </div>
+        </div>
+        
+        <button class="btn-submit-season" (click)="closeRevealedStickerModal()" style="max-width: 150px;">Continuar</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Season Manager Modal -->
+@if (isSeasonModalOpen() && authService.isAdmin()) {
+  <div class="modal-overlay season-manager-modal" (click)="closeSeasonManager()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span class="material-icons title-icon">date_range</span>
+          Gestionar Temporadas
+        </h3>
+        <button class="close-button" (click)="closeSeasonManager()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <!-- Active Season Info -->
+        @if (activeSeason()) {
+          <div class="active-season-card">
+            <div class="active-season-header">
+              <h4 style="margin: 0; color: #0f172a; font-weight: 700;">{{ activeSeason().name }}</h4>
+              <span class="active-badge">
+                <span class="material-icons" style="font-size: 1rem;">check_circle</span> Activa
+              </span>
+            </div>
+            <div class="active-season-details">
+              <p><strong>Tipo de Juego:</strong> {{ activeSeason().gamification_type === 'ranking' ? 'Clasificación de Perros (Ranking)' : 'Álbum de Stickers' }}</p>
+              <p><strong>Fecha de Inicio:</strong> {{ activeSeason().start_date | date:'dd/MM/yyyy' }}</p>
+            </div>
+            <button class="btn-end-season" (click)="endCurrentSeason()">
+              <span class="material-icons" style="font-size: 1.1rem;">block</span> Finalizar Temporada Actual
+            </button>
+          </div>
+        } @else {
+          <div class="no-active-season">
+            <span class="material-icons">warning</span>
+            <div>
+              <h4 style="margin: 0 0 4px 0; font-weight: 700;">No hay temporada activa</h4>
+              <p>Actualmente no hay ninguna temporada de gamificación activa en el club. Para que los perros acumulen puntos de ranking o stickers, inicia una nueva temporada a continuación.</p>
+            </div>
+          </div>
+        }
+
+        <!-- Start New Season Form -->
+        <div class="season-form-section">
+          <h5>Iniciar Nueva Temporada</h5>
+          
+          @if (activeSeason()) {
+            <div class="form-note">
+              <span class="material-icons">info</span>
+              <span>Al iniciar una nueva temporada, la temporada activa actual (<strong>{{ activeSeason().name }}</strong>) se finalizará automáticamente y sus posiciones quedarán congeladas para el historial.</span>
+            </div>
+          }
+
+          <div class="form-group-custom">
+            <label for="new-season-name">Nombre de la Temporada</label>
+            <input type="text" id="new-season-name" [(ngModel)]="newSeasonName" placeholder="Ej: Temporada de Primavera 2026" class="form-control-custom">
+          </div>
+
+          <div class="form-group-custom">
+            <label for="new-season-type">Dinámica de Gamificación</label>
+            <select id="new-season-type" [(ngModel)]="newSeasonType" class="form-control-custom">
+              <option value="ranking">Clasificación de Perros (Ranking)</option>
+              <option value="stickers">Colección de Stickers (Próximamente)</option>
+            </select>
+          </div>
+
+          <div class="form-group-custom">
+            <label for="new-season-date">Fecha de Inicio</label>
+            <input type="date" id="new-season-date" [(ngModel)]="newSeasonStartDate" class="form-control-custom">
+          </div>
+
+          <button class="btn-submit-season" (click)="startNewSeason()">
+            <span class="material-icons">play_circle</span> Iniciar Temporada
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
 
 </div>

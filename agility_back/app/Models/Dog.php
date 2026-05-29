@@ -35,7 +35,8 @@ class Dog extends Model
         'user_id',
         'club_id',
         'rfec_grade',
-        'rfec_category'
+        'rfec_category',
+        'club_entry_year'
     ];
 
     protected $casts = [
@@ -69,6 +70,11 @@ class Dog extends Model
     public function pointHistories()
     {
         return $this->hasMany(PointHistory::class);
+    }
+
+    public function dogSeasonPoints()
+    {
+        return $this->hasMany(DogSeasonPoint::class, 'dog_id');
     }
 
     public function rsceTracks()
@@ -232,5 +238,16 @@ class Dog extends Model
             'recent_history' => $workloads->whereIn('status', ['confirmed', 'auto_confirmed'])->values(),
             'status_color' => $statusColor
         ];
+    }
+
+    /**
+     * Get the dog's entry year, defaulting to the year of created_at.
+     */
+    public function getClubEntryYearAttribute($value)
+    {
+        if ($value !== null) {
+            return (int) $value;
+        }
+        return $this->created_at ? $this->created_at->year : now()->year;
     }
 }

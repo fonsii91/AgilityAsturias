@@ -3,26 +3,40 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dog;
+use App\Models\GamificationSeason;
 use Illuminate\Http\Request;
 
 class RankingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // 1. Get all dogs with their current points and points obtained in the last day.
-        $dogs = Dog::select('id', 'name', 'breed', 'birth_date', 'rsce_category', 'microchip', 'pedigree', 'points', 'photo_url')
-            ->with(['users:id,name,photo_url', 'pointHistories' => function ($query) {
-                $query->orderBy('created_at', 'desc');
+        $seasonId = $request->query('season_id');
+
+        if ($seasonId) {
+            $season = GamificationSeason::findOrFail($seasonId);
+        } else {
+            $season = GamificationSeason::where('status', 'active')
+                ->where('gamification_type', 'ranking')
+                ->first();
+        }
+
+        if (!$season || $season->gamification_type !== 'ranking') {
+            return response()->json([]);
+        }
+
+        // 1. Get all dogs with their seasonal points and points obtained in the last day.
+        $dogs = Dog::select('dogs.id', 'dogs.name', 'dogs.breed', 'dogs.birth_date', 'dogs.rsce_category', 'dogs.microchip', 'dogs.pedigree', 'dogs.photo_url')
+            ->join('dog_season_points', 'dogs.id', '=', 'dog_season_points.dog_id')
+            ->where('dog_season_points.season_id', $season->id)
+            ->where('dog_season_points.points', '>', 0)
+            ->selectRaw('dog_season_points.points as points, dog_season_points.final_position as final_position')
+            ->with(['users:id,name,photo_url', 'pointHistories' => function ($query) use ($season) {
+                $query->where('season_id', $season->id)->orderBy('created_at', 'desc');
             }])
-            ->withCount([
-                'reservations as recent_points' => function ($query) {
-                    // Count reservations that were marked as completed in the last day
-                    $query->where('status', 'completed')
-                        ->where('attendance_verified', true)
-                        ->where('updated_at', '>=', now()->subDays(1));
-                }
-            ])
-            ->where('points', '>', 0)
+            ->withSum(['pointHistories as recent_points' => function ($query) use ($season) {
+                $query->where('season_id', $season->id)
+                    ->where('created_at', '>=', now()->subDays(1));
+            }], 'points')
             ->get();
 
         // 2. Sort to get current ranking
@@ -32,8 +46,8 @@ class RankingController extends Controller
         foreach ($currentRanking as $index => $dog) {
             $currentPositions[$dog->id] = $index + 1;
 
-            // Calculate past points
-            $dog->past_points = $dog->points - $dog->recent_points;
+            // Calculate past points (default recent_points to 0 if null)
+            $dog->past_points = $dog->points - ($dog->recent_points ?? 0);
         }
 
         // 3. Sort to get past ranking (1 day ago)
@@ -48,9 +62,9 @@ class RankingController extends Controller
             }
         }
 
-        // 4. Attach position change and format final list (Limit to top 50)
+        // 4. Attach position change and format final list (Return all dogs in ranking)
         $finalRanking = [];
-        foreach ($currentRanking->take(50) as $dog) {
+        foreach ($currentRanking as $dog) {
             $currentPos = $currentPositions[$dog->id];
             $pastPos = $pastPositions[$dog->id];
 

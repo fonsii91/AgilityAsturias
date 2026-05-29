@@ -91,12 +91,44 @@ class AttendanceController extends Controller
                     $res->status = 'completed';
                     // Award points directly to the assigned dog
                     if ($res->dog) {
-                        $res->dog->increment('points', 3);
-                        PointHistory::create([
-                            'dog_id' => $res->dog->id,
-                            'points' => 3,
-                            'category' => 'Asistencia a entrenamiento'
-                        ]);
+                        $activeSeason = \App\Models\GamificationSeason::where('status', 'active')
+                            ->where('gamification_type', 'ranking')
+                            ->first();
+
+                        $activeStickersSeason = \App\Models\GamificationSeason::where('status', 'active')
+                            ->where('gamification_type', 'stickers')
+                            ->first();
+
+                        if ($activeSeason) {
+                            $seasonId = $activeSeason->id;
+                            $seasonPoint = \App\Models\DogSeasonPoint::firstOrCreate([
+                                'dog_id' => $res->dog->id,
+                                'season_id' => $seasonId,
+                            ]);
+                            $seasonPoint->increment('points', 3);
+                            $res->dog->increment('points', 3);
+
+                            PointHistory::create([
+                                'dog_id' => $res->dog->id,
+                                'points' => 3,
+                                'category' => 'Asistencia a entrenamiento',
+                                'season_id' => $seasonId,
+                            ]);
+                        } else if ($activeStickersSeason) {
+                            if ($res->dog && $res->dog->users) {
+                                foreach ($res->dog->users as $owner) {
+                                    $profile = \App\Models\UserStickerProfile::firstOrCreate([
+                                        'user_id' => $owner->id,
+                                        'season_id' => $activeStickersSeason->id
+                                    ], [
+                                        'coins' => 0,
+                                        'unopened_chests_count' => 0,
+                                        'claimed_promotions' => []
+                                    ]);
+                                    $profile->increment('unopened_chests_count', 1);
+                                }
+                            }
+                        }
                         
                         if ($res->dog && $res->dog->users) {
                             foreach ($res->dog->users as $owner) {
@@ -249,12 +281,45 @@ class AttendanceController extends Controller
                 if ($pointsToAdd > 0) {
                     $dog = \App\Models\Dog::find($dogId);
                     if ($dog) {
-                        $dog->increment('points', $pointsToAdd);
-                        PointHistory::create([
-                            'dog_id' => $dog->id,
-                            'points' => $pointsToAdd,
-                            'category' => $categoryName
-                        ]);
+                        $activeSeason = \App\Models\GamificationSeason::where('status', 'active')
+                            ->where('gamification_type', 'ranking')
+                            ->first();
+
+                        $activeStickersSeason = \App\Models\GamificationSeason::where('status', 'active')
+                            ->where('gamification_type', 'stickers')
+                            ->first();
+
+                        if ($activeSeason) {
+                            $seasonId = $activeSeason->id;
+                            $seasonPoint = \App\Models\DogSeasonPoint::firstOrCreate([
+                                'dog_id' => $dog->id,
+                                'season_id' => $seasonId,
+                            ]);
+                            $seasonPoint->increment('points', $pointsToAdd);
+                            $dog->increment('points', $pointsToAdd);
+
+                            PointHistory::create([
+                                'dog_id' => $dog->id,
+                                'points' => $pointsToAdd,
+                                'category' => $categoryName,
+                                'season_id' => $seasonId,
+                            ]);
+                        } else if ($activeStickersSeason) {
+                            $dog->load('users');
+                            if ($dog->users) {
+                                foreach ($dog->users as $owner) {
+                                    $profile = \App\Models\UserStickerProfile::firstOrCreate([
+                                        'user_id' => $owner->id,
+                                        'season_id' => $activeStickersSeason->id
+                                    ], [
+                                        'coins' => 0,
+                                        'unopened_chests_count' => 0,
+                                        'claimed_promotions' => []
+                                    ]);
+                                    $profile->increment('unopened_chests_count', 1);
+                                }
+                            }
+                        }
                         // Notificamos a todos los dueños del perro
                         $dog->load('users');
                         if ($dog->users) {
