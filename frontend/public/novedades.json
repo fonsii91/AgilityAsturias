@@ -12,6 +12,7 @@
       "¡Protección y bloqueo inteligente de participación! Al desactivar temporalmente tu participación en el Tablón, la aplicación pausará tus opciones de aceptar o validar contratos. Tus contratos activos acumulados se conservarán de forma segura en la base de datos para prevenir pérdidas de progreso en caso de desactivaciones por error."
     ],
     "bugfixes": [
+      "Hemos solucionado un problema que impedía visualizar correctamente el ranking e historial de puntos en algunos clubes al acceder a la plataforma.",
       "Corregido un comportamiento que seguía mostrando el botón 'Aceptar Contrato' en los carteles de perros que tú ya estabas cazando activamente. Ahora verás directamente el indicativo de 'CONTRATO EN CURSO' para evitar compras duplicadas por error.",
       "Solucionado un problema por el cual tu elección de no participar en el Tablón de Cazarrecompensas no se quedaba guardada en el servidor y te obligaba a participar de forma continua."
     ]

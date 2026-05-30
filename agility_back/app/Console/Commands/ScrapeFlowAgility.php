@@ -416,7 +416,9 @@ class ScrapeFlowAgility extends Command
                             }
                             
                             if ($pointsToAdd > 0) {
-                                $activeSeason = \App\Models\GamificationSeason::where('status', 'active')
+                                $activeSeason = \App\Models\GamificationSeason::withoutGlobalScopes()
+                                    ->where('club_id', $dog->club_id)
+                                    ->where('status', 'active')
                                     ->where('gamification_type', 'ranking')
                                     ->first();
 
