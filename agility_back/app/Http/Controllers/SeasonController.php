@@ -102,4 +102,91 @@ class SeasonController extends Controller
             }
         }
     }
+
+    /**
+     * Update a season's name and dates.
+     */
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        $season = GamificationSeason::findOrFail($id);
+        $season->update($validated);
+
+        return response()->json([
+            'message' => 'Temporada actualizada con éxito',
+            'season' => $season
+        ]);
+    }
+
+    /**
+     * Reopen a finished season if there is no other active season.
+     */
+    public function reopen($id)
+    {
+        $activeSeason = GamificationSeason::where('status', 'active')->first();
+        if ($activeSeason) {
+            return response()->json([
+                'message' => 'No se puede reabrir esta temporada porque ya hay otra activa (' . $activeSeason->name . '). Finalízala primero.'
+            ], 422);
+        }
+
+        $season = GamificationSeason::findOrFail($id);
+
+        DB::transaction(function () use ($season) {
+            $season->status = 'active';
+            $season->end_date = null;
+            $season->save();
+
+            // Clear final positions if it's a ranking
+            if ($season->gamification_type === 'ranking') {
+                DogSeasonPoint::where('season_id', $season->id)->update(['final_position' => null]);
+            }
+        });
+
+        return response()->json([
+            'message' => 'Temporada reabierta con éxito',
+            'season' => $season->fresh()
+        ]);
+    }
+
+    /**
+     * Delete a season and safely cascade clean its related records.
+     */
+    public function destroy($id)
+    {
+        $season = GamificationSeason::findOrFail($id);
+
+        DB::transaction(function () use ($season) {
+            // 1. Delete points in dog_season_points
+            DogSeasonPoint::where('season_id', $season->id)->delete();
+
+            // 2. Unlink point histories
+            \App\Models\PointHistory::where('season_id', $season->id)->update(['season_id' => null]);
+
+            // 3. Delete bounty board contracts
+            \App\Models\BountyContract::where('season_id', $season->id)->delete();
+
+            // 4. Delete sticker trades
+            \App\Models\StickerTrade::where('season_id', $season->id)->delete();
+
+            // 5. Delete user stickers linked to profiles
+            $profileIds = \App\Models\UserStickerProfile::where('season_id', $season->id)->pluck('id');
+            \App\Models\UserSticker::whereIn('user_sticker_profile_id', $profileIds)->delete();
+
+            // 6. Delete user sticker profiles
+            \App\Models\UserStickerProfile::where('season_id', $season->id)->delete();
+
+            // 7. Delete the season itself
+            $season->delete();
+        });
+
+        return response()->json([
+            'message' => 'Temporada y todos sus datos asociados eliminados con éxito'
+        ]);
+    }
 }

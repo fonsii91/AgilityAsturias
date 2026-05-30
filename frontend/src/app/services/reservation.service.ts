@@ -188,6 +188,18 @@ export class ReservationService {
         return this.http.post<any>(`${environment.apiUrl}/admin/seasons/end`, {});
     }
 
+    updateSeason(id: number, payload: { name: string, start_date: string, end_date?: string | null }) {
+        return this.http.put<any>(`${environment.apiUrl}/admin/seasons/${id}`, payload);
+    }
+
+    deleteSeason(id: number) {
+        return this.http.delete<any>(`${environment.apiUrl}/admin/seasons/${id}`);
+    }
+
+    reopenSeason(id: number) {
+        return this.http.post<any>(`${environment.apiUrl}/admin/seasons/${id}/reopen`, {});
+    }
+
     // Sticker Album API
     getStickerAlbum(seasonId?: number) {
         const url = seasonId ? `${environment.apiUrl}/album?season_id=${seasonId}` : `${environment.apiUrl}/album`;

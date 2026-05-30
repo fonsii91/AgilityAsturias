@@ -406,19 +406,106 @@
       <!-- Bounty Subview: FEED -->
       @if (activeBountyTab() === 'feed') {
         <div class="feed-content fade-in">
-          <div class="feed-header-cazarrecompensas">
-            <h4 style="margin-top: 0; font-weight: 700;">Diario de Cazas del Club</h4>
-            <p style="font-size: 0.9rem;">El historial público de contratos cobrados, fallidos o expirados.</p>
+          <div class="feed-header-cazarrecompensas" style="margin-bottom: 1.5rem; border-bottom: 2px dashed rgba(168, 148, 118, 0.6); padding-bottom: 12px;">
+            <h4 style="margin-top: 0; font-weight: 700; color: #451a03 !important;">Diario de Cazas del Club</h4>
+            <p style="font-size: 0.9rem; color: #78350f !important;">El historial público de contratos cobrados, fallidos o expirados.</p>
           </div>
           
           @if (bountyFeed().length === 0) {
             <div class="empty-state"><p>Aún no hay contratos registrados en esta temporada.</p></div>
           } @else {
-            <div class="history-list glass-effect">
+            <div class="history-list glass-effect" style="background: transparent !important; border: none !important; display: flex; flex-direction: column; gap: 15px; box-shadow: none !important; padding: 0 !important;">
               @for (item of bountyFeed(); track item.id) {
-                <div class="history-row" style="padding: 18px 15px; display: flex; flex-direction: column; gap: 4px;">
-                  <span class="history-text" style="font-size: 0.95rem; color: #1e293b; line-height: 1.4;">{{ item.message }}</span>
-                  <span class="history-date" style="font-size: 0.8rem; color: #94a3b8; font-weight: 500;">{{ item.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                <div class="history-row" style="background: #fdfaf2; border: 3px dashed #a89476; border-radius: 4px; padding: 18px 15px; display: flex; flex-direction: column; gap: 12px; border-left: 8px solid #a89476 !important; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s ease;"
+                     [style.border-left-color]="item.status === 'claimed' ? '#16a34a' : (item.status === 'burned' ? '#d97706' : '#64748b')">
+                  
+                  <!-- Card Header: Status Badge & Time -->
+                  <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed rgba(168, 148, 118, 0.4); padding-bottom: 8px; width: 100%;">
+                    @if (item.status === 'claimed') {
+                      <span class="contract-type-badge asalto" style="background-color: #dcfce7 !important; color: #15803d !important; font-weight: 800; font-size: 0.7rem; border: 1px solid rgba(21,128,61,0.2);">CONTRATO COBRADO</span>
+                    } @else if (item.status === 'burned') {
+                      <span class="contract-type-badge hachazo" style="background-color: #fee2e2 !important; color: #dc2626 !important; font-weight: 800; font-size: 0.7rem; border: 1px solid rgba(220,38,38,0.2);">SOBREVIVIDO (FALSO)</span>
+                    } @else {
+                      <span class="contract-type-badge guante_blanco" style="background-color: #f1f5f9 !important; color: #475569 !important; font-weight: 800; font-size: 0.7rem; border: 1px solid rgba(71,85,105,0.2);">SOBREVIVIDO (EXPIRADO)</span>
+                    }
+                    <span style="font-size: 0.8rem; color: #8a7a5f; font-weight: 600;">{{ item.updated_at | date:'dd/MM/yyyy HH:mm' }}</span>
+                  </div>
+
+                  <!-- Faceoff Visualization -->
+                  <div style="display: flex; align-items: center; justify-content: center; gap: 15px; width: 100%;">
+                    <!-- Hunter Profile -->
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 85px; text-align: center;">
+                      <div style="width: 50px; height: 50px; border-radius: 50%; border: 3px solid #a89476; overflow: hidden; background: #e2e8f0; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.15);">
+                        @if (item.status === 'claimed' && item.hunter_dog?.photo_url) {
+                          <img [src]="item.hunter_dog.photo_url" alt="Cazador" style="width: 100%; height: 100%; object-fit: cover;">
+                        } @else {
+                          <span class="material-icons" style="font-size: 1.8rem; color: #8a7a5f;">help_outline</span>
+                        }
+                      </div>
+                      <span style="font-size: 0.8rem; font-weight: 800; color: #451a03; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;">
+                        {{ item.status === 'claimed' ? item.hunter_dog?.name : 'Misterioso' }}
+                      </span>
+                    </div>
+
+                    <!-- Action Indicator -->
+                    <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                      @if (item.status === 'claimed') {
+                        <span class="material-icons" style="font-size: 1.8rem; color: #16a34a;">local_police</span>
+                        <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #15803d; letter-spacing: 0.5px;">¡CAZADO!</span>
+                      } @else if (item.status === 'burned') {
+                        <span class="material-icons" style="font-size: 1.8rem; color: #d97706;">shield</span>
+                        <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #d97706; letter-spacing: 0.5px;">FALLIDO</span>
+                      } @else {
+                        <span class="material-icons" style="font-size: 1.8rem; color: #64748b;">history_toggle_off</span>
+                        <span style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; color: #475569; letter-spacing: 0.5px;">EXPIRADO</span>
+                      }
+                    </div>
+
+                    <!-- Victim Profile -->
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 85px; text-align: center;">
+                      <div style="width: 50px; height: 50px; border-radius: 50%; border: 3px solid #a89476; overflow: hidden; background: #e2e8f0; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 6px rgba(0,0,0,0.15);">
+                        @if (item.victim_dog?.photo_url) {
+                          <img [src]="item.victim_dog.photo_url" alt="Víctima" style="width: 100%; height: 100%; object-fit: cover;">
+                        } @else {
+                          <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #8a7a5f; background: #e5dac1;">
+                            <span class="material-icons">pets</span>
+                          </div>
+                        }
+                      </div>
+                      <span style="font-size: 0.8rem; font-weight: 800; color: #451a03; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; width: 100%;">
+                        {{ item.victim_dog?.name }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Details Box -->
+                  <div style="background: rgba(69, 26, 3, 0.04); border-left: 4px solid #a89476; padding: 10px 12px; border-radius: 4px; font-size: 0.88rem; line-height: 1.4; color: #5c3d2e;"
+                       [style.border-left-color]="item.status === 'claimed' ? '#16a34a' : (item.status === 'burned' ? '#d97706' : '#64748b')">
+                    @if (item.status === 'claimed') {
+                      <p style="margin: 0; color: #451a03;">
+                        <strong>Misión:</strong> "{{ item.action_description }}"
+                      </p>
+                      <div style="margin-top: 8px; font-size: 0.8rem; display: flex; justify-content: space-between; flex-wrap: wrap; color: #78350f; font-weight: 600;">
+                        <span>Testigo: <strong>{{ item.witness_name }}</strong></span>
+                        <span style="color: #15803d; font-weight: 800;">Botín: +{{ item.bounty }} pts</span>
+                      </div>
+                    } @else if (item.status === 'burned') {
+                      <p style="margin: 0; color: #451a03;">
+                        <strong>{{ item.victim_dog?.name }}</strong> sobrevivió al contrato. El testigo <strong>{{ item.witness_name }}</strong> reportó falsedad. El cazador ha perdido su fianza.
+                      </p>
+                      <div style="margin-top: 8px; font-size: 0.8rem; color: #15803d; font-weight: 800; text-align: right;">
+                        Premio de supervivencia: +{{ item.survival_reward }} pts
+                      </div>
+                    } @else {
+                      <p style="margin: 0; color: #451a03;">
+                        <strong>{{ item.victim_dog?.name }}</strong> sobrevivió al contrato de 30 días.
+                      </p>
+                      <div style="margin-top: 8px; font-size: 0.8rem; color: #15803d; font-weight: 800; text-align: right;">
+                        Premio de supervivencia: +{{ item.survival_reward }} pts
+                      </div>
+                    }
+                  </div>
+
                 </div>
               }
             </div>
@@ -781,97 +868,16 @@
   </div>
 }
 
-<!-- Season Manager Modal -->
-@if (isSeasonModalOpen() && authService.isManager()) {
-  <div class="modal-overlay season-manager-modal" (click)="closeSeasonManager()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3 class="modal-title">
-          <span class="material-icons title-icon">date_range</span>
-          Gestionar Temporadas
-        </h3>
-        <button class="close-button" (click)="closeSeasonManager()">&times;</button>
-      </div>
-      
-      <div class="modal-body">
-        <!-- Active Season Info -->
-        @if (activeSeason()) {
-          <div class="active-season-card">
-            <div class="active-season-header">
-              <h4 style="margin: 0; color: #0f172a; font-weight: 700;">{{ activeSeason().name }}</h4>
-              <span class="active-badge">
-                <span class="material-icons" style="font-size: 1rem;">check_circle</span> Activa
-              </span>
-            </div>
-            <div class="active-season-details">
-              <p><strong>Tipo de Juego:</strong> {{ activeSeason().gamification_type === 'ranking' ? 'Clasificación de Perros (Ranking)' : 'Álbum de Stickers' }}</p>
-              <p><strong>Fecha de Inicio:</strong> {{ activeSeason().start_date | date:'dd/MM/yyyy' }}</p>
-            </div>
-            
-            @if (activeSeason().gamification_type === 'ranking') {
-              <div class="bounty-toggle-admin" style="margin: 15px 0; padding-top: 15px; border-top: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between;">
-                <div style="display: flex; flex-direction: column; gap: 2px;">
-                  <span style="font-weight: 600; color: #1e293b; font-size: 0.95rem;">Tablón de Cazarrecompensas</span>
-                  <span style="font-size: 0.8rem; color: #64748b;">Habilita el juego de robos de puntos y misiones anónimas.</span>
-                </div>
-                <label class="switch">
-                  <input type="checkbox" [checked]="bountyBoardEnabled()" (change)="toggleBountyBoardState($event)">
-                  <span class="slider round"></span>
-                </label>
-              </div>
-            }
-
-            <button class="btn-end-season" (click)="endCurrentSeason()">
-              <span class="material-icons" style="font-size: 1.1rem;">block</span> Finalizar Temporada Actual
-            </button>
-          </div>
-        } @else {
-          <div class="no-active-season">
-            <span class="material-icons">warning</span>
-            <div>
-              <h4 style="margin: 0 0 4px 0; font-weight: 700;">No hay temporada activa</h4>
-              <p>Actualmente no hay ninguna temporada de gamificación activa en el club. Para que los perros acumulen puntos de ranking o stickers, inicia una nueva temporada a continuación.</p>
-            </div>
-          </div>
-        }
-
-        <!-- Start New Season Form -->
-        <div class="season-form-section">
-          <h5>Iniciar Nueva Temporada</h5>
-          
-          @if (activeSeason()) {
-            <div class="form-note">
-              <span class="material-icons">info</span>
-              <span>Al iniciar una nueva temporada, la temporada activa actual (<strong>{{ activeSeason().name }}</strong>) se finalizará automáticamente y sus posiciones quedarán congeladas para el historial.</span>
-            </div>
-          }
-
-          <div class="form-group-custom">
-            <label for="new-season-name">Nombre de la Temporada</label>
-            <input type="text" id="new-season-name" [(ngModel)]="newSeasonName" placeholder="Ej: Temporada de Primavera 2026" class="form-control-custom">
-          </div>
-
-          <div class="form-group-custom">
-            <label for="new-season-type">Dinámica de Gamificación</label>
-            <select id="new-season-type" [(ngModel)]="newSeasonType" class="form-control-custom">
-              <option value="ranking">Clasificación de Perros (Ranking)</option>
-              <option value="stickers">Colección de Stickers (Próximamente)</option>
-            </select>
-          </div>
-
-          <div class="form-group-custom">
-            <label for="new-season-date">Fecha de Inicio</label>
-            <input type="date" id="new-season-date" [(ngModel)]="newSeasonStartDate" class="form-control-custom">
-          </div>
-
-          <button class="btn-submit-season" (click)="startNewSeason()">
-            <span class="material-icons">play_circle</span> Iniciar Temporada
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-}
+<!-- Season Manager Component -->
+<app-seasons-manager 
+  [isOpen]="isSeasonModalOpen()" 
+  [activeSeason]="activeSeason()"
+  [activeSeasonStats]="activeSeasonStats()" 
+  [seasons]="seasons()"
+  [bountyBoardEnabled]="bountyBoardEnabled()" 
+  (close)="closeSeasonManager()"
+  (seasonChanged)="loadSeasons()">
+</app-seasons-manager>
 
 <!-- Confirm Caza Witness Modal -->
 @if (isConfirmingCaza()) {

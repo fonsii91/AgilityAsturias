@@ -163,6 +163,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Seasons Management (Admin & Manager)
         Route::post('/admin/seasons/start', [\App\Http\Controllers\SeasonController::class, 'start']);
         Route::post('/admin/seasons/end', [\App\Http\Controllers\SeasonController::class, 'endCurrent']);
+        Route::put('/admin/seasons/{id}', [\App\Http\Controllers\SeasonController::class, 'update']);
+        Route::delete('/admin/seasons/{id}', [\App\Http\Controllers\SeasonController::class, 'destroy']);
+        Route::post('/admin/seasons/{id}/reopen', [\App\Http\Controllers\SeasonController::class, 'reopen']);
 
         Route::get('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'show']);
         Route::put('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']);

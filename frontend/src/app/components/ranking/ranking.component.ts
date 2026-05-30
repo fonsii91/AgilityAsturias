@@ -15,11 +15,12 @@ import { RouterModule } from '@angular/router';
 import { OnboardingService } from '../../services/onboarding';
 import { TenantService } from '../../services/tenant.service';
 import { BountyService } from '../../services/bounty.service';
+import { SeasonsManagerComponent } from '../admin/seasons-manager/seasons-manager.component';
 
 @Component({
     selector: 'app-ranking',
     standalone: true,
-    imports: [CommonModule, RouterModule, FichaPerroComponent, MatTooltipModule, InstruccionesComponent, FormsModule],
+    imports: [CommonModule, RouterModule, FichaPerroComponent, MatTooltipModule, InstruccionesComponent, FormsModule, SeasonsManagerComponent],
     templateUrl: './ranking.component.html',
     styleUrls: ['./ranking.component.css']
 })
@@ -72,6 +73,34 @@ export class RankingComponent {
         return this.selectedSeason()?.gamification_type === 'stickers';
     });
 
+    activeSeasonStats = computed(() => {
+        const active = this.activeSeason();
+        if (!active) return null;
+
+        if (active.gamification_type === 'ranking') {
+            const list = this.ranking();
+            const activeDogs = list.length;
+            const totalPoints = list.reduce((sum: number, d: any) => sum + (d.points || 0), 0);
+            const leader = list.length > 0 ? list[0] : null;
+
+            return {
+                activeDogs,
+                totalPoints,
+                leaderName: leader ? leader.name : 'Ninguno',
+                leaderPhoto: leader ? leader.photo_url : null
+            };
+        } else {
+            const album = this.albumData();
+            const profile = album?.profile;
+            return {
+                userCoins: profile?.coins || 0,
+                unopenedChests: profile?.unopened_chests_count || 0,
+                completedStickers: this.getAlbumCompletedCount(),
+                totalStickers: this.getAlbumTotalCount()
+            };
+        }
+    });
+
     // Stickers signals
     albumData = signal<any | null>(null);
     tradesList = signal<any[]>([]);
@@ -88,10 +117,7 @@ export class RankingComponent {
     selectedRequestedDogId = signal<number | null>(null);
     isSubmittingTrade = signal(false);
 
-    // Form inputs for new season
-    newSeasonName = '';
-    newSeasonType = 'ranking';
-    newSeasonStartDate = new Date().toISOString().substring(0, 10);
+
 
     constructor() {
         this.loadSeasons();
@@ -414,51 +440,7 @@ export class RankingComponent {
         document.body.style.overflow = 'auto';
     }
 
-    startNewSeason() {
-        if (!this.newSeasonName.trim()) {
-            this.toastService.error('Debes introducir un nombre para la temporada');
-            return;
-        }
 
-        const payload = {
-            name: this.newSeasonName,
-            gamification_type: this.newSeasonType,
-            start_date: this.newSeasonStartDate
-        };
-
-        this.reservationService.startSeason(payload).subscribe({
-            next: (res) => {
-                this.toastService.success(res.message || 'Nueva temporada iniciada con éxito');
-                this.newSeasonName = '';
-                this.loadSeasons();
-                this.closeSeasonManager();
-            },
-            error: (err) => {
-                console.error('Error starting season', err);
-                const errMsg = err.error?.message || 'Error al iniciar la temporada';
-                this.toastService.error(errMsg);
-            }
-        });
-    }
-
-    endCurrentSeason() {
-        if (!confirm('¿Estás seguro de que deseas finalizar la temporada actual? Esto congelará las posiciones y puntuaciones de los perros.')) {
-            return;
-        }
-
-        this.reservationService.endSeason().subscribe({
-            next: (res) => {
-                this.toastService.success(res.message || 'Temporada finalizada con éxito');
-                this.loadSeasons();
-                this.closeSeasonManager();
-            },
-            error: (err) => {
-                console.error('Error ending season', err);
-                const errMsg = err.error?.message || 'Error al finalizar la temporada';
-                this.toastService.error(errMsg);
-            }
-        });
-    }
 
     getMedal(index: number): string {
         if (index === 0) return '🥇';
@@ -666,19 +648,7 @@ export class RankingComponent {
         }
     }
 
-    toggleBountyBoardState(event: any) {
-        const enabled = event.target.checked;
-        this.bountyService.toggleBountyBoard(enabled).subscribe({
-            next: (res: any) => {
-                this.toastService.success(res.message || 'Ajuste guardado con éxito');
-                this.tenantService.reload();
-            },
-            error: (err: any) => {
-                console.error(err);
-                this.toastService.error(err.error?.message || 'Error al guardar ajuste');
-            }
-        });
-    }
+
 
     onBountyPrivacyChange(event: any) {
         const optIn = event.target.checked;

@@ -100,6 +100,12 @@ El precio del cartel y el botín no son fijos; se calculan en función de los pu
   - El coste del cartel siempre redondea hacia arriba (`Math.ceil`).
   - El botín robado siempre redondea hacia abajo (`Math.floor`).
 * **Recompensa por Supervivencia (La Fianza):** Si el cazador falla la misión, el contrato expira a los 7 días o el testigo dictamina que es falso (pulsa NO), el **20% de los puntos** que costó el cartel se le ingresan automáticamente a la víctima. Esquivar la bala tiene premio.
+* **Control de Privacidad (Opt-In / Opt-Out)**:
+  * Cada miembro puede activar o desactivar libremente su participación en el Tablón.
+  * **Cancelación de Contratos Activos**: Si un usuario se desactiva (`opt_in = false`), cualquier contrato activo en curso donde sus perros figuren como **víctimas** o **cazadores** se cancela de inmediato (estado `cancelled`).
+  * **Reembolso por Baja**: Para evitar perjuicios a terceros, al cancelarse un contrato por la desactivación de la víctima, se le reembolsa el **100% de los puntos del coste** del cartel al cazador, registrándose en el historial de puntos.
+  * **Regla de Cooldown (Bloqueo por 7 días)**: Para impedir que un usuario use la desactivación como "escudo temporal" reactivo (ej. darse de baja al sospechar que está siendo cazado y volver a darse de alta enseguida), el sistema impone un **periodo de espera obligatorio de 7 días** a partir de cualquier cambio en el estado de participación. Durante este cooldown, no se permiten nuevas modificaciones.
+
 
 ### ⚙️ Algoritmo de Selección de Testigos
 Para evitar trampas e intervención del [[usuarios|Staff]], el backend selecciona automáticamente a **tres testigos obligatorios** para cada contrato:

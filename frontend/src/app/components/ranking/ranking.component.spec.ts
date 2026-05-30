@@ -131,39 +131,6 @@ describe('RankingComponent', () => {
     expect(document.body.style.overflow).toBe('auto');
   });
 
-  it('should start new season successfully', () => {
-    component.newSeasonName = 'Nueva Temporada';
-    component.newSeasonType = 'ranking';
-    component.newSeasonStartDate = '2026-06-01';
-
-    const startSpy = vi.spyOn(reservationService, 'startSeason').mockReturnValue(of({ message: 'Temporada creada' }));
-    const loadSpy = vi.spyOn(component, 'loadSeasons').mockImplementation(() => {});
-    const closeSpy = vi.spyOn(component, 'closeSeasonManager').mockImplementation(() => {});
-    
-    component.startNewSeason();
-
-    expect(startSpy).toHaveBeenCalledWith({
-      name: 'Nueva Temporada',
-      gamification_type: 'ranking',
-      start_date: '2026-06-01'
-    });
-    expect(component.newSeasonName).toBe('');
-    expect(loadSpy).toHaveBeenCalled();
-    expect(closeSpy).toHaveBeenCalled();
-  });
-
-  it('should end current season successfully', () => {
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
-    const endSpy = vi.spyOn(reservationService, 'endSeason').mockReturnValue(of({ message: 'Temporada finalizada' }));
-    const loadSpy = vi.spyOn(component, 'loadSeasons').mockImplementation(() => {});
-    const closeSpy = vi.spyOn(component, 'closeSeasonManager').mockImplementation(() => {});
-
-    component.endCurrentSeason();
-
-    expect(endSpy).toHaveBeenCalled();
-    expect(loadSpy).toHaveBeenCalled();
-    expect(closeSpy).toHaveBeenCalled();
-  });
 
   it('should open and close modal manually', () => {
     const dog = { id: 1, name: 'Buddy' };

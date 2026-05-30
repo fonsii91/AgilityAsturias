@@ -520,21 +520,10 @@ $hunterPointsRow = DogSeasonPoint::where('dog_id', $hunterDogId)
                 'expires_at' => $c->expires_at
             ]);
 
-        // 3. Contracts where user is a validator (designated witness 1-5 OR victim owner)
+        // 3. Contracts where user is selected for validation
         $witnessing = BountyContract::where('season_id', $season->id)
             ->where('status', 'active')
-            ->where(function ($q) use ($user) {
-                $q->where('witness_1_id', $user->id)
-                  ->orWhere('witness_2_id', $user->id)
-                  ->orWhere('witness_3_id', $user->id)
-                  ->orWhere('witness_4_id', $user->id)
-                  ->orWhere('witness_5_id', $user->id)
-                  ->orWhereIn('victim_dog_id', function ($sub) use ($user) {
-                      $sub->select('dog_id')
-                          ->from('dog_user')
-                          ->where('user_id', $user->id);
-                  });
-            })
+            ->where('witness_validated_id', $user->id)
             ->with(['hunterDog:id,name', 'victimDog:id,name'])
             ->get()
             ->map(fn($c) => [
@@ -542,7 +531,7 @@ $hunterPointsRow = DogSeasonPoint::where('dog_id', $hunterDogId)
                 'hunter_dog' => $c->hunterDog,
                 'victim_dog' => $c->victimDog,
                 'action_description' => $c->action_description,
-                'is_selected_for_validation' => $c->witness_validated_id == $user->id,
+                'is_selected_for_validation' => true,
                 'expires_at' => $c->expires_at
             ]);
 
@@ -725,7 +714,7 @@ $hunterPointsRow = DogSeasonPoint::where('dog_id', $hunterDogId)
 
         $contracts = BountyContract::where('season_id', $season->id)
             ->whereIn('status', ['claimed', 'burned', 'expired'])
-            ->with(['hunterDog:id,name', 'victimDog:id,name', 'witnessValidated:id,name'])
+            ->with(['hunterDog:id,name,photo_url', 'victimDog:id,name,photo_url', 'witnessValidated:id,name'])
             ->orderBy('updated_at', 'desc')
             ->take(20)
             ->get()
@@ -742,7 +731,23 @@ $hunterPointsRow = DogSeasonPoint::where('dog_id', $hunterDogId)
                 }
                 return [
                     'id' => $c->id,
+                    'status' => $c->status,
                     'message' => $msg,
+                    'hunter_dog' => $c->hunterDog ? [
+                        'id' => $c->hunterDog->id,
+                        'name' => $c->hunterDog->name,
+                        'photo_url' => $c->hunterDog->photo_url,
+                    ] : null,
+                    'victim_dog' => $c->victimDog ? [
+                        'id' => $c->victimDog->id,
+                        'name' => $c->victimDog->name,
+                        'photo_url' => $c->victimDog->photo_url,
+                    ] : null,
+                    'witness_name' => $c->witnessValidated->name ?? 'Comunidad',
+                    'action_description' => $c->action_description,
+                    'bounty' => $c->bounty,
+                    'cost' => $c->cost,
+                    'survival_reward' => (int)floor($c->cost * 0.20),
                     'updated_at' => $c->updated_at
                 ];
             });
@@ -760,11 +765,105 @@ $hunterPointsRow = DogSeasonPoint::where('dog_id', $hunterDogId)
         ]);
 
         $optIn = $request->input('opt_in');
+        $user = $request->user();
+
+        $setting = BountyUserSetting::where('user_id', $user->id)->first();
+
+        // Enforce 7-day cooldown between opt-in status changes
+        if ($setting && $setting->opt_in !== $optIn) {
+            $cooldownDays = 7;
+            if ($setting->last_opt_change_at) {
+                $nextAllowed = Carbon::parse($setting->last_opt_change_at)->addDays($cooldownDays);
+                if (Carbon::now()->lessThan($nextAllowed)) {
+                    $minutesRemaining = Carbon::now()->diffInMinutes($nextAllowed);
+                    $hoursRemaining = ceil($minutesRemaining / 60);
+                    if ($hoursRemaining > 24) {
+                        $days = ceil($hoursRemaining / 24);
+                        return response()->json([
+                            'message' => "Debes esperar {$days} día(s) antes de cambiar tu participación en el Tablón."
+                        ], 400);
+                    } else {
+                        return response()->json([
+                            'message' => "Debes esperar {$hoursRemaining} hora(s) antes de cambiar tu participación en el Tablón."
+                        ], 400);
+                    }
+                }
+            }
+        }
+
+        $isChanging = !$setting || ($setting->opt_in !== $optIn);
+        $updateData = ['opt_in' => $optIn];
+        if ($isChanging) {
+            $updateData['last_opt_change_at'] = Carbon::now();
+        }
 
         $setting = BountyUserSetting::updateOrCreate(
-            ['user_id' => $request->user()->id],
-            ['opt_in' => $optIn]
+            ['user_id' => $user->id],
+            $updateData
         );
+
+        if (!$optIn) {
+            $myDogIds = DB::table('dog_user')
+                ->where('user_id', $user->id)
+                ->pluck('dog_id')
+                ->toArray();
+
+            if (!empty($myDogIds)) {
+                // 1. Cancel contracts where user's dogs are victims (refund the hunters)
+                $victimContracts = BountyContract::whereIn('victim_dog_id', $myDogIds)
+                    ->where('status', 'active')
+                    ->get();
+
+                foreach ($victimContracts as $contract) {
+                    DB::transaction(function () use ($contract) {
+                        $contract->status = 'cancelled';
+                        $contract->save();
+
+                        // Refund cost to the hunter dog
+                        $hunterPoints = DogSeasonPoint::firstOrCreate(
+                            ['dog_id' => $contract->hunter_dog_id, 'season_id' => $contract->season_id],
+                            ['points' => 0]
+                        );
+                        $hunterPoints->points += $contract->cost;
+                        $hunterPoints->save();
+
+                        PointHistory::create([
+                            'dog_id' => $contract->hunter_dog_id,
+                            'season_id' => $contract->season_id,
+                            'points' => $contract->cost,
+                            'category' => 'Reembolso por cancelación de contrato (Víctima desactivada)',
+                        ]);
+                    });
+                }
+
+                // 2. Cancel contracts where user's dogs are hunters (refund themselves)
+                $hunterContracts = BountyContract::whereIn('hunter_dog_id', $myDogIds)
+                    ->where('status', 'active')
+                    ->get();
+
+                foreach ($hunterContracts as $contract) {
+                    DB::transaction(function () use ($contract) {
+                        $contract->status = 'cancelled';
+                        $contract->save();
+
+                        // Refund cost to themselves
+                        $hunterPoints = DogSeasonPoint::firstOrCreate(
+                            ['dog_id' => $contract->hunter_dog_id, 'season_id' => $contract->season_id],
+                            ['points' => 0]
+                        );
+                        $hunterPoints->points += $contract->cost;
+                        $hunterPoints->save();
+
+                        PointHistory::create([
+                            'dog_id' => $contract->hunter_dog_id,
+                            'season_id' => $contract->season_id,
+                            'points' => $contract->cost,
+                            'category' => 'Reembolso por cancelación de contrato (Auto-desactivado)',
+                        ]);
+                    });
+                }
+            }
+        }
 
         return response()->json([
             'message' => 'Configuración de privacidad del Tablón guardada correctamente.',

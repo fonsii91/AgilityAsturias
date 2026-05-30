@@ -12,11 +12,13 @@ class BountyUserSetting extends Model
         'user_id',
         'opt_in',
         'allow_anonymous_alerts',
+        'last_opt_change_at',
     ];
 
     protected $casts = [
         'opt_in' => 'boolean',
         'allow_anonymous_alerts' => 'boolean',
+        'last_opt_change_at' => 'datetime',
     ];
 
     public function user()

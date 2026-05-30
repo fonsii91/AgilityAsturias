@@ -492,10 +492,132 @@ class BountyBoardTest extends TestCase
             'expires_at' => Carbon::now()->addDays(30),
         ]);
 
-        // 4. Opt out again and check that the contract is preserved
+        // 4. Opt out again and check that the contract is cancelled and refunded
         $response = $this->actingAs($user)->postJson('/api/bounty/settings', ['opt_in' => false]);
         $response->assertStatus(200);
 
         $this->assertEquals(1, BountyContract::where('id', $contract->id)->count());
+        $this->assertEquals('cancelled', $contract->fresh()->status);
+        $this->assertEquals(58, DogSeasonPoint::where('dog_id', $dog->id)->value('points'));
+        $this->assertTrue(\App\Models\PointHistory::where([
+            'dog_id' => $dog->id,
+            'points' => 8,
+            'category' => 'Reembolso por cancelación de contrato (Auto-desactivado)'
+        ])->exists());
+    }
+
+    public function test_opt_out_cancels_victim_contracts_and_refunds_hunter()
+    {
+        $hunterUser = $this->createUser();
+        $hunterDog = $this->createDog($hunterUser, 50);
+
+        $victimUser = $this->createUser();
+        $victimDog = $this->createDog($victimUser, 100);
+
+        $contract = BountyContract::create([
+            'club_id' => $this->club->id,
+            'season_id' => $this->season->id,
+            'hunter_dog_id' => $hunterDog->id,
+            'victim_dog_id' => $victimDog->id,
+            'action_description' => 'Test Mission',
+            'witness_1_id' => $hunterUser->id,
+            'cost' => 8,
+            'bounty' => 20,
+            'cartel_type' => 'asalto',
+            'status' => 'active',
+            'expires_at' => Carbon::now()->addDays(30),
+        ]);
+
+        // Victim opts out
+        $response = $this->actingAs($victimUser)->postJson('/api/bounty/settings', ['opt_in' => false]);
+        $response->assertStatus(200);
+
+        // Contract should be cancelled
+        $this->assertEquals('cancelled', $contract->fresh()->status);
+
+        // Hunter should be refunded the cost (50 + 8 = 58)
+        $this->assertEquals(58, DogSeasonPoint::where('dog_id', $hunterDog->id)->value('points'));
+
+        // Point history record should exist
+        $this->assertTrue(\App\Models\PointHistory::where([
+            'dog_id' => $hunterDog->id,
+            'points' => 8,
+            'category' => 'Reembolso por cancelación de contrato (Víctima desactivada)'
+        ])->exists());
+    }
+
+    public function test_opt_in_cooldown_enforced()
+    {
+        $user = $this->createUser();
+
+        // 1. Initial change: user opts out. Should succeed and set last_opt_change_at.
+        $response = $this->actingAs($user)->postJson('/api/bounty/settings', ['opt_in' => false]);
+        $response->assertStatus(200);
+
+        $setting = BountyUserSetting::where('user_id', $user->id)->first();
+        $this->assertNotNull($setting->last_opt_change_at);
+        $lastChange = $setting->last_opt_change_at;
+
+        // 2. Second change: try to opt back in immediately. Should fail with 400.
+        $response = $this->actingAs($user)->postJson('/api/bounty/settings', ['opt_in' => true]);
+        $response->assertStatus(400);
+        $response->assertJsonStructure(['message']);
+
+        // 3. Travel in time: simulate 8 days passing.
+        Carbon::setTestNow(Carbon::now()->addDays(8));
+
+        // 4. Third change: opt back in after cooldown. Should succeed.
+        $response = $this->actingAs($user)->postJson('/api/bounty/settings', ['opt_in' => true]);
+        $response->assertStatus(200);
+        
+        $this->assertTrue(BountyUserSetting::where('user_id', $user->id)->value('opt_in'));
+        $this->assertNotEquals($lastChange->toDateTimeString(), BountyUserSetting::where('user_id', $user->id)->value('last_opt_change_at')->toDateTimeString());
+
+        // Reset time
+        Carbon::setTestNow();
+    }
+
+    public function test_witness_cannot_see_contract_until_selected_for_validation()
+    {
+        $hunterUser = $this->createUser();
+        $hunterDog = $this->createDog($hunterUser, 50);
+
+        $victimUser = $this->createUser();
+        $victimDog = $this->createDog($victimUser, 100);
+
+        $witness = $this->createUser();
+
+        // 1. Create contract with $witness as one of the potential witnesses
+        $contract = BountyContract::create([
+            'club_id' => $this->club->id,
+            'season_id' => $this->season->id,
+            'hunter_dog_id' => $hunterDog->id,
+            'victim_dog_id' => $victimDog->id,
+            'action_description' => 'Test Mission',
+            'witness_1_id' => $witness->id,
+            'cost' => 8,
+            'bounty' => 20,
+            'cartel_type' => 'asalto',
+            'status' => 'active',
+            'expires_at' => Carbon::now()->addDays(30),
+        ]);
+
+        // 2. Fetch my-contracts as the witness - witnessing list should be empty
+        $response = $this->actingAs($witness)->getJson('/api/bounty/my-contracts');
+        $response->assertStatus(200);
+        $this->assertCount(0, $response->json('witnessing'));
+
+        // 3. Hunter confirms and selects the witness
+        $response2 = $this->actingAs($hunterUser)->postJson("/api/bounty/contracts/{$contract->id}/confirm", [
+            'witness_id' => $witness->id
+        ]);
+        $response2->assertStatus(200);
+
+        // 4. Fetch my-contracts as the witness again - contract should now appear under witnessing
+        $response3 = $this->actingAs($witness)->getJson('/api/bounty/my-contracts');
+        $response3->assertStatus(200);
+        $this->assertCount(1, $response3->json('witnessing'));
+        $this->assertEquals($contract->id, $response3->json('witnessing.0.id'));
+        $this->assertTrue($response3->json('witnessing.0.is_selected_for_validation'));
     }
 }
