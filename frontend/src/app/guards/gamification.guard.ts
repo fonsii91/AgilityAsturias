@@ -20,7 +20,7 @@ export const gamificationGuard: CanActivateFn = async (route, state) => {
     }
 
     const info = tenantService.tenantInfo();
-    if (info?.settings?.gamification_enabled !== false) {
+    if (info?.settings?.['gamification_enabled'] !== false) {
         return true;
     }
 

@@ -65,7 +65,7 @@ export class ModificarPuntosComponent implements OnInit {
 
   ngOnInit() {
     const info = this.tenantService.tenantInfo();
-    if (info?.settings?.gamification_enabled === false) {
+    if (info?.settings?.['gamification_enabled'] === false) {
       this.snackBar.open('El sistema de gamificación está desactivado.', 'Cerrar', {
         duration: 3000,
         panelClass: ['error-snackbar']
