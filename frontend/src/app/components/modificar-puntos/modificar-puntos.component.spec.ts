@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { DogService } from '../../services/dog.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TenantService } from '../../services/tenant.service';
 
 describe('ModificarPuntosComponent', () => {
   let component: ModificarPuntosComponent;
@@ -12,6 +13,7 @@ describe('ModificarPuntosComponent', () => {
   let mockRouter: any;
   let mockLocation: any;
   let mockSnackBar: any;
+  let mockTenantService: any;
 
   beforeEach(() => {
     mockDogService = {
@@ -35,12 +37,23 @@ describe('ModificarPuntosComponent', () => {
       open: vi.fn()
     };
 
+    mockTenantService = {
+      tenantInfo: signal<any>({
+        id: 1,
+        name: 'Test Club',
+        settings: {
+          gamification_enabled: true
+        }
+      })
+    };
+
     TestBed.configureTestingModule({
       providers: [
         { provide: Router, useValue: mockRouter },
         { provide: Location, useValue: mockLocation },
         { provide: DogService, useValue: mockDogService },
-        { provide: MatSnackBar, useValue: mockSnackBar }
+        { provide: MatSnackBar, useValue: mockSnackBar },
+        { provide: TenantService, useValue: mockTenantService }
       ]
     });
 
@@ -145,6 +158,40 @@ describe('ModificarPuntosComponent', () => {
     expect(mockSnackBar.open).toHaveBeenCalledWith('Error al modificar los puntos.', 'Cerrar', expect.any(Object));
     expect(mockRouter.navigate).not.toHaveBeenCalled();
     expect(component.isLoading).toBe(false);
+  });
+
+  it('should redirect and show snackbar if gamification is disabled on init', () => {
+    mockTenantService.tenantInfo.set({
+      id: 1,
+      name: 'Test Club',
+      settings: {
+        gamification_enabled: false
+      }
+    });
+
+    component.ngOnInit();
+
+    expect(mockSnackBar.open).toHaveBeenCalledWith('El sistema de gamificación está desactivado.', 'Cerrar', {
+      duration: 3000,
+      panelClass: ['error-snackbar']
+    });
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+    expect(mockDogService.loadAllDogs).not.toHaveBeenCalled();
+  });
+
+  it('should load dogs on init if gamification is enabled', () => {
+    mockTenantService.tenantInfo.set({
+      id: 1,
+      name: 'Test Club',
+      settings: {
+        gamification_enabled: true
+      }
+    });
+
+    component.ngOnInit();
+
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+    expect(mockDogService.loadAllDogs).toHaveBeenCalled();
   });
 });
 

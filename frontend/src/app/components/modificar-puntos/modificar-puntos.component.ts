@@ -7,6 +7,7 @@ import { DogService } from '../../services/dog.service';
 import { Dog } from '../../models/dog.model';
 import { getEmojiForCategory } from '../../utils/point-categories';
 import { OnboardingService } from '../../services/onboarding';
+import { TenantService } from '../../services/tenant.service';
 
 @Component({
   selector: 'app-modificar-puntos',
@@ -21,6 +22,7 @@ export class ModificarPuntosComponent implements OnInit {
   dogService = inject(DogService);
   snackBar = inject(MatSnackBar);
   onboardingService = inject(OnboardingService);
+  tenantService = inject(TenantService);
 
   dogs = this.dogService.getAllDogs();
   
@@ -62,6 +64,15 @@ export class ModificarPuntosComponent implements OnInit {
   }
 
   ngOnInit() {
+    const info = this.tenantService.tenantInfo();
+    if (info?.settings?.gamification_enabled === false) {
+      this.snackBar.open('El sistema de gamificación está desactivado.', 'Cerrar', {
+        duration: 3000,
+        panelClass: ['error-snackbar']
+      });
+      this.router.navigate(['/']);
+      return;
+    }
     this.dogService.loadAllDogs();
   }
 

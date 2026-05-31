@@ -17,6 +17,7 @@ import { adminGuard } from './guards/admin.guard';
 import { memberGuard } from './guards/member.guard';
 import { managerGuard } from './guards/manager.guard';
 import { featureGuard } from './guards/feature.guard';
+import { gamificationGuard } from './guards/gamification.guard';
 
 export const routes: Routes = [
     {
@@ -40,13 +41,13 @@ export const routes: Routes = [
     {
         path: 'admin/temporadas',
         loadComponent: () => import('./components/admin/seasons-list/seasons-list.component').then(m => m.SeasonsListComponent),
-        canActivate: [managerGuard],
+        canActivate: [managerGuard, gamificationGuard],
         title: titleResolver, data: { pageTitle: 'Gestión de Temporadas' }
     },
     {
         path: 'admin/temporadas/nueva',
         loadComponent: () => import('./components/admin/season-form/season-form.component').then(m => m.SeasonFormComponent),
-        canActivate: [managerGuard],
+        canActivate: [managerGuard, gamificationGuard],
         title: titleResolver, data: { pageTitle: 'Nueva Temporada' }
     },
     {
@@ -224,7 +225,7 @@ export const routes: Routes = [
     {
         path: 'ranking',
         loadComponent: () => import('./components/ranking/ranking.component').then(m => m.RankingComponent),
-        canActivate: [memberGuard],
+        canActivate: [memberGuard, gamificationGuard],
         title: titleResolver, data: { pageTitle: '' }
     },
     {
@@ -236,7 +237,7 @@ export const routes: Routes = [
     {
         path: 'admin/puntos-extra',
         loadComponent: () => import('./components/modificar-puntos/modificar-puntos.component').then(m => m.ModificarPuntosComponent),
-        canActivate: [staffGuard],
+        canActivate: [staffGuard, gamificationGuard],
         title: titleResolver, data: { pageTitle: 'Modificar Puntos' }
     },
     {

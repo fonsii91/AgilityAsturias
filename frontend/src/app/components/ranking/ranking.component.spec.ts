@@ -4,6 +4,7 @@ import { ReservationService } from '../../services/reservation.service';
 import { AuthService } from '../../services/auth.service';
 import { DogService } from '../../services/dog.service';
 import { ToastService } from '../../services/toast.service';
+import { TenantService } from '../../services/tenant.service';
 import { of, throwError } from 'rxjs';
 import { vi } from 'vitest';
 
@@ -14,19 +15,30 @@ class MockReservationService {
   getSeasons() { return of([]); }
   startSeason(payload: any) { return of({ message: 'Success' }); }
   endSeason() { return of({ message: 'Success' }); }
+  getStickerAlbum(seasonId?: number) { return of({ promotions: [] }); }
 }
-class MockAuthService { currentUser = { id: 1, name: 'Test User' }; currentUserSignal = signal({ id: 1, name: 'Test User' }); }
+class MockAuthService { currentUser = { id: 1, name: 'Test User' }; currentUserSignal = signal({ id: 1, name: 'Test User' }); isMember() { return true; } }
 class MockDogService {
   updateDog(id: number, data: any) { return Promise.resolve(data); }
   getDogs() { return signal([]); }
   loadUserDogs() { return Promise.resolve([]); }
 }
 class MockToastService { success(msg: string) {} error(msg: string) {} }
+class MockTenantService {
+  tenantInfo = signal<any>({
+    id: 1,
+    name: 'Test Club',
+    settings: {
+      gamification_enabled: true
+    }
+  });
+}
 
 describe('RankingComponent', () => {
   let component: RankingComponent;
   let reservationService: ReservationService;
   let toastService: ToastService;
+  let tenantService: TenantService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -34,12 +46,14 @@ describe('RankingComponent', () => {
         { provide: ReservationService, useClass: MockReservationService },
         { provide: AuthService, useClass: MockAuthService },
         { provide: DogService, useClass: MockDogService },
-        { provide: ToastService, useClass: MockToastService }
+        { provide: ToastService, useClass: MockToastService },
+        { provide: TenantService, useClass: MockTenantService }
       ]
     });
 
     reservationService = TestBed.inject(ReservationService);
     toastService = TestBed.inject(ToastService);
+    tenantService = TestBed.inject(TenantService);
 
     TestBed.runInInjectionContext(() => {
       component = new RankingComponent();
@@ -148,5 +162,37 @@ describe('RankingComponent', () => {
     expect(component.selectedDogModal()).toBeNull();
     expect(component.fichaModalOpen()).toBe(false);
     expect(document.body.style.overflow).toBe('auto');
+  });
+
+  it('should compute gamificationEnabled as true if settings.gamification_enabled is not explicitly false', () => {
+    (tenantService.tenantInfo as any).set({
+      id: 1,
+      name: 'Test Club',
+      settings: {
+        gamification_enabled: true
+      }
+    });
+    expect(component.gamificationEnabled()).toBe(true);
+
+    (tenantService.tenantInfo as any).set({
+      id: 1,
+      name: 'Test Club',
+      settings: {}
+    });
+    expect(component.gamificationEnabled()).toBe(true);
+
+    (tenantService.tenantInfo as any).set(null);
+    expect(component.gamificationEnabled()).toBe(true);
+  });
+
+  it('should compute gamificationEnabled as false if settings.gamification_enabled is false', () => {
+    (tenantService.tenantInfo as any).set({
+      id: 1,
+      name: 'Test Club',
+      settings: {
+        gamification_enabled: false
+      }
+    });
+    expect(component.gamificationEnabled()).toBe(false);
   });
 });

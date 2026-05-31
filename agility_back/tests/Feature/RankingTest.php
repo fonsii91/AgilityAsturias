@@ -150,4 +150,19 @@ class RankingTest extends TestCase
         $this->assertCount(1, $data);
         $this->assertEquals($dogValid->id, $data[0]['id']);
     }
+
+    public function test_ranking_throws_403_if_gamification_disabled()
+    {
+        $user = $this->createUser();
+        $this->createDog($user, ['points' => 10]);
+
+        // Disable gamification
+        $this->club->settings = ['gamification_enabled' => false];
+        $this->club->save();
+
+        $response = $this->actingAs($user)->getJson('/api/ranking');
+
+        $response->assertStatus(403);
+        $response->assertJson(['message' => 'El sistema de gamificación está desactivado para este club.']);
+    }
 }

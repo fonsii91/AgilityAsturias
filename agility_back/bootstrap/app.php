@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'gamification.enabled' => \App\Http\Middleware\CheckGamificationEnabled::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -2,37 +2,52 @@ const { chromium } = require('playwright');
 
 function parseDayTextToDate(dayText, eventDateStr) {
   try {
+    const months = {
+      // Spanish
+      'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4, 'mayo': 5, 'junio': 6,
+      'julio': 7, 'agosto': 8, 'septiembre': 9, 'setiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12,
+      // Portuguese
+      'janeiro': 1, 'fevereiro': 2, 'março': 3, 'marco': 3, 'abril': 4, 'maio': 5, 'junho': 6,
+      'julho': 7, 'agosto': 8, 'setembro': 9, 'outubro': 10, 'novembro': 11, 'dezembro': 12,
+      // English
+      'january': 1, 'jan': 1, 'february': 2, 'feb': 2, 'march': 3, 'mar': 3, 'april': 4, 'apr': 4,
+      'may': 5, 'june': 6, 'jun': 6, 'july': 7, 'jul': 7, 'august': 8, 'aug': 8,
+      'september': 9, 'sep': 9, 'sept': 9, 'october': 10, 'oct': 10, 'november': 11, 'nov': 11, 'december': 12, 'dec': 12
+    };
+
     const parts = dayText.toLowerCase().trim().split(/\s+/);
-    let dayNumStr = '';
-    let monthName = '';
-    
-    if (parts.length >= 3) {
-      if (parts[2] === 'de') {
-        dayNumStr = parts[1];
-        monthName = parts[3];
-      } else {
-        dayNumStr = parts[1];
-        monthName = parts[2];
+    let day = null;
+    let month = null;
+    let year = null;
+
+    for (const part of parts) {
+      const cleanWord = part.replace(/[^a-zà-úçñ]/g, '');
+      const cleanNum = part.replace(/\D/g, '');
+
+      // Check if it's a month
+      if (months[cleanWord]) {
+        month = months[cleanWord];
       }
-    } else if (parts.length === 2) {
-      dayNumStr = parts[0];
-      monthName = parts[1];
-    } else {
+
+      // Check if it's a number
+      if (cleanNum) {
+        const val = parseInt(cleanNum, 10);
+        if (val > 1000 && val < 3000) {
+          year = val;
+        } else if (val >= 1 && val <= 31) {
+          day = val;
+        }
+      }
+    }
+
+    if (!day || !month) {
       return eventDateStr;
     }
-    
-    const day = parseInt(dayNumStr, 10);
-    if (isNaN(day)) return eventDateStr;
-    
-    const months = {
-      'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4, 'mayo': 5, 'junio': 6,
-      'julio': 7, 'agosto': 8, 'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12
-    };
-    
-    const month = months[monthName];
-    if (!month) return eventDateStr;
-    
-    const year = eventDateStr.split('-')[0];
+
+    if (!year) {
+      year = parseInt(eventDateStr.split('-')[0], 10) || new Date().getFullYear();
+    }
+
     const pad = (n) => n.toString().padStart(2, '0');
     return `${year}-${pad(month)}-${pad(day)}`;
   } catch (e) {

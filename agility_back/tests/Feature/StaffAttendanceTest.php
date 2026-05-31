@@ -417,4 +417,46 @@ class StaffAttendanceTest extends TestCase
             'is_staff_verified' => 1
         ]);
     }
+
+    public function test_points_are_not_awarded_during_attendance_verification_if_gamification_disabled()
+    {
+        Sanctum::actingAs($this->staff);
+        Notification::fake();
+
+        // Disable gamification
+        $this->club->settings = ['gamification_enabled' => false];
+        $this->club->save();
+
+        $yesterdayDateTime = Carbon::yesterday()->toDateString() . ' 00:00:00';
+        $slot = TimeSlot::factory()->create(['club_id' => $this->club->id]);
+
+        $resAttended = Reservation::factory()->create([
+            'user_id' => $this->member->id,
+            'dog_id' => $this->dog->id,
+            'slot_id' => $slot->id,
+            'date' => $yesterdayDateTime,
+            'status' => 'active',
+            'attendance_verified' => false,
+        ]);
+
+        $response = $this->postJson('/api/admin/attendance/confirm', [
+            'date' => $yesterdayDateTime,
+            'slot_id' => $slot->id,
+            'attended_ids' => [$resAttended->id]
+        ]);
+
+        $response->assertStatus(200);
+
+        // Assert dog did NOT receive points
+        $this->dog = $this->dog->fresh();
+        $this->assertEquals(0, $this->dog->points);
+
+        // Assert no point histories were created
+        $this->assertDatabaseMissing('point_histories', [
+            'dog_id' => $this->dog->id,
+        ]);
+
+        // Assert notification was NOT sent
+        Notification::assertNothingSent();
+    }
 }

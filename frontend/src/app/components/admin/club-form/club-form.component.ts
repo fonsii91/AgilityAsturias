@@ -288,6 +288,27 @@ interface Plan {
               </div>
             </div>
 
+            <!-- Card: Gamificación -->
+            <div class="bento-card">
+              <div class="card-header purple-header">
+                <div class="icon-box purple-icon"><mat-icon>emoji_events</mat-icon></div>
+                <h2>Gamificación</h2>
+              </div>
+              <div class="card-body stack-gap">
+                <div class="input-group">
+                  <label>Módulo de Clasificación y Premios</label>
+                  <p class="help-text" style="margin-top: 2px; margin-bottom: 12px;">Activa o desactiva las mecánicas de gamificación (Ranking de Perros, Álbum de Stickers y Cazarrecompensas) para tu club.</p>
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0;">
+                    <span style="font-size: 0.875rem; font-weight: 500; color: #475569;">Sistema de Gamificación</span>
+                    <label class="switch">
+                      <input type="checkbox" formControlName="gamification_enabled">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </form>
@@ -822,6 +843,47 @@ interface Plan {
       color: #475569;
       text-align: center;
     }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #cbd5e1;
+      transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3.5px;
+      background-color: white;
+      transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    input:checked + .slider {
+      background-color: var(--primary-color, #0073CF);
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
   `]
 })
 export class ClubFormComponent implements OnInit {
@@ -910,7 +972,8 @@ export class ClubFormComponent implements OnInit {
       facebook: [''],
       addressLine1: [''],
       addressLine2: [''],
-      mapUrl: ['']
+      mapUrl: [''],
+      gamification_enabled: [true]
     });
   }
 
@@ -938,7 +1001,8 @@ export class ClubFormComponent implements OnInit {
             facebook: settings.social?.facebook || '',
             addressLine1: settings.contact?.addressLine1 || '',
             addressLine2: settings.contact?.addressLine2 || '',
-            mapUrl: settings.contact?.mapUrl || ''
+            mapUrl: settings.contact?.mapUrl || '',
+            gamification_enabled: settings.gamification_enabled !== false
           });
 
         } else {
@@ -1042,6 +1106,7 @@ export class ClubFormComponent implements OnInit {
       },
       customizationRequest: this.clubData?.settings?.customizationRequest || '',
       landing_page_requested: this.clubData?.settings?.landing_page_requested || false,
+      gamification_enabled: formValue.gamification_enabled,
       contact: {
         phone: formValue.phone,
         email: formValue.email,

@@ -52,6 +52,10 @@ export class RankingComponent {
         return !!this.tenantService.tenantInfo()?.settings_ranking?.bounty_board_enabled;
     });
 
+    gamificationEnabled = computed(() => {
+        return this.tenantService.tenantInfo()?.settings?.gamification_enabled !== false;
+    });
+
     ranking = signal<any[]>([]);
     isLoading = signal(true);
     

@@ -90,7 +90,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/seasons', [\App\Http\Controllers\SeasonController::class, 'index']);
 
         // Extra Points (Admin/Staff)
-        Route::post('/dogs/{id}/extra-points', [DogController::class, 'giveExtraPoints']);
+        Route::post('/dogs/{id}/extra-points', [DogController::class, 'giveExtraPoints'])->middleware('gamification.enabled');
 
         // Reservations index moved to general authenticated routes
 
@@ -160,12 +160,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::middleware(['role:admin,manager'])->group(function () {
-        // Seasons Management (Admin & Manager)
-        Route::post('/admin/seasons/start', [\App\Http\Controllers\SeasonController::class, 'start']);
-        Route::post('/admin/seasons/end', [\App\Http\Controllers\SeasonController::class, 'endCurrent']);
-        Route::put('/admin/seasons/{id}', [\App\Http\Controllers\SeasonController::class, 'update']);
-        Route::delete('/admin/seasons/{id}', [\App\Http\Controllers\SeasonController::class, 'destroy']);
-        Route::post('/admin/seasons/{id}/reopen', [\App\Http\Controllers\SeasonController::class, 'reopen']);
+        Route::middleware(['gamification.enabled'])->group(function () {
+            // Seasons Management (Admin & Manager)
+            Route::post('/admin/seasons/start', [\App\Http\Controllers\SeasonController::class, 'start']);
+            Route::post('/admin/seasons/end', [\App\Http\Controllers\SeasonController::class, 'endCurrent']);
+            Route::put('/admin/seasons/{id}', [\App\Http\Controllers\SeasonController::class, 'update']);
+            Route::delete('/admin/seasons/{id}', [\App\Http\Controllers\SeasonController::class, 'destroy']);
+            Route::post('/admin/seasons/{id}/reopen', [\App\Http\Controllers\SeasonController::class, 'reopen']);
+        });
 
         Route::get('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'show']);
         Route::put('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']);
@@ -178,9 +180,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/user/onboarding/step', [\App\Http\Controllers\OnboardingController::class, 'updateStep']);
         Route::post('/user/onboarding/tutorial-finish', [\App\Http\Controllers\OnboardingController::class, 'finishTutorial']);
 
-        // Ranking
-        Route::get('/ranking', [RankingController::class, 'index']);
-        Route::get('/seasons', [\App\Http\Controllers\SeasonController::class, 'index']);
+
 
         // Users for sharing
         Route::get('/users/minimal', [\App\Http\Controllers\AuthController::class, 'minimalIndex']);
@@ -268,28 +268,34 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Liga Norte Public Standings
         Route::get('/liga-norte/standings', [LigaNorteController::class, 'getStandings']);
 
-        // Sticker Album & Trades Routes
-        Route::get('/album', [\App\Http\Controllers\StickerAlbumController::class, 'getAlbum']);
-        Route::post('/album/open-chest', [\App\Http\Controllers\StickerAlbumController::class, 'openChest']);
-        Route::post('/album/buy-pack', [\App\Http\Controllers\StickerAlbumController::class, 'buyStickerPack']);
-        Route::post('/album/claim-promotion', [\App\Http\Controllers\StickerAlbumController::class, 'claimPromotionReward']);
+        Route::middleware(['gamification.enabled'])->group(function () {
+            // Ranking
+            Route::get('/ranking', [RankingController::class, 'index']);
+            Route::get('/seasons', [\App\Http\Controllers\SeasonController::class, 'index']);
 
-        Route::get('/trades', [\App\Http\Controllers\StickerTradeController::class, 'index']);
-        Route::post('/trades', [\App\Http\Controllers\StickerTradeController::class, 'store']);
-        Route::post('/trades/{id}/accept', [\App\Http\Controllers\StickerTradeController::class, 'accept']);
-        Route::post('/trades/{id}/reject', [\App\Http\Controllers\StickerTradeController::class, 'reject']);
-        Route::post('/trades/{id}/cancel', [\App\Http\Controllers\StickerTradeController::class, 'cancel']);
+            // Sticker Album & Trades Routes
+            Route::get('/album', [\App\Http\Controllers\StickerAlbumController::class, 'getAlbum']);
+            Route::post('/album/open-chest', [\App\Http\Controllers\StickerAlbumController::class, 'openChest']);
+            Route::post('/album/buy-pack', [\App\Http\Controllers\StickerAlbumController::class, 'buyStickerPack']);
+            Route::post('/album/claim-promotion', [\App\Http\Controllers\StickerAlbumController::class, 'claimPromotionReward']);
 
-        // Bounty Board (Cazarrecompensas) Routes
-        Route::get('/bounty/posters', [BountyController::class, 'getPosters']);
-        Route::post('/bounty/contracts', [BountyController::class, 'buyContract']);
-        Route::get('/bounty/my-contracts', [BountyController::class, 'getMyContracts']);
-        Route::post('/bounty/contracts/{id}/confirm', [BountyController::class, 'confirmCaza']);
-        Route::post('/bounty/contracts/{id}/validate', [BountyController::class, 'validateCaza']);
-        Route::post('/bounty/contracts/{id}/reroll', [BountyController::class, 'reroll']);
-        Route::get('/bounty/feed', [BountyController::class, 'getFeed']);
-        Route::post('/bounty/settings', [BountyController::class, 'updateSettings']);
-        Route::post('/admin/bounty/toggle', [BountyController::class, 'toggleBountyBoard']);
+            Route::get('/trades', [\App\Http\Controllers\StickerTradeController::class, 'index']);
+            Route::post('/trades', [\App\Http\Controllers\StickerTradeController::class, 'store']);
+            Route::post('/trades/{id}/accept', [\App\Http\Controllers\StickerTradeController::class, 'accept']);
+            Route::post('/trades/{id}/reject', [\App\Http\Controllers\StickerTradeController::class, 'reject']);
+            Route::post('/trades/{id}/cancel', [\App\Http\Controllers\StickerTradeController::class, 'cancel']);
+
+            // Bounty Board (Cazarrecompensas) Routes
+            Route::get('/bounty/posters', [BountyController::class, 'getPosters']);
+            Route::post('/bounty/contracts', [BountyController::class, 'buyContract']);
+            Route::get('/bounty/my-contracts', [BountyController::class, 'getMyContracts']);
+            Route::post('/bounty/contracts/{id}/confirm', [BountyController::class, 'confirmCaza']);
+            Route::post('/bounty/contracts/{id}/validate', [BountyController::class, 'validateCaza']);
+            Route::post('/bounty/contracts/{id}/reroll', [BountyController::class, 'reroll']);
+            Route::get('/bounty/feed', [BountyController::class, 'getFeed']);
+            Route::post('/bounty/settings', [BountyController::class, 'updateSettings']);
+            Route::post('/admin/bounty/toggle', [BountyController::class, 'toggleBountyBoard']);
+        });
     });
 
 

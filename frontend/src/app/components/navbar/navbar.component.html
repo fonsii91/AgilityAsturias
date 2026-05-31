@@ -55,8 +55,10 @@
               Reservas</a></li>
           <li><a routerLink="/calendario" routerLinkActive="active-route"><span
                 class="material-icons">calendar_month</span> Calendario</a></li>
-          <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
-              Clasificación</a></li>
+          @if (gamificationEnabled()) {
+            <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
+                Clasificación</a></li>
+          }
           <li *hasFeature="'galeria-videos'"><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
               Vídeos</a></li>
         </ul>
@@ -75,8 +77,10 @@
                 class="material-icons">visibility</span> Monitor Reservas</a></li>
           <li><a routerLink="/admin/asistencia" routerLinkActive="active-route"><span
                 class="material-icons">fact_check</span> Verificar Asistencia</a></li>
-          <li><a routerLink="/admin/puntos-extra" routerLinkActive="active-route" (click)="closeMenu()"><span
-                class="material-icons">military_tech</span> Puntos Extra</a></li>
+          @if (gamificationEnabled()) {
+            <li><a routerLink="/admin/puntos-extra" routerLinkActive="active-route" (click)="closeMenu()"><span
+                  class="material-icons">military_tech</span> Puntos Extra</a></li>
+          }
           <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route"><span
                 class="material-icons">people</span> Gestión Miembros</a></li>
           <li *hasFeature="'reservas-pistas'"><a routerLink="/gestionar-horarios" routerLinkActive="active-route"><span
