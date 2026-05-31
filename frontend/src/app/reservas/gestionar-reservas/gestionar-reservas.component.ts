@@ -180,9 +180,19 @@ export class GestionarReservasComponent {
         const dd = String(now.getDate()).padStart(2, '0');
         const todayStr = `${yyyy}-${mm}-${dd}`;
 
-        const mappedSlots = this.timeSlots().map(slot => {
-            const normalizedDay = slot.day === 'Sabado' ? 'Sábado' : slot.day;
-            const slotDate = weekDates[normalizedDay] || weekDates['Lunes']; // Fallback to avoid crashes
+        const weekDateValues = Object.values(weekDates);
+
+        const mappedSlots = this.timeSlots()
+            .filter(slot => {
+                if (slot.date) {
+                    return weekDateValues.includes(slot.date);
+                }
+                return true;
+            })
+            .map(slot => {
+                const normalizedDay = slot.day === 'Sabado' ? 'Sábado' : slot.day;
+                const slotDate = slot.date || weekDates[normalizedDay] || weekDates['Lunes']; // Fallback to avoid crashes
+                const isUnique = !!slot.date;
 
             // 1. Find My Reservations (for "isBookedByCurrentUser" and attendees list if admin/self)
             const slotMyReservations = reservations.filter(r => {
@@ -246,12 +256,13 @@ export class GestionarReservasComponent {
             return {
                 ...slot,
                 date: slotDate,
+                isUnique,
                 currentBookings: totalBookedSpots,
                 isBookedByCurrentUser: !!myReservation,
                 userReservationId: myReservation?.id,
                 reservations: allAttendees,
                 isCancelled
-            } as TimeSlot & { date: string, isCancelled: boolean };
+            } as TimeSlot & { date: string, isUnique: boolean, isCancelled: boolean };
         });
 
         // Filter out slots from past days
@@ -512,7 +523,41 @@ export class GestionarReservasComponent {
 
     // Cancellation Modal State
     isCancelModalOpen = false;
-    selectedSlotForCancellation: TimeSlot | null = null;
+    selectedSlotForCancellation = signal<(TimeSlot & { date: string }) | null>(null);
+    selectedCancellationReservationIds: Set<number> = new Set();
+
+    bookedDogsForCancellation = computed(() => {
+        const slot = this.selectedSlotForCancellation();
+        if (!slot) return [];
+        const reservations = this.reservationService.getReservations()();
+        const currentUser = this.authService.currentUserSignal();
+        if (!currentUser) return [];
+
+        const slotDate = slot.date;
+        const slotMyReservations = reservations.filter(r => {
+            const isSameSlot = r.slotId == slot.id;
+            const isSameDate = r.date === slotDate;
+            const sameUser = String(r.userId) === String(currentUser.id);
+            const isMyDog = (r.dog as any)?.users?.some((u: any) => String(u.id) === String(currentUser.id));
+            return isSameSlot && isSameDate && (sameUser || isMyDog);
+        });
+
+        return slotMyReservations.map(r => ({
+            reservationId: r.id,
+            dogId: r.dogId,
+            dogName: r.dog?.name || 'Perro Desconocido'
+        }));
+    });
+
+    toggleCancellationSelection(reservationId: number) {
+        const newSet = new Set(this.selectedCancellationReservationIds);
+        if (newSet.has(reservationId)) {
+            newSet.delete(reservationId);
+        } else {
+            newSet.add(reservationId);
+        }
+        this.selectedCancellationReservationIds = newSet;
+    }
 
     openCancelModal(slot: TimeSlot & { date: string }) {
         if (!slot.isBookedByCurrentUser) return;
@@ -537,25 +582,48 @@ export class GestionarReservasComponent {
             }
         }
 
-        this.selectedSlotForCancellation = slot;
+        this.selectedSlotForCancellation.set(slot);
+        
+        // Initialize with all reservations of the user for this slot
+        this.selectedCancellationReservationIds.clear();
+        const booked = this.bookedDogsForCancellation();
+        booked.forEach(b => this.selectedCancellationReservationIds.add(b.reservationId));
+
         this.isCancelModalOpen = true;
     }
 
     closeCancelModal() {
         this.isCancelModalOpen = false;
-        this.selectedSlotForCancellation = null;
+        this.selectedSlotForCancellation.set(null);
+        this.selectedCancellationReservationIds.clear();
     }
 
     async confirmCancellation() {
-        // Now using slot_id and date to cancel all my reservations for this block
-        if (!this.selectedSlotForCancellation) return;
+        const slot = this.selectedSlotForCancellation();
+        if (!slot) return;
+
+        if (this.selectedCancellationReservationIds.size === 0) {
+            this.toastService.warning('Por favor, selecciona al menos un perro para cancelar.');
+            return;
+        }
 
         this.isSubmitting.set(true);
         try {
-            await this.reservationService.deleteBlock(
-                this.selectedSlotForCancellation.id,
-                (this.selectedSlotForCancellation as any).date
-            );
+            const bookedCount = this.bookedDogsForCancellation().length;
+            const toCancelCount = this.selectedCancellationReservationIds.size;
+
+            if (bookedCount === toCancelCount) {
+                await this.reservationService.deleteBlock(
+                    slot.id,
+                    slot.date
+                );
+            } else {
+                // Cancel selected reservations individually
+                const ids = Array.from(this.selectedCancellationReservationIds);
+                for (const id of ids) {
+                    await this.reservationService.deleteReservation(id);
+                }
+            }
             this.toastService.success('Reserva cancelada correctamente.');
             this.closeCancelModal();
         } catch (error) {

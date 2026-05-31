@@ -595,3 +595,24 @@ h2 {
     color: white;
 }
 
+.admin-slot-card.color-blue {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+.admin-slot-card.color-green {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+.admin-slot-card.color-amber {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+.admin-slot-card.color-purple {
+    background: #faf5ff;
+    border-color: #e9d5ff;
+}
+.admin-slot-card.color-rose {
+    background: #fff1f2;
+    border-color: #fecdd3;
+}
+

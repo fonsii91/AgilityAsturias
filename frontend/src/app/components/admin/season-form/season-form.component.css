@@ -1,0 +1,318 @@
+/* --- SEASON FORM COMPONENT PREMIUM CSS --- */
+
+.season-form-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1e293b;
+  position: relative;
+  min-height: 70vh;
+}
+
+/* Header Bar styling */
+.season-form-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1.25rem;
+}
+
+.admin-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.icon-title {
+  color: var(--primary-color, #3b82f6);
+  font-size: 2rem;
+}
+
+.btn-back {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: translateX(-2px);
+}
+
+/* Form Card Wrapper */
+.form-card-wrapper {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 2.25rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+}
+
+/* Warning Banner */
+.form-warning-banner {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  color: #92400e;
+  margin-bottom: 2rem;
+  align-items: flex-start;
+}
+
+.warning-icon {
+  font-size: 2rem;
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.warning-texts h4 {
+  margin: 0 0 4px 0;
+  font-weight: 800;
+  font-size: 1rem;
+  color: #b45309;
+}
+
+.warning-texts p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+/* Inputs Stack */
+.form-inputs-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  margin-bottom: 2.25rem;
+}
+
+.input-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-field-group > label {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.input-wrapper-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-wrapper-icon .input-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  font-size: 1.25rem;
+}
+
+.form-control-custom {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-control-custom:focus {
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color, #3b82f6) 15%, transparent);
+}
+
+.form-control-custom[type="date"] {
+  padding-left: 42px;
+}
+
+/* Game Dynamics Card Grid */
+.module-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.module-card-premium {
+  position: relative;
+  border: 2px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1.5rem;
+  background: #f8fafc;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.module-card-premium:hover {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.02);
+}
+
+.module-card-premium.selected {
+  border-color: var(--primary-color, #3b82f6);
+  background: color-mix(in srgb, var(--primary-color, #3b82f6) 5%, white);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--primary-color, #3b82f6) 12%, transparent);
+}
+
+.card-radio-circle {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid #cbd5e1;
+  background: white;
+}
+
+.module-card-premium.selected .card-radio-circle {
+  border-color: var(--primary-color, #3b82f6);
+  border-width: 5.5px;
+}
+
+.module-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.module-icon.ranking {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.module-icon.stickers {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.module-info h5 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.module-info p {
+  margin: 4px 0 0 0;
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* Actions Footer */
+.form-actions-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 1.5rem;
+}
+
+.btn-cancel-form {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel-form:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.btn-submit-season {
+  background: var(--primary-color, #3b82f6);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--primary-color, #3b82f6) 20%, transparent);
+  transition: all 0.2s ease;
+}
+
+.btn-submit-season:hover {
+  background: color-mix(in srgb, var(--primary-color, #3b82f6) 88%, black);
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--primary-color, #3b82f6) 30%, transparent);
+}
+
+/* Overlay for submits */
+.submitting-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.2);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  z-index: 2000;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.spinner-premium {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f1f5f9;
+  border-top-color: var(--primary-color, #3b82f6);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

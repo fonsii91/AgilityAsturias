@@ -1,0 +1,521 @@
+/* --- SEASONS LIST COMPONENT PREMIUM CSS --- */
+
+.seasons-admin-container {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #1e293b;
+  position: relative;
+  min-height: 70vh;
+}
+
+/* Header Bar styling */
+.seasons-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 1.25rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.admin-title {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: -0.5px;
+}
+
+.icon-title {
+  color: var(--primary-color, #3b82f6);
+  font-size: 2rem;
+}
+
+/* Buttons */
+.btn-back {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-back:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: translateX(-2px);
+}
+
+.btn-add-season {
+  background: var(--primary-color, #3b82f6);
+  color: white;
+  border: none;
+  padding: 0.65rem 1.25rem;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color, #3b82f6) 20%, transparent);
+  transition: all 0.2s ease;
+}
+
+.btn-add-season:hover {
+  background: color-mix(in srgb, var(--primary-color, #3b82f6) 88%, black);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-color, #3b82f6) 30%, transparent);
+}
+
+/* No Seasons Card */
+.no-seasons-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 24px;
+  padding: 4rem 2rem;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  max-width: 500px;
+  margin: 3rem auto;
+}
+
+.no-seasons-icon {
+  font-size: 4rem;
+  color: #94a3b8;
+}
+
+.no-seasons-card h3 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.no-seasons-card p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+.btn-add-season-center {
+  background: var(--primary-color, #3b82f6);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 24px;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color, #3b82f6) 25%, transparent);
+  transition: all 0.2s ease;
+}
+
+.btn-add-season-center:hover {
+  background: color-mix(in srgb, var(--primary-color, #3b82f6) 88%, black);
+  transform: translateY(-2px);
+}
+
+/* Loading/Spinner States */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 0;
+  gap: 1.25rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.spinner-premium {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f1f5f9;
+  border-top-color: var(--primary-color, #3b82f6);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Grid layout for seasons */
+.seasons-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.season-item-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.season-item-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+  transform: translateY(-2px);
+}
+
+.season-item-card.active-season {
+  border-left: 6px solid #10b981;
+}
+
+.season-item-card.editing-season {
+  border-color: var(--primary-color, #3b82f6);
+}
+
+.season-item-card.deleting-season {
+  border-color: #fca5a5;
+  background: #fff8f8;
+}
+
+/* Card contents structure */
+.season-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.card-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 250px;
+}
+
+.gamification-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background: #fef3c7;
+  color: #d97706;
+  letter-spacing: 0.5px;
+}
+
+.gamification-badge.ranking-badge {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.season-name {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+}
+
+.season-dates-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.season-dates-group .material-icons {
+  font-size: 1.1rem;
+  color: #94a3b8;
+}
+
+.active-date-badge {
+  color: #10b981;
+  font-weight: 700;
+}
+
+.card-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.status-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.active-pill {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.archived-pill {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+}
+
+/* Actions */
+.action-buttons-group {
+  display: flex;
+  gap: 6px;
+}
+
+.action-btn {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  cursor: pointer;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s ease;
+}
+
+.action-btn .material-icons {
+  font-size: 1.25rem;
+}
+
+.action-btn:hover {
+  background: #ffffff;
+  color: #0f172a;
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+}
+
+.action-btn.reopen-btn:hover {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.action-btn.edit-btn:hover {
+  color: var(--primary-color, #3b82f6);
+  border-color: color-mix(in srgb, var(--primary-color, #3b82f6) 30%, transparent);
+  background: color-mix(in srgb, var(--primary-color, #3b82f6) 4%, transparent);
+}
+
+.action-btn.delete-btn:hover {
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.25);
+  background: #fff5f5;
+}
+
+/* Inline Edit Form */
+.inline-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.form-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 8px;
+}
+
+.form-title .material-icons {
+  color: var(--primary-color, #3b82f6);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.form-group-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group-item label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #475569;
+}
+
+.form-control-edit {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  font-size: 0.88rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.form-control-edit:focus {
+  border-color: var(--primary-color, #3b82f6);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color, #3b82f6) 15%, transparent);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-save {
+  background: var(--primary-color, #3b82f6);
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.2s;
+}
+
+.btn-save:hover {
+  background: color-mix(in srgb, var(--primary-color, #3b82f6) 88%, black);
+}
+
+.btn-cancel {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+/* Inline Delete Form */
+.inline-delete-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.warning-header-group {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.warning-alert-icon {
+  font-size: 2.25rem;
+  color: #ef4444;
+  flex-shrink: 0;
+}
+
+.warning-texts h4 {
+  margin: 0 0 4px 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #991b1b;
+}
+
+.warning-texts p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #7f1d1d;
+  line-height: 1.5;
+}
+
+.warning-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-confirm-delete {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-confirm-delete:hover {
+  background: #dc2626;
+}
+
+/* Overlay for submits */
+.submitting-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.2);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  z-index: 2000;
+  color: #0f172a;
+  font-weight: 700;
+}

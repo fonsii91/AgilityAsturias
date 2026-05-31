@@ -549,6 +549,11 @@ textarea.form-control {
     padding-left: 15px !important;
 }
 
+.border-exhibicion {
+    border-left: 5px solid #8b5cf6 !important;
+    padding-left: 15px !important;
+}
+
 /* Scraper Autocomplete Styles */
 .scraper-autocomplete-container {
     position: relative;

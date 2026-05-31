@@ -1,0 +1,153 @@
+<div class="seasons-admin-container">
+  <!-- Header Bar -->
+  <div class="seasons-admin-header">
+    <div class="header-left">
+      <button class="btn-back" routerLink="/ranking" title="Volver al Ranking">
+        <span class="material-icons">arrow_back</span>
+        <span>Ranking</span>
+      </button>
+      <h1 class="admin-title">
+        <span class="material-icons icon-title">history</span>
+        Historial de Temporadas
+      </h1>
+    </div>
+    
+    <button class="btn-add-season" routerLink="/admin/temporadas/nueva">
+      <span class="material-icons">add_circle</span>
+      <span>Nueva Temporada</span>
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <div class="spinner-premium"></div>
+      <p>Cargando historial de temporadas...</p>
+    </div>
+  } @else {
+    <!-- Seasons List -->
+    <div class="seasons-list-wrapper">
+      @if (seasons().length === 0) {
+        <div class="no-seasons-card">
+          <span class="material-icons no-seasons-icon">calendar_today</span>
+          <h3>No hay temporadas registradas</h3>
+          <p>Comienza a gamificar tu club creando tu primera temporada ahora mismo.</p>
+          <button class="btn-add-season-center" routerLink="/admin/temporadas/nueva">
+            <span class="material-icons">play_arrow</span> Iniciar Primera Temporada
+          </button>
+        </div>
+      } @else {
+        <div class="seasons-grid">
+          @for (season of seasons(); track season.id) {
+            <div class="season-item-card" 
+                 [class.active-season]="season.status === 'active'"
+                 [class.editing-season]="editingSeasonId === season.id"
+                 [class.deleting-season]="deletingSeasonId === season.id">
+              
+              <!-- Normal/Display Mode -->
+              @if (editingSeasonId !== season.id && deletingSeasonId !== season.id) {
+                <div class="season-card-content">
+                  <div class="card-left">
+                    <span class="gamification-badge" [class.ranking-badge]="season.gamification_type === 'ranking'">
+                      {{ season.gamification_type === 'ranking' ? '🏆 Ranking' : '📦 Stickers' }}
+                    </span>
+                    <h3 class="season-name">{{ season.name }}</h3>
+                    <div class="season-dates-group">
+                      <span class="material-icons">date_range</span>
+                      <span>
+                        {{ season.start_date | date:'dd/MM/yyyy' }} 
+                        @if (season.end_date) { - {{ season.end_date | date:'dd/MM/yyyy' }} }
+                        @else { <span class="active-date-badge">- Activa</span> }
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="card-right">
+                    @if (season.status === 'active') {
+                      <span class="status-pill active-pill">Activa</span>
+                    } @else {
+                      <span class="status-pill archived-pill">Archivada</span>
+                    }
+
+                    <div class="action-buttons-group">
+                      <button class="action-btn edit-btn" (click)="startEdit(season)" title="Editar temporada">
+                        <span class="material-icons">edit</span>
+                      </button>
+                      
+                      @if (season.status !== 'active') {
+                        <button class="action-btn reopen-btn" (click)="reopenSeason(season)" title="Reactivar/Abrir temporada">
+                          <span class="material-icons">restart_alt</span>
+                        </button>
+                      }
+                      
+                      <button class="action-btn delete-btn" (click)="requestDelete(season.id)" title="Eliminar temporada">
+                        <span class="material-icons">delete_outline</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              <!-- Edit Inline Form -->
+              @if (editingSeasonId === season.id) {
+                <div class="inline-edit-form">
+                  <h4 class="form-title">
+                    <span class="material-icons">edit</span> Editar Detalles de Temporada
+                  </h4>
+                  <div class="form-row">
+                    <div class="form-group-item">
+                      <label>Nombre de la Temporada</label>
+                      <input type="text" [(ngModel)]="editForm.name" class="form-control-edit">
+                    </div>
+                    <div class="form-group-item">
+                      <label>Fecha de Inicio</label>
+                      <input type="date" [(ngModel)]="editForm.start_date" class="form-control-edit">
+                    </div>
+                    <div class="form-group-item">
+                      <label>Fecha de Fin</label>
+                      <input type="date" [(ngModel)]="editForm.end_date" class="form-control-edit">
+                    </div>
+                  </div>
+                  <div class="form-actions">
+                    <button class="btn-save" (click)="saveEdit(season.id)">
+                      <span class="material-icons">check</span> Guardar Cambios
+                    </button>
+                    <button class="btn-cancel" (click)="cancelEdit()">Cancelar</button>
+                  </div>
+                </div>
+              }
+
+              <!-- Delete Inline Warning -->
+              @if (deletingSeasonId === season.id) {
+                <div class="inline-delete-form">
+                  <div class="warning-header-group">
+                    <span class="material-icons warning-alert-icon">warning</span>
+                    <div class="warning-texts">
+                      <h4>¿Seguro que deseas eliminar "{{ season.name }}"?</h4>
+                      <p>Esta acción es **completamente irreversible**. Se borrarán de forma permanente todos los registros de clasificación, botines de cazarrecompensas, fotos y cromos asociados a esta temporada.</p>
+                    </div>
+                  </div>
+                  <div class="warning-actions">
+                    <button class="btn-confirm-delete" (click)="confirmDelete(season.id)">
+                      Sí, eliminar permanentemente
+                    </button>
+                    <button class="btn-cancel" (click)="cancelDelete()">Cancelar</button>
+                  </div>
+                </div>
+              }
+
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Spinner overlay for async operations -->
+  @if (isSubmitting) {
+    <div class="submitting-overlay">
+      <div class="spinner-premium"></div>
+      <span>Procesando solicitud...</span>
+    </div>
+  }
+</div>

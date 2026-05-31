@@ -7,7 +7,7 @@ export interface Competition {
     formaPago: string;
     cartel: string | null;
     enlace: string;
-    tipo: 'competicion' | 'otros';
+    tipo: 'competicion' | 'exhibicion' | 'otros';
     federacion?: 'RSCE' | 'RFEC' | 'Otro';
     nombre?: string; // Optional for backward compatibility with existing records
     judge_name?: string;

@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.1.44",
+    "date": "2026-05-31",
+    "features": [
+      "¡Nuevo tipo de evento: Exhibición! Hemos incorporado las exhibiciones del club al calendario de eventos. Al participar en ellas, se registrará de forma automática la carga de esfuerzo físico de tu perro en su ficha de Salud Deportiva con unos valores mínimos y adaptados, garantizando un control completo de su forma física.",
+      "¡Navegación y visualización de temporadas renovada! Hemos rediseñado la pantalla de Temporadas para que, al acceder desde el ranking, te muestre de manera clara y directa únicamente la información de la temporada actual activa en tu club. Además, hemos reorganizado el menú de administración separando los formularios de creación en sus propios apartados para una visualización más despejada.",
+      "¡Idioma de la plataforma unificado en español! Hemos solventado un problema por el cual algunos navegadores (como Safari o Google Chrome) detectaban la plataforma erróneamente en inglés y sugerían traducirla. Ahora toda la aplicación especifica de forma clara su idioma nativo para evitar molestias de traducción automática."
+    ],
+    "bugfixes": [
+      "Hemos optimizado la sincronización automática de competiciones con FlowAgility de varios días de duración, garantizando que se importen de forma completa todos tus resultados del fin de semana sin interrupciones."
+    ]
+  },
+  {
     "version": "1.1.43",
     "date": "2026-05-30",
     "features": [

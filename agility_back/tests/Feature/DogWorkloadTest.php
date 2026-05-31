@@ -232,4 +232,41 @@ class DogWorkloadTest extends TestCase
         $this->assertCount(1, $data2);
         $this->assertStringContainsString($sunday, $data2[0]['date']);
     }
+
+    public function test_get_pending_reviews_for_exhibition_generates_workloads_with_lower_values()
+    {
+        $user = $this->createUser();
+        
+        $dog = Dog::factory()->create(['user_id' => $user->id, 'club_id' => $this->club->id]);
+        $user->dogs()->attach([
+            $dog->id => ['is_primary_owner' => true]
+        ]);
+
+        $date = now()->subDays(2)->format('Y-m-d');
+
+        $competition = \App\Models\Competition::factory()->create([
+            'club_id' => $this->club->id,
+            'fecha_evento' => $date,
+            'fecha_fin_evento' => null,
+            'tipo' => 'exhibicion',
+            'attendance_verified' => false
+        ]);
+
+        $competition->attendees()->attach($user->id, ['dias_asistencia' => json_encode([$date])]);
+        
+        \Illuminate\Support\Facades\DB::table('competition_dog')->insert([
+            ['competition_id' => $competition->id, 'dog_id' => $dog->id, 'user_id' => $user->id, 'dias_asistencia' => json_encode([$date])]
+        ]);
+
+        // Get pending reviews for Dog
+        $response = $this->actingAs($user)->getJson("/api/dogs/{$dog->id}/pending-reviews");
+        $response->assertStatus(200);
+        $data = $response->json();
+        
+        // Dog should have 1 workload generated for the exhibition
+        $this->assertCount(1, $data);
+        $this->assertStringContainsString($date, $data[0]['date']);
+        $this->assertEquals(1, $data[0]['duration_min']); // lowest default values
+        $this->assertEquals(3, $data[0]['intensity_rpe']); // lowest default values
+    }
 }

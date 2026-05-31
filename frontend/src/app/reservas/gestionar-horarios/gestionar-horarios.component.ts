@@ -73,12 +73,32 @@ export class GestionarHorariosComponent {
   isSettingsModalOpen = false;
   isSubmittingSettings = signal(false);
   cancellationNoticeHours: number = 24;
+  availableColors = [
+    { value: '', label: 'Por defecto', bg: '#f1f5f9', border: '#cbd5e1' },
+    { value: 'blue', label: 'Azul', bg: '#eff6ff', border: '#bfdbfe' },
+    { value: 'green', label: 'Verde', bg: '#ecfdf5', border: '#a7f3d0' },
+    { value: 'amber', label: 'Naranja/Amarillo', bg: '#fffbeb', border: '#fde68a' },
+    { value: 'purple', label: 'Púrpura', bg: '#faf5ff', border: '#e9d5ff' },
+    { value: 'rose', label: 'Rosa', bg: '#fff1f2', border: '#fecdd3' }
+  ];
+
+  getDayNameFromDate(dateStr: string): string {
+    if (!dateStr) return 'Lunes';
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const dateObj = new Date(year, month - 1, day);
+    const daysMap = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return daysMap[dateObj.getDay()];
+  }
+
   slotForm = {
     days: ['Lunes'] as string[],
     name: '' as string | null,
     startTime: '10:00',
     endTime: '11:00',
-    maxBookings: 5
+    maxBookings: 5,
+    isUnique: false,
+    date: '',
+    color: ''
   };
 
   openModal() {
@@ -89,7 +109,10 @@ export class GestionarHorariosComponent {
       name: '',
       startTime: '10:00',
       endTime: '11:00',
-      maxBookings: 5
+      maxBookings: 5,
+      isUnique: false,
+      date: '',
+      color: ''
     };
   }
 
@@ -139,7 +162,10 @@ export class GestionarHorariosComponent {
       name: slot.name || '',
       startTime: slot.start_time,
       endTime: slot.end_time,
-      maxBookings: slot.max_bookings
+      maxBookings: slot.max_bookings,
+      isUnique: !!slot.date,
+      date: slot.date || '',
+      color: slot.color || ''
     };
   }
 
@@ -163,29 +189,62 @@ export class GestionarHorariosComponent {
   async saveSlot() {
     try {
       if (this.editingSlot) {
+        let dayValue = this.slotForm.days[0];
+        let dateValue: string | null = null;
+        if (this.slotForm.isUnique) {
+          if (!this.slotForm.date) {
+            this.toastService.warning('Por favor, selecciona una fecha para la clase única.');
+            return;
+          }
+          dayValue = this.getDayNameFromDate(this.slotForm.date);
+          dateValue = this.slotForm.date;
+        }
+
         const slotData = {
-          day: this.slotForm.days[0], // Edición no masiva
+          day: dayValue,
           name: this.slotForm.name || null,
           start_time: this.slotForm.startTime,
           end_time: this.slotForm.endTime,
-          max_bookings: this.slotForm.maxBookings
+          max_bookings: this.slotForm.maxBookings,
+          color: this.slotForm.color || null,
+          date: dateValue
         };
         await this.timeSlotService.updateTimeSlot(this.editingSlot.id, slotData);
         this.toastService.success('Horario actualizado.');
         this.onboardingService.markStepCompleted('staff_clase');
       } else {
-        // Creación masiva
-        for (const day of this.slotForm.days) {
+        if (this.slotForm.isUnique) {
+          if (!this.slotForm.date) {
+            this.toastService.warning('Por favor, selecciona una fecha para la clase única.');
+            return;
+          }
+          const dayValue = this.getDayNameFromDate(this.slotForm.date);
           const slotData = {
-            day: day,
+            day: dayValue,
             name: this.slotForm.name || null,
             start_time: this.slotForm.startTime,
             end_time: this.slotForm.endTime,
-            max_bookings: this.slotForm.maxBookings
+            max_bookings: this.slotForm.maxBookings,
+            color: this.slotForm.color || null,
+            date: this.slotForm.date
           };
           await this.timeSlotService.addTimeSlot(slotData as any);
+        } else {
+          // Creación masiva
+          for (const day of this.slotForm.days) {
+            const slotData = {
+              day: day,
+              name: this.slotForm.name || null,
+              start_time: this.slotForm.startTime,
+              end_time: this.slotForm.endTime,
+              max_bookings: this.slotForm.maxBookings,
+              color: this.slotForm.color || null,
+              date: null
+            };
+            await this.timeSlotService.addTimeSlot(slotData as any);
+          }
         }
-        this.toastService.success(`Horario(s) creado(s) para ${this.slotForm.days.length} día(s).`);
+        this.toastService.success('Clase(s) guardada(s) correctamente.');
       }
       this.timeSlotService.fetchTimeSlots(); // Refresh
       this.onboardingService.markStepCompleted('gestor_horario');

@@ -5,16 +5,12 @@ import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { BountyService } from '../../../services/bounty.service';
 import { TenantService } from '../../../services/tenant.service';
-import { of, throwError } from 'rxjs';
+import { Router } from '@angular/router';
+import { of } from 'rxjs';
 import { vi } from 'vitest';
-import { signal } from '@angular/core';
 
 class MockReservationService {
-  startSeason(payload: any) { return of({ message: 'Success' }); }
   endSeason() { return of({ message: 'Success' }); }
-  updateSeason(id: number, payload: any) { return of({ message: 'Success' }); }
-  reopenSeason(id: number) { return of({ message: 'Success' }); }
-  deleteSeason(id: number) { return of({ message: 'Success' }); }
 }
 
 class MockAuthService {
@@ -34,10 +30,16 @@ class MockTenantService {
   reload() {}
 }
 
+class MockRouter {
+  navigate(commands: any[]) { return Promise.resolve(true); }
+}
+
 describe('SeasonsManagerComponent', () => {
   let component: SeasonsManagerComponent;
   let reservationService: ReservationService;
   let toastService: ToastService;
+  let bountyService: BountyService;
+  let router: Router;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,12 +48,15 @@ describe('SeasonsManagerComponent', () => {
         { provide: AuthService, useClass: MockAuthService },
         { provide: ToastService, useClass: MockToastService },
         { provide: BountyService, useClass: MockBountyService },
-        { provide: TenantService, useClass: MockTenantService }
+        { provide: TenantService, useClass: MockTenantService },
+        { provide: Router, useClass: MockRouter }
       ]
     });
 
     reservationService = TestBed.inject(ReservationService);
     toastService = TestBed.inject(ToastService);
+    bountyService = TestBed.inject(BountyService);
+    router = TestBed.inject(Router);
 
     TestBed.runInInjectionContext(() => {
       component = new SeasonsManagerComponent();
@@ -60,27 +65,6 @@ describe('SeasonsManagerComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should start new season successfully', () => {
-    component.newSeasonName = 'Nueva Temporada Test';
-    component.newSeasonType = 'ranking';
-    component.newSeasonStartDate = '2026-06-01';
-
-    const startSpy = vi.spyOn(reservationService, 'startSeason').mockReturnValue(of({ message: 'Temporada creada' }));
-    const successSpy = vi.spyOn(toastService, 'success');
-    const emitSpy = vi.spyOn(component.seasonChanged, 'emit');
-
-    component.startNewSeason();
-
-    expect(startSpy).toHaveBeenCalledWith({
-      name: 'Nueva Temporada Test',
-      gamification_type: 'ranking',
-      start_date: '2026-06-01'
-    });
-    expect(component.newSeasonName).toBe('');
-    expect(successSpy).toHaveBeenCalledWith('Temporada creada');
-    expect(emitSpy).toHaveBeenCalled();
   });
 
   it('should end current season successfully', () => {
@@ -96,60 +80,24 @@ describe('SeasonsManagerComponent', () => {
     expect(emitSpy).toHaveBeenCalled();
   });
 
-  it('should start inline editing of a season', () => {
-    const season = { id: 5, name: 'Temporada Antigua', start_date: '2026-01-01', end_date: '2026-03-31' };
-    
-    component.startEdit(season);
-
-    expect(component.editingSeasonId).toBe(5);
-    expect(component.editForm.name).toBe('Temporada Antigua');
-    expect(component.editForm.start_date).toBe('2026-01-01');
-    expect(component.editForm.end_date).toBe('2026-03-31');
-  });
-
-  it('should save inline edit successfully', () => {
-    component.editingSeasonId = 5;
-    component.editForm = {
-      name: 'Nombre Modificado',
-      start_date: '2026-01-10',
-      end_date: '2026-04-05'
-    };
-
-    const updateSpy = vi.spyOn(reservationService, 'updateSeason').mockReturnValue(of({ message: 'Temporada actualizada' }));
+  it('should toggle bounty board successfully', () => {
+    const event = { target: { checked: true } };
+    const toggleSpy = vi.spyOn(bountyService, 'toggleBountyBoard').mockReturnValue(of({ message: 'Ajuste de recompensas guardado' }));
     const successSpy = vi.spyOn(toastService, 'success');
-    const emitSpy = vi.spyOn(component.seasonChanged, 'emit');
 
-    component.saveEdit(5);
+    component.toggleBountyBoardState(event);
 
-    expect(updateSpy).toHaveBeenCalledWith(5, {
-      name: 'Nombre Modificado',
-      start_date: '2026-01-10',
-      end_date: '2026-04-05'
-    });
-    expect(component.editingSeasonId).toBeNull();
-    expect(successSpy).toHaveBeenCalledWith('Temporada actualizada');
-    expect(emitSpy).toHaveBeenCalled();
+    expect(toggleSpy).toHaveBeenCalledWith(true);
+    expect(successSpy).toHaveBeenCalledWith('Ajuste de recompensas guardado');
   });
 
-  it('should request delete and cancel correctly', () => {
-    component.requestDelete(8);
-    expect(component.deletingSeasonId).toBe(8);
+  it('should navigate to manage seasons', () => {
+    const navigateSpy = vi.spyOn(router, 'navigate');
+    const emitSpy = vi.spyOn(component.close, 'emit');
 
-    component.cancelDelete();
-    expect(component.deletingSeasonId).toBeNull();
-  });
+    component.manageSeasons();
 
-  it('should confirm delete and call API successfully', () => {
-    component.deletingSeasonId = 8;
-    const deleteSpy = vi.spyOn(reservationService, 'deleteSeason').mockReturnValue(of({ message: 'Temporada eliminada' }));
-    const successSpy = vi.spyOn(toastService, 'success');
-    const emitSpy = vi.spyOn(component.seasonChanged, 'emit');
-
-    component.confirmDelete(8);
-
-    expect(deleteSpy).toHaveBeenCalledWith(8);
-    expect(component.deletingSeasonId).toBeNull();
-    expect(successSpy).toHaveBeenCalledWith('Temporada eliminada');
     expect(emitSpy).toHaveBeenCalled();
+    expect(navigateSpy).toHaveBeenCalledWith(['/admin/temporadas']);
   });
 });

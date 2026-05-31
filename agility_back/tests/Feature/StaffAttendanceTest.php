@@ -375,4 +375,46 @@ class StaffAttendanceTest extends TestCase
             'date' => $saturday . ' 00:00:00',
         ]);
     }
+
+    public function test_staff_can_confirm_exhibition_attendance_and_assign_points_and_workload_with_lower_defaults()
+    {
+        Sanctum::actingAs($this->staff);
+        Notification::fake();
+
+        $yesterday = Carbon::yesterday()->toDateString();
+        
+        $competition = Competition::factory()->create([
+            'club_id' => $this->club->id,
+            'fecha_evento' => $yesterday,
+            'tipo' => 'exhibicion',
+            'nombre' => 'Exhibición Test',
+            'attendance_verified' => false,
+        ]);
+
+        $competition->attendees()->attach($this->member->id, ['dias_asistencia' => json_encode([$yesterday])]);
+        $competition->attendingDogs()->attach($this->dog->id, ['user_id' => $this->member->id]);
+
+        $payload = [
+            'competition_id' => $competition->id,
+            'attended_dogs' => [
+                ['id' => $this->dog->id, 'position' => '4+']
+            ],
+            'new_attendees' => []
+        ];
+
+        $response = $this->postJson('/api/admin/attendance/confirm-competition', $payload);
+
+        $response->assertStatus(200);
+
+        // Verify workload was created for dog with lower default values
+        $this->assertDatabaseHas('dog_workloads', [
+            'dog_id' => $this->dog->id,
+            'source_type' => 'auto_competition',
+            'source_id' => $competition->id,
+            'date' => $yesterday . ' 00:00:00',
+            'duration_min' => 1, // exhibition lower default value
+            'intensity_rpe' => 3, // exhibition lower default value
+            'is_staff_verified' => 1
+        ]);
+    }
 }

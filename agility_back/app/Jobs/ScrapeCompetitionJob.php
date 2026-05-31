@@ -20,7 +20,7 @@ class ScrapeCompetitionJob implements ShouldQueue
      *
      * @var int
      */
-    public $timeout = 600; // 10 minutos
+    public $timeout = 1800; // 30 minutos
 
     protected $competitionId;
 

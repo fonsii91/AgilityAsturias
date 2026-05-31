@@ -30,6 +30,8 @@ class TimeSlotController extends Controller
             'start_time' => 'required|string',
             'end_time' => 'required|string',
             'max_bookings' => 'required|integer',
+            'color' => 'nullable|string|max:255',
+            'date' => 'nullable|date',
         ]);
 
         $timeSlot = TimeSlot::create($validated);
@@ -62,6 +64,8 @@ class TimeSlotController extends Controller
             'start_time' => 'string',
             'end_time' => 'string',
             'max_bookings' => 'integer',
+            'color' => 'nullable|string|max:255',
+            'date' => 'nullable|date',
         ]);
 
         $timeSlot->update($validated);

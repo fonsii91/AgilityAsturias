@@ -84,6 +84,7 @@
             @for (comp of displayedEvents(); track comp) {
               <tr>
                 <td [class.border-comp]="!comp.tipo || comp.tipo === 'competicion'"
+                  [class.border-exhibicion]="comp.tipo === 'exhibicion'"
                   [class.border-other]="comp.tipo === 'otros'">
                   <strong>{{ comp.nombre || comp.lugar }}</strong>
                   @if (comp.nombre && comp.lugar) {
@@ -211,6 +212,7 @@
           <label for="tipo">Tipo de Evento</label>
           <select id="tipo" formControlName="tipo" class="form-control">
             <option value="competicion">Competición Agility</option>
+            <option value="exhibicion">Exhibición</option>
             <option value="otros">Otro Evento</option>
           </select>
         </div>

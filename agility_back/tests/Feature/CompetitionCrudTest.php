@@ -193,4 +193,23 @@ class CompetitionCrudTest extends TestCase
         
         $this->assertFalse(in_array($otherDog->id, $competitionResponse['all_attending_dog_ids']));
     }
+
+    public function test_permite_a_un_administrador_crear_una_exhibicion()
+    {
+        $payload = [
+            'nombre' => 'Exhibición Fiestas Gijón',
+            'lugar' => 'Plaza Mayor',
+            'fecha_evento' => '2026-08-20',
+            'tipo' => 'exhibicion',
+        ];
+
+        $response = $this->actingAs($this->admin)->postJson('/api/competitions', $payload);
+
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('competitions', [
+            'nombre' => 'Exhibición Fiestas Gijón',
+            'tipo' => 'exhibicion',
+            'club_id' => $this->club->id,
+        ]);
+    }
 }

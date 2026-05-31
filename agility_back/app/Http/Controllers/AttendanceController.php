@@ -328,8 +328,8 @@ class AttendanceController extends Controller
                             }
                         }
 
-                        // Solo registrar cargas de trabajo automáticas para eventos deportivos (Competiciones reales)
-                        if ($competition->tipo === 'competicion') {
+                        // Solo registrar cargas de trabajo automáticas para eventos deportivos (Competiciones y Exhibiciones)
+                        if ($competition->tipo === 'competicion' || $competition->tipo === 'exhibicion') {
                             $diasAsistencia = [$competition->fecha_evento]; // Default
 
                             // First, try dog-specific days
@@ -351,6 +351,9 @@ class AttendanceController extends Controller
                                 }
                             }
 
+                            $durationMin = $competition->tipo === 'exhibicion' ? 1 : 2;
+                            $intensityRpe = $competition->tipo === 'exhibicion' ? 3 : 8;
+
                             foreach ($diasAsistencia as $dia) {
                                 $compWorkload = \App\Models\DogWorkload::firstOrCreate(
                                     [
@@ -360,8 +363,8 @@ class AttendanceController extends Controller
                                         'date' => $dia
                                     ],
                                     [
-                                        'duration_min' => 2,
-                                        'intensity_rpe' => 8,
+                                        'duration_min' => $durationMin,
+                                        'intensity_rpe' => $intensityRpe,
                                         'status' => 'pending_review'
                                     ]
                                 );

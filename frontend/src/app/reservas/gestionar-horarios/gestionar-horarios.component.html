@@ -68,7 +68,12 @@
           </h3>
           <div class="slots-list-container">
             @for (slot of group.slots; track slot.id) {
-            <div class="admin-slot-card" [class.highlighted]="editingSlot?.id === slot.id">
+            <div class="admin-slot-card" [class.highlighted]="editingSlot?.id === slot.id"
+              [class.color-blue]="slot.color === 'blue'"
+              [class.color-green]="slot.color === 'green'"
+              [class.color-amber]="slot.color === 'amber'"
+              [class.color-purple]="slot.color === 'purple'"
+              [class.color-rose]="slot.color === 'rose'">
               <div class="slot-card-left">
                 <div class="day-badge-container" [style.opacity]="isAfternoonSlot(slot.start_time) ? '0.9' : '1'">
                   <span class="day-badge" [class.afternoon-badge]="isAfternoonSlot(slot.start_time)">
@@ -82,10 +87,18 @@
                     }}</span>
                   }
                   <span class="time-range">{{ slot.start_time | slice:0:5 }} - {{ slot.end_time | slice:0:5 }}</span>
-                  <span class="capacity-badge">
-                    <span class="material-icons icon-tiny">person</span>
-                    {{ slot.max_bookings }} plazas max.
-                  </span>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                    <span class="capacity-badge">
+                      <span class="material-icons icon-tiny">person</span>
+                      {{ slot.max_bookings }} plazas max.
+                    </span>
+                    @if (slot.date) {
+                    <span class="capacity-badge" style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border-color: rgba(239, 68, 68, 0.15); font-weight: 600;">
+                      <span class="material-icons icon-tiny" style="color: #ef4444;">event</span>
+                      Única: {{ slot.date | date:'dd/MM/yyyy' }}
+                    </span>
+                    }
+                  </div>
                 </div>
               </div>
               <div class="slot-actions">
@@ -147,25 +160,50 @@
 
         <div class="form-grid">
           <div class="form-group" style="grid-column: 1 / -1;">
-            <label>Día(s) de la semana</label>
+            <label>Tipo de clase</label>
+            <div style="display: flex; gap: 16px; margin-top: 4px;">
+              <label style="display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; color: var(--text-main, #0f172a);">
+                <input type="radio" name="classType" [value]="false" [(ngModel)]="slotForm.isUnique" style="cursor: pointer;" [disabled]="!!editingSlot" />
+                Repetitiva (Semanal)
+              </label>
+              <label style="display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; color: var(--text-main, #0f172a);">
+                <input type="radio" name="classType" [value]="true" [(ngModel)]="slotForm.isUnique" style="cursor: pointer;" [disabled]="!!editingSlot" />
+                Única (Una sola vez)
+              </label>
+            </div>
             @if (editingSlot) {
-            <div class="select-wrapper">
-              <select [(ngModel)]="slotForm.days[0]" class="modern-input">
+              <span style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px; display: block;">* El tipo de clase no se puede cambiar en edición.</span>
+            }
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            @if (!slotForm.isUnique) {
+              <label>Día(s) de la semana</label>
+              @if (editingSlot) {
+              <div class="select-wrapper">
+                <select [(ngModel)]="slotForm.days[0]" class="modern-input">
+                  @for (day of availableDays; track day) {
+                  <option [value]="day">{{ day }}</option>
+                  }
+                </select>
+                <span class="material-icons select-icon">expand_more</span>
+              </div>
+              } @else {
+              <div class="days-multi-selector">
                 @for (day of availableDays; track day) {
-                <option [value]="day">{{ day }}</option>
+                <button class="day-select-btn" [class.selected]="slotForm.days.includes(day)"
+                  (click)="toggleDaySelection(day)">
+                  {{ day.substring(0, 3) }}
+                </button>
                 }
-              </select>
-              <span class="material-icons select-icon">expand_more</span>
-            </div>
-            } @else {
-            <div class="days-multi-selector">
-              @for (day of availableDays; track day) {
-              <button class="day-select-btn" [class.selected]="slotForm.days.includes(day)"
-                (click)="toggleDaySelection(day)">
-                {{ day.substring(0, 3) }}
-              </button>
+              </div>
               }
-            </div>
+            } @else {
+              <label>Fecha de la clase única</label>
+              <div class="input-with-icon">
+                <span class="material-icons input-icon">event</span>
+                <input type="date" [(ngModel)]="slotForm.date" class="modern-input with-icon" [disabled]="!!editingSlot" />
+              </div>
             }
           </div>
 
@@ -199,6 +237,25 @@
             <div class="input-with-icon">
               <span class="material-icons input-icon">group</span>
               <input type="number" [(ngModel)]="slotForm.maxBookings" class="modern-input with-icon" min="1" />
+            </div>
+          </div>
+
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Color de la clase (Sutil)</label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px;">
+              @for (c of availableColors; track c.value) {
+                <button type="button" 
+                  (click)="slotForm.color = c.value" 
+                  [style.background]="c.bg" 
+                  [style.border-color]="slotForm.color === c.value ? 'var(--primary-color, #0073CF)' : c.border"
+                  [style.box-shadow]="slotForm.color === c.value ? '0 0 0 3px rgba(0, 115, 207, 0.25)' : 'none'"
+                  style="width: 36px; height: 36px; border-radius: 50%; border-width: 2px; border-style: solid; cursor: pointer; transition: all 0.2s; position: relative; display: flex; align-items: center; justify-content: center;"
+                  [title]="c.label">
+                  @if (slotForm.color === c.value) {
+                    <span class="material-icons" style="font-size: 18px; color: var(--primary-color, #0073CF);">check</span>
+                  }
+                </button>
+              }
             </div>
           </div>
         </div>

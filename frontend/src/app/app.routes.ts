@@ -38,6 +38,18 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: 'Editar Club' }
     },
     {
+        path: 'admin/temporadas',
+        loadComponent: () => import('./components/admin/seasons-list/seasons-list.component').then(m => m.SeasonsListComponent),
+        canActivate: [managerGuard],
+        title: titleResolver, data: { pageTitle: 'Gestión de Temporadas' }
+    },
+    {
+        path: 'admin/temporadas/nueva',
+        loadComponent: () => import('./components/admin/season-form/season-form.component').then(m => m.SeasonFormComponent),
+        canActivate: [managerGuard],
+        title: titleResolver, data: { pageTitle: 'Nueva Temporada' }
+    },
+    {
         path: 'gestor/landing-page',
         loadComponent: () => import('./components/gestor/landing-page-request/landing-page-request.component').then(m => m.LandingPageRequestComponent),
         canActivate: [managerGuard],

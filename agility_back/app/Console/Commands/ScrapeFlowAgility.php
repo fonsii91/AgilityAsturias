@@ -690,7 +690,7 @@ class ScrapeFlowAgility extends Command
             'PLAYWRIGHT_BROWSERS_PATH' => env('PLAYWRIGHT_BROWSERS_PATH', '/opt/playwright-browsers'),
         ]);
 
-        $process->setTimeout(600); // 10 minutos
+        $process->setTimeout(1800); // 30 minutos
         
         $output = '';
         $process->run(function ($type, $buffer) use (&$output) {

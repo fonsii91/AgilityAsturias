@@ -19,6 +19,8 @@ class TimeSlot extends Model
         'start_time',
         'end_time',
         'max_bookings',
+        'color',
+        'date',
     ];
 
     public function reservations()

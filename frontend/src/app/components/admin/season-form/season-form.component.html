@@ -1,0 +1,94 @@
+<div class="season-form-container">
+  <!-- Header Bar -->
+  <div class="season-form-header">
+    <button class="btn-back" routerLink="/admin/temporadas" title="Volver al Historial">
+      <span class="material-icons">arrow_back</span>
+      <span>Historial</span>
+    </button>
+    <h1 class="admin-title">
+      <span class="material-icons icon-title">add_circle_outline</span>
+      Iniciar Nueva Temporada
+    </h1>
+  </div>
+
+  <!-- Main Card Form -->
+  <div class="form-card-wrapper">
+    @if (activeSeason) {
+      <div class="form-warning-banner">
+        <span class="material-icons warning-icon">warning_amber</span>
+        <div class="warning-texts">
+          <h4>¡Advertencia de Cierre de Temporada!</h4>
+          <p>Al iniciar una nueva temporada, se cerrará de forma automática e irreversible la temporada actual en curso: <strong>{{ activeSeason.name }}</strong>. Las puntuaciones de los perros en el ranking quedarán congeladas.</p>
+        </div>
+      </div>
+    }
+
+    <!-- Inputs Group -->
+    <div class="form-inputs-stack">
+      
+      <!-- Name field -->
+      <div class="input-field-group">
+        <label for="new-season-name">Nombre de la Temporada</label>
+        <div class="input-wrapper-icon">
+          <span class="material-icons input-icon">edit</span>
+          <input type="text" id="new-season-name" [(ngModel)]="newSeasonName" placeholder="Ej: Temporada de Verano 2026" class="form-control-custom">
+        </div>
+      </div>
+
+      <!-- Game Dynamics Cards -->
+      <div class="input-field-group">
+        <label>Seleccionar Dinámica de Juego</label>
+        <div class="module-selector-grid">
+          
+          <div class="module-card-premium" [class.selected]="newSeasonType === 'ranking'" (click)="newSeasonType = 'ranking'">
+            <div class="card-radio-circle"></div>
+            <span class="material-icons module-icon ranking">emoji_events</span>
+            <div class="module-info">
+              <h5>Ranking Deportivo</h5>
+              <p>Clasificación tradicional por asistencia a entrenamientos y resultados en competiciones oficiales. Ideal para incentivar la competitividad y asistencia diaria.</p>
+            </div>
+          </div>
+
+          <div class="module-card-premium" [class.selected]="newSeasonType === 'stickers'" (click)="newSeasonType = 'stickers'">
+            <div class="card-radio-circle"></div>
+            <span class="material-icons module-icon stickers">auto_stories</span>
+            <div class="module-info">
+              <h5>Álbum de Cromos</h5>
+              <p>Dinámica de colección y juego social donde los miembros desbloquean y mejoran cromos de los perros del club abriendo cofres y realizando intercambios.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Start Date field -->
+      <div class="input-field-group">
+        <label for="new-season-date">Fecha de Inicio de la Temporada</label>
+        <div class="input-wrapper-icon">
+          <span class="material-icons input-icon">today</span>
+          <input type="date" id="new-season-date" [(ngModel)]="newSeasonStartDate" class="form-control-custom">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions Footer -->
+    <div class="form-actions-footer">
+      <button class="btn-cancel-form" routerLink="/admin/temporadas">
+        Cancelar y Volver
+      </button>
+      <button class="btn-submit-season" (click)="startNewSeason()">
+        <span class="material-icons">play_arrow</span> 
+        <span>Iniciar Temporada</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Spinner overlay for async operations -->
+  @if (isSubmitting) {
+    <div class="submitting-overlay">
+      <div class="spinner-premium"></div>
+      <span>Iniciando nueva dinámica de temporada...</span>
+    </div>
+  }
+</div>

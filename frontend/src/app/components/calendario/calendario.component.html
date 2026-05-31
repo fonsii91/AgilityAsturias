@@ -24,6 +24,7 @@
             <li><strong>Pistas de colores:</strong>
               <ul>
                 <li><strong style="color: #00509e;">Azul oscuro:</strong> Designa una <i>Competición</i> oficial.</li>
+                <li><strong style="color: #8b5cf6;">Morado:</strong> Designa una <i>Exhibición</i>.</li>
                 <li><strong style="color: #2e7d32;">Verde oscuro:</strong> Designa <i>Otros tipos de evento</i> (cenas,
                   seminarios, reuniones).</li>
                 <li><strong style="color: #10b981;">Verde esmeralda:</strong> Son tus <i>Eventos Personales</i> privados (veterinario, fisio).</li>
@@ -66,6 +67,10 @@
         <span>Competición</span>
       </div>
       <div class="legend-item">
+        <span class="dot exhibicion-dot"></span>
+        <span>Exhibición</span>
+      </div>
+      <div class="legend-item">
         <span class="dot other-dot"></span>
         <span>Otros Eventos</span>
       </div>
@@ -96,7 +101,7 @@
       <div class="days-grid">
         @for (day of month.days; track day) {
         <div class="day" [class.other-month]="day.isOtherMonth" [class.weekend]="day.isWeekend"
-          [class.competition]="day.isCompetition" [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
+          [class.competition]="day.isCompetition" [class.exhibicion]="day.isExhibicion" [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
           [class.attending]="day.isAttending" [class.personal-event]="day.personalEvents.length > 0"
           (click)="handleDayClick(day)">
           @if (!day.isOtherMonth) {
@@ -139,7 +144,7 @@
         <div class="events-list">
           @for (comp of selectedCompetitions; track comp) {
           <div class="event-card-preview" (click)="selectCompetitionFromList(comp)"
-            [style.border-left]="comp.isAttending ? '4px solid #e65100' : (comp.tipo === 'otros' ? '4px solid var(--other-bg)' : '4px solid var(--accent-color)')">
+            [style.border-left]="comp.isAttending ? '4px solid #e65100' : (comp.tipo === 'otros' ? '4px solid var(--other-bg)' : (comp.tipo === 'exhibicion' ? '4px solid #8b5cf6' : '4px solid var(--accent-color)'))">
             <div class="event-preview-header">
               <span class="event-name">{{ comp.nombre || comp.lugar }}</span>
               <div style="display: flex; gap: 0.5rem;">
@@ -149,8 +154,8 @@
                   Asistiré
                 </span>
                 }
-                <span class="event-type-badge" [class.type-other]="comp.tipo === 'otros'">
-                  {{ comp.tipo === 'otros' ? 'Otro' : 'Competición' }}
+                <span class="event-type-badge" [class.type-other]="comp.tipo === 'otros'" [class.type-exhibicion]="comp.tipo === 'exhibicion'">
+                  {{ comp.tipo === 'otros' ? 'Otro' : (comp.tipo === 'exhibicion' ? 'Exhibición' : 'Competición') }}
                 </span>
               </div>
             </div>
@@ -221,8 +226,8 @@
             <div class="modal-title-row">
               <h3>{{ selectedCompetition.nombre || selectedCompetition.lugar }}</h3>
               <div class="modal-date-badge"
-                [style.background]="selectedCompetition.isAttending ? 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)' : (selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : 'var(--accent-color)')"
-                [style.color]="selectedCompetition.isAttending ? 'white' : (selectedCompetition.tipo === 'otros' ? 'white' : 'var(--primary-dark)')">
+                [style.background]="selectedCompetition.isAttending ? 'linear-gradient(135deg, #e65100 0%, #ff9800 100%)' : (selectedCompetition.tipo === 'otros' ? 'var(--other-bg)' : (selectedCompetition.tipo === 'exhibicion' ? '#8b5cf6' : 'var(--accent-color)'))"
+                [style.color]="selectedCompetition.isAttending ? 'white' : (selectedCompetition.tipo === 'otros' ? 'white' : (selectedCompetition.tipo === 'exhibicion' ? 'white' : 'var(--primary-dark)'))">
                 {{ selectedCompetition.fechaEvento | date:'d MMM' }}
                 @if (selectedCompetition.fechaFinEvento && selectedCompetition.fechaFinEvento !==
                 selectedCompetition.fechaEvento) {

@@ -11,6 +11,7 @@ import { OnboardingService } from '../../services/onboarding';
 interface CalendarDay {
     date: Date;
     isCompetition: boolean;
+    isExhibicion: boolean;
     isOtherEvent: boolean;
     isWeekend: boolean;
     isOtherMonth: boolean;
@@ -205,6 +206,7 @@ export class CalendarioComponent implements AfterViewInit {
             days.push({
                 date: new Date(year, monthIndex, -i),
                 isCompetition: false,
+                isExhibicion: false,
                 isOtherEvent: false,
                 isWeekend: false,
                 isOtherMonth: true,
@@ -236,6 +238,7 @@ export class CalendarioComponent implements AfterViewInit {
             // Determine indicators
             // Default type is 'competicion'
             const isCompetition = dailyCompetitions.some((c: any) => !c.tipo || c.tipo === 'competicion');
+            const isExhibicion = dailyCompetitions.some((c: any) => c.tipo === 'exhibicion');
             const isOtherEvent = dailyCompetitions.some((c: any) => c.tipo === 'otros');
             const isAttending = dailyCompetitions.some((c: any) => c.isAttending);
 
@@ -252,6 +255,7 @@ export class CalendarioComponent implements AfterViewInit {
             days.push({
                 date: new Date(date),
                 isCompetition: isCompetition,
+                isExhibicion: isExhibicion,
                 isOtherEvent: isOtherEvent,
                 isWeekend: isWeekend,
                 isOtherMonth: false,

@@ -50,9 +50,9 @@ class DogWorkloadController extends Controller
             );
         }
         
-        // Auto-generate pending workloads for unverified competitions
+        // Auto-generate pending workloads for unverified competitions & exhibitions
         $unverifiedCompetitions = \App\Models\Competition::where('attendance_verified', false)
-            ->where('tipo', 'competicion')
+            ->whereIn('tipo', ['competicion', 'exhibicion'])
             ->where('fecha_evento', '<=', $today)
             ->whereHas('attendingDogs', function($q) use ($dog) {
                 $q->where('dogs.id', $dog->id);
@@ -94,6 +94,9 @@ class DogWorkloadController extends Controller
 
             foreach ($diasAsistencia as $dia) {
                 if ($dia <= $today) {
+                    $durationMin = $comp->tipo === 'exhibicion' ? 1 : 2;
+                    $intensityRpe = $comp->tipo === 'exhibicion' ? 3 : 8;
+
                     \App\Models\DogWorkload::firstOrCreate(
                         [
                             'dog_id' => $dog->id,
@@ -102,8 +105,8 @@ class DogWorkloadController extends Controller
                             'date' => $dia
                         ],
                         [
-                            'duration_min' => 2,
-                            'intensity_rpe' => 8,
+                            'duration_min' => $durationMin,
+                            'intensity_rpe' => $intensityRpe,
                             'status' => 'pending_review',
                             'is_staff_verified' => false
                         ]
