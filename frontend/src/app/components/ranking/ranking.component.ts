@@ -53,7 +53,8 @@ export class RankingComponent {
     });
 
     gamificationEnabled = computed(() => {
-        return this.tenantService.tenantInfo()?.settings?.['gamification_enabled'] !== false;
+        const val = this.tenantService.tenantInfo()?.settings?.['gamification_enabled'];
+        return val !== false && val !== 'false';
     });
 
     ranking = signal<any[]>([]);

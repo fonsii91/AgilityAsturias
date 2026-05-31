@@ -76,12 +76,15 @@ export class TenantService {
 
   private async loadTenantInfo() {
     try {
-      const headers: any = {};
+      const headers: any = {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      };
       if (this.tenantSlug()) headers['X-Club-Slug'] = this.tenantSlug()!;
       const domain = this.getTenantDomain();
       if (domain) headers['X-Club-Domain'] = domain;
 
-      const response = await fetch(`${environment.apiUrl}/tenant/info`, { headers });
+      const response = await fetch(`${environment.apiUrl}/tenant/info?cb=${Date.now()}`, { headers });
       if (response.ok) {
         const info: TenantInfo = await response.json();
         this.tenantInfo.set(info);

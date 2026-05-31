@@ -34,7 +34,10 @@ export class App implements OnInit, OnDestroy {
   authService = inject(AuthService);
   tenantService = inject(TenantService);
   analyticsService = inject(AnalyticsService);
-  gamificationEnabled = computed(() => this.tenantService.tenantInfo()?.settings?.['gamification_enabled'] !== false);
+  gamificationEnabled = computed(() => {
+    const val = this.tenantService.tenantInfo()?.settings?.['gamification_enabled'];
+    return val !== false && val !== 'false';
+  });
   private toastService = inject(ToastService);
   private swUpdate = inject(SwUpdate);
   private injector = inject(Injector);

@@ -29,7 +29,10 @@ export class NavbarComponent {
     
     clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);
     clubLogo = computed(() => this.tenantService.tenantInfo()?.logo_url || this.clubConfig.logoPath);
-    gamificationEnabled = computed(() => this.tenantService.tenantInfo()?.settings?.['gamification_enabled'] !== false);
+    gamificationEnabled = computed(() => {
+        const val = this.tenantService.tenantInfo()?.settings?.['gamification_enabled'];
+        return val !== false && val !== 'false';
+    });
 
     toggleSidenav = output<void>();
 
