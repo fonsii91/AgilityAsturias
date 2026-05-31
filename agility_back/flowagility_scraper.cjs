@@ -40,16 +40,37 @@ function parseDayTextToDate(dayText, eventDateStr) {
       }
     }
 
-    if (!day || !month) {
+    if (!day) {
       return eventDateStr;
     }
 
-    if (!year) {
-      year = parseInt(eventDateStr.split('-')[0], 10) || new Date().getFullYear();
+    // If month is found, construct date normally
+    if (month) {
+      if (!year) {
+        year = parseInt(eventDateStr.split('-')[0], 10) || new Date().getFullYear();
+      }
+      const pad = (n) => n.toString().padStart(2, '0');
+      return `${year}-${pad(month)}-${pad(day)}`;
     }
 
-    const pad = (n) => n.toString().padStart(2, '0');
-    return `${year}-${pad(month)}-${pad(day)}`;
+    // If month is not found, search in 7-day sequence starting from eventDateStr
+    const startDate = new Date(eventDateStr + 'T00:00:00');
+    if (isNaN(startDate.getTime())) {
+      return eventDateStr;
+    }
+
+    for (let i = 0; i < 7; i++) {
+      const candidateDate = new Date(startDate.getTime() + i * 24 * 60 * 60 * 1000);
+      if (candidateDate.getDate() === day) {
+        const y = candidateDate.getFullYear();
+        const m = candidateDate.getMonth() + 1;
+        const d = candidateDate.getDate();
+        const pad = (n) => n.toString().padStart(2, '0');
+        return `${y}-${pad(m)}-${pad(d)}`;
+      }
+    }
+
+    return eventDateStr;
   } catch (e) {
     return eventDateStr;
   }
