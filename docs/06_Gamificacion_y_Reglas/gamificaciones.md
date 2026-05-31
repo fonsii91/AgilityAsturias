@@ -31,6 +31,9 @@ Para evitar la saturación de los usuarios y mantener el interés a largo plazo,
 
 ## 🛠️ Módulos de Gamificación e Interacción
 
+> [!IMPORTANT]
+> **Gamificación Opcional por Club:** Todo el sistema de gamificación (incluyendo el Ranking de perros, Álbum de Stickers y Cazarrecompensas) es opcional. Los gestores del club pueden activarlo o desactivarlo en cualquier momento desde la pantalla de configuración del club (`/admin/clubs/edit/:id`), guardándose en la clave `settings.gamification_enabled` del club. Al desactivarlo, se deniega el acceso a los endpoints backend (devolviendo `403 Forbidden`) y se ocultan reactivamente todos los accesos en el frontend (navbar, menú lateral y guards de ruta).
+
 ### 🔄 Dinámicas Rotativas por Temporada
 
 #### 1. Ranking de perros

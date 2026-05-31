@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.45",
+    "date": "2026-06-01",
+    "bugfixes": [
+      "¡Corregido el contador de ascensos y Campeonato de España! Hemos solucionado un problema que impedía que algunas mangas con pista limpia (registradas como excelentes a cero) se sumaran al contador de medallas y progreso para el ascenso de grado de tu perro en la bitácora canina. ¡Ahora todas tus pistas limpias sumarán correctamente!"
+    ]
+  },
+  {
     "version": "1.1.44",
     "date": "2026-05-31",
     "features": [

@@ -475,9 +475,9 @@ export class RfecTrackerComponent implements OnInit {
       const qual = t.qualification.toLowerCase().trim();
       let pts = 0;
       
-      if (qual.includes('excelente a 0') || qual.includes('excelente a cero') || qual === 'exc a 0') {
+      if (qual.includes('excelente a 0') || qual.includes('excelente a cero') || qual === 'exc a 0' || qual === 'exc_0') {
         pts = 10;
-      } else if (qual.includes('excelente')) {
+      } else if (qual.includes('excelente') || qual === 'exc') {
         pts = 5;
       }
 

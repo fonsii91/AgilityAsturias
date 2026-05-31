@@ -283,7 +283,7 @@ export class RsceTrackerComponent implements OnInit {
     const category = dog.rsce_category || 'M';
 
     if (grade === '1') {
-        const exc0 = tracks.filter(t => t.qualification === 'Excelente a 0' || t.qualification === 'EXCELENTE' || t.qualification === 'Excelente');
+        const exc0 = tracks.filter(t => this.isCleanRun(t));
         const agilityPaths = exc0.filter(t => t.manga_type.startsWith('Agility'));
         const jumpingPaths = exc0.filter(t => t.manga_type.startsWith('Jumping'));
 
@@ -315,7 +315,7 @@ export class RsceTrackerComponent implements OnInit {
         const requiredAgilitySpeed = (category === 'S' || category === 'M') ? 4.50 : 4.70;
         const requiredJumpingSpeed = (category === 'S' || category === 'M') ? 4.70 : 4.90;
 
-        const exc0 = tracks.filter(t => t.qualification === 'Excelente a 0' || t.qualification === 'EXCELENTE' || t.qualification === 'Excelente');
+        const exc0 = tracks.filter(t => this.isCleanRun(t));
         
         const validAgility = exc0.filter(t => t.manga_type.startsWith('Agility') && t.speed && t.speed >= requiredAgilitySpeed);
         const validJumping = exc0.filter(t => t.manga_type.startsWith('Jumping') && t.speed && t.speed >= requiredJumpingSpeed);
@@ -358,8 +358,7 @@ export class RsceTrackerComponent implements OnInit {
         let seasonEndDate = new Date(`${targetYear}-12-31T23:59:59`);
         
         const ceTracks = tracks.filter(t => {
-            const isExc = (t.qualification === 'Excelente a 0' || t.qualification === 'EXCELENTE' || t.qualification === 'Excelente');
-            if (!isExc || !t.date) return false;
+            if (!this.isCleanRun(t) || !t.date) return false;
             const tDate = new Date((t.date as string).substring(0, 10));
             return tDate >= seasonStartDate && tDate <= seasonEndDate;
         });

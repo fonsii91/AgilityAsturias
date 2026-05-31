@@ -5,7 +5,13 @@ status: completo
 ---
 # 🏆 Ranking de Perros
 
-El **Ranking de Perros** es la mecánica de gamificación activa por defecto en **ClubAgility**. Consiste en un sistema de puntuación acumulativo que premia tanto la constancia en los entrenamientos diarios como el desempeño deportivo en competiciones oficiales, además de permitir la asignación manual de puntos positivos o negativos por parte del staff.
+El **Ranking de Perros** es la mecánica de gamificación activa por defecto en **ClubAgility** (si la gamificación está habilitada para el club). Consiste en un sistema de puntuación acumulativo que premia tanto la constancia en los entrenamientos diarios como el desempeño deportivo en competiciones oficiales, además de permitir la asignación manual de puntos positivos o negativos por parte del staff.
+
+> [!IMPORTANT]
+> **Disponibilidad Global:** La gamificación en su totalidad es opcional y configurable por club. Los gestores del club pueden activarla o desactivarla en la configuración del club (`settings.gamification_enabled`). Cuando se desactiva:
+> - El acceso a la clasificación, temporadas y puntos extra se bloquea en backend mediante el middleware `CheckGamificationEnabled` (retornando `403`).
+> - Se ocultan los enlaces en el navbar y menú lateral del frontend, y las rutas quedan protegidas por el `gamificationGuard`.
+> - Durante la confirmación de asistencia del staff (entrenamientos o competiciones), se omite la asignación automática de puntos y el envío de notificaciones push de puntos.
 
 ---
 
