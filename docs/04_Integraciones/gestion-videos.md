@@ -31,7 +31,7 @@ sequenceDiagram
     Front->>Bitmovin: PUT [Archivo Binario] a uploadUrl (Subida directa con barra de progreso)
     Front->>Back: POST /api/videos/{id}/uploaded (Notifica fin de subida)
     Back->>Bitmovin: POST /v1/encoding/encodings (Inicia Job de Transcodificación a HLS)
-    Note over Bitmovin,S4: Transcodificación a múltiples calidades y subida de segmentos (.ts / .m3u8)
+    Note over Bitmovin,S4: Transcodificación exclusiva a 720p y subida de segmentos (.ts / .m3u8)
     Bitmovin->>S4: Escribe outputs HLS en /clubs/{club_slug}/videos/{uuid}/
     Bitmovin-->>Back: Webhook: encoding.status.finished
     Back->>Back: Actualiza DB (status = 'completed', playback_url)
@@ -68,34 +68,31 @@ sequenceDiagram
 
 ---
 
-## ⚡ 2. Reproducción y Transcodificación
+## ⚡ 2. Reproducción y Transcodificación (Optimizada a 720p)
 
-Para ofrecer una experiencia fluida y sin interrupciones en conexiones móviles a pie de pista, el vídeo original se procesa a través del pipeline de Bitmovin utilizando la tecnología **HLS (HTTP Live Streaming)**.
+Para minimizar significativamente los costes de procesamiento en Bitmovin y el espacio consumido en el bucket Mega S4, **el sistema se configura para transcodificar y almacenar única y exclusivamente en resolución 720p**. 
 
-### Configuración del Pipeline de Transcodificación
+### ¿Es posible limitar a 720p en Bitmovin?
+**Sí, es totalmente posible.** En lugar de configurar un "Ladder" con múltiples resoluciones (1080p, 720p, 480p, etc.), configuramos el pipeline de codificación para crear un único flujo de vídeo (H.264/AAC) a 720p. Al no definir configuraciones de codec para otras resoluciones ni asociarlas a muxings, Bitmovin omitirá cualquier otro procesado y solo facturará por los minutos de salida en calidad HD 720p (ahorrando aproximadamente un 60-70% frente a un pipeline multi-calidad estándar).
 
-Bitmovin procesa el vídeo de entrada y genera las siguientes variantes de calidad (Ladder de bitrate adaptativo):
-* **1080p (FHD):** ~4500 kbps (Para pantallas grandes y conexiones Wi-Fi rápidas).
-* **720p (HD):** ~2500 kbps (Calidad estándar recomendada).
-* **480p (SD):** ~800 kbps (Para reproducción móvil fluida con baja cobertura).
+### Configuración del Pipeline de Transcodificación (720p Único)
 
-Los resultados se escriben en el bucket de Mega S4 con la siguiente estructura de archivos:
+El pipeline de Bitmovin procesará el vídeo original y generará únicamente la siguiente variante de salida:
+* **720p (HD):** ~2500 kbps (Ancho: 1280, Alto: 720). Proporciona un equilibrio óptimo de nitidez para ver los recorridos de agility (obstáculos, guía, etc.) y consumo de datos.
+
+Los resultados se escriben en el bucket de Mega S4 con la siguiente estructura de archivos simplificada:
 ```bash
 /clubs/{club_slug}/videos/{uuid}/
-  ├── manifest.m3u8             # Manifiesto maestro
-  ├── video_1080p.m3u8          # Manifiesto variante 1080p
-  ├── video_720p.m3u8           # Manifiesto variante 720p
-  ├── video_480p.m3u8           # Manifiesto variante 480p
-  ├── video_1080p_0001.ts       # Segmentos de vídeo en Full HD
-  ├── video_720p_0001.ts        # Segmentos de vídeo en HD
-  └── video_480p_0001.ts        # Segmentos de vídeo en SD
+  ├── manifest.m3u8             # Manifiesto maestro HLS (referencia únicamente al stream de 720p)
+  ├── video_720p.m3u8           # Manifiesto de variante 720p
+  └── video_720p_000x.ts        # Segmentos de vídeo HLS a 720p
 ```
 
 ### Reproducción en Frontend (Angular)
 
-El componente del frontend `SmartVideoPlayerComponent` detectará la extensión `.m3u8` en la URL de reproducción y utilizará la librería **`hls.js`** o un reproductor compatible (como **`Video.js`**) para renderizar el streaming adaptativo:
-* El reproductor cambiará dinámicamente entre las calidades de 480p, 720p y 1080p dependiendo del ancho de banda disponible del usuario en tiempo real.
-* Se mantendrá el soporte nativo `<video>` HTML5 para Safari, que soporta HLS sin librerías externas.
+El componente del frontend `SmartVideoPlayerComponent` detectará la extensión `.m3u8` en la URL de reproducción y utilizará la librería **`hls.js`** o un reproductor compatible (como **`Video.js`**) para renderizar el streaming:
+* Dado que solo existe una variante de resolución en el manifiesto (`video_720p.m3u8`), el reproductor se mantendrá fijo en 720p, adaptando dinámicamente la descarga del buffer (pero sin realizar saltos de resolución) ante variaciones de la red.
+* Se mantendrá el soporte nativo `<video>` HTML5 para Safari, que reproduce el manifiesto HLS directamente.
 
 ---
 
