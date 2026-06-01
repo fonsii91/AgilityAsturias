@@ -1,0 +1,94 @@
+@if (totalTasks() > 0) {
+  <div class="upload-panel-container" [class.is-minimized]="isMinimized()">
+    
+    <!-- MINIMIZED VIEW -->
+    @if (isMinimized()) {
+      <div class="minimized-pill" (click)="toggleMinimize()">
+        <span class="material-icons pill-icon" [class.spin-animation]="activeTasksCount() > 0">
+          {{ activeTasksCount() > 0 ? 'sync' : (failedTasksCount() > 0 ? 'warning' : 'cloud_done') }}
+        </span>
+        <span class="pill-text">
+          @if (activeTasksCount() > 0) {
+            Subiendo {{ activeTasksCount() }} {{ activeTasksCount() === 1 ? 'vídeo' : 'vídeos' }} ({{ globalProgress() }}%)
+          } @else if (failedTasksCount() > 0) {
+            {{ failedTasksCount() }} {{ failedTasksCount() === 1 ? 'subida fallida' : 'subidas fallidas' }}
+          } @else {
+            {{ completedTasksCount() }} {{ completedTasksCount() === 1 ? 'vídeo subido' : 'vídeos subidos' }}
+          }
+        </span>
+        <span class="material-icons pill-expand">keyboard_arrow_up</span>
+      </div>
+    }
+
+    <!-- MAXIMIZED VIEW -->
+    @if (!isMinimized()) {
+      <div class="maximized-card">
+        <div class="card-header">
+          <div class="header-title">
+            <span class="material-icons">cloud_sync</span>
+            <h4>Subidas de Vídeo</h4>
+            <span class="tasks-badge">{{ activeTasksCount() }} / {{ totalTasks() }}</span>
+          </div>
+          <div class="header-actions">
+            @if (completedTasksCount() > 0 || failedTasksCount() > 0) {
+              <button class="action-btn clear-btn" (click)="clearCompleted($event)" title="Limpiar completados">
+                <span class="material-icons">clear_all</span>
+              </button>
+            }
+            <button class="action-btn minimize-btn" (click)="toggleMinimize()" title="Minimizar">
+              <span class="material-icons">keyboard_arrow_down</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="tasks-list">
+            @for (task of tasks(); track task.id) {
+              <div class="task-row" [class.is-failed]="task.status === 'failed'" [class.is-completed]="task.status === 'completed'">
+                <div class="task-main-content">
+                  <div class="task-info">
+                    <div class="task-meta">
+                      <span class="task-title" [title]="task.title">{{ task.title }}</span>
+                      <span class="task-status-badge" [class]="task.status">
+                        {{ getStatusText(task.status) }}
+                      </span>
+                    </div>
+                    
+                    @if (task.status === 'failed') {
+                      <span class="task-error-text">{{ task.error }}</span>
+                    } @else {
+                      <span class="task-filename">{{ task.fileName }}</span>
+                    }
+                  </div>
+
+                  <!-- Action Controls -->
+                  <div class="task-controls">
+                    @if (task.status === 'failed') {
+                      <button class="control-btn retry-btn" (click)="retryTask(task.id, $event)" title="Reintentar">
+                        <span class="material-icons">replay</span>
+                      </button>
+                    }
+                    <button class="control-btn remove-btn" (click)="removeTask(task.id, $event)" title="Eliminar/Cancelar">
+                      <span class="material-icons">close</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Progress Bar -->
+                @if (task.status !== 'completed' && task.status !== 'failed') {
+                  <div class="task-progress-container">
+                    <div class="task-progress-wrapper">
+                      <div class="task-progress-bar" [style.width.%]="task.progress"></div>
+                    </div>
+                    <span class="task-progress-value">{{ task.progress }}%</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+    
+  </div>
+}

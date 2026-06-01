@@ -22,10 +22,11 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { ClubagilityComponent } from './clubagility/clubagility.component';
 import { OnboardingWidgetComponent } from './components/shared/onboarding-widget/onboarding-widget';
 import { CookieBannerComponent } from './components/shared/cookie-banner/cookie-banner.component';
+import { UploadProgressPanelComponent } from './components/shared/upload-progress-panel/upload-progress-panel.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent, HasFeatureDirective, CookieBannerComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent, HasFeatureDirective, CookieBannerComponent, UploadProgressPanelComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

@@ -596,7 +596,8 @@ class VideoController extends Controller
 
         // Status: 3 - Finished, 4 - Resolution finished (means playable)
         if ($status == 3 || $status == 4) {
-            $playbackUrl = "https://iframe.mediadelivery.net/play/{$libraryId}/{$videoGuid}/playlist.m3u8";
+            $pullZone = config('services.bunny.pull_zone') ?: 'iframe.mediadelivery.net/play/' . $libraryId;
+            $playbackUrl = "https://{$pullZone}/{$videoGuid}/playlist.m3u8";
 
             $video->update([
                 'status' => 'completed',

@@ -64,6 +64,7 @@ return [
     'bunny' => [
         'library_id' => env('BUNNY_LIBRARY_ID'),
         'api_key' => env('BUNNY_API_KEY'),
+        'pull_zone' => env('BUNNY_STREAM_PULL_ZONE'),
     ],
 
 ];

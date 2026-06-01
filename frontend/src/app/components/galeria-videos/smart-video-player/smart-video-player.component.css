@@ -251,4 +251,52 @@
 
 .return-cover-btn .material-icons {
     font-size: 28px;
+}
+
+/* Video Error Overlay */
+.video-error-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(13, 17, 23, 0.95); /* Deep dark background */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+    text-align: center;
+    z-index: 40; /* On top of the video and standard play overlay */
+    color: #fff;
+    cursor: default;
+}
+
+.video-error-overlay .error-icon {
+    font-size: 56px;
+    color: #ff2a5f; /* Accent color / red warning */
+    margin-bottom: 12px;
+    animation: pulseError 2s infinite;
+}
+
+.video-error-overlay .error-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #f8f9fa;
+}
+
+.video-error-overlay .error-desc {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: #a0aec0;
+    margin: 0;
+    max-width: 280px;
+}
+
+@keyframes pulseError {
+    0% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.9; }
 }

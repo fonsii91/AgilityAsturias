@@ -5,6 +5,7 @@ import { DogService } from '../../../services/dog.service';
 import { CompetitionService } from '../../../services/competition.service';
 import { VideoService } from '../../../services/video.service';
 import { ToastService } from '../../../services/toast.service';
+import { UploadService } from '../../../services/upload.service';
 import { Router } from '@angular/router';
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
@@ -25,6 +26,7 @@ export class UploadVideoComponent implements OnInit {
     public compService = inject(CompetitionService);
     private videoService = inject(VideoService);
     private toastService = inject(ToastService);
+    private uploadService = inject(UploadService);
     private router = inject(Router);
     private cdr = inject(ChangeDetectorRef);
     public authService = inject(AuthService);
@@ -355,136 +357,17 @@ export class UploadVideoComponent implements OnInit {
             }
         }
 
-        this.isUploading = true;
-        this.cdr.detectChanges();
+        const videoData = {
+            dog_id: this.uploadForm.get('dog_id')?.value,
+            competition_id: this.uploadForm.get('competition_id')?.value || null,
+            date: this.uploadForm.get('date')?.value,
+            title: this.uploadForm.get('title')?.value || '',
+            manga_type: this.uploadForm.get('manga_type')?.value || 'Agility 1',
+            orientation: this.detectedOrientation
+        };
 
-        if (this.uploadDriver === 'bitmovin' || this.uploadDriver === 'bunny') {
-            this.compressionMessage = 'Preparando subida directa...';
-            this.cdr.detectChanges();
-
-            const videoData = {
-                dog_id: this.uploadForm.get('dog_id')?.value,
-                competition_id: this.uploadForm.get('competition_id')?.value || null,
-                date: this.uploadForm.get('date')?.value,
-                title: this.uploadForm.get('title')?.value || '',
-                manga_type: this.uploadForm.get('manga_type')?.value || 'Agility 1',
-                orientation: this.detectedOrientation
-            };
-
-            this.videoService.createDirectUploadVideo(videoData).subscribe({
-                next: (res: any) => {
-                    const uploadUrl = res.uploadUrl;
-                    const videoId = res.video.id;
-                    const accessKey = res.accessKey;
-
-                    if (!uploadUrl || !videoId) {
-                        this.toastService.error('Respuesta de subida inválida.');
-                        this.isUploading = false;
-                        this.cdr.detectChanges();
-                        return;
-                    }
-
-                    const headers: any = {};
-                    if (this.uploadDriver === 'bunny' && accessKey) {
-                        headers['AccessKey'] = accessKey;
-                        headers['Content-Type'] = 'application/octet-stream';
-                    }
-
-                    this.videoService.uploadToUrl(uploadUrl, finalFile, headers).subscribe({
-                        next: (event: any) => {
-                            if (event.type === HttpEventType.UploadProgress) {
-                                const percentDone = event.total ? Math.round((100 * event.loaded) / event.total) : 0;
-                                this.compressionMessage = `Subiendo vídeo... ${percentDone}%`;
-                                this.cdr.detectChanges();
-                            } else if (event.type === HttpEventType.Response) {
-                                this.compressionMessage = 'Procesando subida en el servidor...';
-                                this.cdr.detectChanges();
-                                this.videoService.notifyVideoUploaded(videoId).subscribe({
-                                    next: () => {
-                                        this.toastService.success(
-                                            this.uploadDriver === 'bunny'
-                                                ? 'Vídeo subido a Bunny.net. Procesando...'
-                                                : 'Vídeo subido con éxito. Transcodificando...'
-                                        );
-                                        this.router.navigate(['/galeria-videos']);
-                                        this.isUploading = false;
-                                        this.cdr.detectChanges();
-                                    },
-                                    error: (err) => {
-                                        console.error('Error in notifyVideoUploaded:', err);
-                                        this.toastService.error('Error al notificar fin de subida.');
-                                        this.isUploading = false;
-                                        this.cdr.detectChanges();
-                                    }
-                                });
-                            }
-                        },
-                        error: (err) => {
-                            console.error(`Error uploading directly to ${this.uploadDriver}:`, err);
-                            this.toastService.error('Error al subir el archivo directamente.');
-                            this.isUploading = false;
-                            this.cdr.detectChanges();
-                        }
-                    });
-                },
-                error: (err) => {
-                    console.error('Error creating direct upload record:', err);
-                    this.toastService.error('Error al iniciar el registro de subida.');
-                    this.isUploading = false;
-                    this.cdr.detectChanges();
-                }
-            });
-        } else {
-            // Legacy flow
-            const formData = new FormData();
-            formData.append('dog_id', this.uploadForm.get('dog_id')?.value);
-
-            const compId = this.uploadForm.get('competition_id')?.value;
-            if (compId) {
-                formData.append('competition_id', compId);
-            }
-
-            formData.append('date', this.uploadForm.get('date')?.value);
-            formData.append('title', this.uploadForm.get('title')?.value || '');
-            formData.append('manga_type', this.uploadForm.get('manga_type')?.value || 'Agility 1');
-            formData.append('orientation', this.detectedOrientation);
-            formData.append('video', finalFile);
-
-            this.videoService.uploadVideo(formData).subscribe({
-                next: () => {
-                    this.toastService.success('Vídeo subido exitosamente.');
-                    this.router.navigate(['/galeria-videos']);
-                    this.isUploading = false;
-                    this.cdr.detectChanges();
-                },
-                error: (err) => {
-                    console.error('Upload Error:', err);
-                    this.isUploading = false;
-                    this.cdr.detectChanges();
-
-                    if (err.status === 422) {
-                        let errorMsg = 'Datos inválidos. Por favor, revisa el formulario.';
-                        if (err.error?.errors) {
-                            const firstErrorKey = Object.keys(err.error.errors)[0];
-                            errorMsg = err.error.errors[firstErrorKey][0];
-                        } else if (err.error?.message) {
-                            errorMsg = err.error.message;
-                        }
-
-                        if (errorMsg === 'The video failed to upload.') {
-                            errorMsg = 'El archivo supera el límite (upload_max_filesize) configurado en el servidor PHP local. Sube un vídeo más pequeño o aumenta este límite en tu php.ini.';
-                        }
-
-                        this.toastService.error(errorMsg);
-                    } else if (err.status === 413) {
-                        this.toastService.error('El vídeo fue rechazado por el servidor porque es demasiado pesado (Máximo 500MB).');
-                    } else if (err.status === 0) {
-                        this.toastService.error('Se perdió la conexión con el servidor. El archivo podría ser demasiado pesado.');
-                    } else {
-                        this.toastService.error('Error procesando el vídeo. Inténtalo de nuevo.');
-                    }
-                }
-            });
-        }
+        this.uploadService.addToQueue(finalFile, videoData, this.uploadDriver);
+        this.toastService.info('Vídeo añadido a la cola de subidas en segundo plano. Puedes seguir usando la aplicación.');
+        this.router.navigate(['/galeria-videos']);
     }
 }

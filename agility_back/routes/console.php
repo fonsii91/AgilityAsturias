@@ -210,3 +210,29 @@ Artisan::command('mega:configure-cors', function () {
     }
 })->purpose('Configure CORS policy for Mega S4 bucket to allow video streaming playbacks');
 
+Artisan::command('video:complete-bunny {id}', function ($id) {
+    $video = \App\Models\Video::find($id);
+    if (!$video) {
+        $this->error("Video with ID {$id} not found.");
+        return 1;
+    }
+    if (!$video->bunny_video_id) {
+        $this->error("Video does not have a Bunny Video ID.");
+        return 1;
+    }
+
+    $libraryId = config('services.bunny.library_id') ?: 'local-library';
+    $pullZone = config('services.bunny.pull_zone') ?: 'iframe.mediadelivery.net/play/' . $libraryId;
+    $playbackUrl = "https://{$pullZone}/{$video->bunny_video_id}/playlist.m3u8";
+
+    $video->update([
+        'status' => 'completed',
+        'playback_url' => $playbackUrl,
+        'error_message' => null
+    ]);
+
+    $this->info("Successfully completed video {$video->id} (Bunny GUID: {$video->bunny_video_id}) locally.");
+    return 0;
+})->purpose('Simulates Bunny webhook callback to mark a video as completed in local development');
+
+

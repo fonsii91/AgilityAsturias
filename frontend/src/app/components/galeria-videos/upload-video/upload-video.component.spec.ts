@@ -5,6 +5,7 @@ import { DogService } from '../../../services/dog.service';
 import { CompetitionService } from '../../../services/competition.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
+import { UploadService } from '../../../services/upload.service';
 import { of } from 'rxjs';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
@@ -32,10 +33,16 @@ describe('UploadVideoComponent', () => {
     let compServiceMock: any;
     let authServiceMock: any;
     let toastServiceMock: any;
+    let uploadServiceMock: any;
 
     beforeEach(async () => {
         videoServiceMock = {
-            uploadVideo: vi.fn().mockReturnValue(of({ id: 1, title: 'Uploaded' }))
+            uploadVideo: vi.fn().mockReturnValue(of({ id: 1, title: 'Uploaded' })),
+            getVideoUploadConfig: vi.fn().mockReturnValue(of({ driver: 'legacy' }))
+        };
+
+        uploadServiceMock = {
+            addToQueue: vi.fn()
         };
 
         dogServiceMock = {
@@ -53,7 +60,9 @@ describe('UploadVideoComponent', () => {
 
         toastServiceMock = {
             success: vi.fn(),
-            error: vi.fn()
+            error: vi.fn(),
+            info: vi.fn(),
+            warning: vi.fn()
         };
 
         await TestBed.configureTestingModule({
@@ -65,6 +74,7 @@ describe('UploadVideoComponent', () => {
                 { provide: CompetitionService, useValue: compServiceMock },
                 { provide: AuthService, useValue: authServiceMock },
                 { provide: ToastService, useValue: toastServiceMock },
+                { provide: UploadService, useValue: uploadServiceMock },
                 { provide: ChangeDetectorRef, useValue: { detectChanges: vi.fn(), markForCheck: vi.fn() } },
                 { provide: DestroyRef, useValue: { onDestroy: vi.fn() } }
             ]
@@ -95,8 +105,8 @@ describe('UploadVideoComponent', () => {
 
         await component.onSubmit();
 
-        expect(videoServiceMock.uploadVideo).toHaveBeenCalled();
-        expect(toastServiceMock.success).toHaveBeenCalledWith('Vídeo subido exitosamente.');
+        expect(uploadServiceMock.addToQueue).toHaveBeenCalled();
+        expect(toastServiceMock.info).toHaveBeenCalledWith('Vídeo añadido a la cola de subidas en segundo plano. Puedes seguir usando la aplicación.');
     });
 
     it('should correctly filter and limit pastAndCurrentCompetitions to 10 events', () => {

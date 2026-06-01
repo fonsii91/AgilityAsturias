@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.1.46",
+    "date": "2026-06-02",
+    "features": [
+      "¡Subida de vídeos en segundo plano! Ahora no tendrás que esperar a que se completen tus subidas para seguir usando la aplicación. Los vídeos se suben de forma silenciosa en segundo plano mientras continúas navegando por el portal.",
+      "¡Panel flotante de progreso de subida! Hemos incorporado una tarjeta interactiva en la parte inferior derecha para ver en tiempo real el porcentaje y estado de cada subida, permitiéndote cancelar o reintentar envíos fácilmente."
+    ],
+    "bugfixes": [
+      "¡Reproducción de vídeos HLS de Bunny.net estabilizada! Se han corregido las restricciones de dominios de desarrollo local y se ha incorporado una pantalla de ayuda si la conexión del reproductor falla."
+    ]
+  },
+  {
     "version": "1.1.45",
     "date": "2026-06-01",
     "features": [
