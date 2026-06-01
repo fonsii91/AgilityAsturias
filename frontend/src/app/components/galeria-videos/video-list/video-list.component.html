@@ -19,6 +19,53 @@
           d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
       </svg>
     </button>
+
+    @if (storageStats && authService.currentUserSignal()) {
+    <div class="storage-popover-wrapper">
+      <button class="floating-storage-btn" [class.active]="isStorageOpen"
+        [class.safe]="storageStats.percentage < 70"
+        [class.warning]="storageStats.percentage >= 70 && storageStats.percentage < 90"
+        [class.danger]="storageStats.percentage >= 90"
+        (click)="toggleStorage()"
+        aria-label="Almacenamiento de vídeo"
+        title="Ver almacenamiento de vídeos">
+        <span class="material-icons">cloud_queue</span>
+        @if (storageStats.percentage >= 90) {
+        <span class="storage-badge-dot"></span>
+        }
+      </button>
+
+      @if (isStorageOpen) {
+      <div class="storage-dropdown-card">
+        <div class="storage-dropdown-header">
+          <span class="material-icons">cloud_queue</span>
+          <strong>Almacenamiento</strong>
+        </div>
+        <div class="storage-dropdown-body">
+          <div class="storage-dropdown-numbers">
+            <strong>{{ storageStats.formatted_used }}</strong> de <strong>{{ storageStats.formatted_limit }}</strong>
+          </div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill" [style.width.%]="storageStats.percentage" [ngClass]="{
+                 'gradient-safe': storageStats.percentage < 70,
+                 'gradient-warning': storageStats.percentage >= 70 && storageStats.percentage < 90,
+                 'gradient-danger': storageStats.percentage >= 90
+               }"></div>
+          </div>
+          <div class="storage-dropdown-footer">
+            <span>{{ 100 - storageStats.percentage | number:'1.0-0' }}% libre ({{ getRemainingStorage() }} restan)</span>
+          </div>
+          @if (storageStats.percentage >= 90) {
+          <div class="storage-dropdown-alert">
+            <span class="material-icons">warning</span>
+            Límite casi alcanzado. Borra vídeos.
+          </div>
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
   </div>
 
   <div class="action-top-bar">
@@ -114,37 +161,7 @@
     </app-instrucciones>
   </div>
 
-  @if (storageStats && authService.currentUserSignal()) {
-  <div class="storage-stats-container">
-    <div class="storage-card">
-      <div class="storage-info">
-        <div class="storage-label">
-          <span class="material-icons storage-icon">cloud_queue</span>
-          <span class="storage-title">Almacenamiento de vídeos</span>
-        </div>
-        <div class="storage-numbers">
-          <strong>{{ storageStats.formatted_used }}</strong> de <strong>{{ storageStats.formatted_limit }}</strong> usados
-        </div>
-      </div>
-      <div class="progress-bar-wrapper">
-        <div class="progress-bar-fill" [style.width.%]="storageStats.percentage" [ngClass]="{
-             'gradient-safe': storageStats.percentage < 70,
-             'gradient-warning': storageStats.percentage >= 70 && storageStats.percentage < 90,
-             'gradient-danger': storageStats.percentage >= 90
-           }"></div>
-      </div>
-      <div class="storage-footer">
-        <span>Quedan {{ getRemainingStorage() }} disponibles ({{ 100 - storageStats.percentage | number:'1.0-1' }}% libre)</span>
-        @if (storageStats.percentage >= 90) {
-          <span class="storage-alert">
-            <span class="material-icons alert-icon">warning</span>
-            Límite casi alcanzado. Borra vídeos o amplía tu plan.
-          </span>
-        }
-      </div>
-    </div>
-  </div>
-  }
+
 
   @if (isFiltersOpen) {
   <div class="advanced-filters-panel">

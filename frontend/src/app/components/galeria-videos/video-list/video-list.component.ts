@@ -46,6 +46,7 @@ export class VideoListComponent implements OnInit {
     isLoading = true;
     hasReachedEnd = false;
     isFiltersOpen = false;
+    isStorageOpen = false;
     activeTab: 'horizontal' | 'vertical' | 'all' = 'all';
     tabCounts = { vertical: 0, horizontal: 0 };
     storageStats: any = null;
@@ -70,6 +71,16 @@ export class VideoListComponent implements OnInit {
 
     toggleFilters() {
         this.isFiltersOpen = !this.isFiltersOpen;
+        if (this.isFiltersOpen) {
+            this.isStorageOpen = false;
+        }
+    }
+
+    toggleStorage() {
+        this.isStorageOpen = !this.isStorageOpen;
+        if (this.isStorageOpen) {
+            this.isFiltersOpen = false;
+        }
     }
 
 
