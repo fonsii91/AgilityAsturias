@@ -377,4 +377,93 @@ class BunnyVideoTest extends TestCase
 
         $this->assertDatabaseMissing('videos', ['id' => $video->id]);
     }
+
+    public function test_video_upload_local_to_bunny_command_uploads_and_updates_status()
+    {
+        // Setup a local video
+        \Illuminate\Support\Facades\Storage::fake('public');
+        \Illuminate\Support\Facades\Storage::disk('public')->put('clubs/testclub/videos/test.mp4', 'dummy video content');
+
+        $video = Video::create([
+            'club_id' => $this->club->id,
+            'dog_id' => $this->dog->id,
+            'user_id' => $this->user->id,
+            'date' => now()->format('Y-m-d'),
+            'title' => 'Test Video Upload Command',
+            'status' => 'local',
+            'local_path' => 'clubs/testclub/videos/test.mp4',
+            'orientation' => 'vertical',
+            'manga_type' => 'Agility 1',
+            'is_public' => true
+        ]);
+
+        Http::fake([
+            // GET collections list (empty)
+            'https://video.bunnycdn.com/library/674294/collections?search=testclub&perPage=100' => Http::response([
+                'items' => [],
+                'totalItems' => 0
+            ], 200),
+            // POST create collection
+            'https://video.bunnycdn.com/library/674294/collections' => Http::response([
+                'guid' => 'mock-collection-guid-777',
+                'name' => 'testclub'
+            ], 200),
+            // POST create video placeholder
+            'https://video.bunnycdn.com/library/674294/videos' => Http::response([
+                'guid' => 'bunny-video-guid-555',
+                'title' => 'Test Video Upload Command',
+                'status' => 0
+            ], 200),
+            // PUT upload file
+            'https://video.bunnycdn.com/library/674294/videos/bunny-video-guid-555' => Http::response(null, 200)
+        ]);
+
+        // Run the command and confirm the prompt
+        $this->artisan('video:upload-local-to-bunny', ['--limit' => 1])
+            ->expectsConfirmation('Do you want to proceed with the sequential upload of 1 videos?', 'yes')
+            ->assertExitCode(0);
+
+        // Assert database record was updated correctly
+        $video->refresh();
+        $this->assertEquals('encoding', $video->status);
+        $this->assertEquals('bunny-video-guid-555', $video->bunny_video_id);
+        $this->assertEquals('clubs/testclub/videos/test.mp4', $video->local_path); // local path preserved!
+
+        // Assert local file still exists
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists('clubs/testclub/videos/test.mp4');
+    }
+
+    public function test_video_cleanup_command_removes_local_files_for_completed_bunny_videos()
+    {
+        // Setup local storage fake and local files
+        \Illuminate\Support\Facades\Storage::fake('public');
+        \Illuminate\Support\Facades\Storage::disk('public')->put('clubs/testclub/videos/test.mp4', 'dummy video content');
+
+        // This video is completed on Bunny but still has a local file reference
+        $video = Video::create([
+            'club_id' => $this->club->id,
+            'dog_id' => $this->dog->id,
+            'user_id' => $this->user->id,
+            'date' => now()->format('Y-m-d'),
+            'title' => 'Test Completed Video',
+            'status' => 'completed',
+            'bunny_video_id' => 'bunny-video-guid-555',
+            'local_path' => 'clubs/testclub/videos/test.mp4',
+            'orientation' => 'vertical',
+            'manga_type' => 'Agility 1',
+            'is_public' => true
+        ]);
+
+        // Run the cleanup command and confirm the prompt
+        $this->artisan('video:cleanup-migrated-bunny-videos', ['--limit' => 1])
+            ->expectsConfirmation('Do you want to proceed with deleting local files for 1 videos?', 'yes')
+            ->assertExitCode(0);
+
+        // Assert database record has null local_path
+        $video->refresh();
+        $this->assertNull($video->local_path);
+
+        // Assert local file was deleted
+        \Illuminate\Support\Facades\Storage::disk('public')->assertMissing('clubs/testclub/videos/test.mp4');
+    }
 }
