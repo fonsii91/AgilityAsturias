@@ -77,6 +77,139 @@ class BunnyVideoTest extends TestCase
         ]);
     }
 
+    public function test_bunny_video_store_creates_collection_when_not_exists_and_caches_it()
+    {
+        Http::fake([
+            // GET collections list (empty)
+            'https://video.bunnycdn.com/library/674294/collections?search=testclub&perPage=100' => Http::response([
+                'items' => [],
+                'totalItems' => 0
+            ], 200),
+            // POST create collection
+            'https://video.bunnycdn.com/library/674294/collections' => Http::response([
+                'guid' => 'mock-collection-guid-777',
+                'name' => 'testclub'
+            ], 200),
+            // POST create video (with collectionId)
+            'https://video.bunnycdn.com/library/674294/videos' => Http::response([
+                'guid' => 'bunny-video-guid-123',
+                'title' => 'Mi super carrera Bunny',
+                'status' => 0
+            ], 200)
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders(['X-Club-Slug' => 'testclub'])
+            ->postJson('/api/videos', [
+                'dog_id' => $this->dog->id,
+                'date' => now()->format('Y-m-d'),
+                'title' => 'Mi super carrera Bunny',
+                'orientation' => 'vertical',
+                'manga_type' => 'Agility 1'
+            ]);
+
+        $response->assertStatus(201);
+
+        // Verify request payload sent to create video includes collectionId
+        Http::assertSent(function ($request) {
+            if ($request->url() === 'https://video.bunnycdn.com/library/674294/videos' && $request->method() === 'POST') {
+                $data = json_decode($request->body(), true);
+                return isset($data['collectionId']) && $data['collectionId'] === 'mock-collection-guid-777';
+            }
+            return true;
+        });
+
+        // Verify club settings cached the collection ID
+        $this->assertEquals('mock-collection-guid-777', $this->club->fresh()->settings['bunny_collection_id'] ?? null);
+    }
+
+    public function test_bunny_video_store_uses_existing_collection_from_bunny_and_caches_it()
+    {
+        Http::fake([
+            // GET collections list (finds collection)
+            'https://video.bunnycdn.com/library/674294/collections?search=testclub&perPage=100' => Http::response([
+                'items' => [
+                    [
+                        'guid' => 'mock-collection-guid-888',
+                        'name' => 'testclub'
+                    ]
+                ],
+                'totalItems' => 1
+            ], 200),
+            // POST create video (with collectionId)
+            'https://video.bunnycdn.com/library/674294/videos' => Http::response([
+                'guid' => 'bunny-video-guid-123',
+                'title' => 'Mi super carrera Bunny',
+                'status' => 0
+            ], 200)
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders(['X-Club-Slug' => 'testclub'])
+            ->postJson('/api/videos', [
+                'dog_id' => $this->dog->id,
+                'date' => now()->format('Y-m-d'),
+                'title' => 'Mi super carrera Bunny',
+                'orientation' => 'vertical',
+                'manga_type' => 'Agility 1'
+            ]);
+
+        $response->assertStatus(201);
+
+        // Verify request payload sent to create video includes collectionId
+        Http::assertSent(function ($request) {
+            if ($request->url() === 'https://video.bunnycdn.com/library/674294/videos' && $request->method() === 'POST') {
+                $data = json_decode($request->body(), true);
+                return isset($data['collectionId']) && $data['collectionId'] === 'mock-collection-guid-888';
+            }
+            return true;
+        });
+
+        // Verify club settings cached the collection ID
+        $this->assertEquals('mock-collection-guid-888', $this->club->fresh()->settings['bunny_collection_id'] ?? null);
+    }
+
+    public function test_bunny_video_store_uses_cached_collection_id_without_querying_bunny_api()
+    {
+        // Cache the collection ID beforehand
+        $this->club->settings = ['bunny_collection_id' => 'mock-collection-guid-999'];
+        $this->club->save();
+
+        Http::fake([
+            // POST create video (with collectionId)
+            'https://video.bunnycdn.com/library/674294/videos' => Http::response([
+                'guid' => 'bunny-video-guid-123',
+                'title' => 'Mi super carrera Bunny',
+                'status' => 0
+            ], 200)
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders(['X-Club-Slug' => 'testclub'])
+            ->postJson('/api/videos', [
+                'dog_id' => $this->dog->id,
+                'date' => now()->format('Y-m-d'),
+                'title' => 'Mi super carrera Bunny',
+                'orientation' => 'vertical',
+                'manga_type' => 'Agility 1'
+            ]);
+
+        $response->assertStatus(201);
+
+        // Verify that GET /collections was NOT called
+        Http::assertSent(function ($request) {
+            if ($request->url() === 'https://video.bunnycdn.com/library/674294/videos' && $request->method() === 'POST') {
+                $data = json_decode($request->body(), true);
+                return isset($data['collectionId']) && $data['collectionId'] === 'mock-collection-guid-999';
+            }
+            return true;
+        });
+
+        Http::assertNotSent(function ($request) {
+            return str_contains($request->url(), '/collections');
+        });
+    }
+
     public function test_bunny_video_uploaded_transitions_to_encoding()
     {
         $video = Video::create([

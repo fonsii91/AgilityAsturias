@@ -151,13 +151,83 @@ class VideoController extends Controller
             }
 
             $title = $request->title ?? ($request->date . ' Video Upload');
+
+            // Resolve and cache collection ID per club slug
+            $collectionId = null;
+            $clubId = app()->bound('active_club_id') ? app('active_club_id') : null;
+            $club = $clubId ? \App\Models\Club::find($clubId) : null;
+
+            if ($club && $club->slug) {
+                $clubSlug = $club->slug;
+                $settings = $club->settings ?? [];
+
+                if (!empty($settings['bunny_collection_id'])) {
+                    $collectionId = $settings['bunny_collection_id'];
+                } else {
+                    try {
+                        // Search for existing collection in Bunny Stream
+                        $searchResponse = \Illuminate\Support\Facades\Http::withHeaders([
+                            'AccessKey' => $apiKey,
+                            'Accept' => 'application/json',
+                        ])->get("https://video.bunnycdn.com/library/{$libraryId}/collections", [
+                            'search' => $clubSlug,
+                            'perPage' => 100,
+                        ]);
+
+                        if ($searchResponse->successful()) {
+                            $collections = $searchResponse->json()['items'] ?? [];
+                            foreach ($collections as $col) {
+                                if (isset($col['name']) && strtolower($col['name']) === strtolower($clubSlug)) {
+                                    $collectionId = $col['guid'];
+                                    break;
+                                }
+                            }
+                        }
+
+                        // If not found, create a new collection in Bunny Stream
+                        if (!$collectionId) {
+                            $createResponse = \Illuminate\Support\Facades\Http::withHeaders([
+                                'AccessKey' => $apiKey,
+                                'Content-Type' => 'application/json',
+                                'Accept' => 'application/json',
+                            ])->post("https://video.bunnycdn.com/library/{$libraryId}/collections", [
+                                'name' => $clubSlug,
+                            ]);
+
+                            if ($createResponse->successful()) {
+                                $createdCol = $createResponse->json();
+                                $collectionId = $createdCol['guid'] ?? null;
+                            } else {
+                                \Illuminate\Support\Facades\Log::warning("Failed to create Bunny Stream collection for club {$clubSlug}", [
+                                    'response' => $createResponse->body()
+                                ]);
+                            }
+                        }
+
+                        // Save the found or created collection ID in club settings
+                        if ($collectionId) {
+                            $settings['bunny_collection_id'] = $collectionId;
+                            $club->settings = $settings;
+                            $club->save();
+                        }
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("Error handling Bunny Stream collection for club {$clubSlug}: " . $e->getMessage());
+                    }
+                }
+            }
+
+            $videoPayload = [
+                'title' => $title,
+            ];
+            if ($collectionId) {
+                $videoPayload['collectionId'] = $collectionId;
+            }
+
             $response = \Illuminate\Support\Facades\Http::withHeaders([
                 'AccessKey' => $apiKey,
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
-            ])->post("https://video.bunnycdn.com/library/{$libraryId}/videos", [
-                'title' => $title,
-            ]);
+            ])->post("https://video.bunnycdn.com/library/{$libraryId}/videos", $videoPayload);
 
             if (!$response->successful()) {
                 return response()->json([
