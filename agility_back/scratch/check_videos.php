@@ -4,23 +4,28 @@ $app = require_once __DIR__ . '/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-$encodingCount = \App\Models\Video::withoutGlobalScopes()->where('status', 'encoding')->count();
-$completedWithLocalCount = \App\Models\Video::withoutGlobalScopes()
-    ->where('status', 'completed')
-    ->whereNotNull('bunny_video_id')
-    ->whereNotNull('local_path')
-    ->count();
+$statusCounts = \App\Models\Video::withoutGlobalScopes()
+    ->selectRaw('status, count(*) as count')
+    ->groupBy('status')
+    ->pluck('count', 'status');
+
 $totalCount = \App\Models\Video::withoutGlobalScopes()->count();
 
-echo "=== VIDEO MIGRATION STATUS ===\n";
-echo "Total Videos in Database: {$totalCount}\n";
-echo "Videos currently in 'encoding' (transcoding on Bunny): {$encodingCount}\n";
-echo "Videos in 'completed' with local files (ready for cleanup): {$completedWithLocalCount}\n";
+echo "=== DATABASE STATUS BREAKDOWN ===\n";
+echo "Total Videos in DB: {$totalCount}\n";
+foreach ($statusCounts as $status => $count) {
+    echo "- Status '{$status}': {$count} videos\n";
+}
 
-if ($encodingCount > 0) {
-    echo "\n--- Encoding Video Details (showing first 10) ---\n";
-    $encodingVideos = \App\Models\Video::withoutGlobalScopes()->where('status', 'encoding')->limit(10)->get();
-    foreach ($encodingVideos as $v) {
-        echo "ID: {$v->id} | Title: {$v->title} | BunnyID: {$v->bunny_video_id}\n";
+$localWithPathCount = \App\Models\Video::withoutGlobalScopes()
+    ->whereNotNull('local_path')
+    ->count();
+echo "\nVideos with 'local_path' filled in DB: {$localWithPathCount}\n";
+
+if ($localWithPathCount > 0) {
+    echo "\n--- Remaining Local Path Videos ---\n";
+    $rem = \App\Models\Video::withoutGlobalScopes()->whereNotNull('local_path')->get();
+    foreach ($rem as $r) {
+        echo "ID: {$r->id} | Status: {$r->status} | Path: {$r->local_path} | BunnyID: {$r->bunny_video_id}\n";
     }
 }
