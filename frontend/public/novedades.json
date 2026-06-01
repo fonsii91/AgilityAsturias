@@ -7,7 +7,8 @@
       "¡Panel flotante de progreso de subida! Hemos incorporado una tarjeta interactiva en la parte inferior derecha para ver en tiempo real el porcentaje y estado de cada subida, permitiéndote cancelar o reintentar envíos fácilmente."
     ],
     "bugfixes": [
-      "¡Reproducción de vídeos HLS de Bunny.net estabilizada! Se han corregido las restricciones de dominios de desarrollo local y se ha incorporado una pantalla de ayuda si la conexión del reproductor falla."
+      "¡Reproducción de vídeos HLS de Bunny.net estabilizada! Se han corregido las restricciones de dominios de desarrollo local y se ha incorporado una pantalla de ayuda si la conexión del reproductor falla.",
+      "¡Publicación automática de vídeos optimizada! Hemos perfeccionado el sistema para asegurar que, una vez que finaliza el procesamiento de tu vídeo en la nube, este se publique inmediatamente en la galería de tu club sin demoras ni esperas."
     ]
   },
   {

@@ -31,4 +31,5 @@ La funcionalidad principal consiste en transformar la biblioteca de vídeos de c
 ---
 
 ## Visión de Futuro
-Esta funcionalidad no solo mejora la técnica individual, sino que crea un **repositorio histórico de errores**. Esto permitirá, a largo plazo, entrenamientos dirigidos por IA que analicen el historial del perro y sugieran al entrenador qué aspectos específicos trabajar en la siguiente sesión presencial.
+* **Compilación Automatizada de Errores:** Al conocer los vídeos y los instantes específicos (minutos/segundos) donde se cometieron los fallos validados, el sistema podrá generar compilaciones de errores continuas. Estas compilaciones reproducirán de forma consecutiva únicamente los fragmentos de vídeo (clips cortos) donde se produce el error, permitiendo agruparlos y filtrarlos por tipo de error (por ejemplo, faltas en zonas, rehusos o derribo de barras) para facilitar un análisis visual rápido de los patrones de fallo.
+* **Entrenamientos dirigidos por IA:** A largo plazo, este repositorio histórico y estructurado de errores permitirá entrenamientos dirigidos por IA que analicen el historial del perro y sugieran al entrenador qué aspectos específicos de la técnica del binomio trabajar en la siguiente sesión presencial.

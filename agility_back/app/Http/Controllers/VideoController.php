@@ -550,6 +550,15 @@ class VideoController extends Controller
             return response()->json(['message' => 'Video not found for this encodingId'], 404);
         }
 
+        // Set tenant context based on the video's club to prevent scoping bugs in related models
+        if ($video->club_id) {
+            app()->instance('active_club_id', $video->club_id);
+            $club = \App\Models\Club::find($video->club_id);
+            if ($club) {
+                app()->instance('active_club_slug', $club->slug);
+            }
+        }
+
         $eventTypeLower = strtolower($eventType);
 
         if (str_contains($eventTypeLower, 'finished')) {
@@ -590,6 +599,15 @@ class VideoController extends Controller
 
         if (!$video) {
             return response()->json(['message' => 'Video not found for this VideoGuid'], 404);
+        }
+
+        // Set tenant context based on the video's club to prevent scoping bugs in related models
+        if ($video->club_id) {
+            app()->instance('active_club_id', $video->club_id);
+            $club = \App\Models\Club::find($video->club_id);
+            if ($club) {
+                app()->instance('active_club_slug', $club->slug);
+            }
         }
 
         $libraryId = config('services.bunny.library_id');
