@@ -564,6 +564,7 @@ class VideoController extends Controller
     {
         return response()->json([
             'driver' => config('services.videos.driver', 'legacy'),
+            'storage' => $this->getClubStorageStats(),
         ]);
     }
 

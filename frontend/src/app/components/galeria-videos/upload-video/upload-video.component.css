@@ -300,3 +300,44 @@
         flex-direction: column-reverse; /* Put cancel below submit */
     }
 }
+
+/* Banner de advertencia de almacenamiento */
+.storage-warning-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    background-color: #fffbeb;
+    border: 2px solid #fef3c7;
+    border-left: 5px solid #f59e0b;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(245, 158, 11, 0.05);
+}
+
+.storage-warning-banner .warning-icon {
+    color: #d97706;
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.warning-text-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.warning-text-container strong {
+    color: #92400e;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-align: left;
+}
+
+.warning-text-container p {
+    margin: 0;
+    color: #b45309;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    text-align: left;
+}

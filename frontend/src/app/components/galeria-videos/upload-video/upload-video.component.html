@@ -9,6 +9,17 @@
 
   <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" class="auth-form">
 
+    <!-- Alerta de almacenamiento casi lleno -->
+    @if (storageStats && storageStats.percentage >= 90) {
+    <div class="storage-warning-banner">
+      <span class="material-icons warning-icon">warning</span>
+      <div class="warning-text-container">
+        <strong>¡Almacenamiento casi lleno ({{ storageStats.percentage | number:'1.0-0' }}%)!</strong>
+        <p>Queda muy poco espacio para nuevos vídeos en el club. Te recomendamos borrar grabaciones antiguas desde la galería o solicitar al administrador subir a un plan superior con mayor capacidad.</p>
+      </div>
+    </div>
+    }
+
     <div class="form-group">
       <label>Perro *</label>
       <div class="input-wrapper">

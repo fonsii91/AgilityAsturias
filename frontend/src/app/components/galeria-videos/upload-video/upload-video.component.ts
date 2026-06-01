@@ -35,6 +35,7 @@ export class UploadVideoComponent implements OnInit {
     selectedFile: File | null = null;
     isUploading = false;
     isDragging = false;
+    storageStats: any = null;
 
     ffmpeg = new FFmpeg();
     isCompressing = false;
@@ -84,6 +85,9 @@ export class UploadVideoComponent implements OnInit {
         this.videoService.getVideoUploadConfig().subscribe({
             next: (config) => {
                 this.uploadDriver = config.driver || 'legacy';
+                if (config.storage) {
+                    this.storageStats = config.storage;
+                }
             },
             error: (err) => {
                 console.error('Error fetching upload config:', err);
