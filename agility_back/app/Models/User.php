@@ -98,6 +98,23 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Get the videos uploaded by the user.
+     */
+    public function videos()
+    {
+        return $this->hasMany(Video::class);
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($user) {
+            foreach ($user->videos as $video) {
+                $video->delete();
+            }
+        });
+    }
+
+    /**
      * Determine if the user can access the Filament panel.
      */
     public function canAccessPanel(Panel $panel): bool

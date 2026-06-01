@@ -360,10 +360,6 @@ class VideoController extends Controller
             'status_before_deletion' => $video->status,
         ]);
 
-        if ($video->local_path && Storage::disk('public')->exists($video->local_path)) {
-            Storage::disk('public')->delete($video->local_path);
-        }
-
         $video->delete();
 
         return response()->json(['message' => 'Video deleted successfully']);

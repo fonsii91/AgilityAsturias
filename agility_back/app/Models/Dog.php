@@ -250,4 +250,14 @@ class Dog extends Model
         }
         return $this->created_at ? $this->created_at->year : now()->year;
     }
+
+    protected static function booted()
+    {
+        static::deleting(function ($dog) {
+            foreach ($dog->videos as $video) {
+                $video->delete();
+            }
+        });
+    }
 }
+

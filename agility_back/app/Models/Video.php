@@ -59,6 +59,31 @@ class Video extends Model
         return $this->hasMany(VideoLike::class);
     }
 
+    protected static function booted()
+    {
+        static::deleting(function ($video) {
+            // Delete from Bunny Stream if it has a Bunny Video ID
+            if ($video->bunny_video_id) {
+                try {
+                    $libraryId = config('services.bunny.library_id');
+                    $apiKey = config('services.bunny.api_key');
+                    if ($libraryId && $apiKey) {
+                        \Illuminate\Support\Facades\Http::withHeaders([
+                            'AccessKey' => $apiKey
+                        ])->delete("https://video.bunnycdn.com/library/{$libraryId}/videos/{$video->bunny_video_id}");
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Failed to delete video {$video->bunny_video_id} from Bunny.net: " . $e->getMessage());
+                }
+            }
+
+            // Delete local storage file if exists
+            if ($video->local_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($video->local_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($video->local_path);
+            }
+        });
+    }
+
     public function getPlaybackUrlAttribute($value)
     {
         if (empty($value)) {

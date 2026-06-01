@@ -156,4 +156,92 @@ class BunnyVideoTest extends TestCase
         $this->assertEquals('failed', $video->fresh()->status);
         $this->assertEquals('Bunny.net transcoding failed', $video->fresh()->error_message);
     }
+
+    public function test_deleting_video_removes_it_from_bunny_stream()
+    {
+        Http::fake([
+            'https://video.bunnycdn.com/library/674294/videos/bunny-video-guid-123' => Http::response(null, 200)
+        ]);
+
+        $video = Video::create([
+            'club_id' => $this->club->id,
+            'dog_id' => $this->dog->id,
+            'user_id' => $this->user->id,
+            'date' => now()->format('Y-m-d'),
+            'title' => 'Video to Delete',
+            'status' => 'completed',
+            'bunny_video_id' => 'bunny-video-guid-123',
+            'orientation' => 'vertical',
+            'manga_type' => 'Agility 1',
+            'is_public' => true
+        ]);
+
+        $video->delete();
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://video.bunnycdn.com/library/674294/videos/bunny-video-guid-123' &&
+                   $request->method() === 'DELETE' &&
+                   $request->header('AccessKey')[0] === '121c41b6-144d-436a-b95930edaa4c-5fd2-42b8';
+        });
+
+        $this->assertDatabaseMissing('videos', ['id' => $video->id]);
+    }
+
+    public function test_deleting_dog_cascades_eloquent_deletes_to_its_videos()
+    {
+        Http::fake([
+            'https://video.bunnycdn.com/library/674294/videos/bunny-video-guid-123' => Http::response(null, 200)
+        ]);
+
+        $video = Video::create([
+            'club_id' => $this->club->id,
+            'dog_id' => $this->dog->id,
+            'user_id' => $this->user->id,
+            'date' => now()->format('Y-m-d'),
+            'title' => 'Video of Dog',
+            'status' => 'completed',
+            'bunny_video_id' => 'bunny-video-guid-123',
+            'orientation' => 'vertical',
+            'manga_type' => 'Agility 1',
+            'is_public' => true
+        ]);
+
+        $this->dog->delete();
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://video.bunnycdn.com/library/674294/videos/bunny-video-guid-123' &&
+                   $request->method() === 'DELETE';
+        });
+
+        $this->assertDatabaseMissing('videos', ['id' => $video->id]);
+    }
+
+    public function test_deleting_user_cascades_eloquent_deletes_to_their_videos()
+    {
+        Http::fake([
+            'https://video.bunnycdn.com/library/674294/videos/bunny-video-guid-123' => Http::response(null, 200)
+        ]);
+
+        $video = Video::create([
+            'club_id' => $this->club->id,
+            'dog_id' => $this->dog->id,
+            'user_id' => $this->user->id,
+            'date' => now()->format('Y-m-d'),
+            'title' => 'Video of User',
+            'status' => 'completed',
+            'bunny_video_id' => 'bunny-video-guid-123',
+            'orientation' => 'vertical',
+            'manga_type' => 'Agility 1',
+            'is_public' => true
+        ]);
+
+        $this->user->delete();
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://video.bunnycdn.com/library/674294/videos/bunny-video-guid-123' &&
+                   $request->method() === 'DELETE';
+        });
+
+        $this->assertDatabaseMissing('videos', ['id' => $video->id]);
+    }
 }
