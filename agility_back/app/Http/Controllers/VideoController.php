@@ -10,7 +10,8 @@ class VideoController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Video::query()->with(['dog.users:id,name', 'user', 'competition']);
+        $query = Video::query()->with(['dog.users:id,name', 'user', 'competition'])
+                     ->whereIn('status', ['local', 'on_youtube', 'completed']);
 
         // Ya no hay filtros de privacidad para miembros, todos ven todos los vídeos
         if (!auth()->check()) {
@@ -130,6 +131,132 @@ class VideoController extends Controller
 
     public function store(Request $request)
     {
+        $driver = config('services.videos.driver', 'legacy');
+
+        if ($driver === 'bunny') {
+            $request->validate([
+                'dog_id' => 'required|exists:dogs,id',
+                'competition_id' => 'nullable|exists:competitions,id',
+                'date' => 'required|date',
+                'title' => 'nullable|string|max:255',
+                'orientation' => 'nullable|in:horizontal,vertical',
+                'manga_type' => 'nullable|in:Agility,Jumping,Otra,Agility 1,Agility 2,Jumping 1,Jumping 2'
+            ]);
+
+            $libraryId = config('services.bunny.library_id');
+            $apiKey = config('services.bunny.api_key');
+
+            if (empty($libraryId) || empty($apiKey)) {
+                return response()->json(['message' => 'Bunny.net Stream API credentials not configured'], 500);
+            }
+
+            $title = $request->title ?? ($request->date . ' Video Upload');
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'AccessKey' => $apiKey,
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])->post("https://video.bunnycdn.com/library/{$libraryId}/videos", [
+                'title' => $title,
+            ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'message' => 'Error creating video in Bunny Stream',
+                    'details' => $response->json()
+                ], 500);
+            }
+
+            $bunnyData = $response->json();
+            $bunnyVideoId = $bunnyData['guid'] ?? null;
+
+            if (!$bunnyVideoId) {
+                return response()->json(['message' => 'Invalid response from Bunny.net'], 500);
+            }
+
+            $video = Video::create([
+                'dog_id' => $request->dog_id,
+                'user_id' => $request->user()->id,
+                'competition_id' => $request->competition_id,
+                'date' => $request->date,
+                'title' => $request->title,
+                'status' => 'uploading',
+                'bunny_video_id' => $bunnyVideoId,
+                'orientation' => $request->orientation ?? 'vertical',
+                'manga_type' => $request->manga_type ?? 'Agility 1',
+                'is_public' => true
+            ]);
+
+            $video->load(['dog.users', 'user', 'competition']);
+
+            $uploadUrl = "https://video.bunnycdn.com/library/{$libraryId}/videos/{$bunnyVideoId}";
+
+            return response()->json([
+                'video' => $video,
+                'uploadUrl' => $uploadUrl,
+                'accessKey' => $apiKey
+            ], 201);
+        }
+
+        if ($driver === 'bitmovin') {
+            $request->validate([
+                'dog_id' => 'required|exists:dogs,id',
+                'competition_id' => 'nullable|exists:competitions,id',
+                'date' => 'required|date',
+                'title' => 'nullable|string|max:255',
+                'orientation' => 'nullable|in:horizontal,vertical',
+                'manga_type' => 'nullable|in:Agility,Jumping,Otra,Agility 1,Agility 2,Jumping 1,Jumping 2'
+            ]);
+
+            $apiKey = config('services.bitmovin.api_key');
+            if (empty($apiKey)) {
+                return response()->json(['message' => 'Bitmovin API key not configured'], 500);
+            }
+
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'X-Api-Key' => $apiKey,
+                'Content-Type' => 'application/json',
+            ])->post('https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload', [
+                'name' => 'Upload de video ClubAgility',
+                'description' => 'Subida temporal para transcodificacion',
+            ]);
+
+            if (!$response->successful()) {
+                return response()->json([
+                    'message' => 'Error requesting upload URL from Bitmovin',
+                    'details' => $response->json()
+                ], 500);
+            }
+
+            $bitmovinData = $response->json();
+            $uploadUrl = $bitmovinData['data']['result']['uploadUrl'] ?? null;
+            $inputId = $bitmovinData['data']['result']['id'] ?? null;
+
+            if (!$uploadUrl || !$inputId) {
+                return response()->json(['message' => 'Invalid response from Bitmovin'], 500);
+            }
+
+            $video = Video::create([
+                'dog_id' => $request->dog_id,
+                'user_id' => $request->user()->id,
+                'competition_id' => $request->competition_id,
+                'date' => $request->date,
+                'title' => $request->title,
+                'status' => 'uploading',
+                'bitmovin_input_id' => $inputId,
+                'orientation' => $request->orientation ?? 'vertical',
+                'manga_type' => $request->manga_type ?? 'Agility 1',
+                'is_public' => true
+            ]);
+
+            $video->load(['dog.users', 'user', 'competition']);
+
+            return response()->json([
+                'video' => $video,
+                'uploadUrl' => $uploadUrl
+            ], 201);
+        }
+
+        // Legacy flow
         $request->validate([
             'dog_id' => 'required|exists:dogs,id',
             'competition_id' => 'nullable|exists:competitions,id',
@@ -337,7 +464,8 @@ class VideoController extends Controller
     {
         $query = Video::query()->with(['dog:id,name,photo_url', 'competition:id,nombre,fecha_evento'])
                      ->where('in_public_gallery', true)
-                     ->where('is_public', true); // Must be explicitly public
+                     ->where('is_public', true) // Must be explicitly public
+                     ->whereIn('status', ['local', 'on_youtube', 'completed']);
 
         $videos = $query->latest()->paginate(9);
         return response()->json($videos);
@@ -354,6 +482,307 @@ class VideoController extends Controller
         return response()->json([
             'message' => 'Video gallery visibility updated', 
             'in_public_gallery' => $video->in_public_gallery
+        ]);
+    }
+
+    public function uploadConfig()
+    {
+        return response()->json([
+            'driver' => config('services.videos.driver', 'legacy'),
+        ]);
+    }
+
+    public function uploaded($id)
+    {
+        $video = Video::findOrFail($id);
+
+        if ($video->status !== 'uploading') {
+            return response()->json(['message' => 'Video is not in uploading status'], 400);
+        }
+
+        $driver = config('services.videos.driver', 'legacy');
+
+        if ($driver === 'bunny') {
+            $video->update(['status' => 'encoding']);
+
+            return response()->json([
+                'message' => 'Video marked as uploaded to Bunny and processing started',
+                'video' => $video->load(['dog.users', 'user', 'competition'])
+            ]);
+        }
+
+        $video->update(['status' => 'uploaded']);
+
+        try {
+            $this->startBitmovinEncoding($video);
+        } catch (\Exception $e) {
+            $video->update([
+                'status' => 'failed',
+                'error_message' => $e->getMessage()
+            ]);
+            return response()->json([
+                'message' => 'Failed to start Bitmovin transcoding job',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+
+        return response()->json([
+            'message' => 'Video marked as uploaded and encoding started',
+            'video' => $video->load(['dog.users', 'user', 'competition'])
+        ]);
+    }
+
+    public function webhook(Request $request)
+    {
+        $payload = $request->json()->all();
+        \Illuminate\Support\Facades\Log::info('Bitmovin Webhook Received', $payload);
+
+        $encodingId = $payload['encoding']['id'] ?? ($payload['triggeredForResourceId'] ?? ($payload['encodingId'] ?? ($payload['data']['encodingId'] ?? null)));
+        $eventType = $payload['eventType'] ?? ($payload['type'] ?? '');
+
+        if (!$encodingId) {
+            return response()->json(['message' => 'No encodingId found in payload'], 400);
+        }
+
+        $video = Video::where('bitmovin_encoding_id', $encodingId)->first();
+
+        if (!$video) {
+            return response()->json(['message' => 'Video not found for this encodingId'], 404);
+        }
+
+        $eventTypeLower = strtolower($eventType);
+
+        if (str_contains($eventTypeLower, 'finished')) {
+            $video->update([
+                'status' => 'completed',
+                'error_message' => null
+            ]);
+            
+            // Notify owners here since encoding is fully complete
+            if ($video->dog) {
+                foreach ($video->dog->users as $owner) {
+                    $owner->notify(new \App\Notifications\NewVideoNotification($video));
+                }
+            }
+        } elseif (str_contains($eventTypeLower, 'failed') || str_contains($eventTypeLower, 'error')) {
+            $video->update([
+                'status' => 'failed',
+                'error_message' => $payload['message'] ?? 'Encoding failed'
+            ]);
+        }
+
+        return response()->json(['message' => 'Webhook processed successfully']);
+    }
+
+    public function bunnyWebhook(Request $request)
+    {
+        $payload = $request->json()->all();
+        \Illuminate\Support\Facades\Log::info('Bunny Webhook Received', $payload);
+
+        $videoGuid = $payload['VideoGuid'] ?? null;
+        $status = $payload['Status'] ?? null;
+
+        if (!$videoGuid) {
+            return response()->json(['message' => 'No VideoGuid found in payload'], 400);
+        }
+
+        $video = Video::where('bunny_video_id', $videoGuid)->first();
+
+        if (!$video) {
+            return response()->json(['message' => 'Video not found for this VideoGuid'], 404);
+        }
+
+        $libraryId = config('services.bunny.library_id');
+
+        // Status: 3 - Finished, 4 - Resolution finished (means playable)
+        if ($status == 3 || $status == 4) {
+            $playbackUrl = "https://iframe.mediadelivery.net/play/{$libraryId}/{$videoGuid}/playlist.m3u8";
+
+            $video->update([
+                'status' => 'completed',
+                'playback_url' => $playbackUrl,
+                'error_message' => null
+            ]);
+
+            // Notify owners here since encoding is fully complete
+            if ($video->dog) {
+                foreach ($video->dog->users as $owner) {
+                    $owner->notify(new \App\Notifications\NewVideoNotification($video));
+                }
+            }
+        } elseif ($status == 5) {
+            $video->update([
+                'status' => 'failed',
+                'error_message' => 'Bunny.net transcoding failed'
+            ]);
+        }
+
+        return response()->json(['message' => 'Webhook processed successfully']);
+    }
+
+    public function streamProxy($id, $file)
+    {
+        $video = Video::findOrFail($id);
+
+        if (!$video->getRawOriginal('playback_url')) {
+            return response()->json(['message' => 'Video not ready'], 404);
+        }
+
+        $baseUrl = dirname($video->getRawOriginal('playback_url')) . '/';
+        $fileUrl = $baseUrl . $file;
+
+        $response = \Illuminate\Support\Facades\Http::get($fileUrl);
+
+        if (!$response->successful()) {
+            return response()->json(['message' => 'Failed to retrieve stream file'], 500);
+        }
+
+        $contentType = 'application/octet-stream';
+        if (str_ends_with($file, '.m3u8')) {
+            $contentType = 'application/vnd.apple.mpegurl';
+        } elseif (str_ends_with($file, '.ts')) {
+            $contentType = 'video/MP2T';
+        }
+
+        return response($response->body(), 200)
+            ->header('Content-Type', $contentType)
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Cache-Control', 'max-age=86400');
+    }
+
+    private function callBitmovin($method, $path, $data = [])
+    {
+        $apiKey = config('services.bitmovin.api_key');
+        $url = 'https://api.bitmovin.com/v1/' . ltrim($path, '/');
+        
+        $request = \Illuminate\Support\Facades\Http::withHeaders([
+            'X-Api-Key' => $apiKey,
+            'Content-Type' => 'application/json',
+        ]);
+
+        if (strtolower($method) === 'post') {
+            $response = $request->post($url, $data);
+        } else {
+            $response = $request->get($url);
+        }
+
+        if (!$response->successful()) {
+            \Illuminate\Support\Facades\Log::error('Bitmovin API Error', [
+                'path' => $path,
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+            throw new \Exception('Bitmovin API error: ' . $response->body());
+        }
+
+        return $response->json();
+    }
+
+    private function startBitmovinEncoding($video)
+    {
+        $clubSlug = app()->bound('active_club_slug') ? app('active_club_slug') : 'default';
+        $uuid = (string) \Illuminate\Support\Str::uuid();
+        $outputPath = "clubs/{$clubSlug}/videos/{$uuid}/";
+
+        // 1. Create Encoding Job
+        $encodingResponse = $this->callBitmovin('post', 'encoding/encodings', [
+            'name' => 'ClubAgility HLS 720p - Video ' . $video->id,
+            'cloudRegion' => 'AUTO'
+        ]);
+        $encodingId = $encodingResponse['data']['result']['id'];
+
+        // 2. Create H264 Video Configuration (720p, ~2500 kbps, 30fps)
+        $codecResponse = $this->callBitmovin('post', 'encoding/configurations/video/h264', [
+            'name' => 'H264 720p (~2500kbps)',
+            'width' => 1280,
+            'height' => 720,
+            'bitrate' => 2500000,
+            'rate' => 30.0,
+            'profile' => 'MAIN'
+        ]);
+        $codecConfigId = $codecResponse['data']['result']['id'];
+
+        // 3. Create Generic S3 Output for Mega S4
+        $outputResponse = $this->callBitmovin('post', 'encoding/outputs/generic-s3', [
+            'name' => 'Mega S4 Bucket Output',
+            'bucketName' => config('services.mega_s4.bucket'),
+            'host' => config('services.mega_s4.endpoint'),
+            'accessKey' => config('services.mega_s4.key'),
+            'secretKey' => config('services.mega_s4.secret'),
+            'signatureVersion' => 'S3_V4',
+            'signingRegion' => config('services.mega_s4.region')
+        ]);
+        $outputId = $outputResponse['data']['result']['id'];
+
+        // 4. Create Stream under the Encoding
+        $streamResponse = $this->callBitmovin('post', "encoding/encodings/{$encodingId}/streams", [
+            'codecConfigId' => $codecConfigId,
+            'inputStreams' => [
+                [
+                    'inputId' => $video->bitmovin_input_id,
+                    'inputPath' => '',
+                    'selectionMode' => 'AUTO'
+                ]
+            ]
+        ]);
+        $streamId = $streamResponse['data']['result']['id'];
+
+        // 5. Create TS Muxing for the video stream
+        $muxingResponse = $this->callBitmovin('post', "encoding/encodings/{$encodingId}/muxings/ts", [
+            'name' => 'Video TS Muxing 720p',
+            'segmentLength' => 4.0,
+            'segmentNaming' => 'video_720p_%number%.ts',
+            'streams' => [
+                ['streamId' => $streamId]
+            ],
+            'outputs' => [
+                [
+                    'outputId' => $outputId,
+                    'outputPath' => $outputPath
+                ]
+            ]
+        ]);
+        $muxingId = $muxingResponse['data']['result']['id'];
+
+        // 6. Create HLS Manifest
+        $manifestResponse = $this->callBitmovin('post', 'encoding/manifests/hls', [
+            'name' => 'HLS Manifest',
+            'manifestName' => 'manifest.m3u8',
+            'outputs' => [
+                [
+                    'outputId' => $outputId,
+                    'outputPath' => $outputPath
+                ]
+            ]
+        ]);
+        $manifestId = $manifestResponse['data']['result']['id'];
+
+        // 7. Add Custom Stream Info to HLS Manifest
+        $this->callBitmovin('post', "encoding/manifests/hls/{$manifestId}/streams", [
+            'encodingId' => $encodingId,
+            'streamId' => $streamId,
+            'muxingId' => $muxingId,
+            'uri' => 'video_720p.m3u8',
+            'segmentPath' => ''
+        ]);
+
+        // 8. Start the encoding, referencing the manifest so it generates it on complete
+        $this->callBitmovin('post', "encoding/encodings/{$encodingId}/start", [
+            'hlsManifests' => [
+                ['manifestId' => $manifestId]
+            ]
+        ]);
+
+        $endpoint = config('services.mega_s4.endpoint');
+        $bucket = config('services.mega_s4.bucket');
+        $cleanEndpoint = preg_replace('/^https?:\/\//', '', $endpoint);
+        $playbackUrl = "https://{$cleanEndpoint}/v1/{$bucket}/{$outputPath}manifest.m3u8";
+
+        // Update video record
+        $video->update([
+            'status' => 'encoding',
+            'bitmovin_encoding_id' => $encodingId,
+            'playback_url' => $playbackUrl,
         ]);
     }
 }

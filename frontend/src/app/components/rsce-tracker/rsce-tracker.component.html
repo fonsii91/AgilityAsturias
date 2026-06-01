@@ -701,7 +701,7 @@
       style="position: absolute; top: -10px; right: -10px; background: white; border-radius: 50%; z-index: 1001; padding: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); cursor: pointer; border: none; display: flex;">
       <span class="material-icons" style="font-size: 24px; color: #334155;">close</span>
     </button>
-    <app-smart-video-player [youtubeId]="videoToPlay()!.youtube_id" [localPath]="videoToPlay()!.local_path"
+    <app-smart-video-player [youtubeId]="videoToPlay()!.youtube_id" [localPath]="videoToPlay()!.local_path" [playbackUrl]="videoToPlay()!.playback_url"
       [coverImageUrl]="videoToPlay()!.dog?.photo_url" [isHorizontal]="videoToPlay()!.orientation === 'horizontal'"
       style="display: block; width: 100%;">
     </app-smart-video-player>

@@ -45,4 +45,25 @@ return [
         'key' => env('GEMINI_API_KEY'),
     ],
 
+    'bitmovin' => [
+        'api_key' => env('BITMOVIN_API_KEY'),
+    ],
+
+    'mega_s4' => [
+        'bucket' => env('MEGA_S4_BUCKET'),
+        'endpoint' => env('MEGA_S4_ENDPOINT'),
+        'key' => env('MEGA_S4_KEY'),
+        'secret' => env('MEGA_S4_SECRET'),
+        'region' => env('MEGA_S4_REGION', 'us-east-1'),
+    ],
+
+    'videos' => [
+        'driver' => env('VIDEO_UPLOAD_DRIVER', 'legacy'),
+    ],
+
+    'bunny' => [
+        'library_id' => env('BUNNY_LIBRARY_ID'),
+        'api_key' => env('BUNNY_API_KEY'),
+    ],
+
 ];

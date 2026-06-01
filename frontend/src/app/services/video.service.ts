@@ -46,6 +46,31 @@ export class VideoService {
         return this.http.get<any>(this.apiUrl, { params });
     }
 
+    getVideoUploadConfig(): Observable<any> {
+        return this.http.get<any>(`${this.apiUrl}/upload-config`);
+    }
+
+    createDirectUploadVideo(videoData: any): Observable<any> {
+        return this.http.post<any>(this.apiUrl, videoData);
+    }
+
+    uploadToUrl(uploadUrl: string, file: File, headers: any = {}): Observable<any> {
+        return this.http.put(uploadUrl, file, {
+            headers: {
+                'Content-Type': file.type || 'video/mp4',
+                ...headers
+            },
+            reportProgress: true,
+            observe: 'events'
+        });
+    }
+
+    notifyVideoUploaded(id: number): Observable<any> {
+        return this.http.post<any>(`${this.apiUrl}/${id}/uploaded`, {}).pipe(
+            tap(() => this.analytics.logVideoInteraction('uploaded'))
+        );
+    }
+
     uploadVideo(formData: FormData): Observable<Video> {
         return this.http.post<Video>(this.apiUrl, formData).pipe(
             tap(() => this.analytics.logVideoInteraction('uploaded'))

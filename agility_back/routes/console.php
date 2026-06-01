@@ -105,3 +105,108 @@ Schedule::command('flowagility:scrape-calendar')->dailyAt('03:00')->timezone('Eu
 // Scrape Telegram Liga Norte channel for classification images
 Schedule::command('liganorte:scrape-telegram')->dailyAt('03:15')->timezone('Europe/Madrid');
 
+Artisan::command('videos:register-bitmovin-webhooks {url}', function ($url) {
+    $apiKey = config('services.bitmovin.api_key');
+    if (empty($apiKey)) {
+        $this->error('Bitmovin API key is not configured in .env (BITMOVIN_API_KEY).');
+        return 1;
+    }
+
+    $this->info("Registering webhooks for URL: {$url}");
+
+    // 1. Finished webhook
+    $responseFinished = \Illuminate\Support\Facades\Http::withHeaders([
+        'X-Api-Key' => $apiKey,
+        'Content-Type' => 'application/json',
+    ])->post('https://api.bitmovin.com/v1/notifications/webhooks/encoding/encodings/finished', [
+        'url' => $url,
+        'method' => 'POST'
+    ]);
+
+    if ($responseFinished->successful()) {
+        $this->info('Successfully registered finished encoding webhook!');
+    } else {
+        $this->error('Failed to register finished encoding webhook: ' . $responseFinished->body());
+    }
+
+    // 2. Error webhook
+    $responseError = \Illuminate\Support\Facades\Http::withHeaders([
+        'X-Api-Key' => $apiKey,
+        'Content-Type' => 'application/json',
+    ])->post('https://api.bitmovin.com/v1/notifications/webhooks/encoding/encodings/error', [
+        'url' => $url,
+        'method' => 'POST'
+    ]);
+
+    if ($responseError->successful()) {
+        $this->info('Successfully registered error encoding webhook!');
+    } else {
+        $this->error('Failed to register error encoding webhook: ' . $responseError->body());
+    }
+
+    return 0;
+})->purpose('Register global finished and failed encoding webhooks in Bitmovin');
+
+Artisan::command('mega:configure-cors', function () {
+    $bucket = config('services.mega_s4.bucket');
+    $endpoint = config('services.mega_s4.endpoint');
+    $key = config('services.mega_s4.key');
+    $secret = config('services.mega_s4.secret');
+    $region = config('services.mega_s4.region', 'us-east-1');
+
+    if (empty($bucket) || empty($endpoint) || empty($key) || empty($secret)) {
+        $this->error('Mega S4 configuration in .env is incomplete. Ensure BUCKET, ENDPOINT, KEY, and SECRET are set.');
+        return 1;
+    }
+
+    $cleanEndpoint = preg_replace('/^https?:\/\//', '', $endpoint);
+    if (!str_starts_with($cleanEndpoint, 's3.')) {
+        $s3Endpoint = "https://s3.{$region}.{$cleanEndpoint}";
+    } else {
+        $s3Endpoint = 'https://' . $cleanEndpoint;
+    }
+
+    $this->info("Connecting to Mega S4 S3 API at {$s3Endpoint}...");
+    $this->info("Target bucket: {$bucket}");
+
+    try {
+        $s3 = new \Aws\S3\S3Client([
+            'version' => 'latest',
+            'region'  => $region,
+            'endpoint' => $s3Endpoint,
+            'use_path_style_endpoint' => true,
+            'credentials' => [
+                'key'    => $key,
+                'secret' => $secret,
+            ],
+        ]);
+
+        $this->info("Setting CORS policy...");
+
+        $s3->putBucketCors([
+            'Bucket' => $bucket,
+            'CORSConfiguration' => [
+                'CORSRules' => [
+                    [
+                        'AllowedHeaders' => ['*'],
+                        'AllowedMethods' => ['GET', 'HEAD', 'OPTIONS'],
+                        'AllowedOrigins' => [
+                            'http://localhost:4200',
+                            'https://app.clubagility.com',
+                            'https://clubagility.com',
+                        ],
+                        'ExposeHeaders' => ['Access-Control-Allow-Origin'],
+                        'MaxAgeSeconds' => 3000,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->info("CORS policy successfully configured for bucket: {$bucket}!");
+        return 0;
+    } catch (\Exception $e) {
+        $this->error("Failed to configure CORS: " . $e->getMessage());
+        return 1;
+    }
+})->purpose('Configure CORS policy for Mega S4 bucket to allow video streaming playbacks');
+

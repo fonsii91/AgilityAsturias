@@ -195,7 +195,7 @@
     @for (video of videoList; track video) {
     <div class="video-card"
       [ngClass]="{'is-horizontal': video.orientation === 'horizontal', 'is-vertical': video.orientation !== 'horizontal', 'is-youtube': !!video.youtube_id && player.isVideoActive}">
-      <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path"
+      <app-smart-video-player #player [youtubeId]="video.youtube_id" [localPath]="video.local_path" [playbackUrl]="video.playback_url"
         [coverImageUrl]="video.dog?.photo_url" [isHorizontal]="video.orientation === 'horizontal'">
       </app-smart-video-player>
       <!-- HORIZONTAL YOUTUBE-STYLE FOOTER -->

@@ -1,8 +1,17 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { TenantService } from '../../services/tenant.service';
+import { environment } from '../../../environments/environment';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+    // Only intercept requests directed to our API/backend
+    const isApiRequest = req.url.startsWith(environment.apiUrl) || 
+                         (!req.url.startsWith('http://') && !req.url.startsWith('https://'));
+
+    if (!isApiRequest) {
+        return next(req);
+    }
+
     const token = localStorage.getItem('access_token');
     const tenantService = inject(TenantService);
     const tenantSlug = tenantService.getTenantSlug();

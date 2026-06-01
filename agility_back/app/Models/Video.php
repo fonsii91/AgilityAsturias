@@ -24,10 +24,14 @@ class Video extends Model
         'title',
         'is_public',
         'in_public_gallery',
-        'youtube_error',
         'orientation',
         'manga_type',
-        'club_id'
+        'club_id',
+        'playback_url',
+        'bitmovin_input_id',
+        'bitmovin_encoding_id',
+        'error_message',
+        'bunny_video_id'
     ];
 
     protected $casts = [
@@ -53,5 +57,18 @@ class Video extends Model
     public function likes()
     {
         return $this->hasMany(VideoLike::class);
+    }
+
+    public function getPlaybackUrlAttribute($value)
+    {
+        if (empty($value)) {
+            return $value;
+        }
+
+        if (!empty($this->bunny_video_id)) {
+            return $value;
+        }
+
+        return url("/api/videos/{$this->id}/stream/manifest.m3u8");
     }
 }

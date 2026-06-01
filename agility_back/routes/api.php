@@ -40,6 +40,9 @@ Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
 Route::get('/public-videos', [VideoController::class, 'publicIndex']);
+Route::post('/webhooks/bitmovin', [VideoController::class, 'webhook']);
+Route::post('/webhooks/bunny', [VideoController::class, 'bunnyWebhook']);
+Route::get('/videos/{id}/stream/{file}', [VideoController::class, 'streamProxy'])->where('file', '.*');
 
 Route::get('/time-slots', [TimeSlotController::class, 'index']);
 
@@ -249,8 +252,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Suggestions
         Route::post('/suggestions', [SuggestionController::class, 'store']);
 
+        Route::get('/videos/upload-config', [VideoController::class, 'uploadConfig']);
         Route::get('/videos', [VideoController::class, 'index']);
         Route::post('/videos', [VideoController::class, 'store']);
+        Route::post('/videos/{id}/uploaded', [VideoController::class, 'uploaded']);
         Route::post('/videos/{id}', [VideoController::class, 'update']);
         Route::post('/videos/{id}/delete', [VideoController::class, 'destroy']);
         Route::post('/videos/{id}/toggle-like', [VideoController::class, 'toggleLike']);

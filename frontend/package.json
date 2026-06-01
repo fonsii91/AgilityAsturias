@@ -42,6 +42,7 @@
     "@ffmpeg/util": "^0.12.2",
     "canvas-confetti": "^1.9.4",
     "echarts": "^6.0.0",
+    "hls.js": "^1.6.16",
     "ngx-echarts": "^21.0.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"

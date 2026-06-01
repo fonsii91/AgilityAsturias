@@ -1,17 +1,26 @@
-# 📹 Nueva Gestión de Vídeos (Bitmovin + Mega S4)
+# 📹 Gestión de Vídeos y Pipelines de Streaming en ClubAgility
 
-Esta documentación describe la arquitectura, el flujo de datos y la implementación técnica para la gestión de vídeos en la plataforma ClubAgility. El nuevo sistema sustituye la antigua carga en servidor y sincronización diaria con YouTube por un pipeline de transcodificación asíncrona de alto rendimiento y reproducción mediante streaming adaptativo (HLS).
+Este documento describe la arquitectura, la configuración de drivers y los flujos técnicos para el almacenamiento y reproducción de vídeos en la plataforma ClubAgility. 
 
-> [!NOTE]
-> Para consultar la documentación del sistema anterior basado en subidas locales y sincronización nocturna con YouTube, consulta la **[[antigua-gestion-videos]]**.
+Para adaptarse a diferentes presupuestos, arquitecturas de red y límites de infraestructura, ClubAgility soporta tres líneas de desarrollo (drivers) configurables desde el archivo de entorno `.env` mediante la variable `VIDEO_UPLOAD_DRIVER`.
 
 ---
 
-## 🏗️ 1. Nueva Arquitectura y Flujo de Carga
+## 🗺️ 1. Resumen de Líneas de Desarrollo
 
-El nuevo flujo de carga minimiza el uso de recursos y ancho de banda en el servidor de la plataforma realizando un **offloading** de la subida del archivo de vídeo directamente desde el cliente hacia la API de Bitmovin.
+| Driver | Estado del Ciclo de Vida | Almacenamiento Destino | Reproductor Utilizado | Observaciones |
+| :--- | :--- | :--- | :--- | :--- |
+| **`bunny`** | **Activo (Opción Principal)** | Bunny.net Stream | HLS Nativo / Hls.js (`playlist.m3u8`) | Excelente coste, transcodificación integrada y CDN global ultrarrápida. |
+| **`legacy`** | **Estable (Forma Antigua)** | Servidor Local + YouTube | Reproductor HTML5 local / Iframe YouTube | Probado y totalmente funcional. Sube al servidor local y un cron lo traslada a YouTube tras 3 días. |
+| **`bitmovin`** | **Prototipo (A medias / Auxiliar)** | Mega S4 Bucket | HLS Nativo / Hls.js con Stream Proxy | API potente para transcodificación premium pero con mayor complejidad y costes de procesamiento. |
 
-### Diagrama de Secuencia del Sistema
+---
+
+## 🚀 2. Bunny.net Stream (Opción Principal)
+
+La integración con **Bunny.net Stream** es el pipeline de vídeo recomendado por su simplicidad, rendimiento y optimización de costes. Realiza un **offloading** completo del procesamiento de vídeo y el ancho de banda del servidor.
+
+### Flujo de Trabajo (Secuencia Bunny)
 
 ```mermaid
 sequenceDiagram
@@ -19,147 +28,111 @@ sequenceDiagram
     actor Usuario as Socio / Staff
     participant Front as Frontend (Angular)
     participant Back as Backend (Laravel)
-    participant Bitmovin as Bitmovin API
-    participant S4 as Mega S4 Storage
+    participant Bunny as Bunny.net Stream API
     
     Usuario->>Front: Completa formulario de vídeo y adjunta archivo (.mp4, .mov, etc.)
     Front->>Back: POST /api/videos (Metadatos: dog_id, title, etc.)
-    Back->>Bitmovin: POST /v1/encoding/inputs/direct-file-upload
-    Bitmovin-->>Back: Devuelve uploadUrl e inputId
-    Back->>Back: Crea registro en DB (status = 'uploading', bitmovin_input_id)
-    Back-->>Front: Devuelve uploadUrl e ID del vídeo creado
-    Front->>Bitmovin: PUT [Archivo Binario] a uploadUrl (Subida directa con barra de progreso)
+    Back->>Bunny: POST /library/{libraryId}/videos (Crea objeto de vídeo vacío)
+    Bunny-->>Back: Devuelve guid (ID de vídeo)
+    Back->>Back: Crea registro en DB (status = 'uploading', bunny_video_id = guid)
+    Back-->>Front: Devuelve uploadUrl, videoId y el AccessKey de biblioteca
+    Front->>Bunny: PUT [Archivo Binario] a uploadUrl (Con cabecera AccessKey)
     Front->>Back: POST /api/videos/{id}/uploaded (Notifica fin de subida)
-    Back->>Bitmovin: POST /v1/encoding/encodings (Inicia Job de Transcodificación a HLS)
-    Note over Bitmovin,S4: Transcodificación exclusiva a 720p y subida de segmentos (.ts / .m3u8)
-    Bitmovin->>S4: Escribe outputs HLS en /clubs/{club_slug}/videos/{uuid}/
-    Bitmovin-->>Back: Webhook: encoding.status.finished
+    Back->>Back: Actualiza DB (status = 'encoding')
+    Note over Bunny: Transcodifica a múltiples resoluciones en segundo plano
+    Bunny-->>Back: Webhook: Status 3 (Finished) o 4 (Resolution finished)
     Back->>Back: Actualiza DB (status = 'completed', playback_url)
-    Usuario->>Front: Carga la videoteca pública / privada
-    Front->>Back: GET /api/videos
-    Back-->>Front: Retorna lista de vídeos con playback_url (Mega S4 Object URL)
-    Front->>Usuario: Reproduce vídeo usando Hls.js o Video.js
+    Usuario->>Front: Carga la videoteca y reproduce el vídeo
+    Front->>Usuario: Reproduce HLS usando Hls.js directo desde el CDN de Bunny
 ```
 
-### Detalle del Flujo de Carga
+### Detalle Técnico Bunny:
 
-1. **Creación del Input en Bitmovin:**
-   El backend realiza una llamada a la API de Bitmovin para solicitar un espacio temporal de subida:
-   * **Endpoint:** `POST https://api.bitmovin.com/v1/encoding/inputs/direct-file-upload`
-   * **Payload de Bitmovin:**
-     ```json
-     {
-       "name": "Upload de vídeo ClubAgility",
-       "description": "Subida temporal para transcodificación"
-     }
-     ```
-   * **Respuesta:** Devuelve un objeto que contiene el `id` (utilizado como `bitmovin_input_id`) y una `uploadUrl`.
+1. **Creación del Vídeo en el Servidor (Bunny API):**
+   * Endpoint: `POST https://video.bunnycdn.com/library/{libraryId}/videos`
+   * Cabecera: `AccessKey: {apiAccessKey}`
+   * Cuerpo: `{"title": "Nombre del Vídeo"}`
 
-2. **Subida Directa desde el Cliente:**
-   El cliente Angular realiza un HTTP `PUT` directamente a la `uploadUrl` obtenida.
-   * **Cabeceras obligatorias:** `Content-Type: video/mp4` (o el tipo MIME correspondiente).
-   * **Ventaja:** El servidor de Laravel no procesa los bytes del archivo original, evitando sobrecargas en memoria y timeouts de HTTP por subidas de hasta 500MB.
+2. **Subida Directa desde el Navegador:**
+   * Endpoint de subida: `PUT https://video.bunnycdn.com/library/{libraryId}/videos/{bunnyVideoGuid}`
+   * El frontend realiza una llamada PUT de flujo binario directo (`application/octet-stream`), enviando en las cabeceras el `AccessKey` temporal de la biblioteca. Esto evita que los archivos pasen por el backend de Laravel, ahorrando memoria y ancho de banda.
 
-3. **Inicio de Codificación (VOD Encoding):**
-   Una vez el cliente confirma la subida, el backend solicita el inicio del proceso de codificación en Bitmovin:
-   * Se define el archivo subido en el input directo como origen.
-   * Se define el almacenamiento **Mega S4** como destino (Output).
-   * Se inicia el job de transcodificación que creará el manifiesto HLS (`manifest.m3u8`) y los archivos de segmento (`.ts`).
+3. **Reproducción HLS Directa:**
+   Al finalizar, Bunny genera una lista de reproducción accesible directamente desde su red de entrega de contenido (CDN):
+   `https://iframe.mediadelivery.net/play/{libraryId}/{bunnyVideoGuid}/playlist.m3u8`
+   Este manifiesto se carga directamente en el reproductor del club (`SmartVideoPlayerComponent`) usando la biblioteca `hls.js`, manteniendo la misma interfaz web y controles unificados sin usar iframes de terceros.
 
 ---
 
-## ⚡ 2. Reproducción y Transcodificación (Optimizada a 720p)
+## 📜 3. Subida Local + YouTube (Driver Legacy)
 
-Para minimizar significativamente los costes de procesamiento en Bitmovin y el espacio consumido en el bucket Mega S4, **el sistema se configura para transcodificar y almacenar única y exclusivamente en resolución 720p**. 
+El driver `legacy` ha sido la base de la plataforma y está **comprobado que funciona al 100%**. 
 
-### ¿Es posible limitar a 720p en Bitmovin?
-**Sí, es totalmente posible.** En lugar de configurar un "Ladder" con múltiples resoluciones (1080p, 720p, 480p, etc.), configuramos el pipeline de codificación para crear un único flujo de vídeo (H.264/AAC) a 720p. Al no definir configuraciones de codec para otras resoluciones ni asociarlas a muxings, Bitmovin omitirá cualquier otro procesado y solo facturará por los minutos de salida en calidad HD 720p (ahorrando aproximadamente un 60-70% frente a un pipeline multi-calidad estándar).
+### Flujo Legacy:
+1. **Subida Directa:** El usuario sube el archivo de vídeo a través de un formulario web normal. Laravel almacena el archivo directamente en su almacenamiento local público (`storage/app/public/clubs/{slug}/videos/`).
+2. **Visualización Inmediata:** El vídeo se muestra de inmediato en la videoteca de los miembros reproduciéndose como un archivo `.mp4` estático local.
+3. **Sincronización Automática con YouTube:**
+   - Un comando de consola diario de Artisan (`php artisan videos:upload-to-youtube`) busca vídeos locales con más de 3 días de antigüedad.
+   - Sube el vídeo al canal de YouTube configurado del club, obtiene el `youtube_id` y actualiza el estado a `on_youtube`.
+   - Elimina el archivo `.mp4` del disco local de nuestro servidor para liberar espacio de forma automática.
+   - A partir de este momento, el vídeo se reproduce en la app embebiendo el iframe de YouTube.
 
-### Configuración del Pipeline de Transcodificación (720p Único)
+*Consulte la guía detallada del sistema legacy en **[[antigua-gestion-videos]]**.*
 
-El pipeline de Bitmovin procesará el vídeo original y generará únicamente la siguiente variante de salida:
-* **720p (HD):** ~2500 kbps (Ancho: 1280, Alto: 720). Proporciona un equilibrio óptimo de nitidez para ver los recorridos de agility (obstáculos, guía, etc.) y consumo de datos.
+---
 
-Los resultados se escriben en el bucket de Mega S4 con la siguiente estructura de archivos simplificada:
-```bash
-/clubs/{club_slug}/videos/{uuid}/
-  ├── manifest.m3u8             # Manifiesto maestro HLS (referencia únicamente al stream de 720p)
-  ├── video_720p.m3u8           # Manifiesto de variante 720p
-  └── video_720p_000x.ts        # Segmentos de vídeo HLS a 720p
+## 🚧 4. Bitmovin + Mega S4 (Opción Auxiliar / Prototipo a Medias)
+
+Esta línea fue diseñada para construir un pipeline HLS personalizado de calidad profesional, utilizando el transcodificador premium de **Bitmovin** y el almacenamiento compatible con S3 de **Mega S4** como destino público.
+
+> [!WARNING]
+> **Estado actual: Prototipo a medias.**
+> Se ha completado la integración del flujo de carga por PUT, el webhook de recepción y el proxy de streaming en backend. Sin embargo, está catalogado como auxiliar debido a limitaciones técnicas del almacenamiento destino (Mega S4 no soporta cabeceras S3 de asignación de ACLs `x-amz-acl`, lo que generaba errores de salida `30002 OUTPUT_ERROR` en Bitmovin) y a un coste de infraestructura más elevado.
+
+### Detalles de la Integración Bitmovin:
+* **Upload:** PUT directo del cliente a la URL de Bitmovin (`direct-file-upload`).
+* **Output:** Configurado con `generic-s3` apuntando al host `s4.mega.io`.
+* **CORS Stream Proxy:** Debido a las restricciones de CORS en el bucket de Mega, el backend expone una ruta intermedia `/api/videos/{id}/stream/manifest.m3u8` que hace de proxy de red para descargar los trozos `.ts` de Mega S4 y servirlos al frontend inyectando cabeceras CORS dinámicas.
+
+---
+
+## ⚙️ 5. Variables de Entorno del Sistema
+
+Para alternar entre los distintos sistemas, configura la variable `VIDEO_UPLOAD_DRIVER` en tu archivo `.env` del backend junto a las credenciales correspondientes:
+
+```env
+# Driver Activo: 'bunny', 'legacy', o 'bitmovin'
+VIDEO_UPLOAD_DRIVER=bunny
+
+# 1. Configuración para Bunny.net Stream (Driver: bunny)
+BUNNY_LIBRARY_ID=tu_library_id
+BUNNY_API_KEY=tu_stream_api_key
+
+# 2. Configuración para Bitmovin & Mega S4 (Driver: bitmovin)
+BITMOVIN_API_KEY=tu_bitmovin_api_key
+MEGA_S4_BUCKET=clubagility
+MEGA_S4_ENDPOINT=s4.mega.io
+MEGA_S4_KEY=tu_access_key
+MEGA_S4_SECRET=tu_secret_key
+MEGA_S4_REGION=eu-central-1
+
+# 3. Configuración para YouTube (Driver: legacy)
+YOUTUBE_CLIENT_ID=tu_client_id
+YOUTUBE_CLIENT_SECRET=tu_client_secret
+YOUTUBE_REFRESH_TOKEN=tu_refresh_token
 ```
 
-### Reproducción en Frontend (Angular)
-
-El componente del frontend `SmartVideoPlayerComponent` detectará la extensión `.m3u8` en la URL de reproducción y utilizará la librería **`hls.js`** o un reproductor compatible (como **`Video.js`**) para renderizar el streaming:
-* Dado que solo existe una variante de resolución en el manifiesto (`video_720p.m3u8`), el reproductor se mantendrá fijo en 720p, adaptando dinámicamente la descarga del buffer (pero sin realizar saltos de resolución) ante variaciones de la red.
-* Se mantendrá el soporte nativo `<video>` HTML5 para Safari, que reproduce el manifiesto HLS directamente.
-
 ---
 
-## 🔒 3. Seguridad, Aislamiento y Privacidad
+## 🔔 6. Webhooks de Sincronización (Expose / Producción)
 
-Al utilizar streaming adaptativo HLS, **las Presigned URLs temporales tradicionales de S3 no son viables** de manera directa, ya que solo autorizan el archivo de manifiesto principal y bloquean las peticiones relativas a los segmentos `.ts`.
+Para que los drivers asíncronos (`bunny` o `bitmovin`) funcionen, los respectivos paneles externos deben notificar a tu aplicación cuando la codificación finaliza.
 
-Para solventar esta limitación con seguridad, se implementa una arquitectura híbrida de **Object URLs con Ofuscación y Aislamiento**.
+### URLs de Webhooks
+* **Bunny.net:** `https://tu-dominio.com/api/webhooks/bunny` (O su equivalente de Expose en local).
+* **Bitmovin:** `https://tu-dominio.com/api/webhooks/bitmovin`.
 
-### Estrategia de Acceso: Object URLs Públicas + Ofuscación
-
-1. **Habilitación de Object URLs en Mega S4:**
-   Se activa la característica de **Object URLs** en el bucket de Mega S4 para la ruta de los vídeos transcodificados. Esto permite que cualquier recurso dentro de esa ruta sea accesible mediante una URL HTTP directa sin firmas criptográficas temporales.
-
-2. **Seguridad mediante Ofuscación (UUIDv4):**
-   Para garantizar la privacidad y que ningún usuario pueda listar o adivinar vídeos ajenos, las rutas de almacenamiento de los vídeos transcodificados se estructuran utilizando identificadores aleatorios UUIDv4:
-   `https://s4.mega.io/v1/agility-videos/clubs/{club_slug}/videos/9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d/manifest.m3u8`
-   * Dado el espacio de nombres de UUIDv4, es criptográficamente imposible adivinar la ruta de un vídeo sin que el backend provea explícitamente su URL. Funciona de manera idéntica al flujo de vídeos "no listados" u "ocultos" de YouTube.
-
-3. **Restricción de Origen (Referer Header en S4 Policy):**
-   Como capa opcional de protección contra el "hotlinking" (uso de los enlaces en otras webs), se puede añadir una política al bucket de Mega S4 para que solo responda peticiones si la cabecera `Referer` coincide con los subdominios de la aplicación:
-   ```json
-   {
-     "Version": "2012-10-17",
-     "Statement": [
-       {
-         "Sid": "AllowRefererRestrictions",
-         "Effect": "Allow",
-         "Principal": "*",
-         "Action": "s3:GetObject",
-         "Resource": "arn:aws:s3:::agility-videos/*",
-         "Condition": {
-           "StringLike": {
-             "aws:Referer": [
-               "https://*.clubagility.com/*",
-               "http://localhost:4200/*"
-             ]
-           }
-         }
-       }
-     ]
-   }
-   ```
-
-4. **Aislamiento Multi-Tenant (A nivel de Base de Datos y Backend):**
-   * El backend de Laravel filtra estrictamente qué registros de la tabla `videos` puede ver cada usuario mediante el scope global de Tenant (`HasClub`).
-   * Aunque una Object URL sea teóricamente accesible de forma directa si se conoce, un usuario malintencionado no tiene forma de obtener los enlaces de los vídeos de otros clubes, ya que el API solo expondrá las URLs de su correspondiente tenant.
-
----
-
-## 💾 4. Modelo de Datos y Estados en el Backend
-
-La tabla de base de datos `videos` gestionará el estado de las tareas en segundo plano mediante las siguientes columnas:
-
-| Campo | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `bitmovin_input_id` | `VARCHAR` | Identificador único del input temporal creado en Bitmovin. |
-| `bitmovin_encoding_id` | `VARCHAR` | Identificador único de la tarea de transcodificación asignada. |
-| `status` | `VARCHAR` | Estado del ciclo de vida: `uploading`, `uploaded`, `encoding`, `completed`, `failed`. |
-| `s3_path` | `VARCHAR` | Ruta física en el bucket (e.g. `clubs/{club_slug}/videos/{uuid}/`). |
-| `playback_url` | `TEXT` | URL pública directa del manifiesto HLS (`manifest.m3u8`) generada por Mega S4. |
-| `error_message` | `TEXT` | Detalles técnicos en caso de que la codificación falle. |
-
-### Ciclo de Estados de un Vídeo
-
-* **`uploading`:** El backend ha registrado el vídeo y generado la URL de carga para el frontend. El usuario está subiendo los bytes del vídeo.
-* **`uploaded`:** El frontend notifica que la subida directa a Bitmovin ha finalizado con éxito. El vídeo está listo para transcodificar.
-* **`encoding`:** El backend ha lanzado el Job de codificación en Bitmovin. Los servidores de Bitmovin están procesando el vídeo.
-* **`completed`:** Bitmovin ha finalizado con éxito la transcodificación y guardado los segmentos en Mega S4. La `playback_url` está disponible para su reproducción.
-* **`failed`:** Ocurrió un error durante la codificación o la subida. Se registra el motivo en `error_message` para su consulta por el administrador.
+### Códigos de Transcodificación Bunny
+El endpoint del webhook de Bunny escucha el objeto `Status` retornado por Bunny Stream:
+* **`Status: 3` (Finished) / `Status: 4` (Resolution finished):** Indica procesado correcto. El vídeo se marca como `completed` en base de datos.
+* **`Status: 5` (Failed):** Indica fallo. El vídeo se marca como `failed`.

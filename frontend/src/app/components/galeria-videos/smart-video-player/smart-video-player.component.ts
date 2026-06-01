@@ -1,7 +1,7 @@
-import { Component, Input, OnInit, inject, ElementRef, input, viewChild } from '@angular/core';
-
+import { Component, Input, OnInit, OnDestroy, inject, ElementRef, input, viewChild, effect } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { environment } from '../../../../environments/environment';
+import Hls from 'hls.js';
 
 @Component({
   selector: 'app-smart-video-player',
@@ -32,7 +32,7 @@ import { environment } from '../../../../environments/environment';
       }
     
       @if (!youtubeUrl && localUrl) {
-        <video #localVideo [src]="localUrl" class="video-local" playsinline webkit-playsinline loop preload="metadata" [muted]="isMuted"
+        <video #localVideo [src]="isNativeHls ? localUrl : null" class="video-local" playsinline webkit-playsinline loop preload="metadata" [muted]="isMuted"
         (playing)="isPlaying = true" (pause)="isPlaying = false" (timeupdate)="onTimeUpdate($event)" (click)="togglePlay()"></video>
         @if (!isPlaying && isVideoActive) {
           <div class="custom-play-overlay" (click)="togglePlay()">
@@ -70,10 +70,11 @@ import { environment } from '../../../../environments/environment';
     </div>
     `
 })
-export class SmartVideoPlayerComponent implements OnInit {
+export class SmartVideoPlayerComponent implements OnInit, OnDestroy {
   @Input() coverImageUrl?: string;
   readonly youtubeId = input<string>();
   readonly localPath = input<string>();
+  readonly playbackUrl = input<string | null | undefined>();
   readonly localVideoRef = viewChild<ElementRef<HTMLVideoElement>>('localVideo');
   readonly youtubeIframeLocal = viewChild<ElementRef<HTMLIFrameElement>>('youtubeIframe');
 
@@ -86,6 +87,8 @@ export class SmartVideoPlayerComponent implements OnInit {
   hasStarted = false; // Tracks if the video was ever started
   progress = 0;
   isMuted = false;
+  isNativeHls = false;
+  hls?: Hls;
 
   @Input() isHorizontal = false;
 
@@ -93,14 +96,50 @@ export class SmartVideoPlayerComponent implements OnInit {
     return this.hasStarted;
   }
 
+  constructor() {
+    effect(() => {
+      const videoElRef = this.localVideoRef();
+      const playbackUrl = this.playbackUrl();
+      
+      if (videoElRef && playbackUrl && !this.isNativeHls) {
+        const video = videoElRef.nativeElement;
+        
+        if (this.hls) {
+          this.hls.destroy();
+        }
+        
+        this.hls = new Hls();
+        this.hls.loadSource(playbackUrl);
+        this.hls.attachMedia(video);
+        
+        if (this.isPlaying) {
+          video.play().catch(e => console.error('HLS play error:', e));
+        }
+      }
+    });
+  }
+
   ngOnInit() {
     const youtubeId = this.youtubeId();
     const localPath = this.localPath();
+    const playbackUrl = this.playbackUrl();
+
     if (youtubeId) {
       this.youtubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${youtubeId}?playsinline=1&rel=0&modestbranding=1&enablejsapi=1`);
       this.autoplayYoutubeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${youtubeId}?playsinline=1&rel=0&modestbranding=1&autoplay=1&enablejsapi=1`);
+    } else if (playbackUrl) {
+      this.localUrl = playbackUrl;
+      const tempVideo = document.createElement('video');
+      this.isNativeHls = !!tempVideo.canPlayType && tempVideo.canPlayType('application/vnd.apple.mpegurl') !== '';
     } else if (localPath) {
       this.localUrl = `${environment.apiUrl.replace('/api', '')}/storage/${localPath}`;
+      this.isNativeHls = true;
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.hls) {
+      this.hls.destroy();
     }
   }
 
@@ -110,7 +149,6 @@ export class SmartVideoPlayerComponent implements OnInit {
     this.isPlaying = true;
 
     if (this.youtubeId()) {
-      // If it was paused, resume it via YouTube API
       if (!isFirstTime) {
          this.youtubeIframeLocal()?.nativeElement.contentWindow?.postMessage(
            '{"event":"command","func":"playVideo","args":""}', '*'
