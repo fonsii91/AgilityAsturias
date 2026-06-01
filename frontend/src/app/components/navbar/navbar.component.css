@@ -578,6 +578,11 @@ nav.desktop-nav .dropdown-menu-list li a.active-route .material-icons {
     color: #8e24aa;
 }
 
+.notif-icon-container.lead-icon {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
 .notif-content {
     flex: 1;
     display: flex;

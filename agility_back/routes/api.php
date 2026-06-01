@@ -140,6 +140,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/admin/clubs/{club}/handoff', [AuthController::class, 'createClubHandoff']);
         Route::delete('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'destroy']);
 
+        // Gestión de Solicitudes de Alta (Leads)
+        Route::get('/admin/club-leads', [\App\Http\Controllers\ClubLeadController::class, 'index']);
+        Route::put('/admin/club-leads/{id}/status', [\App\Http\Controllers\ClubLeadController::class, 'updateStatus']);
+        Route::delete('/admin/club-leads/{id}', [\App\Http\Controllers\ClubLeadController::class, 'destroy']);
+
         // Suggestions (Admin)
         Route::get('/admin/suggestions', [SuggestionController::class, 'index']);
         Route::post('/admin/suggestions/{id}/resolve', [SuggestionController::class, 'resolve']);

@@ -19,6 +19,18 @@ export interface ClubHandoff {
     expires_in: number;
 }
 
+export interface ClubLead {
+    id: number;
+    name: string;
+    slug: string;
+    email: string;
+    phone: string;
+    plan_selected: string;
+    status: 'pending' | 'approved' | 'rejected';
+    created_at: string;
+    updated_at: string;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -58,5 +70,17 @@ export class ClubAdminService {
 
     createClubHandoff(id: number): Observable<ClubHandoff> {
         return this.http.post<ClubHandoff>(`${this.apiUrl}/admin/clubs/${id}/handoff`, {});
+    }
+
+    getLeads(): Observable<ClubLead[]> {
+        return this.http.get<ClubLead[]>(`${this.apiUrl}/admin/club-leads`);
+    }
+
+    deleteLead(id: number): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/admin/club-leads/${id}`);
+    }
+
+    updateLeadStatus(id: number, status: string): Observable<ClubLead> {
+        return this.http.put<ClubLead>(`${this.apiUrl}/admin/club-leads/${id}/status`, { status });
     }
 }

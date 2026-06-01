@@ -10,6 +10,11 @@ use App\Mail\NewClubLeadAdmin;
 
 class ClubLeadController extends Controller
 {
+    public function index()
+    {
+        return response()->json(ClubLead::orderBy('created_at', 'desc')->get());
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -29,9 +34,37 @@ class ClubLeadController extends Controller
             \Log::error('Error sending club lead emails: ' . $e->getMessage());
         }
 
+        // Send database notification to admin users
+        try {
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewClubLeadNotification($lead));
+        } catch (\Exception $e) {
+            \Log::error('Error sending database notification to admins: ' . $e->getMessage());
+        }
+
         return response()->json([
             'message' => 'Lead created successfully',
             'lead' => $lead
         ], 201);
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|in:pending,approved,rejected',
+        ]);
+
+        $lead = ClubLead::findOrFail($id);
+        $lead->update(['status' => $validated['status']]);
+
+        return response()->json($lead);
+    }
+
+    public function destroy($id)
+    {
+        $lead = ClubLead::findOrFail($id);
+        $lead->delete();
+
+        return response()->json(['message' => 'Lead deleted successfully']);
     }
 }

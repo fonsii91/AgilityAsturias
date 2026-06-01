@@ -1,10 +1,10 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ClubAdminService, Club } from '../../services/club-admin.service';
+import { ClubAdminService, Club, ClubLead } from '../../services/club-admin.service';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ToastService } from '../../services/toast.service';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -92,13 +92,108 @@ interface Plan {
         <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
       </table>
+
+      <!-- Seccion de Solicitudes de Alta (Leads) -->
+      <div class="mt-12">
+        <h2 class="text-2xl font-bold mb-4">Solicitudes de Registro (Alta)</h2>
+        
+        @if (leads().length === 0) {
+          <div class="p-6 bg-gray-50 border border-gray-200 rounded-lg text-center text-gray-500">
+            No hay solicitudes de registro pendientes o procesadas.
+          </div>
+        } @else {
+          <table mat-table [dataSource]="leads()" class="mat-elevation-z8 w-full mt-4">
+            <!-- ID Column -->
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef> ID </th>
+              <td mat-cell *matCellDef="let lead"> {{lead.id}} </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+              <th mat-header-cell *matHeaderCellDef> Nombre del Club </th>
+              <td mat-cell *matCellDef="let lead"> {{lead.name}} </td>
+            </ng-container>
+
+            <!-- Slug Column -->
+            <ng-container matColumnDef="slug">
+              <th mat-header-cell *matHeaderCellDef> Subdominio Deseado </th>
+              <td mat-cell *matCellDef="let lead"> {{lead.slug}} </td>
+            </ng-container>
+
+            <!-- Contact Column -->
+            <ng-container matColumnDef="contact">
+              <th mat-header-cell *matHeaderCellDef> Contacto </th>
+              <td mat-cell *matCellDef="let lead">
+                <div class="flex flex-col text-sm">
+                  <span><strong>Email:</strong> {{lead.email}}</span>
+                  <span><strong>Tlf:</strong> {{lead.phone}}</span>
+                </div>
+              </td>
+            </ng-container>
+
+            <!-- Plan Column -->
+            <ng-container matColumnDef="plan">
+              <th mat-header-cell *matHeaderCellDef> Plan </th>
+              <td mat-cell *matCellDef="let lead">
+                <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-semibold rounded uppercase">
+                  {{lead.plan_selected || 'Pro'}}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef> Estado </th>
+              <td mat-cell *matCellDef="let lead">
+                <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-800': lead.status === 'pending',
+                  'bg-green-100 text-green-800': lead.status === 'approved',
+                  'bg-red-100 text-red-800': lead.status === 'rejected'
+                }" class="px-2 py-1 text-xs font-semibold rounded capitalize">
+                  {{lead.status === 'pending' ? 'Pendiente' : lead.status === 'approved' ? 'Aprobado' : 'Rechazado'}}
+                </span>
+              </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Acciones </th>
+              <td mat-cell *matCellDef="let lead">
+                <div class="flex gap-2">
+                  @if (lead.status === 'pending') {
+                    <button mat-raised-button color="primary" (click)="approveLead(lead)">
+                      <mat-icon>add_business</mat-icon> Crear Club
+                    </button>
+                    <button mat-raised-button color="warn" (click)="rejectLead(lead)">
+                      <mat-icon>close</mat-icon> Rechazar
+                    </button>
+                  } @else {
+                    <button mat-icon-button color="warn" (click)="deleteLead(lead)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  }
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="leadDisplayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: leadDisplayedColumns;"></tr>
+          </table>
+        }
+      </div>
     </div>
   `,
   styles: [`
     .w-full { width: 100%; }
     .p-6 { padding: 1.5rem; }
     .mb-6 { margin-bottom: 1.5rem; }
+    .mb-4 { margin-bottom: 1rem; }
+    .mt-12 { margin-top: 3rem; }
+    .mt-4 { margin-top: 1rem; }
     .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .gap-2 { gap: 0.5rem; }
     .justify-between { justify-content: space-between; }
     .items-center { align-items: center; }
     .text-2xl { font-size: 1.5rem; line-height: 2rem; }
@@ -107,20 +202,46 @@ interface Plan {
     .hover\\:underline:hover { text-decoration: underline; }
     .plan-select { padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.875rem; background: white; outline: none; }
     .plan-select:focus { border-color: #3b82f6; }
+    .bg-gray-50 { background-color: #f9fafb; }
+    .border-gray-200 { border-color: #e5e7eb; }
+    .rounded-lg { border-radius: 0.5rem; }
+    .text-center { text-align: center; }
+    .text-gray-500 { color: #6b7280; }
+    .text-sm { font-size: 0.875rem; }
+    .text-xs { font-size: 0.75rem; }
+    .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    .bg-blue-100 { background-color: #dbeafe; }
+    .text-blue-800 { color: #1e40af; }
+    .bg-yellow-100 { background-color: #fef3c7; }
+    .text-yellow-800 { color: #92400e; }
+    .bg-green-100 { background-color: #d1fae5; }
+    .text-green-800 { color: #065f46; }
+    .bg-red-100 { background-color: #fee2e2; }
+    .text-red-800 { color: #991b1b; }
+    .font-semibold { font-weight: 600; }
+    .rounded { border-radius: 0.25rem; }
+    .uppercase { text-transform: uppercase; }
+    .capitalize { text-transform: capitalize; }
   `]
 })
 export class ClubsListComponent implements OnInit {
   private clubService = inject(ClubAdminService);
   private toast = inject(ToastService);
   private http = inject(HttpClient);
+  private router = inject(Router);
 
   clubs = signal<Club[]>([]);
   plans = signal<Plan[]>([]);
+  leads = signal<ClubLead[]>([]);
+  
   displayedColumns: string[] = ['id', 'name', 'slug', 'domain', 'plan', 'actions'];
+  leadDisplayedColumns: string[] = ['id', 'name', 'slug', 'contact', 'plan', 'status', 'actions'];
 
   ngOnInit(): void {
     this.loadClubs();
     this.loadPlans();
+    this.loadLeads();
   }
 
   loadPlans() {
@@ -180,6 +301,49 @@ export class ClubsListComponent implements OnInit {
           this.loadClubs();
         },
         error: () => this.toast.error('Error al eliminar club')
+      });
+    }
+  }
+
+  loadLeads() {
+    this.clubService.getLeads().subscribe({
+      next: (data) => this.leads.set(data),
+      error: (err) => this.toast.error('Error al cargar solicitudes')
+    });
+  }
+
+  approveLead(lead: ClubLead) {
+    this.router.navigate(['/admin/clubs/new'], {
+      queryParams: {
+        lead_id: lead.id,
+        name: lead.name,
+        slug: lead.slug,
+        email: lead.email,
+        phone: lead.phone
+      }
+    });
+  }
+
+  rejectLead(lead: ClubLead) {
+    if (confirm(`¿Estás seguro de rechazar la solicitud de ${lead.name}?`)) {
+      this.clubService.updateLeadStatus(lead.id, 'rejected').subscribe({
+        next: () => {
+          this.toast.success('Solicitud rechazada');
+          this.loadLeads();
+        },
+        error: () => this.toast.error('Error al rechazar solicitud')
+      });
+    }
+  }
+
+  deleteLead(lead: ClubLead) {
+    if (confirm(`¿Estás seguro de eliminar el registro de la solicitud de ${lead.name}?`)) {
+      this.clubService.deleteLead(lead.id).subscribe({
+        next: () => {
+          this.toast.success('Registro de solicitud eliminado');
+          this.loadLeads();
+        },
+        error: () => this.toast.error('Error al eliminar solicitud')
       });
     }
   }

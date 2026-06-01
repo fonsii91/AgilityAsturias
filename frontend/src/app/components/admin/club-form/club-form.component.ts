@@ -912,6 +912,7 @@ export class ClubFormComponent implements OnInit {
   ctaPreviewUrl = signal<string | null>(null);
 
   clubId: number | null = null;
+  clubLeadId: number | null = null;
   clubData: Club | null = null;
 
   logoFile: File | null = null;
@@ -951,6 +952,22 @@ export class ClubFormComponent implements OnInit {
       } else {
         this.isEditMode.set(false);
         this.isLoading.set(false);
+
+        // Handle query params for pre-filling lead requests
+        this.route.queryParams.subscribe(qParams => {
+          if (qParams['lead_id']) {
+            this.clubLeadId = +qParams['lead_id'];
+          }
+          if (qParams['name'] || qParams['slug'] || qParams['email'] || qParams['phone']) {
+            this.form.patchValue({
+              name: qParams['name'] || '',
+              slug: qParams['slug'] || '',
+              email: qParams['email'] || '',
+              phone: qParams['phone'] || '',
+            });
+            this.form.markAsDirty();
+          }
+        });
       }
     });
   }
@@ -1126,6 +1143,9 @@ export class ClubFormComponent implements OnInit {
     if (formValue.domain) formData.append('domain', formValue.domain);
     if (!this.logoFile && formValue.logo_url) formData.append('logo_url', formValue.logo_url);
     formData.append('settings', JSON.stringify(settingsObj));
+    if (this.clubLeadId) {
+      formData.append('lead_id', this.clubLeadId.toString());
+    }
 
     if (this.logoFile) formData.append('logo_file', this.logoFile);
     if (this.heroFile) formData.append('hero_file', this.heroFile);

@@ -163,6 +163,14 @@ class ClubController extends Controller
 
         $this->handleClubFiles($request, $club);
 
+        $leadId = $request->input('lead_id');
+        if ($leadId) {
+            $lead = \App\Models\ClubLead::find($leadId);
+            if ($lead) {
+                $lead->update(['status' => 'approved']);
+            }
+        }
+
         return response()->json($club, 201);
     }
 
