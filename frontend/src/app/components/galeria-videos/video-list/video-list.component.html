@@ -29,7 +29,10 @@
         (click)="toggleStorage()"
         aria-label="Almacenamiento de vídeo"
         title="Ver almacenamiento de vídeos">
-        <span class="material-icons">cloud_queue</span>
+        <span class="material-icons icon-unfilled">cloud_queue</span>
+        <div class="storage-fill-overlay" [style.height.%]="storageStats.percentage">
+          <span class="material-icons icon-filled">cloud_queue</span>
+        </div>
         @if (storageStats.percentage >= 90) {
         <span class="storage-badge-dot"></span>
         }

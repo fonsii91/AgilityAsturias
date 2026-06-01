@@ -1624,53 +1624,97 @@ select.form-input {
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background-color: #fff;
-    border: 2px solid #e0e0e0;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     cursor: pointer;
-    color: #475569;
     position: relative;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-width: 2px;
+    border-style: solid;
+    background-color: #ffffff;
+    overflow: hidden; /* Clips the background fill overlay */
 }
 
-.floating-storage-btn .material-icons {
+/* Base unfilled icon style */
+.floating-storage-btn .icon-unfilled {
     font-size: 22px;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
 }
 
-.floating-storage-btn:hover {
-    transform: scale(1.05);
+/* Fill overlay */
+.storage-fill-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    z-index: 2;
+    pointer-events: none;
+    transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+}
+
+/* Filled white icon style */
+.storage-fill-overlay .icon-filled {
+    font-size: 22px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 44px; /* Adjusting for the border width (48px - 2px*2) */
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff !important;
 }
 
 /* Colors based on storage fill states */
 .floating-storage-btn.safe {
-    border-color: #10b981;
-    color: #10b981;
-    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.15);
+    border-color: var(--primary-color, #1c62b9);
+    box-shadow: 0 6px 16px rgba(28, 98, 185, 0.15);
+}
+.floating-storage-btn.safe .icon-unfilled {
+    color: var(--primary-color, #1c62b9);
+}
+.floating-storage-btn.safe .storage-fill-overlay {
+    background-color: var(--primary-color, #1c62b9);
 }
 .floating-storage-btn.safe:hover {
-    background-color: rgba(16, 185, 129, 0.05);
-    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.25);
+    box-shadow: 0 8px 20px rgba(28, 98, 185, 0.25);
+    transform: scale(1.05);
 }
 
 .floating-storage-btn.warning {
     border-color: #f59e0b;
-    color: #f59e0b;
     box-shadow: 0 6px 16px rgba(245, 158, 11, 0.15);
 }
+.floating-storage-btn.warning .icon-unfilled {
+    color: #d97706;
+}
+.floating-storage-btn.warning .storage-fill-overlay {
+    background-color: #f59e0b;
+}
 .floating-storage-btn.warning:hover {
-    background-color: rgba(245, 158, 11, 0.05);
     box-shadow: 0 8px 20px rgba(245, 158, 11, 0.25);
+    transform: scale(1.05);
 }
 
 .floating-storage-btn.danger {
     border-color: #ef4444;
-    color: #ef4444;
-    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.15);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.2);
     animation: pulseStorageDanger 2s infinite;
 }
+.floating-storage-btn.danger .icon-unfilled {
+    color: #dc2626;
+}
+.floating-storage-btn.danger .storage-fill-overlay {
+    background-color: #ef4444;
+}
 .floating-storage-btn.danger:hover {
-    background-color: rgba(239, 68, 68, 0.05);
     box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+    transform: scale(1.05);
 }
 
 @keyframes pulseStorageDanger {
@@ -1686,7 +1730,8 @@ select.form-input {
 }
 
 .floating-storage-btn.active {
-    background-color: #f1f5f9;
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* Badge dot for alerts */
