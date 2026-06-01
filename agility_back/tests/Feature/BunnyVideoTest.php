@@ -175,6 +175,9 @@ class BunnyVideoTest extends TestCase
         $this->club->settings = ['bunny_collection_id' => 'mock-collection-guid-999'];
         $this->club->save();
 
+        // Warm up the storage stats cache to prevent HTTP request during storage check
+        \Illuminate\Support\Facades\Cache::put("club_{$this->club->id}_bunny_storage_bytes", 5 * 1024 * 1024 * 1024);
+
         Http::fake([
             // POST create video (with collectionId)
             'https://video.bunnycdn.com/library/674294/videos' => Http::response([

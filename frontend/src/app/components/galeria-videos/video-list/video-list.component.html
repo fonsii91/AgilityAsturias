@@ -114,6 +114,38 @@
     </app-instrucciones>
   </div>
 
+  @if (storageStats && authService.currentUserSignal()) {
+  <div class="storage-stats-container">
+    <div class="storage-card">
+      <div class="storage-info">
+        <div class="storage-label">
+          <span class="material-icons storage-icon">cloud_queue</span>
+          <span class="storage-title">Almacenamiento de vídeos</span>
+        </div>
+        <div class="storage-numbers">
+          <strong>{{ storageStats.formatted_used }}</strong> de <strong>{{ storageStats.formatted_limit }}</strong> usados
+        </div>
+      </div>
+      <div class="progress-bar-wrapper">
+        <div class="progress-bar-fill" [style.width.%]="storageStats.percentage" [ngClass]="{
+             'gradient-safe': storageStats.percentage < 70,
+             'gradient-warning': storageStats.percentage >= 70 && storageStats.percentage < 90,
+             'gradient-danger': storageStats.percentage >= 90
+           }"></div>
+      </div>
+      <div class="storage-footer">
+        <span>Quedan {{ getRemainingStorage() }} disponibles ({{ 100 - storageStats.percentage | number:'1.0-1' }}% libre)</span>
+        @if (storageStats.percentage >= 90) {
+          <span class="storage-alert">
+            <span class="material-icons alert-icon">warning</span>
+            Límite casi alcanzado. Borra vídeos o amplía tu plan.
+          </span>
+        }
+      </div>
+    </div>
+  </div>
+  }
+
   @if (isFiltersOpen) {
   <div class="advanced-filters-panel">
     <div class="filter-group">

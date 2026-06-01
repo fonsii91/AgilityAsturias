@@ -26,7 +26,8 @@ class SubscriptionAdminController extends Controller
             'slug' => 'required|string|max:255|unique:plans,slug',
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'video_storage_limit_gb' => 'nullable|integer|min:0'
         ]);
 
         $plan = Plan::create($validated);
@@ -40,7 +41,8 @@ class SubscriptionAdminController extends Controller
             'slug' => 'required|string|max:255|unique:plans,slug,' . $plan->id,
             'price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'video_storage_limit_gb' => 'nullable|integer|min:0'
         ]);
 
         $plan->update($validated);

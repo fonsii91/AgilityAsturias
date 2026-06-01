@@ -125,6 +125,7 @@ class VideoController extends Controller
             'vertical' => $verticalCount,
             'horizontal' => $horizontalCount
         ];
+        $responseArray['storage'] = $this->getClubStorageStats();
 
         return response()->json($responseArray);
     }
@@ -148,6 +149,14 @@ class VideoController extends Controller
 
             if (empty($libraryId) || empty($apiKey)) {
                 return response()->json(['message' => 'Bunny.net Stream API credentials not configured'], 500);
+            }
+
+            // Check storage limit
+            $storageStats = $this->getClubStorageStats();
+            if ($storageStats['limit_bytes'] > 0 && $storageStats['used_bytes'] >= $storageStats['limit_bytes']) {
+                return response()->json([
+                    'message' => 'Límite de almacenamiento de vídeo excedido. Por favor, actualiza tu plan o borra vídeos antiguos.'
+                ], 403);
             }
 
             $title = $request->title ?? ($request->date . ' Video Upload');
@@ -689,6 +698,9 @@ class VideoController extends Controller
                 'error_message' => null
             ]);
 
+            // Clear cache for storage stats
+            \Illuminate\Support\Facades\Cache::forget("club_{$video->club_id}_bunny_storage_bytes");
+
             // Notify owners here since encoding is fully complete
             if ($video->dog) {
                 foreach ($video->dog->users as $owner) {
@@ -869,6 +881,71 @@ class VideoController extends Controller
             'bitmovin_encoding_id' => $encodingId,
             'playback_url' => $playbackUrl,
         ]);
+    }
+
+    public function getClubStorageStats()
+    {
+        $driver = config('services.videos.driver', 'legacy');
+        
+        $clubId = app()->bound('active_club_id') ? app('active_club_id') : null;
+        $club = $clubId ? \App\Models\Club::with('plan')->find($clubId) : null;
+        
+        $limitGb = 10; // Default fallback limit
+        if ($club && $club->plan) {
+            $limitGb = $club->plan->video_storage_limit_gb ?? 10;
+        }
+        $limitBytes = $limitGb * 1024 * 1024 * 1024;
+        
+        $usedBytes = 0;
+        
+        if ($club && $driver === 'bunny') {
+            $libraryId = config('services.bunny.library_id');
+            $apiKey = config('services.bunny.api_key');
+            $collectionId = $club->settings['bunny_collection_id'] ?? null;
+            
+            if (!empty($libraryId) && !empty($apiKey) && !empty($collectionId)) {
+                $cacheKey = "club_{$club->id}_bunny_storage_bytes";
+                
+                $usedBytes = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(10), function () use ($libraryId, $apiKey, $collectionId) {
+                    try {
+                        $response = \Illuminate\Support\Facades\Http::withHeaders([
+                            'AccessKey' => $apiKey,
+                            'Accept' => 'application/json',
+                        ])->get("https://video.bunnycdn.com/library/{$libraryId}/collections/{$collectionId}");
+                        
+                        if ($response->successful()) {
+                            $data = $response->json();
+                            return (int) ($data['totalSize'] ?? 0);
+                        }
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("Error fetching collection size from Bunny: " . $e->getMessage());
+                    }
+                    
+                    return 0;
+                });
+            }
+        }
+        
+        $percentage = $limitBytes > 0 ? min(100, round(($usedBytes / $limitBytes) * 100, 2)) : 0;
+        
+        return [
+            'driver' => $driver,
+            'used_bytes' => $usedBytes,
+            'limit_bytes' => $limitBytes,
+            'percentage' => $percentage,
+            'formatted_used' => $this->formatBytes($usedBytes),
+            'formatted_limit' => $limitGb > 0 ? "{$limitGb} GB" : 'Ilimitado',
+        ];
+    }
+    
+    private function formatBytes($bytes, $precision = 2)
+    {
+        $units = array('B', 'KB', 'MB', 'GB', 'TB');
+        $bytes = max($bytes, 0);
+        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+        $pow = min($pow, count($units) - 1);
+        $bytes /= pow(1024, $pow);
+        return round($bytes, $precision) . ' ' . $units[$pow];
     }
 }
 

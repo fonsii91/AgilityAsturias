@@ -15,6 +15,7 @@ class Plan extends Model
         'price',
         'description',
         'is_active',
+        'video_storage_limit_gb',
     ];
 
     public function features()

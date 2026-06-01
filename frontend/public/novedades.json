@@ -4,7 +4,8 @@
     "date": "2026-06-02",
     "features": [
       "¡Subida de vídeos en segundo plano! Ahora no tendrás que esperar a que se completen tus subidas para seguir usando la aplicación. Los vídeos se suben de forma silenciosa en segundo plano mientras continúas navegando por el portal.",
-      "¡Panel flotante de progreso de subida! Hemos incorporado una tarjeta interactiva en la parte inferior derecha para ver en tiempo real el porcentaje y estado de cada subida, permitiéndote cancelar o reintentar envíos fácilmente."
+      "¡Panel flotante de progreso de subida! Hemos incorporado una tarjeta interactiva en la parte inferior derecha para ver en tiempo real el porcentaje y estado de cada subida, permitiéndote cancelar o reintentar envíos fácilmente.",
+      "¡Visualización del almacenamiento disponible para tus vídeos! Hemos añadido una elegante barra indicadora al principio de la galería de vídeos que te muestra en tiempo real el espacio de almacenamiento utilizado por tu club y cuánto espacio libre queda disponible en tu plan."
     ],
     "bugfixes": [
       "¡Reproducción de vídeos HLS de Bunny.net estabilizada! Se han corregido las restricciones de dominios de desarrollo local y se ha incorporado una pantalla de ayuda si la conexión del reproductor falla.",

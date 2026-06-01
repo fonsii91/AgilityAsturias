@@ -48,6 +48,7 @@ export class VideoListComponent implements OnInit {
     isFiltersOpen = false;
     activeTab: 'horizontal' | 'vertical' | 'all' = 'all';
     tabCounts = { vertical: 0, horizontal: 0 };
+    storageStats: any = null;
 
     selectedDogForProfile: Dog | null = null;
     isDogProfileOpen = false;
@@ -123,6 +124,10 @@ export class VideoListComponent implements OnInit {
                 
                 if (res.counts) {
                     this.tabCounts = res.counts;
+                }
+
+                if (res.storage) {
+                    this.storageStats = res.storage;
                 }
                 
                 this.isLoading = false;
@@ -379,5 +384,22 @@ export class VideoListComponent implements OnInit {
                 this.cdr.detectChanges();
             }
         });
+    }
+
+    getRemainingStorage(): string {
+        if (!this.storageStats) return '';
+        const limit = this.storageStats.limit_bytes;
+        const used = this.storageStats.used_bytes;
+        const remaining = Math.max(0, limit - used);
+        return this.formatBytes(remaining);
+    }
+
+    private formatBytes(bytes: number, precision: number = 2): string {
+        const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const p = Math.max(bytes, 0);
+        const pow = Math.floor((p ? Math.log(p) : 0) / Math.log(1024));
+        const powClamped = Math.min(pow, units.length - 1);
+        const value = p / Math.pow(1024, powClamped);
+        return `${value.toFixed(precision)} ${units[powClamped]}`;
     }
 }

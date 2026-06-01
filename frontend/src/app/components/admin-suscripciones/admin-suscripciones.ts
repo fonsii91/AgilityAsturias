@@ -22,6 +22,7 @@ interface Plan {
   price: string;
   description: string;
   is_active: boolean;
+  video_storage_limit_gb?: number;
   features?: Feature[];
 }
 
@@ -47,7 +48,8 @@ export class AdminSuscripcionesComponent implements OnInit {
     slug: '',
     price: '0.00',
     description: '',
-    is_active: true
+    is_active: true,
+    video_storage_limit_gb: 10
   });
 
   ngOnInit() {
@@ -112,13 +114,30 @@ export class AdminSuscripcionesComponent implements OnInit {
     this.showNewPlanForm.update(v => !v);
   }
 
+  async updatePlanStorageLimit(plan: Plan) {
+    try {
+      await this.http.put(`${this.apiUrl}/plans/${plan.id}`, {
+        name: plan.name,
+        slug: plan.slug,
+        price: plan.price,
+        description: plan.description,
+        is_active: plan.is_active,
+        video_storage_limit_gb: plan.video_storage_limit_gb
+      }).toPromise();
+    } catch (error) {
+      console.error('Error updating plan storage limit', error);
+      alert('Error al guardar el límite de almacenamiento de vídeo.');
+      this.loadData(); // Revert
+    }
+  }
+
   async createPlan() {
     try {
       const created = await this.http.post<Plan>(`${this.apiUrl}/plans`, this.newPlan()).toPromise();
       if (created) {
         this.plans.update(plans => [...plans, created]);
         this.showNewPlanForm.set(false);
-        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true });
+        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10 });
       }
     } catch (error) {
       console.error('Error creating plan', error);

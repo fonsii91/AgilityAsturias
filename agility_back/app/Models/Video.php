@@ -81,6 +81,9 @@ class Video extends Model
             if ($video->local_path && \Illuminate\Support\Facades\Storage::disk('public')->exists($video->local_path)) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($video->local_path);
             }
+
+            // Clear cache for storage stats
+            \Illuminate\Support\Facades\Cache::forget("club_{$video->club_id}_bunny_storage_bytes");
         });
     }
 
