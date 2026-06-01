@@ -544,7 +544,7 @@ class VideoController extends Controller
             return response()->json(['message' => 'No encodingId found in payload'], 400);
         }
 
-        $video = Video::where('bitmovin_encoding_id', $encodingId)->first();
+        $video = Video::withoutGlobalScopes()->where('bitmovin_encoding_id', $encodingId)->first();
 
         if (!$video) {
             return response()->json(['message' => 'Video not found for this encodingId'], 404);
@@ -586,7 +586,7 @@ class VideoController extends Controller
             return response()->json(['message' => 'No VideoGuid found in payload'], 400);
         }
 
-        $video = Video::where('bunny_video_id', $videoGuid)->first();
+        $video = Video::withoutGlobalScopes()->where('bunny_video_id', $videoGuid)->first();
 
         if (!$video) {
             return response()->json(['message' => 'Video not found for this VideoGuid'], 404);
