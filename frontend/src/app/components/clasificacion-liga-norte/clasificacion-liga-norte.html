@@ -48,14 +48,6 @@
         <p>No se han encontrado registros cargados en esta clase.</p>
       </div>
     } @else {
-      <!-- Banner Informativo del Campeonato de España -->
-      <div class="info-banner glass-card">
-        <span class="material-icons-outlined banner-icon">info</span>
-        <p class="banner-text">
-          <strong>Campeonato de España:</strong> Se clasifica el <strong>50%</strong> de los perros participantes en cada altura (resaltados en azul con el distintivo <span class="badge-ce-mini">CE</span>).
-        </p>
-      </div>
-
       <!-- Desktop Table View -->
       <div class="table-card glass-card desktop-only">
         <div class="table-responsive">
@@ -95,13 +87,6 @@
                         <span class="dog-no-link">
                           <span class="material-icons-outlined dog-icon-disabled">pets</span>
                           <strong class="dog-name-disabled-txt">{{ row.perro_nombre }}</strong>
-                        </span>
-                      }
-                      
-                      @if (isQualified(row, idx)) {
-                        <span class="badge-ce" title="Clasificado para el Campeonato de España (50% superior)">
-                          <span class="material-icons-outlined ce-icon">emoji_events</span>
-                          CE
                         </span>
                       }
                     </div>
@@ -162,13 +147,6 @@
                     <span class="dog-no-link">
                       <span class="material-icons-outlined dog-icon-disabled">pets</span>
                       <span class="dog-name-disabled">{{ row.perro_nombre }}</span>
-                    </span>
-                  }
-                  
-                  @if (isQualified(row, idx)) {
-                    <span class="badge-ce" title="Clasificado para el Campeonato de España (50% superior)">
-                      <span class="material-icons-outlined ce-icon">emoji_events</span>
-                      CE
                     </span>
                   }
                 </div>

@@ -240,69 +240,6 @@ tr.asturias-row:hover td {
   align-items: center;
 }
 
-/* Championship Qualification (CE) Highlights */
-.info-banner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 20px;
-  padding: 12px 18px;
-  background: rgba(239, 246, 255, 0.6); /* Soft blue glass */
-  border: 1px solid rgba(191, 219, 254, 0.5);
-  border-radius: 12px;
-  backdrop-filter: blur(8px);
-}
-
-.info-banner .banner-icon {
-  color: #3b82f6;
-  font-size: 1.3rem;
-  flex-shrink: 0;
-}
-
-.info-banner .banner-text {
-  margin: 0;
-  font-size: 0.88rem;
-  color: #1e3a8a;
-  line-height: 1.45;
-}
-
-.badge-ce {
-  display: inline-flex;
-  align-items: center;
-  gap: 3px;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 2px 6px;
-  border-radius: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  white-space: nowrap;
-  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.05);
-  margin-left: 6px;
-}
-
-.ce-icon {
-  font-size: 0.85rem;
-  color: #2563eb;
-}
-
-.badge-ce-mini {
-  display: inline-flex;
-  align-items: center;
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-  font-size: 0.65rem;
-  font-weight: 850;
-  padding: 1px 4px;
-  border-radius: 4px;
-  margin: 0 2px;
-  vertical-align: middle;
-}
-
 /* Desktop row highlights */
 tr.qualified-row td {
   background-color: #f8fafc; /* Subtle default fallback */
