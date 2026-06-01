@@ -80,8 +80,7 @@ export class RsceTrackerComponent implements OnInit {
   isUpgrading = signal<boolean>(false);
 
   // Arrays for Medals
-  slotArrayA = [1, 2, 3];
-  slotArrayB = [1, 2, 3, 4];
+  // slotArrayA and slotArrayB are now dynamically returned via getSlotsA() and getSlotsB()
 
   // CE Progress state
   ceMet = signal<boolean>(false);
@@ -288,7 +287,7 @@ export class RsceTrackerComponent implements OnInit {
         const jumpingPaths = exc0.filter(t => t.manga_type.startsWith('Jumping'));
 
         let aCount = agilityPaths.length;
-        let aJudges = new Set(agilityPaths.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
+        let aJudges = this.getDistinctJudgesCount(agilityPaths);
 
         let optionAMet = aCount >= 3 && aJudges >= 2;
         let aScore = Math.min(3, aCount);
@@ -299,8 +298,8 @@ export class RsceTrackerComponent implements OnInit {
         let bAgilityCount = agilityPaths.length;
         let bJumpingCount = jumpingPaths.length;
         
-        let combinedTracks = [...agilityPaths.slice(0, 2), ...jumpingPaths.slice(0, 2)];
-        let bJudges = new Set(combinedTracks.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
+        let combinedTracks = [...agilityPaths, ...jumpingPaths];
+        let bJudges = this.getDistinctJudgesCount(combinedTracks);
 
         let optionBMet = bAgilityCount >= 2 && bJumpingCount >= 2 && bJudges >= 2;
         let bScore = Math.min(2, bAgilityCount) + Math.min(2, bJumpingCount);
@@ -320,14 +319,18 @@ export class RsceTrackerComponent implements OnInit {
         const validAgility = exc0.filter(t => t.manga_type.startsWith('Agility') && t.speed && t.speed >= requiredAgilitySpeed);
         const validJumping = exc0.filter(t => t.manga_type.startsWith('Jumping') && t.speed && t.speed >= requiredJumpingSpeed);
 
-        let aJudges = new Set(validAgility.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
-        let jJudges = new Set(validJumping.filter(t => t.judge_name).map(t => t.judge_name?.trim().toLowerCase())).size;
+        // Evaluamos todas las pistas válidas de cada disciplina para el recuento de jueces,
+        // ya que si el total de pistas válidas tiene al menos 3 jueces diferentes,
+        // siempre es posible elegir 3 de agility y 3 de jumping que sumen al menos 3 jueces.
+        const combinedTracksForJudges = [...validAgility, ...validJumping];
+        let totalJudges = this.getDistinctJudgesCount(combinedTracksForJudges);
 
         let aCount = validAgility.length;
         let jCount = validJumping.length;
 
-        let aMet = aCount >= 3 && aJudges >= 3;
-        let jMet = jCount >= 3 && jJudges >= 3;
+        let aMet = aCount >= 3;
+        let jMet = jCount >= 3;
+        let judgesMet = totalJudges >= 3;
 
         let aScore = Math.min(3, aCount);
         let jScore = Math.min(3, jCount);
@@ -336,12 +339,12 @@ export class RsceTrackerComponent implements OnInit {
         this.progressValueB.set((jScore / 3) * 100);
 
         this.progressTitleA.set('Agility');
-        this.progressSubtitleA.set(`Vel ≥ ${requiredAgilitySpeed} m/s • ${aCount}/3 puntos` + (aCount > 0 && aJudges < 3 ? ` (${aJudges}/3 jueces)` : ''));
+        this.progressSubtitleA.set(`Vel ≥ ${requiredAgilitySpeed} m/s • ${aCount}/3 puntos` + ((aCount > 0 || jCount > 0) && totalJudges < 3 ? ` (${totalJudges}/3 jueces totales)` : ''));
         
         this.progressTitleB.set('Jumping');
-        this.progressSubtitleB.set(`Vel ≥ ${requiredJumpingSpeed} m/s • ${jCount}/3 puntos` + (jCount > 0 && jJudges < 3 ? ` (${jJudges}/3 jueces)` : ''));
+        this.progressSubtitleB.set(`Vel ≥ ${requiredJumpingSpeed} m/s • ${jCount}/3 puntos` + ((aCount > 0 || jCount > 0) && totalJudges < 3 ? ` (${totalJudges}/3 jueces totales)` : ''));
 
-        this.progressMet.set(aMet && jMet);
+        this.progressMet.set(aMet && jMet && judgesMet);
 
     } else {
         this.progressTitleA.set('¡Grado Máximo Alcanzado!');
@@ -729,12 +732,25 @@ export class RsceTrackerComponent implements OnInit {
     return Math.max(calculated, dbVal);
   }
 
+  getSlotsA(): number[] {
+    return [1, 2, 3];
+  }
+
+  getSlotsB(): number[] {
+    const dog = this.selectedDog();
+    const grade = dog?.pivot?.rsce_grade || '0';
+    if (grade === '2') {
+      return [1, 2, 3];
+    }
+    return [1, 2, 3, 4];
+  }
+
   getFilledSlotsA(): number {
-    return Math.round((this.progressValueA() / 100) * this.slotArrayA.length);
+    return Math.round((this.progressValueA() / 100) * this.getSlotsA().length);
   }
 
   getFilledSlotsB(): number {
-    return Math.round((this.progressValueB() / 100) * this.slotArrayB.length);
+    return Math.round((this.progressValueB() / 100) * this.getSlotsB().length);
   }
 
   getCESlotArrayA(): number[] {
@@ -839,5 +855,38 @@ export class RsceTrackerComponent implements OnInit {
     if (qLower === 'eliminado' || qLower === 'elim') return 'ELIM';
     if (qLower === 'no presentado' || qLower === 'np') return 'N.P.';
     return qual;
+  }
+
+  isExcellent(qualification: string | undefined): boolean {
+    if (!qualification) return false;
+    const qLower = qualification.toLowerCase().trim();
+    return qLower === 'excelente a 0' || 
+           qLower === 'exc_0' || 
+           qLower === 'excelente a cero' || 
+           qLower === 'exc a 0' || 
+           qLower === 'excelente' || 
+           qLower === 'exc';
+  }
+
+  normalizeJudgeName(name: string): string {
+    return name
+      .trim()
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  }
+
+  getDistinctJudgesCount(tracks: RsceTrack[]): number {
+    const judgesSet = new Set<string>();
+    tracks.forEach(t => {
+      if (t.judge_name) {
+        const names = t.judge_name
+          .split(/,|\s+y\s+|\s+and\s+|\s+&\s+/)
+          .map(name => this.normalizeJudgeName(name))
+          .filter(Boolean);
+        names.forEach(name => judgesSet.add(name));
+      }
+    });
+    return judgesSet.size;
   }
 }

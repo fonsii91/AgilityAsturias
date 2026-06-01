@@ -196,4 +196,24 @@ export class ClasificacionLigaNorteComponent implements OnInit {
            club === 'AGILITY ASTURIAS' || 
            club === 'C.A. ASTURIAS';
   }
+
+  isQualified(row: any, index: number): boolean {
+    const list = this.filteredStandings();
+    const total = list.length;
+    if (total === 0) return false;
+    
+    const limitCount = Math.ceil(total / 2);
+    if (index < limitCount) {
+      return true;
+    }
+    
+    // Handle ties at the boundary line
+    const lastQualifiedIndex = limitCount - 1;
+    const lastQualifiedRow = list[lastQualifiedIndex];
+    if (lastQualifiedRow && row.posicion && row.posicion === lastQualifiedRow.posicion) {
+      return true;
+    }
+    
+    return false;
+  }
 }

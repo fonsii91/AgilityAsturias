@@ -145,6 +145,30 @@ describe('RsceTrackerComponent', () => {
     expect(component.progressTitleB()).toContain('Jumping');
   });
 
+  it('should calculate Grade 2 progress with combined judges correctly', () => {
+    component.selectedDog.set({ id: 1, name: 'Fido', pivot: { rsce_grade: '2' }, rsce_category: 'M' } as any);
+    component.selectedDogId.set(1);
+    
+    // We mock 3 valid Agility tracks and 3 valid Jumping tracks.
+    // Judges for Agility: Judge A, Judge B, Judge C (3 distinct)
+    // Judges for Jumping: Judge A, Judge B, Judge A (2 distinct)
+    // Combined distinct judges: Judge A, Judge B, Judge C (3 distinct)
+    const tracks = [
+      { id: 1, dog_id: 1, date: '2023-01-01', manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.60, judge_name: 'Judge A' },
+      { id: 2, dog_id: 1, date: '2023-01-02', manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.70, judge_name: 'Judge B' },
+      { id: 3, dog_id: 1, date: '2023-01-03', manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.80, judge_name: 'Judge C' },
+      { id: 4, dog_id: 1, date: '2023-01-04', manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.80, judge_name: 'Judge A' },
+      { id: 5, dog_id: 1, date: '2023-01-05', manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.90, judge_name: 'Judge B' },
+      { id: 6, dog_id: 1, date: '2023-01-06', manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 5.00, judge_name: 'Judge A' }
+    ];
+    
+    component.filteredTracks.set(tracks as any);
+    component.calculateProgress();
+
+    // Verify progress is met because we have 3 distinct judges in total, 3 valid Agility and 3 valid Jumping tracks
+    expect(component.progressMet()).toBe(true);
+  });
+
   it('should calculate Campeonato de España (CE) progress correctly for Grade 2', () => {
     component.selectedDog.set({ id: 1, name: 'Fido', pivot: { rsce_grade: '2' }, rsce_category: 'M' } as any);
     component.selectedDogId.set(1);
@@ -219,5 +243,63 @@ describe('RsceTrackerComponent', () => {
     
     expect(component.pastAndCurrentCompetitions().length).toBe(1);
     expect(component.pastAndCurrentCompetitions()[0].id).toBe(1);
+  });
+
+  it('should correctly normalize qualifications and split/normalize judge names', () => {
+    // 1. Test isExcellent
+    expect(component.isExcellent('Excelente a 0')).toBe(true);
+    expect(component.isExcellent('EXC_0')).toBe(true);
+    expect(component.isExcellent('excelente')).toBe(true);
+    expect(component.isExcellent('exc')).toBe(true);
+    expect(component.isExcellent('Muy Bueno')).toBe(false);
+
+    // 2. Test normalizeJudgeName
+    expect(component.normalizeJudgeName('  José Ramón  ')).toBe('jose ramon');
+    expect(component.normalizeJudgeName('María Ángeles')).toBe('maria angeles');
+
+    // 3. Test getDistinctJudgesCount with various formats and delimiters
+    const tracks = [
+      { judge_name: 'José Ramón' },
+      { judge_name: 'Jose Ramon, Marta Gomez' },
+      { judge_name: 'Marta Gómez y Luis Pérez' },
+      { judge_name: 'Luis Perez & Ana Belén' }
+    ] as any;
+
+    // Distinct normalized judges should be:
+    // "jose ramon", "marta gomez", "luis perez", "ana belen" -> total 4
+    expect(component.getDistinctJudgesCount(tracks)).toBe(4);
+  });
+
+  it('should return correct slot arrays dynamically based on dog grade', () => {
+    // 1. Dog in Grade 1
+    component.selectedDog.set({ id: 1, name: 'Fido', pivot: { rsce_grade: '1' } } as any);
+    expect(component.getSlotsA()).toEqual([1, 2, 3]);
+    expect(component.getSlotsB()).toEqual([1, 2, 3, 4]);
+
+    // 2. Dog in Grade 2
+    component.selectedDog.set({ id: 1, name: 'Fido', pivot: { rsce_grade: '2' } } as any);
+    expect(component.getSlotsA()).toEqual([1, 2, 3]);
+    expect(component.getSlotsB()).toEqual([1, 2, 3]);
+  });
+
+  it('should count distinct judges across all valid tracks instead of slicing the first ones', () => {
+    component.selectedDog.set({ id: 1, name: 'Fido', pivot: { rsce_grade: '2' }, rsce_category: 'M' } as any);
+    component.selectedDogId.set(1);
+    
+    const tracks = [
+      { id: 1, dog_id: 1, date: '2023-01-04', manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.60, judge_name: 'Judge A' },
+      { id: 2, dog_id: 1, date: '2023-01-03', manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.60, judge_name: 'Judge A' },
+      { id: 3, dog_id: 1, date: '2023-01-02', manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.60, judge_name: 'Judge A' },
+      { id: 4, dog_id: 1, date: '2023-01-01', manga_type: 'Agility', qualification: 'Excelente a 0', speed: 4.60, judge_name: 'Judge B' },
+      
+      { id: 5, dog_id: 1, date: '2023-01-07', manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.80, judge_name: 'Judge A' },
+      { id: 6, dog_id: 1, date: '2023-01-06', manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.80, judge_name: 'Judge A' },
+      { id: 7, dog_id: 1, date: '2023-01-05', manga_type: 'Jumping', qualification: 'Excelente a 0', speed: 4.80, judge_name: 'Judge C' }
+    ];
+    
+    component.filteredTracks.set(tracks as any);
+    component.calculateProgress();
+    
+    expect(component.progressMet()).toBe(true);
   });
 });

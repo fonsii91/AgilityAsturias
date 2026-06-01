@@ -59,7 +59,7 @@
             <h4 style="margin: 0 0 12px 0; font-size: 15px; color: #1e293b;">🐕 Si estás en Grado 2 (Para pasar a Grado 3):
             </h4>
             <p style="margin: 0 0 8px 0;">Las reglas se endurecen y ya no hay vías opcionales; debes completar
-              <strong>ambos</strong> retos bajo la mirada de <strong>3 jueces diferentes</strong> en cada disciplina:
+              <strong>ambos</strong> retos acumulando al menos <strong>3 jueces diferentes en total</strong>:
             </p>
             <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px;">
               <li style="display: flex; gap: 10px; align-items: flex-start;">
@@ -243,7 +243,7 @@
             <span class="label-percent">{{ progressValueA() | number:'1.0-0' }}%</span>
           </div>
           <div class="slots-container">
-            @for (slot of slotArrayA; track $index) {
+            @for (slot of getSlotsA(); track $index) {
             <div class="medal-slot" [class.filled]="$index < getFilledSlotsA()">
               <span class="material-icons">{{ $index < getFilledSlotsA() ? 'workspace_premium' : 'workspace_premium'
                   }}</span>
@@ -261,7 +261,7 @@
             <span class="label-percent">{{ progressValueB() | number:'1.0-0' }}%</span>
           </div>
           <div class="slots-container">
-            @for (slot of slotArrayB; track $index) {
+            @for (slot of getSlotsB(); track $index) {
             <div class="medal-slot" [class.filled]="$index < getFilledSlotsB()">
               <span class="material-icons">{{ $index < getFilledSlotsB() ? 'workspace_premium' : 'workspace_premium'
                   }}</span>

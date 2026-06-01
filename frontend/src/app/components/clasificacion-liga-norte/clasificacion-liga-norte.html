@@ -48,6 +48,14 @@
         <p>No se han encontrado registros cargados en esta clase.</p>
       </div>
     } @else {
+      <!-- Banner Informativo del Campeonato de España -->
+      <div class="info-banner glass-card">
+        <span class="material-icons-outlined banner-icon">info</span>
+        <p class="banner-text">
+          <strong>Campeonato de España:</strong> Se clasifica el <strong>50%</strong> de los perros participantes en cada altura (resaltados en azul con el distintivo <span class="badge-ce-mini">CE</span>).
+        </p>
+      </div>
+
       <!-- Desktop Table View -->
       <div class="table-card glass-card desktop-only">
         <div class="table-responsive">
@@ -69,7 +77,7 @@
             </thead>
             <tbody>
               @for (row of filteredStandings(); track row.id; let idx = $index) {
-                <tr [class.asturias-row]="isAsturias(row)">
+                <tr [class.asturias-row]="isAsturias(row)" [class.qualified-row]="isQualified(row, idx)">
                   <td style="text-align: center; vertical-align: middle;">
                     <span class="rank-badge-new rank-{{ row.posicion <= 3 ? row.posicion : 'default' }}">
                       {{ row.posicion }}
@@ -90,6 +98,12 @@
                         </span>
                       }
                       
+                      @if (isQualified(row, idx)) {
+                        <span class="badge-ce" title="Clasificado para el Campeonato de España (50% superior)">
+                          <span class="material-icons-outlined ce-icon">emoji_events</span>
+                          CE
+                        </span>
+                      }
                     </div>
                   </td>
                   <td>{{ row.guia_nombre }}</td>
@@ -125,8 +139,11 @@
 
       <!-- Mobile Card View -->
       <div class="mobile-cards mobile-only">
-        @for (row of filteredStandings(); track row.id) {
-          <div class="standing-card glass-card" [class.asturias-card]="isAsturias(row)" [class.expanded]="isRowExpanded(row.id)">
+        @for (row of filteredStandings(); track row.id; let idx = $index) {
+          <div class="standing-card glass-card" 
+               [class.asturias-card]="isAsturias(row)" 
+               [class.qualified-card]="isQualified(row, idx)" 
+               [class.expanded]="isRowExpanded(row.id)">
             <div class="card-header" (click)="toggleRow(row.id)">
               <div class="rank-badge">
                 <span class="rank-badge-new rank-{{ row.posicion <= 3 ? row.posicion : 'default' }}">
@@ -145,6 +162,13 @@
                     <span class="dog-no-link">
                       <span class="material-icons-outlined dog-icon-disabled">pets</span>
                       <span class="dog-name-disabled">{{ row.perro_nombre }}</span>
+                    </span>
+                  }
+                  
+                  @if (isQualified(row, idx)) {
+                    <span class="badge-ce" title="Clasificado para el Campeonato de España (50% superior)">
+                      <span class="material-icons-outlined ce-icon">emoji_events</span>
+                      CE
                     </span>
                   }
                 </div>

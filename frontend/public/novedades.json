@@ -3,7 +3,9 @@
     "version": "1.1.45",
     "date": "2026-06-01",
     "bugfixes": [
-      "¡Corregido el contador de ascensos y Campeonato de España! Hemos solucionado un problema que impedía que algunas mangas con pista limpia (registradas como excelentes a cero) se sumaran al contador de medallas y progreso para el ascenso de grado de tu perro en la bitácora canina. ¡Ahora todas tus pistas limpias sumarán correctamente!"
+      "¡Corregido el contador de ascensos y Campeonato de España! Hemos solucionado un problema que impedía que algunas mangas con pista limpia (registradas como excelentes a cero) se sumaran al contador de medallas y progreso para el ascenso de grado de tu perro en la bitácora canina. ¡Ahora todas tus pistas limpias sumarán correctamente!",
+      "Corregido el error visual en el seguimiento Canina (RSCE) donde la disciplina de Jumping en Grado 2 mostraba erróneamente 4 medallas en lugar de las 3 requeridas para el ascenso.",
+      "Solucionado el problema que bloqueaba incorrectamente el ascenso de grado al limitar el recuento de jueces distintos a las primeras mangas en lugar de evaluar todo el conjunto de mangas válidas del perro."
     ]
   },
   {
@@ -34,6 +36,14 @@
       "Hemos solucionado un problema que impedía visualizar correctamente el ranking e historial de puntos en algunos clubes al acceder a la plataforma.",
       "Corregido un comportamiento que seguía mostrando el botón 'Aceptar Contrato' en los carteles de perros que tú ya estabas cazando activamente. Ahora verás directamente el indicativo de 'CONTRATO EN CURSO' para evitar compras duplicadas por error.",
       "Solucionado un problema por el cual tu elección de no participar en el Tablón de Cazarrecompensas no se quedaba guardada en el servidor y te obligaba a participar de forma continua."
+=======
+    "date": "2026-06-01",
+    "features": [
+      "¡Destacado de clasificados al Campeonato de España en la Liga Norte! Ahora destacamos de forma sutil con un tono azul a los binomios que se clasifican para el nacional (el 50% superior de cada altura). También hemos añadido un distintivo 'CE' con icono de trofeo al lado del nombre de cada perro clasificado y un banner explicativo al principio. Si un perro pertenece a nuestro club, se prioriza el color verde corporativo pero manteniendo la etiqueta 'CE'. ¡Descubre quiénes tienen el pase al campeonato con un solo vistazo!"
+    ],
+    "bugfixes": [
+      "¡Mejoras en el Seguimiento Canina (RSCE)! Hemos corregido un problema que impedía contabilizar correctamente las pistas excelentes importadas de forma automática o aquellas con nombres de jueces múltiples o con acentos. Además, de acuerdo al reglamento oficial, ahora el requisito de jueces únicos en Grado 2 se calcula sumando el total combinado de ambas disciplinas (Agility + Jumping) en lugar de exigirse de forma individual por separado. ¡Todo tu progreso de ascenso y jueces se calculará con total precisión!"
+>>>>>>> e33398f (Correcion de bitacora RSCE: Medallas de jumping en Grado 2, recuento de jueces sin slicing y novedades 1.1.45)
     ]
   },
   {
