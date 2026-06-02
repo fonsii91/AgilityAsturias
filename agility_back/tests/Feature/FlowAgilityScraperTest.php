@@ -210,6 +210,7 @@ class FlowAgilityScraperTest extends TestCase
             'user_id' => $user->id
         ]);
         $dog->users()->attach($user->id, ['is_primary_owner' => true]);
+        $comp->attendingDogs()->attach($dog->id, ['user_id' => $user->id]);
 
         // 3. Create pre-existing workload
         $workload = DogWorkload::create([
@@ -419,5 +420,165 @@ class FlowAgilityScraperTest extends TestCase
 
         $comp->refresh();
         $this->assertTrue((bool)$comp->results_scraped); // True because 6 days ago + 5 days grace < today
+    }
+
+    public function test_scraper_does_not_auto_register_or_award_points_to_non_registered_dogs()
+    {
+        // 1. Create a past competition
+        $comp = Competition::forceCreate([
+            'club_id' => $this->club->id,
+            'nombre' => 'Valladolid Agility Trial',
+            'lugar' => 'Valladolid',
+            'fecha_evento' => '2026-05-09',
+            'fecha_fin_evento' => '2026-05-10',
+            'tipo' => 'competicion',
+            'federacion' => 'RSCE',
+            'enlace' => 'https://www.flowagility.com/zone/events/info/b6a5b896-93bb-4b12-9344-cfb41c52fe65',
+            'results_scraped' => false,
+            'scrape_status' => 'pending',
+            'attendance_verified' => false
+        ]);
+
+        // 2. Create the registered dog
+        $userReg = User::factory()->create(['name' => 'Registered Owner', 'club_id' => $this->club->id]);
+        $dogReg = Dog::factory()->create(['name' => 'Reggie', 'club_id' => $this->club->id, 'user_id' => $userReg->id]);
+        $dogReg->users()->attach($userReg->id, ['is_primary_owner' => true]);
+        
+        // Attach registered dog to the competition
+        $comp->attendingDogs()->attach($dogReg->id, ['user_id' => $userReg->id]);
+
+        // 3. Create the non-registered dog
+        $userUnreg = User::factory()->create(['name' => 'Unregistered Owner', 'club_id' => $this->club->id]);
+        $dogUnreg = Dog::factory()->create(['name' => 'UnregisteredDog', 'club_id' => $this->club->id, 'user_id' => $userUnreg->id]);
+        $dogUnreg->users()->attach($userUnreg->id, ['is_primary_owner' => true]);
+
+        // 4. Create a dog from another club (tenant isolation testing)
+        $clubB = Club::create(['name' => 'Club B', 'slug' => 'club-b', 'subdomain' => 'clubb', 'db_connection' => 'sqlite']);
+        $userB = User::factory()->create(['name' => 'Owner Club B', 'club_id' => $clubB->id]);
+        $dogB = Dog::factory()->create(['name' => 'DogClubB', 'club_id' => $clubB->id, 'user_id' => $userB->id]);
+        $dogB->users()->attach($userB->id, ['is_primary_owner' => true]);
+
+        // Mock scraper output
+        $fakeScraperOutput = "RESULT_JSON:" . json_encode([
+            [
+                'eventId' => $comp->id,
+                'dogName' => 'Reggie',
+                'handlerName' => 'Registered Owner',
+                'license' => 'RSCE111',
+                'clubName' => 'Agility Asturias',
+                'position' => '1',
+                'dorsal' => 'D01',
+                'runDate' => '2026-05-09',
+                'runs' => [
+                    [
+                        'mangaType' => 'Agility',
+                        'time' => '30.00',
+                        'speed' => '5.00',
+                        'faults' => '0',
+                        'refusals' => '0',
+                        'timePenalty' => '0.00',
+                        'totalPenalty' => '0.00',
+                        'qualification' => 'EXC_0',
+                    ]
+                ]
+            ],
+            [
+                'eventId' => $comp->id,
+                'dogName' => 'UnregisteredDog',
+                'handlerName' => 'Unregistered Owner',
+                'license' => 'RSCE222',
+                'clubName' => 'Agility Asturias',
+                'position' => '2',
+                'dorsal' => 'D02',
+                'runDate' => '2026-05-09',
+                'runs' => [
+                    [
+                        'mangaType' => 'Agility',
+                        'time' => '31.00',
+                        'speed' => '4.80',
+                        'faults' => '0',
+                        'refusals' => '0',
+                        'timePenalty' => '0.00',
+                        'totalPenalty' => '0.00',
+                        'qualification' => 'EXC_0',
+                    ]
+                ]
+            ],
+            [
+                'eventId' => $comp->id,
+                'dogName' => 'DogClubB',
+                'handlerName' => 'Owner Club B',
+                'license' => 'RSCE333',
+                'clubName' => 'Club B',
+                'position' => '3',
+                'dorsal' => 'D03',
+                'runDate' => '2026-05-09',
+                'runs' => [
+                    [
+                        'mangaType' => 'Agility',
+                        'time' => '32.00',
+                        'speed' => '4.60',
+                        'faults' => '0',
+                        'refusals' => '0',
+                        'timePenalty' => '0.00',
+                        'totalPenalty' => '0.00',
+                        'qualification' => 'EXC_0',
+                    ]
+                ]
+            ]
+        ]);
+
+        config(['app.fake_scraper_output' => $fakeScraperOutput]);
+
+        // Run the Artisan command
+        $this->artisan('flowagility:scrape', ['--force' => true]);
+
+        $comp->refresh();
+        $this->assertTrue((bool)$comp->attendance_verified);
+
+        // Assert 1: Registered dog is updated, has position and points
+        $this->assertDatabaseHas('competition_dog', [
+            'competition_id' => $comp->id,
+            'dog_id' => $dogReg->id,
+            'position' => '1',
+            'dorsal' => 'D01'
+        ]);
+        $dogReg->refresh();
+        $this->assertEquals(4, $dogReg->points); // 4 points for 1st place!
+
+        // Assert 2: Unregistered dog is NOT in competition_dog and has NO points in points field
+        $this->assertDatabaseMissing('competition_dog', [
+            'competition_id' => $comp->id,
+            'dog_id' => $dogUnreg->id
+        ]);
+        $dogUnreg->refresh();
+        $this->assertEquals(0, $dogUnreg->points);
+
+        // Assert 3: Dog from Club B is NOT in competition_dog (since Club B has no competition for this event)
+        $this->assertDatabaseMissing('competition_dog', [
+            'competition_id' => $comp->id,
+            'dog_id' => $dogB->id
+        ]);
+        $dogB->refresh();
+        $this->assertEquals(0, $dogB->points);
+
+        // Assert 4: But tracks are successfully imported for ALL dogs!
+        $this->assertDatabaseHas('rsce_tracks', [
+            'dog_id' => $dogReg->id,
+            'manga_type' => 'Agility',
+            'qualification' => 'EXC_0'
+        ]);
+        $this->assertDatabaseHas('rsce_tracks', [
+            'dog_id' => $dogUnreg->id,
+            'manga_type' => 'Agility',
+            'qualification' => 'EXC_0'
+        ]);
+        $this->assertDatabaseHas('rsce_tracks', [
+            'dog_id' => $dogB->id,
+            'manga_type' => 'Agility',
+            'qualification' => 'EXC_0',
+            'club_id' => $clubB->id,
+            'location' => 'Valladolid Agility Trial - Valladolid' // Verified fallback to scraped comp meta
+        ]);
     }
 }

@@ -10,7 +10,8 @@
     "bugfixes": [
       "¡Reproducción de vídeos HLS de Bunny.net estabilizada! Se han corregido las restricciones de dominios de desarrollo local y se ha incorporado una pantalla de ayuda si la conexión del reproductor falla.",
       "¡Publicación automática de vídeos optimizada! Hemos perfeccioncionado el sistema para asegurar que, una vez que finaliza el procesamiento de tu vídeo en la nube, este se publique inmediatamente en la galería de tu club sin demoras ni esperas.",
-      "¡Optimización del almacenamiento de vídeos! Hemos mejorado la organización y procesamiento interno de tus grabaciones en la nube para una mayor rapidez y estabilidad."
+      "¡Optimización del almacenamiento de vídeos! Hemos mejorado la organización y procesamiento interno de tus grabaciones en la nube para una mayor rapidez y estabilidad.",
+      "Corregido un problema por el cual los resultados importados de la competición de Teverga se mostraban erróneamente en la bitácora de la Canina (RSCE) en lugar de la bitácora de la RFEC. ¡Tus carreras ya aparecen en su federación correspondiente!"
     ]
   },
   {

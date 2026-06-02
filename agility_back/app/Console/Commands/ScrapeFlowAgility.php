@@ -189,26 +189,32 @@ class ScrapeFlowAgility extends Command
                 return $this->normalizeUrl($c->enlace) === $scrapedNormalizedUrl && $c->club_id === $dog->club_id;
             });
 
-            if (!$competition) {
-                $competition = $scrapedComp;
-            }
+            // Metadatos de la competición fallback (para tracks/workloads si el club del perro no registró la competición)
+            $fallbackComp = $competition ?: $scrapedComp;
 
-            // Vincular perro en competition_dog si no está
-            $competition->attendingDogs()->syncWithoutDetaching([
-                $dog->id => [
-                    'user_id' => $user->id,
-                    'position' => $item['position'] ?? '-',
-                    'dorsal' => $item['dorsal'] ?? ''
-                ]
-            ]);
+            if ($competition) {
+                // Comprobamos si el perro ya estaba registrado (apuntado) en la competición
+                $isRegistered = $competition->attendingDogs()->where('dogs.id', $dog->id)->exists();
 
-            // Vincular también al usuario en competition_user si no está
-            if (!$competition->attendees()->where('users.id', $user->id)->exists()) {
-                $competition->attendees()->attach($user->id);
+                if ($isRegistered) {
+                    // Vincular perro en competition_dog si ya está apuntado
+                    $competition->attendingDogs()->syncWithoutDetaching([
+                        $dog->id => [
+                            'user_id' => $user->id,
+                            'position' => $item['position'] ?? '-',
+                            'dorsal' => $item['dorsal'] ?? ''
+                        ]
+                    ]);
+
+                    // Vincular también al usuario en competition_user si no está
+                    if (!$competition->attendees()->where('users.id', $user->id)->exists()) {
+                        $competition->attendees()->attach($user->id);
+                    }
+                }
             }
 
             // --- Auto-completar y Enriquecer Ficha del Perro ---
-            if ($competition->federacion === 'RFEC') {
+            if ($fallbackComp->federacion === 'RFEC') {
                 if (empty($user->rfec_license) && !empty($item['license'])) {
                     $user->rfec_license = $item['license'];
                     $user->save();
@@ -246,9 +252,9 @@ class ScrapeFlowAgility extends Command
                 $isClean = ($faults === 0 && $refusals === 0 && $timePenalty == 0.00 && stripos($run['qualification'], 'elim') === false);
 
                 // Mapear calificación para base de datos
-                $qualification = $this->mapQualification($run['qualification'], $competition->federacion, !empty($time), $faults, $refusals, $timePenalty, $totalPenalty);
+                $qualification = $this->mapQualification($run['qualification'], $fallbackComp->federacion, !empty($time), $faults, $refusals, $timePenalty, $totalPenalty);
 
-                $runDate = $item['runDate'] ?? $competition->fecha_evento ?: Carbon::now()->toDateString();
+                $runDate = $item['runDate'] ?? $fallbackComp->fecha_evento ?: Carbon::now()->toDateString();
 
                 $trackData = [
                     'dog_id' => $dog->id,
@@ -262,15 +268,15 @@ class ScrapeFlowAgility extends Command
                     'time_penalty' => $timePenalty,
                     'total_penalty' => $totalPenalty,
                     'is_clean' => $isClean,
-                    'judge_name' => $competition->judge_name ?: null,
-                    'location' => !empty($competition->nombre)
-                        ? (!empty($competition->lugar) ? $competition->nombre . ' - ' . $competition->lugar : $competition->nombre)
-                        : $competition->lugar,
+                    'judge_name' => $fallbackComp->judge_name ?: null,
+                    'location' => !empty($fallbackComp->nombre)
+                        ? (!empty($fallbackComp->lugar) ? $fallbackComp->nombre . ' - ' . $fallbackComp->lugar : $fallbackComp->nombre)
+                        : $fallbackComp->lugar,
                     'club_id' => $dog->club_id,
                     'notes' => "Importado automáticamente de FlowAgility. Manga original: {$run['mangaType']}"
                 ];
 
-                if ($competition->federacion === 'RFEC') {
+                if ($fallbackComp->federacion === 'RFEC') {
                     $trackData['grade'] = $dog->rfec_grade;
                     RfecTrack::updateOrCreate(
                         [
@@ -293,13 +299,13 @@ class ScrapeFlowAgility extends Command
             }
 
             // --- Registrar Carga de Trabajo Automática de Competición ---
-            if ($competition->tipo === 'competicion' && !empty($item['runs'])) {
-                $runDate = $item['runDate'] ?? $competition->fecha_evento ?: Carbon::now()->toDateString();
+            if ($fallbackComp->tipo === 'competicion' && !empty($item['runs'])) {
+                $runDate = $item['runDate'] ?? $fallbackComp->fecha_evento ?: Carbon::now()->toDateString();
                 $workload = DogWorkload::firstOrCreate(
                     [
                         'dog_id' => $dog->id,
                         'source_type' => 'auto_competition',
-                        'source_id' => $competition->id,
+                        'source_id' => $fallbackComp->id,
                         'date' => Carbon::parse($runDate)
                     ],
                     [
