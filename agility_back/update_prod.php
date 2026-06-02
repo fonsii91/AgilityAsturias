@@ -1,9 +1,6 @@
 <?php
-
-require __DIR__.'/vendor/autoload.php';
-$app = require_once __DIR__.'/bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-$kernel->bootstrap();
-
-\App\Models\Club::where('id', 1)->update(['domain' => 'agilityasturias.com']);
-echo "Updated production DB!\n";
+require 'vendor/autoload.php';
+$app = require_once 'bootstrap/app.php';
+$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+$updated = \App\Models\Video::withoutGlobalScopes()->whereIn('id', [326, 327])->update(['club_id' => 2]);
+echo "Updated {$updated} videos!\n";

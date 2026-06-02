@@ -13,10 +13,10 @@ trait HasClub
 
         static::creating(function ($model) {
             if (!$model->club_id) {
-                if (auth()->hasUser()) {
-                    $model->club_id = auth()->user()->club_id;
-                } elseif (app()->bound('active_club_id')) {
+                if (app()->bound('active_club_id')) {
                     $model->club_id = app('active_club_id');
+                } elseif (auth()->hasUser()) {
+                    $model->club_id = auth()->user()->club_id;
                 }
             }
         });

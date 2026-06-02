@@ -160,18 +160,21 @@ export class UploadService {
                     this.processQueue();
                   },
                   error: (err) => {
-                    this.handleError(task.id, 'Error al registrar la subida en el servidor principal.', err);
+                    const errorMsg = err.error?.message || 'Error al registrar la subida en el servidor principal.';
+                    this.handleError(task.id, errorMsg, err);
                   }
                 });
               }
             },
             error: (err) => {
-              this.handleError(task.id, `Fallo en la transferencia de datos a ${task.driver}.`, err);
+              const errorMsg = err.error?.message || `Fallo en la transferencia de datos a ${task.driver}.`;
+              this.handleError(task.id, errorMsg, err);
             }
           });
         },
         error: (err) => {
-          this.handleError(task.id, 'Error al registrar la subida con la base de datos.', err);
+          const errorMsg = err.error?.message || 'Error al registrar la subida con la base de datos.';
+          this.handleError(task.id, errorMsg, err);
         }
       });
     } else {
