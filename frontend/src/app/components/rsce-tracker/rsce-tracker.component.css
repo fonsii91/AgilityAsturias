@@ -740,6 +740,11 @@
     display: none !important;
   }
 
+  .table-responsive {
+    display: block !important;
+    overflow: visible !important;
+  }
+
   body {
     background: white !important;
     margin: 0 !important;
@@ -803,7 +808,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
   .list-header {
     flex-direction: column;
     align-items: stretch;
@@ -1079,7 +1084,7 @@
 }
 
 /* Media Queries for Layout Toggle */
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
   .table-responsive {
     display: none !important;
   }

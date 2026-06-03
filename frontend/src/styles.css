@@ -520,4 +520,64 @@ a:hover {
     line-height: 1.4 !important;
     text-align: center !important;
     max-width: 250px !important;
-}app-toast { position: relative; z-index: 2147483647; display: block; }
+}
+app-toast { position: relative; z-index: 2147483647; display: block; }
+
+/* -------------------------------------------------------------------------- */
+/* GLOBAL PRINT OVERRIDES                                                     */
+/* -------------------------------------------------------------------------- */
+@media print {
+    /* Reset heights and overflows to allow standard browser pagination */
+    html, 
+    body, 
+    .app-container, 
+    mat-sidenav-container, 
+    mat-sidenav-content, 
+    .sidenav-container,
+    .mat-drawer-container,
+    .mat-drawer-content,
+    .mat-drawer-inner-container {
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+        display: block !important;
+        position: static !important;
+    }
+
+    /* Hide layouts and elements that should not appear on print */
+    app-navbar, 
+    mat-sidenav, 
+    footer, 
+    .no-print, 
+    .global-warning-overlay, 
+    .minimized-warning-fab,
+    app-toast {
+        display: none !important;
+    }
+
+    /* Main container adapts to full width */
+    main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+
+    .print-footer-brand {
+        display: block !important;
+        text-align: center;
+        font-size: 10pt;
+        color: #64748b;
+        margin-top: 2.5rem;
+        border-top: 1px dashed #cbd5e1;
+        padding-top: 1rem;
+        width: 100%;
+    }
+}
+
+.print-footer-brand {
+    display: none;
+}
+

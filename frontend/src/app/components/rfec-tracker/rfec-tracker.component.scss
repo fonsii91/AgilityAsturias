@@ -541,6 +541,7 @@
   
   @media print {
     .no-print { display: none !important; }
+    .table-responsive { display: block !important; overflow: visible !important; }
     .print-header { display: block; margin-bottom: 2rem; border-bottom: 2px solid #000; padding-bottom: 1rem; }
     .tracker-container { margin: 0; padding: 0; }
     .tracks-section { box-shadow: none; border: none; padding: 0; }
@@ -554,7 +555,7 @@
     }
   }
 
-  @media (max-width: 768px) {
+  @media screen and (max-width: 768px) {
     .section-header {
       flex-direction: column;
       align-items: stretch;
@@ -835,7 +836,7 @@
   }
 
   /* Media Queries for Toggle */
-  @media (max-width: 768px) {
+  @media screen and (max-width: 768px) {
     .table-responsive {
       display: none !important;
     }

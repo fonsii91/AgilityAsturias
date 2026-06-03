@@ -2,8 +2,12 @@
   {
     "version": "1.1.47",
     "date": "2026-06-03",
+    "features": [
+      "¡Pie de página de marca en exportación! Hemos añadido un pie de página en los documentos PDF generados de tus bitácoras que indica que han sido creados a través de la plataforma del club."
+    ],
     "bugfixes": [
-      "¡Optimización masiva del historial de pistas! Hemos unificado y saneado el almacenamiento de las carreras de tu perro en la base de datos. A partir de ahora, la carga de tus bitácoras de competición (tanto de la Canina/RSCE como de la RFEC) y la consulta del Seguimiento Provisional serán más rápidas y eficientes."
+      "¡Optimización masiva del historial de pistas! Hemos unificado y saneado el almacenamiento de las carreras de tu perro en la base de datos. A partir de ahora, la carga de tus bitácoras de competición (tanto de la Canina/RSCE como de la RFEC) y la consulta del Seguimiento Provisional serán más rápidas y eficientes.",
+      "¡Corregido el problema de la impresión vacía! Solucionado un inconveniente técnico por el cual, al intentar imprimir o exportar tus bitácoras de la Canina (RSCE) o de Caza (RFEC) desde ciertos navegadores o dispositivos móviles, la vista previa del PDF se generaba en blanco y omitía el historial de mangas de tu perro."
     ]
   },
   {
