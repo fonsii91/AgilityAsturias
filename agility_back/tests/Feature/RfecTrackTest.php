@@ -76,10 +76,11 @@ class RfecTrackTest extends TestCase
         $response = $this->actingAs($user)->postJson('/api/rfec-tracks', $trackData);
 
         $response->assertStatus(201);
-        $this->assertDatabaseHas('rfec_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'dog_id' => $dog->id,
             'qualification' => 'Excelente',
-            'judge_name' => 'John Doe'
+            'judge_name' => 'John Doe',
+            'federation' => 'RFEC'
         ]);
     }
 
@@ -122,10 +123,11 @@ class RfecTrackTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/rfec-tracks/{$track->id}", $updateData);
 
         $response->assertStatus(200);
-        $this->assertDatabaseHas('rfec_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'id' => $track->id,
             'qualification' => 'Muy Bueno',
-            'location' => 'Barcelona'
+            'location' => 'Barcelona',
+            'federation' => 'RFEC'
         ]);
     }
 
@@ -159,7 +161,7 @@ class RfecTrackTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/rfec-tracks/{$track->id}/delete");
 
         $response->assertStatus(204);
-        $this->assertDatabaseMissing('rfec_tracks', [
+        $this->assertDatabaseMissing('tracks', [
             'id' => $track->id
         ]);
     }

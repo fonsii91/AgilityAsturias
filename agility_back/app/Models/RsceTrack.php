@@ -2,48 +2,18 @@
 
 namespace App\Models;
 
-use App\Traits\HasClub;
+use Illuminate\Database\Eloquent\Builder;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
-class RsceTrack extends Model
+class RsceTrack extends Track
 {
-    use HasClub, HasFactory;
-    protected $fillable = [
-        'dog_id',
-        'date',
-        'manga_type',
-        'qualification',
-        'speed',
-        'judge_name',
-        'location',
-        'notes',
-        'time',
-        'faults',
-        'refusals',
-        'time_penalty',
-        'total_penalty',
-        'is_clean',
-        'course_length',
-        'standard_time',
-        'club_id'
-    ];
-
-    protected $casts = [
-        'speed' => 'float',
-        'time' => 'float',
-        'faults' => 'integer',
-        'refusals' => 'integer',
-        'time_penalty' => 'float',
-        'total_penalty' => 'float',
-        'is_clean' => 'boolean',
-        'course_length' => 'float',
-        'standard_time' => 'float',
-    ];
-
-    public function dog()
+    protected static function booted()
     {
-        return $this->belongsTo(Dog::class);
+        static::addGlobalScope('federation_rsce', function (Builder $builder) {
+            $builder->where('federation', 'RSCE');
+        });
+
+        static::creating(function ($track) {
+            $track->federation = 'RSCE';
+        });
     }
 }

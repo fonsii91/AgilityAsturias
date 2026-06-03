@@ -176,10 +176,11 @@ class FlowAgilityScraperTest extends TestCase
         $comp->refresh();
         $this->assertEquals('success', $comp->scrape_status);
 
-        $this->assertDatabaseHas('rsce_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'dog_id' => $dog->id,
             'manga_type' => 'Agility',
-            'qualification' => 'EXC_0'
+            'qualification' => 'EXC_0',
+            'federation' => 'RSCE'
         ]);
     }
 
@@ -268,7 +269,7 @@ class FlowAgilityScraperTest extends TestCase
         $this->assertTrue((bool)$comp->attendance_verified);
 
         // Check RsceTrack creation
-        $this->assertDatabaseHas('rsce_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'dog_id' => $dog->id,
             'date' => '2026-05-09',
             'manga_type' => 'Jumping 1',
@@ -281,7 +282,8 @@ class FlowAgilityScraperTest extends TestCase
             'total_penalty' => 5.00,
             'is_clean' => 0, // False due to refusal
             'club_id' => $this->club->id,
-            'location' => 'Valladolid Agility Trial - Valladolid'
+            'location' => 'Valladolid Agility Trial - Valladolid',
+            'federation' => 'RSCE'
         ]);
 
         // Check license updated in dog_user pivot table
@@ -563,22 +565,25 @@ class FlowAgilityScraperTest extends TestCase
         $this->assertEquals(0, $dogB->points);
 
         // Assert 4: But tracks are successfully imported for ALL dogs!
-        $this->assertDatabaseHas('rsce_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'dog_id' => $dogReg->id,
             'manga_type' => 'Agility',
-            'qualification' => 'EXC_0'
+            'qualification' => 'EXC_0',
+            'federation' => 'RSCE'
         ]);
-        $this->assertDatabaseHas('rsce_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'dog_id' => $dogUnreg->id,
             'manga_type' => 'Agility',
-            'qualification' => 'EXC_0'
+            'qualification' => 'EXC_0',
+            'federation' => 'RSCE'
         ]);
-        $this->assertDatabaseHas('rsce_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'dog_id' => $dogB->id,
             'manga_type' => 'Agility',
             'qualification' => 'EXC_0',
             'club_id' => $clubB->id,
-            'location' => 'Valladolid Agility Trial - Valladolid' // Verified fallback to scraped comp meta
+            'location' => 'Valladolid Agility Trial - Valladolid', // Verified fallback to scraped comp meta
+            'federation' => 'RSCE'
         ]);
     }
 }

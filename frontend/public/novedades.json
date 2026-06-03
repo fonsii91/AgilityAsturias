@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.47",
+    "date": "2026-06-03",
+    "bugfixes": [
+      "¡Optimización masiva del historial de pistas! Hemos unificado y saneado el almacenamiento de las carreras de tu perro en la base de datos. A partir de ahora, la carga de tus bitácoras de competición (tanto de la Canina/RSCE como de la RFEC) y la consulta del Seguimiento Provisional serán más rápidas y eficientes."
+    ]
+  },
+  {
     "version": "1.1.46",
     "date": "2026-06-02",
     "features": [

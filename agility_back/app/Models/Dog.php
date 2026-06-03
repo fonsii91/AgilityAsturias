@@ -87,6 +87,11 @@ class Dog extends Model
         return $this->hasMany(RfecTrack::class);
     }
 
+    public function tracks()
+    {
+        return $this->hasMany(Track::class);
+    }
+
     public function workloads()
     {
         return $this->hasMany(DogWorkload::class);

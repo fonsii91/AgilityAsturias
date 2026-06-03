@@ -324,30 +324,11 @@ class CompetitionController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
-        $rsce = \App\Models\RsceTrack::with(['dog.users', 'club'])
+        $merged = \App\Models\Track::with(['dog.users', 'club'])
             ->where('notes', 'like', '%FlowAgility%')
-            ->orderBy('id', 'desc')
+            ->orderBy('created_at', 'desc')
             ->limit(100)
-            ->get()
-            ->map(function ($track) {
-                $track->federation = 'RSCE';
-                return $track;
-            });
-
-        $rfec = \App\Models\RfecTrack::with(['dog.users', 'club'])
-            ->where('notes', 'like', '%FlowAgility%')
-            ->orderBy('id', 'desc')
-            ->limit(100)
-            ->get()
-            ->map(function ($track) {
-                $track->federation = 'RFEC';
-                return $track;
-            });
-
-        $merged = $rsce->concat($rfec)
-            ->sortByDesc('created_at')
-            ->take(100)
-            ->values();
+            ->get();
 
         $formatted = $merged->map(function ($track) {
             $primaryUser = $track->dog && $track->dog->users ? $track->dog->users->first() : null;
@@ -377,30 +358,11 @@ class CompetitionController extends Controller
 
     public function memberScraperLastTracks(Request $request)
     {
-        $rsce = \App\Models\RsceTrack::with(['dog.users', 'club'])
+        $merged = \App\Models\Track::with(['dog.users', 'club'])
             ->where('notes', 'like', '%FlowAgility%')
-            ->orderBy('id', 'desc')
+            ->orderBy('created_at', 'desc')
             ->limit(100)
-            ->get()
-            ->map(function ($track) {
-                $track->federation = 'RSCE';
-                return $track;
-            });
-
-        $rfec = \App\Models\RfecTrack::with(['dog.users', 'club'])
-            ->where('notes', 'like', '%FlowAgility%')
-            ->orderBy('id', 'desc')
-            ->limit(100)
-            ->get()
-            ->map(function ($track) {
-                $track->federation = 'RFEC';
-                return $track;
-            });
-
-        $merged = $rsce->concat($rfec)
-            ->sortByDesc('created_at')
-            ->take(100)
-            ->values();
+            ->get();
 
         $formatted = $merged->map(function ($track) {
             $primaryUser = $track->dog && $track->dog->users ? $track->dog->users->first() : null;

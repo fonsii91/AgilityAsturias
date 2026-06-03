@@ -75,10 +75,11 @@ class RsceTrackTest extends TestCase
         $response = $this->actingAs($user)->postJson('/api/rsce-tracks', $trackData);
 
         $response->assertStatus(201);
-        $this->assertDatabaseHas('rsce_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'dog_id' => $dog->id,
             'qualification' => 'EXC',
-            'judge_name' => 'John Doe'
+            'judge_name' => 'John Doe',
+            'federation' => 'RSCE'
         ]);
     }
 
@@ -121,10 +122,11 @@ class RsceTrackTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/rsce-tracks/{$track->id}", $updateData);
 
         $response->assertStatus(200);
-        $this->assertDatabaseHas('rsce_tracks', [
+        $this->assertDatabaseHas('tracks', [
             'id' => $track->id,
             'qualification' => 'MB',
-            'location' => 'Barcelona'
+            'location' => 'Barcelona',
+            'federation' => 'RSCE'
         ]);
     }
 
@@ -158,7 +160,7 @@ class RsceTrackTest extends TestCase
         $response = $this->actingAs($user)->postJson("/api/rsce-tracks/{$track->id}/delete");
 
         $response->assertStatus(204);
-        $this->assertDatabaseMissing('rsce_tracks', [
+        $this->assertDatabaseMissing('tracks', [
             'id' => $track->id
         ]);
     }
