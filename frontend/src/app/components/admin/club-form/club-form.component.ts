@@ -288,11 +288,11 @@ interface Plan {
               </div>
             </div>
 
-            <!-- Card: Gamificación -->
+            <!-- Card: Módulos Activos -->
             <div class="bento-card">
               <div class="card-header purple-header">
-                <div class="icon-box purple-icon"><mat-icon>emoji_events</mat-icon></div>
-                <h2>Gamificación</h2>
+                <div class="icon-box purple-icon"><mat-icon>widgets</mat-icon></div>
+                <h2>Módulos Activos</h2>
               </div>
               <div class="card-body stack-gap">
                 <div class="input-group">
@@ -302,6 +302,20 @@ interface Plan {
                     <span style="font-size: 0.875rem; font-weight: 500; color: #475569;">Sistema de Gamificación</span>
                     <label class="switch">
                       <input type="checkbox" formControlName="gamification_enabled">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="input-group">
+                  <label>Módulo de Provisión de Fondos</label>
+                  <p class="help-text" style="margin-top: 2px; margin-bottom: 12px;">Permite a los socios consultar sus ingresos, gastos y saldo, y a los gestores administrar los fondos del club.</p>
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0;">
+                    <span style="font-size: 0.875rem; font-weight: 500; color: #475569;">Provisión de Fondos</span>
+                    <label class="switch">
+                      <input type="checkbox" formControlName="provision_fondos_enabled">
                       <span class="slider"></span>
                     </label>
                   </div>
@@ -990,7 +1004,8 @@ export class ClubFormComponent implements OnInit {
       addressLine1: [''],
       addressLine2: [''],
       mapUrl: [''],
-      gamification_enabled: [true]
+      gamification_enabled: [true],
+      provision_fondos_enabled: [true]
     });
   }
 
@@ -1019,7 +1034,8 @@ export class ClubFormComponent implements OnInit {
             addressLine1: settings.contact?.addressLine1 || '',
             addressLine2: settings.contact?.addressLine2 || '',
             mapUrl: settings.contact?.mapUrl || '',
-            gamification_enabled: settings.gamification_enabled !== false
+            gamification_enabled: settings.gamification_enabled !== false,
+            provision_fondos_enabled: settings.provision_fondos_enabled !== false
           });
 
         } else {
@@ -1124,6 +1140,7 @@ export class ClubFormComponent implements OnInit {
       customizationRequest: this.clubData?.settings?.customizationRequest || '',
       landing_page_requested: this.clubData?.settings?.landing_page_requested || false,
       gamification_enabled: formValue.gamification_enabled,
+      provision_fondos_enabled: formValue.provision_fondos_enabled,
       contact: {
         phone: formValue.phone,
         email: formValue.email,

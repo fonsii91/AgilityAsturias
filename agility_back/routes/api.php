@@ -278,6 +278,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Liga Norte Public Standings
         Route::get('/liga-norte/standings', [LigaNorteController::class, 'getStandings']);
 
+        // Provisión de Fondos (Finanzas)
+        Route::middleware(['provision_fondos.enabled'])->group(function () {
+            Route::get('/fund-transactions', [\App\Http\Controllers\FundTransactionController::class, 'index']);
+            
+            Route::middleware(['role:admin,manager'])->group(function () {
+                Route::get('/fund-transactions/dashboard', [\App\Http\Controllers\FundTransactionController::class, 'dashboard']);
+                Route::post('/fund-transactions', [\App\Http\Controllers\FundTransactionController::class, 'store']);
+                Route::post('/fund-transactions/{id}/delete', [\App\Http\Controllers\FundTransactionController::class, 'destroy']);
+            });
+        });
+
         Route::middleware(['gamification.enabled'])->group(function () {
             // Ranking
             Route::get('/ranking', [RankingController::class, 'index']);

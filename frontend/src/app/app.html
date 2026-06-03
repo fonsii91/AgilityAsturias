@@ -40,6 +40,7 @@
           <li><a routerLink="/ranking" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">emoji_events</span> Clasificación</a></li>
           }
+
           <li *hasFeature="'galeria-videos'"><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">movie</span> Vídeos</a></li>
           }
@@ -82,6 +83,10 @@
               (click)="sidenav.close()"><span class="material-icons">settings</span> Configurar Club</a></li>
           <li><a routerLink="/gestor/landing-page" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">design_services</span> P. Bienvenida</a></li>
+          @if (provisionFondosEnabled()) {
+          <li><a routerLink="/admin/finanzas" routerLinkActive="active-route" (click)="sidenav.close()"><span
+                class="material-icons">payments</span> Provisión Fondos</a></li>
+          }
           }
 
           <!-- Administrar Section -->
@@ -150,7 +155,7 @@
     </mat-sidenav-content>
   </mat-sidenav-container>
 
-  <app-onboarding-widget></app-onboarding-widget>
+  <!-- <app-onboarding-widget></app-onboarding-widget> -->
   <app-toast />
   <app-upload-progress-panel></app-upload-progress-panel>
 

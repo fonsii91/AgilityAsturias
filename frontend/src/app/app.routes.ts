@@ -18,6 +18,7 @@ import { memberGuard } from './guards/member.guard';
 import { managerGuard } from './guards/manager.guard';
 import { featureGuard } from './guards/feature.guard';
 import { gamificationGuard } from './guards/gamification.guard';
+import { provisionFondosGuard } from './guards/provision-fondos.guard';
 
 export const routes: Routes = [
     {
@@ -290,6 +291,18 @@ export const routes: Routes = [
         loadComponent: () => import('./components/novedades/novedades.component').then(m => m.NovedadesComponent),
         canActivate: [memberGuard],
         title: titleResolver, data: { pageTitle: '' }
+    },
+    {
+        path: 'finanzas',
+        loadComponent: () => import('./components/finanzas-socio/finanzas-socio.component').then(m => m.FinanzasSocioComponent),
+        canActivate: [memberGuard, provisionFondosGuard],
+        title: titleResolver, data: { pageTitle: 'Provisión de Fondos' }
+    },
+    {
+        path: 'admin/finanzas',
+        loadComponent: () => import('./components/finanzas-gestor/finanzas-gestor.component').then(m => m.FinanzasGestorComponent),
+        canActivate: [managerGuard, provisionFondosGuard],
+        title: titleResolver, data: { pageTitle: 'Administrar Finanzas' }
     },
     {
         path: 'explorar/salud-deportiva',

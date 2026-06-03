@@ -101,5 +101,19 @@ Para gestionar la plataforma SaaS, el rol `admin` (Administrador Global) actúa 
 *   El Middleware de validación de roles (`RoleMiddleware`) ha sido adaptado para que los administradores globales pasen las validaciones de las distintas rutas, garantizando que un `admin` nunca se quede "encerrado" fuera de módulos operativos.
 *   Existe un CRUD protegido (Accesible solo por `admin`/Administrador Global) para la gestión, creación, modificación de slugs y colores de todos los clubes de la plataforma.
 
+---
+
+## 6. Módulos Opcionales y Configuración del Club (Tenant Settings)
+
+No todos los clubes de la plataforma requieren o utilizan todas las funcionalidades disponibles. Para soportar características opcionales y modulares (como **Provisión de Fondos** o **Gamificación**):
+
+*   **Configuración del Tenant:** La activación y desactivación de módulos se controla mediante llaves de configuración en la columna JSON/serialized `settings` en la tabla `clubs` (ej. `settings.provision_fondos_enabled` o `settings.gamification_enabled`).
+*   **Aislamiento y Bloqueo en Backend:** Se implementan middlewares especializados (`CheckProvisionFondosEnabled`, `CheckGamificationEnabled`) que comprueban la configuración de la instancia activa del club en el contenedor de Laravel. Si un módulo está desactivado, cualquier petición a sus endpoints es cancelada inmediatamente devolviendo un error **403 Forbidden**.
+*   **Visibilidad Condicional en Frontend:**
+    *   **Route Guards:** Las rutas de Angular se protegen de manera reactiva mediante guards asociados (ej. `provisionFondosGuard`) que comprueban las configuraciones dentro de `TenantService.tenantInfo()`.
+    *   **Control de Navegación y Menús:** Los enlaces del navbar (`navbar.component.html`) y el sidenav móvil (`app.html`) se ocultan o muestran usando signals computados (`provisionFondosEnabled()`).
+    *   **Restricciones de Rol en Módulos:** Ciertos módulos pueden excluir completamente a determinados roles de forma explícita. Por ejemplo, el módulo de provisión de fondos oculta y bloquea cualquier acceso a los usuarios con rol `staff` (entrenadores y monitores), tanto en las rutas del frontend como en la respuesta del controlador de la API backend, para salvaguardar la privacidad financiera de los socios.
+
+
 
 

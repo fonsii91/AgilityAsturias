@@ -1,5 +1,20 @@
 [
   {
+    "version": "1.1.48",
+    "date": "2026-06-04",
+    "features": [
+      "¡Renovación del Panel de Finanzas de la directiva! Rediseñamos por completo el panel de Provisión de Fondos para los responsables del club. Ahora dispone de un diseño visual moderno de dos columnas en ordenadores, tarjetas de resumen rápidas para ver el estado de la caja y las deudas al instante, y un feed con los últimos movimientos.",
+      "¡Registro en masa (Registro Múltiple)! Incorporamos la posibilidad de aplicar un cargo o un depósito (como la cuota mensual o licencias) a varios socios del club al mismo tiempo en un solo paso, incluyendo atajos de selección rápida de socios.",
+      "¡Navegación móvil ultra-cómoda! En teléfonos móviles, el panel se organiza en pestañas de 'Resumen' y 'Socios' para evitar desplazamientos largos. Además, al pulsar sobre el número de deudores, la aplicación te lleva directamente a la pestaña de socios con la lista filtrada de forma automática.",
+      "¡Subida de justificantes interactiva! Añadimos soporte para arrastrar y soltar (Drag & Drop) los archivos de recibos e imágenes de pago, haciendo el registro de movimientos mucho más ágil.",
+      "¡Acciones siempre a la vista en móviles! En el formulario de registro, los botones de guardar y cancelar ahora quedan fijados en la parte inferior de tu pantalla para que puedas confirmar los movimientos al instante sin desplazarte hacia abajo."
+    ],
+    "bugfixes": [
+      "Corregido un problema visual que hacía que las opciones del método de pago se mostraran transparentes y se solaparan con los campos inferiores del formulario, dificultando su selección.",
+      "Añadido un nuevo diálogo integrado para anular movimientos erróneos con confirmación de seguridad y soporte para cerrar mediante la tecla Escape."
+    ]
+  },
+  {
     "version": "1.1.47",
     "date": "2026-06-03",
     "features": [

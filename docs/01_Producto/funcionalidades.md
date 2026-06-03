@@ -68,6 +68,9 @@ Herramienta avanzada para la prevención de lesiones y monitorización del rendi
 * **Bitácora RSCE:** Herramienta para realizar un seguimiento personal de las pistas RSCE realizadas, guardar resultados, registrar puntos y llevar un control del grado de competición.
 * **Bitácora RFEC:** Herramienta paralela para el seguimiento de clasificaciones, resultados y progresión en la normativa de la Real Federación Española de Caza (RFEC) (ver [[normativa-rfec]]).
 
+### Finanzas y Provisión de Fondos
+* **Consulta de Provisión de Fondos:** Visualizar el saldo acumulado (neto) personal y acceder al historial completo de movimientos (ingresos y gastos), incluyendo métodos de pago y visualización/descarga de justificantes (ver especificaciones en [[provision-fondos]]).
+
 ### Gamificación
 Dinámicas recreativas y colaborativas diseñadas para incentivar la participación activa en el club y la app (ver [[gamificaciones]]):
 * **Dinámicas Rotativas por Temporada (Alternas):**
@@ -106,3 +109,15 @@ Los miembros con el rol de "Staff" (monitores, entrenadores, directiva) tienen a
 * **Asignación de Puntos Extra:** Otorgar puntos adicionales de forma manual a los perros en el sistema de Ranking para premiar acciones, méritos especiales o resultados en ligas externas.
 * **Gestión del Tablón de Cazarrecompensas:** Habilitar o deshabilitar la extensión del Tablón de Cazarrecompensas y auditar la veracidad de validaciones de testigos sospechosas desde el panel de control.
 * **Gestión de Salud Deportiva (Si aplica):** Supervisar los registros de carga física (ACWR) introducidos por los usuarios si requieren confirmación adicional.
+
+---
+
+## 4. Funcionalidades para Responsable del Club (Gestor)
+
+El Responsable del Club (Gestor) posee todos los permisos del Staff y del Socio, además de funcionalidades orientadas a la administración corporativa y financiera del club:
+
+### Gestión Financiera y Provisión de Fondos
+* **Gestión de la Provisión de Fondos:** Acceso al panel financiero de auditoría para todos los socios del tenant. Permite registrar nuevos ingresos (Bizum, transferencia, efectivo, etc.), registrar gastos imputados (cuotas, inscripciones, licencias, etc.), subir los documentos/justificantes de las transacciones y anular movimientos erróneos (ver especificaciones en [[provision-fondos]]).
+
+### Administración del Club (Configuración)
+* **Gestión del Club:** Acceso al panel de configuración e identidad visual del club. Permite modificar logotipos, imágenes hero/salto, información de contacto/redes, inyectar colores dinámicos del tema de Angular Material, y habilitar/deshabilitar selectivamente los módulos de Gamificación y Provisión de Fondos (ver especificaciones en [[gestionar-club]]).

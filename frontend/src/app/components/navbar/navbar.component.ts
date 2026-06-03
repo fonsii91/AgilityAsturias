@@ -33,6 +33,10 @@ export class NavbarComponent {
         const val = this.tenantService.tenantInfo()?.settings?.['gamification_enabled'];
         return val !== false && val !== 'false';
     });
+    provisionFondosEnabled = computed(() => {
+        const val = this.tenantService.tenantInfo()?.settings?.['provision_fondos_enabled'];
+        return val !== false && val !== 'false';
+    });
 
     toggleSidenav = output<void>();
 

@@ -59,6 +59,7 @@
             <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
                 Clasificación</a></li>
           }
+
           <li *hasFeature="'galeria-videos'"><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
               Vídeos</a></li>
         </ul>
@@ -99,6 +100,10 @@
               Club</a></li>
           <li><a routerLink="/gestor/landing-page" routerLinkActive="active-route"><span
                 class="material-icons">design_services</span> P. Bienvenida</a></li>
+          @if (provisionFondosEnabled()) {
+            <li><a routerLink="/admin/finanzas" routerLinkActive="active-route"><span class="material-icons">payments</span>
+                Provisión Fondos</a></li>
+          }
         </ul>
       </li>
       }
@@ -275,6 +280,10 @@
         @if (authService.isMember()) {
         <a routerLink="/gestionar-perros" (click)="closeMenu()" class="dropdown-item"><span
             class="material-icons">pets</span> Mis Perros</a>
+        @if (provisionFondosEnabled()) {
+        <a routerLink="/finanzas" (click)="closeMenu()" class="dropdown-item"><span
+            class="material-icons">account_balance_wallet</span> Mis gastos</a>
+        }
         <div class="dropdown-divider"></div>
         <a routerLink="/novedades" (click)="closeMenu()" class="dropdown-item">
           <span class="material-icons">new_releases</span> Novedades

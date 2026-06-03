@@ -17,6 +17,8 @@ A continuación, se detalla el mapa de navegación interactivo del proyecto. Uti
 Concepto de la aplicación, mapa de características y funcionalidades.
 *   **[[funcionalidades]]**: Índice de funciones disponibles para Socios, Staff e Invitados/Inactivos.
 *   **[[usuarios]]**: Roles de usuario (Visitante / Invitado / Inactivo, Socio, Staff, Responsable del Club y Administrador Global) y alcance de permisos.
+*   **[[provision-fondos]]**: Especificación de la provisión de fondos de socios (saldo, ingresos, gastos y roles de acceso).
+*   **[[gestionar-club]]**: Panel de configuración de identidad visual, marca, contacto y activación de módulos por club.
 *   **[[lineas-futuras-roadmap]]**: Futuras líneas de desarrollo (Notificaciones Push, Mapas de pistas, etc.).
 
 ### 💼 02. Negocio

@@ -39,6 +39,7 @@ Es el perfil principal del deportista y socio del club. Cuenta con acceso a las 
     *   **Historial Deportivo:** Gestionar las marcas personales y competiciones en las bitácoras oficiales de la **RSCE** y la **RFEC** (ver [[normativa-rfec]]).
     *   **Gamificación:** Coleccionar stickers de los perros del club, abrir cofres, acumular monedas anti-frustración e intercambiar cromos repetidos con otros socios (ver [[gamificacion-stickers]]).
     *   **Multimedia:** Subir vídeos de sus entrenamientos, dar "Me gusta" en los vídeos del club y descargarlos de forma local (ver [[gestion-videos]]).
+    *   **Finanzas:** Consultar su propia provisión de fondos (saldo acumulado, listado de ingresos y gastos históricos de forma confidencial) (ver [[provision-fondos]]).
 
 ---
 
@@ -46,7 +47,7 @@ Es el perfil principal del deportista y socio del club. Cuenta con acceso a las 
 Es el perfil destinado a los monitores, entrenadores o miembros de la junta directiva encargados del día a día deportivo del club.
 
 *   **Alcance:**
-    *   *Todos los permisos de Socio.*
+    *   *Todos los permisos de Socio (incluyendo la consulta de su propia provisión de fondos personal, pero sin visibilidad ni acceso a la de otros socios).*
     *   **Gestión del Horario:** Modificar y programar las franjas de reservas (time slots) del calendario y establecer excepciones (bloqueo por lluvia o mantenimiento).
     *   **Puntos y Asistencia:** Validar oficialmente la asistencia de los socios a clase ("pasar lista") y otorgar puntos deportivos manuales para la clasificación interna.
     *   **Tablón de Anuncios:** Publicar, modificar o retirar anuncios y circulares para todos los socios con alertas de notificación interna.
@@ -59,6 +60,7 @@ Es el perfil de gestión y responsabilidad sobre el club como negocio. Gestiona 
 
 *   **Alcance:**
     *   *Todos los permisos de Staff.*
+    *   **Gestión Financiera (Gestor):** Administrar la provisión de fondos de todos los socios del club (crear y anular movimientos de ingresos/gastos, y adjuntar justificantes) (ver [[provision-fondos]]).
     *   **Configuración Visual (Theming):** Modificar el subdominio/slug, el logotipo y la paleta de colores corporativos del club que Angular inyecta dinámicamente como variables CSS (ver [[sistema-diseno]] y [[arquitectura-multi-tenant]]).
     *   **Control de Accesos:** Invitar a nuevos miembros generando enlaces de registro, habilitar/deshabilitar usuarios y gestionar los roles de Staff.
     *   **Onboarding:** Seguir el flujo en cascada del Checklist global de bienvenida para configurar y activar el club (ver [[estrategias-onboarding-ux]]).

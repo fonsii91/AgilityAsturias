@@ -523,6 +523,38 @@ a:hover {
 }
 app-toast { position: relative; z-index: 2147483647; display: block; }
 
+/* MatSelect Global Styles - Premium Look & Solid Background Fix */
+.mat-mdc-select-panel, .mat-select-panel {
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+    padding: 6px 0 !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+.mat-mdc-option, .mat-option {
+    min-height: 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    color: var(--text-main) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 0.85rem !important;
+    transition: background-color 0.15s ease !important;
+}
+
+.mat-mdc-option:hover:not(.mdc-list-item--disabled), .mat-option:hover:not(.mat-option-disabled) {
+    background-color: #f1f5f9 !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mdc-list-item--disabled), 
+.mat-option.mat-selected:not(.mat-option-disabled) {
+    background-color: color-mix(in srgb, var(--primary-color) 8%, white) !important;
+    color: var(--primary-color) !important;
+    font-weight: 600 !important;
+}
+
+
 /* -------------------------------------------------------------------------- */
 /* GLOBAL PRINT OVERRIDES                                                     */
 /* -------------------------------------------------------------------------- */
