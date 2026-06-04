@@ -31,11 +31,11 @@ El formulario utiliza un diseño estructurado tipo *Bento Grid* optimizado para 
 *   **Slogan / Lema:** Breve frase definitoria que se inyecta en la landing page del club.
 
 ### B. Imágenes de Portada (Advanced Branding)
-*   **Imagen Cabecera (Hero):** Imagen principal que se muestra en la sección superior de la pantalla de bienvenida.
+*   **Imagen Cabecera (Hero):** Imagen principal que se muestra en la sección superior de la pantalla de bienvenida (ver [[presencia-publica]]).
 *   **Imagen Salto (Call to Action / Jump):** Imagen secundaria que ilustra la sección inferior o llamada a la acción en la página pública del club.
 
 ### C. Contacto y Redes Sociales
-Campos destinados a la comunicación y visualización en la cara pública del club:
+Campos destinados a la comunicación y visualización en la cara pública del club (ver [[presencia-publica]]):
 *   **Teléfono de Contacto**
 *   **Email de Contacto**
 *   **Dirección Línea 1** (Calle, número)
@@ -67,6 +67,7 @@ La plataforma inyecta dinámicamente colores de marca en variables de estilo CSS
 Interruptores de activación rápida para los módulos de la aplicación:
 *   **Sistema de Gamificación (`settings.gamification_enabled`):** Activa o desactiva de forma global el ranking interno, el álbum de stickers coleccionables y la extensión del tablón de cazarrecompensas (ver [[gamificaciones]]).
 *   **Módulo de Provisión de Fondos (`settings.provision_fondos_enabled`):** Activa o desactiva la visualización del saldo e historial financiero para los socios, así como la consola de auditoría para los gestores (ver [[provision-fondos]]).
+*   **Módulo de Patrocinadores (`settings.sponsors_enabled`):** Habilita la sección de patrocinadores en la cara pública de la web. Su activación genera un botón de acceso directo en el panel de configuración que redirige a los gestores y staff al panel de administración CRUD de patrocinadores (ver [[presencia-publica]]).
 
 ---
 

@@ -86,6 +86,11 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'patrocinadores',
+        loadComponent: () => import('./components/patrocinadores/patrocinadores').then(m => m.PatrocinadoresComponent),
+        title: titleResolver, data: { pageTitle: 'Patrocinadores' }
+    },
+    {
         path: 'calendario',
         loadComponent: () => import('./components/calendario/calendario.component').then(m => m.CalendarioComponent),
         canActivate: [memberGuard],
@@ -222,6 +227,12 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin-usuarios/admin-usuarios').then(m => m.AdminUsuariosComponent),
         canActivate: [adminGuard],
         title: titleResolver, data: { pageTitle: '' }
+    },
+    {
+        path: 'admin/patrocinadores',
+        loadComponent: () => import('./components/patrocinadores/crud-patrocinadores').then(m => m.CrudPatrocinadoresComponent),
+        canActivate: [staffGuard],
+        title: titleResolver, data: { pageTitle: 'Gestionar Patrocinadores' }
     },
     {
         path: 'ranking',

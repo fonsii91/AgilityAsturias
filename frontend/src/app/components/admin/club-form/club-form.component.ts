@@ -320,6 +320,28 @@ interface Plan {
                     </label>
                   </div>
                 </div>
+
+                <hr class="divider">
+
+                <div class="input-group">
+                  <label>Módulo de Patrocinadores</label>
+                  <p class="help-text" style="margin-top: 2px; margin-bottom: 12px;">Habilita la sección de patrocinadores en la cara pública y la gestión de marcas colaboradoras.</p>
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0;">
+                    <span style="font-size: 0.875rem; font-weight: 500; color: #475569;">Módulo Patrocinadores</span>
+                    <label class="switch">
+                      <input type="checkbox" formControlName="sponsors_enabled">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                  @if (form.get('sponsors_enabled')?.value && isEditMode()) {
+                    <div style="margin-top: 0.75rem;">
+                      <a routerLink="/admin/patrocinadores" class="cancel-btn w-full" mat-stroked-button style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; text-decoration: none;">
+                        <mat-icon>handshake</mat-icon>
+                        <span>Gestionar Patrocinadores</span>
+                      </a>
+                    </div>
+                  }
+                </div>
               </div>
             </div>
 
@@ -1005,7 +1027,8 @@ export class ClubFormComponent implements OnInit {
       addressLine2: [''],
       mapUrl: [''],
       gamification_enabled: [true],
-      provision_fondos_enabled: [true]
+      provision_fondos_enabled: [true],
+      sponsors_enabled: [false]
     });
   }
 
@@ -1035,7 +1058,8 @@ export class ClubFormComponent implements OnInit {
             addressLine2: settings.contact?.addressLine2 || '',
             mapUrl: settings.contact?.mapUrl || '',
             gamification_enabled: settings.gamification_enabled !== false,
-            provision_fondos_enabled: settings.provision_fondos_enabled !== false
+            provision_fondos_enabled: settings.provision_fondos_enabled !== false,
+            sponsors_enabled: settings.sponsors_enabled === true || settings.sponsors_enabled === 'true'
           });
 
         } else {
@@ -1141,6 +1165,7 @@ export class ClubFormComponent implements OnInit {
       landing_page_requested: this.clubData?.settings?.landing_page_requested || false,
       gamification_enabled: formValue.gamification_enabled,
       provision_fondos_enabled: formValue.provision_fondos_enabled,
+      sponsors_enabled: formValue.sponsors_enabled,
       contact: {
         phone: formValue.phone,
         email: formValue.email,

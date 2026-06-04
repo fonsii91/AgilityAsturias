@@ -6,11 +6,12 @@ Este documento detalla todas las funcionalidades disponibles en la plataforma, c
 
 ## 1. Funcionalidades Públicas (Presencia Web)
 
-La plataforma cuenta con una cara pública orientada a visitantes, invitados o usuarios registrados que se encuentran inactivos. Actúa como la carta de presentación o landing page del club:
+La plataforma cuenta con una cara pública orientada a visitantes, invitados o usuarios registrados que se encuentran inactivos. Actúa como la carta de presentación o landing page del club (ver detalles en [[presencia-publica]]):
 * **Bienvenida:** Página de inicio (Home) con información general del club, filosofía, quiénes somos y qué ofrecemos.
 * **Galería:** Visor de las fotografías y momentos destacados seleccionados por el club de forma pública.
 * **Videoteca (Vídeos Públicos):** Espacio para mostrar los vídeos de entrenamientos o competiciones que el Staff ha decidido compartir con el público.
 * **Contacto:** Formulario y datos de contacto directo con la organización del club para consultas, información o solicitudes de inscripción.
+* **Patrocinadores:** Sección configurable para listar las marcas colaboradoras (logotipo, nombre, descripción y enlace web).
 
 ---
 
@@ -105,6 +106,7 @@ Los miembros con el rol de "Staff" (monitores, entrenadores, directiva) tienen a
 * **Administración de Recursos:** Subir nuevos archivos PDF, documentos o enlaces útiles a la sección de "Recursos" para que los miembros puedan descargarlos o consultarlos. Modificar o eliminar estos recursos.
 * **Administración de la Galería:** Subir nuevas imágenes a la galería del club y borrar fotografías.
 * **Aprobación de Vídeos Públicos:** Alternar la visibilidad de los vídeos subidos por los usuarios para decidir si deben o no mostrarse en la galería pública.
+* **Gestión de Patrocinadores:** Acceso al panel CRUD para añadir, modificar y eliminar las marcas patrocinadoras (ver [[presencia-publica]]).
 
 ### Gestión Deportiva y Gamificación
 * **Asignación de Puntos Extra:** Otorgar puntos adicionales de forma manual a los perros en el sistema de Ranking para premiar acciones, méritos especiales o resultados en ligas externas.
@@ -121,4 +123,4 @@ El Responsable del Club (Gestor) posee todos los permisos del Staff y del Socio,
 * **Gestión de la Provisión de Fondos:** Acceso al panel financiero de auditoría para todos los socios del tenant. Permite registrar nuevos ingresos (Bizum, transferencia, efectivo, etc.), registrar gastos imputados (cuotas, inscripciones, licencias, etc.), subir los documentos/justificantes de las transacciones y anular movimientos erróneos (ver especificaciones en [[provision-fondos]]).
 
 ### Administración del Club (Configuración)
-* **Gestión del Club:** Acceso al panel de configuración e identidad visual del club. Permite modificar logotipos, imágenes hero/salto, información de contacto/redes, inyectar colores dinámicos del tema de Angular Material, y habilitar/deshabilitar selectivamente los módulos de Gamificación y Provisión de Fondos (ver especificaciones en [[gestionar-club]]).
+* **Gestión del Club:** Acceso al panel de configuración e identidad visual del club. Permite modificar logotipos, imágenes hero/salto, información de contacto/redes, inyectar colores dinámicos del tema de Angular Material, y habilitar/deshabilitar selectivamente los módulos de Gamificación, Provisión de Fondos y Patrocinadores (ver especificaciones en [[gestionar-club]]). Si este último está activo, incluye acceso directo al CRUD de gestión de patrocinadores.

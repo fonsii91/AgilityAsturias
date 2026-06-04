@@ -682,3 +682,23 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 
 ### End-to-End (Playwright)
 - No requerido (El flujo de estado del progreso y su interacción cruzada están probados ampliamente en Backend y test unitarios en el Frontend).
+
+---
+
+## 33. Funcionalidades Públicas (Presencia Web) - Patrocinadores (Sponsors)
+**Fecha:** 05/06/2026
+**Capas Cubiertas:** Frontend y Backend
+
+### Backend (PHPUnit)
+- **Archivos Modificados/Creados:**
+  - `agility_back/tests/Feature/SponsorTest.php`
+- **Descripción:** Se validó el endpoint público de listado de patrocinadores y los endpoints restringidos del panel de gestión CRUD. Se verificó que cualquier usuario (incluso no autenticado) pueda listar los patrocinadores de un club, y que solo los usuarios autorizados (staff) puedan crear, editar y eliminar registros (retornando la respuesta de eliminación adecuada HTTP 204). Se comprobó el aislamiento tenant automático.
+
+### Frontend (Vitest + Angular)
+- **Archivos Modificados/Creados:**
+  - `frontend/src/app/components/patrocinadores/patrocinadores.spec.ts`
+  - `frontend/src/app/components/patrocinadores/crud-patrocinadores.spec.ts`
+- **Descripción:** Se testearon las dos vistas principales de la funcionalidad: la vista pública (`PatrocinadoresComponent`), comprobando el estado vacío y el renderizado en cuadrícula al haber datos disponibles; y la consola de gestión (`CrudPatrocinadoresComponent`), probando la visibilidad condicional del formulario de edición, la inyección del formulario reactivo, la preparación del envío para añadir registros y el modal de diálogo para borrado seguro de entidades.
+
+### End-to-End (Playwright)
+- No requerido (La funcionalidad CRUD y la vista pública están validadas de forma completa mediante tests unitarios y Feature tests).

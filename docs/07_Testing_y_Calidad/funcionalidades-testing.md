@@ -9,6 +9,7 @@ Puedes ir marcando las casillas (`[x]`) a medida que completemos las pruebas de 
 ## 1. Funcionalidades Públicas (Presencia Web)
 - [x] **Vistas Públicas:** Páginas informativas (Bienvenida, Galería Pública, Videoteca Pública).
 - [x] **Contacto:** Información de Contacto (Visualización de datos del Tenant).
+- [x] **Patrocinadores:** Módulos activos, listado público de patrocinadores y panel CRUD de gestión en la administración del club.
 
 ---
 

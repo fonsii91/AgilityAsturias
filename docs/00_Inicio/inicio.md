@@ -16,6 +16,7 @@ A continuación, se detalla el mapa de navegación interactivo del proyecto. Uti
 ### 📦 01. Producto
 Concepto de la aplicación, mapa de características y funcionalidades.
 *   **[[funcionalidades]]**: Índice de funciones disponibles para Socios, Staff e Invitados/Inactivos.
+*   **[[presencia-publica]]**: Detalle de la cara pública de la web (Bienvenida, Galería, Videoteca y Contacto).
 *   **[[usuarios]]**: Roles de usuario (Visitante / Invitado / Inactivo, Socio, Staff, Responsable del Club y Administrador Global) y alcance de permisos.
 *   **[[provision-fondos]]**: Especificación de la provisión de fondos de socios (saldo, ingresos, gastos y roles de acceso).
 *   **[[historial-asistencia]]**: Análisis y consulta del histórico y estadísticas de asistencia de miembros (clases y eventos) para el perfil Staff.

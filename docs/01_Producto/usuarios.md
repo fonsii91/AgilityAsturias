@@ -19,7 +19,7 @@ graph TD
 ---
 
 ## 1. 🌐 Visitante / Invitado / Inactivo
-Representa al usuario que accede a la aplicación sin iniciar sesión (anónimo/invitado) o a un usuario registrado que se encuentra en estado inactivo (por ejemplo, de baja temporal o sin cuota/suscripción activa en el club). Su vista está limitada estrictamente a la presencia web exterior y pública de cada club.
+Representa al usuario que accede a la aplicación sin iniciar sesión (anónimo/invitado) o a un usuario registrado que se encuentra en estado inactivo (por ejemplo, de baja temporal o sin cuota/suscripción activa en el club). Su vista está limitada estrictamente a la presencia web exterior y pública de cada club (ver detalles en [[presencia-publica]]).
 
 *   **Alcance:**
     *   Visualizar la página de inicio (Landing Page) pública del club (lema, eslogan, horarios generales).

@@ -1,5 +1,15 @@
 [
   {
+    "version": "1.1.49",
+    "date": "2026-06-05",
+    "features": [
+      "¡Nueva sección de Patrocinadores! Hemos estrenado una bonita sección pública en la web de nuestro club para dar visibilidad a las marcas y patrocinadores colaboradores que nos apoyan cada temporada. Podrás consultar el listado de marcas, una breve descripción sobre ellos y enlaces directos a sus páginas web para conocer sus servicios."
+    ],
+    "bugfixes": [
+      "¡Mejoras de lectura y diseño táctil! Hemos corregido un pequeño problema de desalineación en los botones del panel de control de patrocinadores, haciendo que los iconos se vean perfectamente centrados y aumentando ligeramente el tamaño del botón para que resulte más cómodo pulsarlo con el dedo desde el teléfono móvil a pie de pista."
+    ]
+  },
+  {
     "version": "1.1.48",
     "date": "2026-06-04",
     "features": [

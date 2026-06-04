@@ -18,6 +18,7 @@ use App\Http\Controllers\RfecTrackController;
 use App\Http\Controllers\PersonalEventController;
 use App\Http\Controllers\LigaNorteController;
 use App\Http\Controllers\BountyController;
+use App\Http\Controllers\SponsorController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,7 @@ Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/{id}', [CompetitionController::class, 'show']);
 
 Route::get('/gallery', [GalleryController::class, 'index']);
+Route::get('/sponsors', [SponsorController::class, 'index']);
 Route::get('/public-videos', [VideoController::class, 'publicIndex']);
 Route::post('/webhooks/bitmovin', [VideoController::class, 'webhook']);
 Route::post('/webhooks/bunny', [VideoController::class, 'bunnyWebhook']);
@@ -71,6 +73,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Gallery
         Route::post('/gallery', [GalleryController::class, 'store']);
         Route::post('/gallery/{id}/delete', [GalleryController::class, 'destroy']);
+
+        // Sponsors
+        Route::post('/sponsors', [SponsorController::class, 'store']);
+        Route::post('/sponsors/{id}', [SponsorController::class, 'update']);
+        Route::post('/sponsors/{id}/delete', [SponsorController::class, 'destroy']);
 
         // Resources
         Route::post('/resources', [ResourceController::class, 'store']);

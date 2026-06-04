@@ -17,6 +17,10 @@
             Galería</a></li>
         <li *hasFeature="'galeria-videos'"><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
               class="material-icons">videocam</span> Videoteca</a></li>
+        @if (sponsorsEnabled()) {
+        <li><a routerLink="/patrocinadores" routerLinkActive="active-route"><span
+              class="material-icons">handshake</span> Patrocinadores</a></li>
+        }
         <li><a routerLink="/contacto" routerLinkActive="active-route"><span
               class="material-icons">contact_support</span> Contacto</a></li>
         }
@@ -31,6 +35,10 @@
                   class="material-icons">photo_library</span> Galería</a></li>
             <li *hasFeature="'galeria-videos'"><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
                   class="material-icons">videocam</span> Videoteca</a></li>
+            @if (sponsorsEnabled()) {
+            <li><a routerLink="/patrocinadores" routerLinkActive="active-route"><span
+                  class="material-icons">handshake</span> Patrocinadores</a></li>
+            }
             <li><a routerLink="/contacto" routerLinkActive="active-route"><span
                   class="material-icons">contact_support</span> Contacto</a></li>
           </ul>
