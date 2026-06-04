@@ -93,6 +93,7 @@ Los miembros con el rol de "Staff" (monitores, entrenadores, directiva) tienen a
 ### Gestión de Eventos y Competiciones
 * **CRUD de Competiciones:** Crear nuevas competiciones en el sistema, modificar sus datos (fecha, lugar, grado) y eliminarlas si se cancelan o introducen por error.
 * **Verificación de Asistencia (Entrenamientos/Competiciones):** Panel para visualizar quiénes están apuntados a eventos y confirmar o validar su asistencia de forma oficial (pasar lista).
+* **Historial de Asistencia:** Panel accesible para el personal Staff para consultar el histórico y estadísticas de asistencia general e individual a clases y eventos, permitiendo filtrar por miembro y tipo de actividad (ver [[historial-asistencia]]).
 
 ### Gestión de Comunidad y Comunicación
 * **Gestión de Miembros:** Ver el listado completo de usuarios registrados en el club y sus datos de contacto básicos.

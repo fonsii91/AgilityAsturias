@@ -236,6 +236,12 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'staff/historial-asistencia',
+        loadComponent: () => import('./components/historial-asistencia/historial-asistencia.component').then(m => m.HistorialAsistenciaComponent),
+        canActivate: [staffGuard],
+        title: titleResolver, data: { pageTitle: 'Historial de Asistencia' }
+    },
+    {
         path: 'admin/puntos-extra',
         loadComponent: () => import('./components/modificar-puntos/modificar-puntos.component').then(m => m.ModificarPuntosComponent),
         canActivate: [staffGuard, gamificationGuard],

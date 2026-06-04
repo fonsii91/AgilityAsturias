@@ -392,4 +392,175 @@ class AttendanceController extends Controller
 
         return response()->json(['message' => 'Asistencia de competición confirmada']);
     }
+
+    // Fetch aggregated club attendance statistics
+    public function historyStats(Request $request)
+    {
+        $clubId = app()->bound('active_club_id') ? app('active_club_id') : null;
+
+        // Total active members (excluding global admins)
+        $totalMembers = User::where('role', '!=', 'admin')->count();
+
+        // Classes attendance stats
+        $totalClasses = Reservation::where('attendance_verified', true)->count();
+        $completedClasses = Reservation::where('attendance_verified', true)->where('status', 'completed')->count();
+        $globalAttendanceRate = $totalClasses > 0 ? round(($completedClasses / $totalClasses) * 100) : 0;
+
+        // Events attendance stats
+        $eventsCount = DB::table('competition_dog')
+            ->join('competitions', 'competition_dog.competition_id', '=', 'competitions.id')
+            ->where('competitions.attendance_verified', true)
+            ->when($clubId, function ($query, $clubId) {
+                return $query->where('competitions.club_id', $clubId);
+            })
+            ->select('competition_dog.user_id', 'competition_dog.competition_id')
+            ->distinct()
+            ->count();
+
+        // Calculate monthly trend for the last 6 months
+        $monthlyTrend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $monthLabel = $date->translatedFormat('M'); // e.g. "ene", "feb"
+            $yearLabel = $date->format('y'); // e.g. "26"
+            $label = ucfirst($monthLabel) . ' ' . $yearLabel;
+
+            $startOfMonth = $date->copy()->startOfMonth();
+            $endOfMonth = $date->copy()->endOfMonth();
+
+            // Classes in this month
+            $monthClasses = Reservation::where('attendance_verified', true)
+                ->where('status', 'completed')
+                ->whereBetween('date', [$startOfMonth, $endOfMonth])
+                ->count();
+
+            // Events in this month
+            $monthEvents = DB::table('competition_dog')
+                ->join('competitions', 'competition_dog.competition_id', '=', 'competitions.id')
+                ->where('competitions.attendance_verified', true)
+                ->when($clubId, function ($query, $clubId) {
+                    return $query->where('competitions.club_id', $clubId);
+                })
+                ->whereBetween('competitions.fecha_evento', [$startOfMonth->toDateString(), $endOfMonth->toDateString()])
+                ->select('competition_dog.user_id', 'competition_dog.competition_id')
+                ->distinct()
+                ->count();
+
+            $monthlyTrend[] = [
+                'month' => $label,
+                'classes' => $monthClasses,
+                'events' => $monthEvents,
+            ];
+        }
+
+        return response()->json([
+            'total_members' => $totalMembers,
+            'global_attendance_rate' => $globalAttendanceRate,
+            'classes_attendance_count' => $completedClasses,
+            'events_attendance_count' => $eventsCount,
+            'monthly_trend' => $monthlyTrend,
+        ]);
+    }
+
+    // Fetch attendance stats and list for a specific member
+    public function historyStatsByMember(Request $request, $userId)
+    {
+        $clubId = app()->bound('active_club_id') ? app('active_club_id') : null;
+        $user = User::with('dogs')->findOrFail($userId);
+
+        // Classes stats
+        $classesPossible = Reservation::where('user_id', $userId)->where('attendance_verified', true)->count();
+        $classesAttended = Reservation::where('user_id', $userId)->where('attendance_verified', true)->where('status', 'completed')->count();
+        $rateClasses = $classesPossible > 0 ? round(($classesAttended / $classesPossible) * 100, 1) : 100;
+
+        // Events stats
+        $eventsAttended = DB::table('competition_dog')
+            ->join('competitions', 'competition_dog.competition_id', '=', 'competitions.id')
+            ->where('competitions.attendance_verified', true)
+            ->where('competition_dog.user_id', $userId)
+            ->select('competition_dog.competition_id')
+            ->distinct()
+            ->count();
+
+        $eventsPossible = DB::table('competition_user')
+            ->join('competitions', 'competition_user.competition_id', '=', 'competitions.id')
+            ->where('competitions.attendance_verified', true)
+            ->where('competition_user.user_id', $userId)
+            ->count();
+
+        $eventsPossible = max($eventsPossible, $eventsAttended);
+        $rateEvents = $eventsPossible > 0 ? round(($eventsAttended / $eventsPossible) * 100, 1) : 100;
+
+        // Build history list
+        $classes = Reservation::with('timeSlot')
+            ->where('user_id', $userId)
+            ->where('attendance_verified', true)
+            ->get()
+            ->map(function ($res) {
+                $dateStr = null;
+                if ($res->date instanceof \Carbon\Carbon) {
+                    $dateStr = $res->date->toDateString();
+                } else if ($res->date) {
+                    $dateStr = Carbon::parse($res->date)->toDateString();
+                }
+                return [
+                    'date' => $dateStr,
+                    'name' => $res->timeSlot ? "Clase " . $res->timeSlot->start_time . "-" . $res->timeSlot->end_time : "Clase de Entrenamiento",
+                    'type' => 'clase',
+                    'status' => $res->status === 'completed' ? 'asistido' : 'ausente',
+                ];
+            });
+
+        $registeredCompIds = DB::table('competition_user')
+            ->join('competitions', 'competition_user.competition_id', '=', 'competitions.id')
+            ->where('competitions.attendance_verified', true)
+            ->where('competition_user.user_id', $userId)
+            ->pluck('competition_id')
+            ->toArray();
+
+        $attendedCompIds = DB::table('competition_dog')
+            ->join('competitions', 'competition_dog.competition_id', '=', 'competitions.id')
+            ->where('competitions.attendance_verified', true)
+            ->where('competition_dog.user_id', $userId)
+            ->pluck('competition_id')
+            ->toArray();
+
+        $allCompIds = array_unique(array_merge($registeredCompIds, $attendedCompIds));
+
+        $competitions = Competition::whereIn('id', $allCompIds)->get()->map(function ($comp) use ($attendedCompIds) {
+            $attended = in_array($comp->id, $attendedCompIds);
+            return [
+                'date' => $comp->fecha_evento,
+                'name' => $comp->nombre ?: "Competición " . $comp->lugar,
+                'type' => 'evento',
+                'status' => $attended ? 'asistido' : 'ausente',
+            ];
+        });
+
+        $historyList = collect($classes)
+            ->concat($competitions)
+            ->sortByDesc('date')
+            ->values()
+            ->toArray();
+
+        return response()->json([
+            'member_info' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'dogs' => $user->dogs->map(function($dog) {
+                    return ['id' => $dog->id, 'name' => $dog->name];
+                })
+            ],
+            'summary' => [
+                'total_classes_attended' => $classesAttended,
+                'total_classes_possible' => $classesPossible,
+                'attendance_rate_classes' => $rateClasses,
+                'total_events_attended' => $eventsAttended,
+                'total_events_possible' => $eventsPossible,
+                'attendance_rate_events' => $rateEvents,
+            ],
+            'history_list' => $historyList
+        ]);
+    }
 }

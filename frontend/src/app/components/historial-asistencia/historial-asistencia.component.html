@@ -1,0 +1,360 @@
+<div class="dashboard-header-container">
+  <div class="header-text">
+    <div style="display: flex; align-items: center; gap: 0.5rem;">
+      <h2 style="margin: 0; display: flex; align-items: center; gap: 0.5rem;">⏱️ Historial de Asistencia</h2>
+      <app-instrucciones titulo="Guía de Asistencia">
+        <h4 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Estadísticas Generales del Club</h4>
+        <p style="margin-bottom: 1.25rem; font-size: 0.9rem; color: #475569; line-height: 1.4;">Esta sección permite al Staff auditar la asistencia y el rendimiento de los socios en clases de entrenamiento y eventos oficiales del club.</p>
+
+        <ul style="padding-left: 0; list-style: none; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 12px; color: #334155; font-size: 0.9rem; line-height: 1.4;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: var(--primary-color, #0073CF); flex-shrink: 0; margin-top: 2px;">people</span>
+            <span><strong>Socios Activos:</strong> El total de deportistas del club (excluyendo cuentas de administración).</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: var(--accent-color, #F6D312); flex-shrink: 0; margin-top: 2px;">percent</span>
+            <span><strong>Tasa de Asistencia:</strong> Ratio global de asistencia de los miembros sobre todas las clases verificadas.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #0284c7; flex-shrink: 0; margin-top: 2px;">school</span>
+            <span><strong>Clases Asistidas:</strong> Sumatorio total de participaciones a entrenamientos presenciales.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">emoji_events</span>
+            <span><strong>Eventos Asistidos:</strong> Sumatorio total de asistencias verificadas en competiciones y exhibiciones oficiales.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #64748b; flex-shrink: 0; margin-top: 2px;">bar_chart</span>
+            <span><strong>Tendencia Histórica:</strong> Gráfico de barras que compara de forma mensual la participación acumulada de los últimos 6 meses.</span>
+          </li>
+        </ul>
+
+        <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Detalle por Socio</h4>
+        <ul style="padding-left: 0; list-style: none; margin-bottom: 0; display: flex; flex-direction: column; gap: 12px; color: #334155; font-size: 0.9rem; line-height: 1.4;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #94a3b8; flex-shrink: 0; margin-top: 2px;">search</span>
+            <span><strong>Buscador:</strong> Escribe el nombre o correo del socio para cargar su expediente detallado. En móviles, se te redirigirá automáticamente a la pestaña correspondiente.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">cancel</span>
+            <span><strong>Criterio de Ausencia:</strong> Una clase o evento se marca como <em>Ausente</em> si el socio estaba apuntado pero el Staff no confirmó su asistencia al verificar el evento en el control del club.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">check_circle</span>
+            <span><strong>Criterio de Asistencia:</strong> Se marca como <em>Asistido</em> una vez que el personal confirma la asistencia en las sesiones o registra la participación con posición en competiciones.</span>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #8b5cf6; flex-shrink: 0; margin-top: 2px;">pets</span>
+            <span><strong>Ficha Individual:</strong> Visualiza los perros asignados al socio y filtra el historial de actividades de manera agrupada por clases o eventos.</span>
+          </li>
+        </ul>
+      </app-instrucciones>
+    </div>
+    <p>Consulta estadísticas generales de asistencia y audita el historial deportivo de los socios.</p>
+  </div>
+
+  <!-- Autocomplete Search Field -->
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar miembro por nombre o email...</mat-label>
+      <input type="text"
+             placeholder="Ej. Juan Pérez"
+             aria-label="Miembro"
+             matInput
+             [formControl]="searchControl"
+             [matAutocomplete]="auto">
+      <mat-icon matPrefix>search</mat-icon>
+      @if (selectedUserId()) {
+        <button mat-icon-button matSuffix (click)="clearMemberSelection()" aria-label="Limpiar selección">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn" (optionSelected)="onMemberSelected($event)">
+        @for (user of filteredUsers(); track user.id) {
+          <mat-option [value]="user">
+            <div class="autocomplete-option">
+              <span class="user-name">{{ user.name }}</span>
+              <span class="user-email">{{ user.email }}</span>
+            </div>
+          </mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+</div>
+
+<!-- Spinner for Loading States -->
+@if (loading() && !generalStats() && !selectedMemberStats()) {
+  <div class="spinner-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Cargando datos de asistencia...</p>
+  </div>
+} @else {
+  <div class="dashboard-layout">
+    
+    <!-- Mobile View: Tabs Navigation -->
+    <div class="mobile-layout-tabs">
+      <mat-tab-group [selectedIndex]="selectedTab()" (selectedIndexChange)="selectedTab.set($event)">
+        
+        <!-- Tab 1: General Club Stats -->
+        <mat-tab label="General Club">
+          <div class="tab-padding">
+            <ng-container *ngTemplateOutlet="generalClubStatsTemplate"></ng-container>
+          </div>
+        </mat-tab>
+        
+        <!-- Tab 2: Individual Member Stats -->
+        <mat-tab label="Por Miembro" [disabled]="!selectedUserId()">
+          <div class="tab-padding">
+            <ng-container *ngTemplateOutlet="memberStatsTemplate"></ng-container>
+          </div>
+        </mat-tab>
+        
+      </mat-tab-group>
+    </div>
+
+    <!-- Desktop View: Side-by-Side Grid Layout -->
+    <div class="desktop-layout-grid">
+      <div class="grid-left">
+        <ng-container *ngTemplateOutlet="generalClubStatsTemplate"></ng-container>
+      </div>
+      <div class="grid-right">
+        <ng-container *ngTemplateOutlet="memberStatsTemplate"></ng-container>
+      </div>
+    </div>
+
+  </div>
+}
+
+<!-- Template 1: General Club Stats -->
+<ng-template #generalClubStatsTemplate>
+  @if (generalStats(); as stats) {
+    <div class="general-stats-container">
+      
+      <!-- Bento Grid KPIs -->
+      <div class="bento-grid">
+        <mat-card class="bento-card kpi-card primary-border">
+          <mat-card-content>
+            <div class="kpi-icon-wrapper primary-bg">
+              <mat-icon>people</mat-icon>
+            </div>
+            <div class="kpi-value">{{ stats.total_members }}</div>
+            <div class="kpi-label">Socios Activos</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="bento-card kpi-card accent-border">
+          <mat-card-content>
+            <div class="kpi-icon-wrapper accent-bg">
+              <mat-icon>percent</mat-icon>
+            </div>
+            <div class="kpi-value">{{ stats.global_attendance_rate }}%</div>
+            <div class="kpi-label">Asistencia a Clases</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="bento-card kpi-card info-border">
+          <mat-card-content>
+            <div class="kpi-icon-wrapper info-bg">
+              <mat-icon>school</mat-icon>
+            </div>
+            <div class="kpi-value">{{ stats.classes_attendance_count }}</div>
+            <div class="kpi-label">Clases Asistidas</div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="bento-card kpi-card success-border">
+          <mat-card-content>
+            <div class="kpi-icon-wrapper success-bg">
+              <mat-icon>emoji_events</mat-icon>
+            </div>
+            <div class="kpi-value">{{ stats.events_attendance_count }}</div>
+            <div class="kpi-label">Eventos Asistidos</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Trend Chart Section (Lazy Loaded) -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>Tendencia de Asistencia (Últimos 6 Meses)</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @defer (on viewport) {
+            <div echarts [options]="generalChartOptions()" class="general-trend-chart"></div>
+          } @placeholder {
+            <div class="chart-placeholder">
+              <mat-spinner diameter="40"></mat-spinner>
+              <p>Preparando gráfica de tendencias...</p>
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+
+    </div>
+  } @else {
+    <div class="empty-state-card text-center">
+      <mat-icon>bar_chart</mat-icon>
+      <p>No se pudieron cargar las estadísticas generales.</p>
+    </div>
+  }
+</ng-template>
+
+<!-- Template 2: Member Stats Detail -->
+<ng-template #memberStatsTemplate>
+  @if (selectedUserId()) {
+    @if (selectedMemberStats(); as stats) {
+      <div class="member-stats-container">
+        
+        <!-- Member Profile Info Card -->
+        <mat-card class="member-info-card">
+          <mat-card-content>
+            <div class="member-profile-header">
+              <div class="avatar-placeholder">
+                {{ stats.member_info.name.charAt(0).toUpperCase() }}
+              </div>
+              <div class="profile-details">
+                <h3>{{ stats.member_info.name }}</h3>
+                <p class="email-text"><mat-icon>email</mat-icon> {{ stats.member_info.email }}</p>
+                @if (stats.member_info.dogs.length > 0) {
+                  <p class="dogs-text">
+                    <mat-icon>pets</mat-icon> 
+                    Perros: 
+                    @for (dog of stats.member_info.dogs; track dog.id; let last = $last) {
+                      <span class="dog-tag">{{ dog.name }}</span>{{ !last ? ', ' : '' }}
+                    }
+                  </p>
+                }
+              </div>
+              <button mat-icon-button class="btn-clear" (click)="clearMemberSelection()" title="Quitar socio">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Member Progress charts -->
+        <div class="member-charts-grid">
+          <mat-card class="mini-chart-card">
+            <mat-card-header>
+              <mat-card-title>Asistencia a Clases</mat-card-title>
+              <mat-card-subtitle>{{ stats.summary.total_classes_attended }} de {{ stats.summary.total_classes_possible }} sesiones</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              @defer (on viewport) {
+                <div echarts [options]="classesChartOptions()" class="doughnut-chart"></div>
+              } @placeholder {
+                <div class="spinner-placeholder"><mat-spinner diameter="30"></mat-spinner></div>
+              }
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="mini-chart-card">
+            <mat-card-header>
+              <mat-card-title>Asistencia a Eventos</mat-card-title>
+              <mat-card-subtitle>{{ stats.summary.total_events_attended }} de {{ stats.summary.total_events_possible }} registrados</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              @defer (on viewport) {
+                <div echarts [options]="eventsChartOptions()" class="doughnut-chart"></div>
+              } @placeholder {
+                <div class="spinner-placeholder"><mat-spinner diameter="30"></mat-spinner></div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+
+        <!-- History Record List / Table -->
+        <mat-card class="history-list-card">
+          <mat-card-header class="history-header">
+            <mat-card-title>Historial de Asistencia</mat-card-title>
+            
+            <!-- Filters Toggle -->
+            <mat-button-toggle-group [value]="filterType()" (change)="filterType.set($event.value)" class="filter-toggle">
+              <mat-button-toggle value="todos">Todos</mat-button-toggle>
+              <mat-button-toggle value="clase">Clases</mat-button-toggle>
+              <mat-button-toggle value="evento">Eventos</mat-button-toggle>
+            </mat-button-toggle-group>
+          </mat-card-header>
+
+          <mat-card-content>
+            <!-- Desktop Layout: Table Structure -->
+            <div class="desktop-history-table">
+              <div class="table-header">
+                <div class="col-date">Fecha</div>
+                <div class="col-name">Actividad</div>
+                <div class="col-type">Tipo</div>
+                <div class="col-status">Estado</div>
+              </div>
+              <div class="table-body">
+                @for (item of filteredHistoryList(); track item.date + item.name) {
+                  <div class="table-row">
+                    <div class="col-date">{{ item.date | date:'dd/MM/yyyy' }}</div>
+                    <div class="col-name">{{ item.name }}</div>
+                    <div class="col-type">
+                      <span class="type-badge" [class.type-clase]="item.type === 'clase'" [class.type-evento]="item.type === 'evento'">
+                        {{ item.type === 'clase' ? 'Clase' : 'Evento' }}
+                      </span>
+                    </div>
+                    <div class="col-status">
+                      <span class="status-badge" [class]="item.status">
+                        {{ item.status === 'asistido' ? 'Asistido' : (item.status === 'ausente' ? 'Ausente' : 'Justificado') }}
+                      </span>
+                    </div>
+                  </div>
+                } @empty {
+                  <div class="empty-table-row">
+                    <mat-icon>event_busy</mat-icon>
+                    <p>No se encontraron registros de asistencia.</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Mobile Layout: Card-list (thumb friendly) -->
+            <div class="mobile-history-list">
+              @for (item of filteredHistoryList(); track item.date + item.name) {
+                <div class="mobile-row-card">
+                  <div class="row-icon-side" [class.type-clase]="item.type === 'clase'" [class.type-evento]="item.type === 'evento'">
+                    <mat-icon>{{ item.type === 'clase' ? 'school' : 'emoji_events' }}</mat-icon>
+                  </div>
+                  <div class="row-info-side">
+                    <h4>{{ item.name }}</h4>
+                    <span class="row-date">{{ item.date | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                  <div class="row-status-side">
+                    <span class="status-badge-dot" [class]="item.status"></span>
+                    <span class="status-text" [class]="item.status">
+                      {{ item.status === 'asistido' ? 'Asistido' : (item.status === 'ausente' ? 'Ausente' : 'Justificado') }}
+                    </span>
+                  </div>
+                </div>
+              } @empty {
+                <div class="empty-table-row">
+                  <mat-icon>event_busy</mat-icon>
+                  <p>No se encontraron registros de asistencia.</p>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+      </div>
+    } @else {
+      <!-- Loader while member statistics are fetching -->
+      <div class="spinner-container member-spinner">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p>Cargando ficha del socio...</p>
+      </div>
+    }
+  } @else {
+    <!-- Empty State (No member selected) -->
+    <div class="empty-state-container">
+      <div class="empty-state-icon">
+        <mat-icon>person_search</mat-icon>
+      </div>
+      <h3>Detalle por Miembro</h3>
+      <p>Selecciona un miembro en el buscador superior para auditar su asistencia individual a clases y eventos.</p>
+    </div>
+  }
+</ng-template>

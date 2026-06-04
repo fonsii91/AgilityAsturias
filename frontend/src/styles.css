@@ -523,8 +523,8 @@ a:hover {
 }
 app-toast { position: relative; z-index: 2147483647; display: block; }
 
-/* MatSelect Global Styles - Premium Look & Solid Background Fix */
-.mat-mdc-select-panel, .mat-select-panel {
+/* MatSelect & MatAutocomplete Global Styles - Premium Look & Solid Background Fix */
+.mat-mdc-select-panel, .mat-select-panel, .mat-mdc-autocomplete-panel, .mat-autocomplete-panel {
     background-color: #ffffff !important;
     border-radius: 12px !important;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;

@@ -7,11 +7,13 @@
       "¡Registro en masa (Registro Múltiple)! Incorporamos la posibilidad de aplicar un cargo o un depósito (como la cuota mensual o licencias) a varios socios del club al mismo tiempo en un solo paso, incluyendo atajos de selección rápida de socios.",
       "¡Navegación móvil ultra-cómoda! En teléfonos móviles, el panel se organiza en pestañas de 'Resumen' y 'Socios' para evitar desplazamientos largos. Además, al pulsar sobre el número de deudores, la aplicación te lleva directamente a la pestaña de socios con la lista filtrada de forma automática.",
       "¡Subida de justificantes interactiva! Añadimos soporte para arrastrar y soltar (Drag & Drop) los archivos de recibos e imágenes de pago, haciendo el registro de movimientos mucho más ágil.",
-      "¡Acciones siempre a la vista en móviles! En el formulario de registro, los botones de guardar y cancelar ahora quedan fijados en la parte inferior de tu pantalla para que puedas confirmar los movimientos al instante sin desplazarte hacia abajo."
+      "¡Acciones siempre a la vista en móviles! En el formulario de registro, los botones de guardar y cancelar ahora quedan fijados en la parte inferior de tu pantalla para que puedas confirmar los movimientos al instante sin desplazarte hacia abajo.",
+      "¡Nuevo Historial y Estadísticas de Asistencia para el Staff! Diseñamos un nuevo panel de control completo para entrenadores y responsables del club. Ahora pueden consultar la asistencia global del club y analizar de forma individualizada la participación de cada socio (tanto a clases de entrenamiento como a competiciones) con gráficos de progreso circular y listas de actividades filtrables junto con una guía de ayuda interactiva integrada."
     ],
     "bugfixes": [
       "Corregido un problema visual que hacía que las opciones del método de pago se mostraran transparentes y se solaparan con los campos inferiores del formulario, dificultando su selección.",
-      "Añadido un nuevo diálogo integrado para anular movimientos erróneos con confirmación de seguridad y soporte para cerrar mediante la tecla Escape."
+      "Añadido un nuevo diálogo integrado para anular movimientos erróneos con confirmación de seguridad y soporte para cerrar mediante la tecla Escape.",
+      "¡Paneles de búsqueda desplegables más legibles! Solucionamos un inconveniente técnico por el cual, al abrir cualquier menú desplegable de autocompletado en la aplicación, las opciones se mostraban con fondo transparente y se mezclaban visualmente con el texto del fondo, dificultando la lectura y selección."
     ]
   },
   {

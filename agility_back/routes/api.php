@@ -88,6 +88,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/admin/attendance/confirm', [AttendanceController::class, 'confirm']);
         Route::get('/admin/attendance/pending-competitions', [AttendanceController::class, 'pendingCompetitions']);
         Route::post('/admin/attendance/confirm-competition', [AttendanceController::class, 'confirmCompetition']);
+        Route::get('/staff/attendance-stats', [AttendanceController::class, 'historyStats']);
+        Route::get('/staff/attendance-stats/member/{userId}', [AttendanceController::class, 'historyStatsByMember']);
 
         // Seasons (Admin/Staff)
         Route::get('/admin/seasons', [\App\Http\Controllers\SeasonController::class, 'index']);

@@ -50,6 +50,7 @@ Es el perfil destinado a los monitores, entrenadores o miembros de la junta dire
     *   *Todos los permisos de Socio (incluyendo la consulta de su propia provisión de fondos personal, pero sin visibilidad ni acceso a la de otros socios).*
     *   **Gestión del Horario:** Modificar y programar las franjas de reservas (time slots) del calendario y establecer excepciones (bloqueo por lluvia o mantenimiento).
     *   **Puntos y Asistencia:** Validar oficialmente la asistencia de los socios a clase ("pasar lista") y otorgar puntos deportivos manuales para la clasificación interna.
+    *   **Historial de Asistencia:** Acceso al panel de estadísticas y gráficos de asistencia general del club y filtrado individual por socio, tanto para clases como para eventos (ver [[historial-asistencia]]).
     *   **Tablón de Anuncios:** Publicar, modificar o retirar anuncios y circulares para todos los socios con alertas de notificación interna.
     *   **Moderación Multimedia:** Decidir qué vídeos subidos por los socios son idóneos para aparecer en la galería y videoteca pública.
 
