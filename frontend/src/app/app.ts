@@ -43,6 +43,10 @@ export class App implements OnInit, OnDestroy {
     const val = this.tenantService.tenantInfo()?.settings?.['provision_fondos_enabled'];
     return val !== false && val !== 'false';
   });
+  sponsorsEnabled = computed(() => {
+    const val = this.tenantService.tenantInfo()?.settings?.['sponsors_enabled'];
+    return val === true || val === 'true';
+  });
   private toastService = inject(ToastService);
   private swUpdate = inject(SwUpdate);
   private injector = inject(Injector);
