@@ -169,7 +169,8 @@ export class SmartVideoPlayerComponent implements OnInit, OnDestroy {
             if (data.details === 'manifestLoadError') {
               const status = (data.response as any)?.code;
               if (status === 403) {
-                this.errorMessage.set('Acceso denegado (403 Forbidden). Por favor, asegúrese de agregar "localhost:4200" a la lista de "Allowed Domains" en la configuración de seguridad de Bunny.net Stream.');
+                const currentHost = window.location.host;
+                this.errorMessage.set(`Acceso denegado (403 Forbidden). Por favor, asegúrese de agregar "${currentHost}" a la lista de "Allowed Domains" en la configuración de seguridad de Bunny.net Stream.`);
               } else if (status === 404) {
                 this.errorMessage.set('El vídeo no se encuentra en Bunny.net (404 Not Found). Puede que aún se esté procesando.');
               } else {
@@ -213,7 +214,8 @@ export class SmartVideoPlayerComponent implements OnInit, OnDestroy {
           break;
         case error.MEDIA_ERR_SRC_NOT_SUPPORTED:
           if (this.playbackUrl()) {
-            this.errorMessage.set('No se admite el formato o el acceso fue denegado (403/404). Asegúrese de haber añadido "localhost:4200" a "Allowed Domains" en Bunny.net.');
+            const currentHost = window.location.host;
+            this.errorMessage.set(`No se admite el formato o el acceso fue denegado (403/404). Asegúrese de haber añadido "${currentHost}" a "Allowed Domains" en Bunny.net.`);
           } else {
             this.errorMessage.set('El archivo de vídeo local no existe en este equipo o el formato no es compatible.');
           }

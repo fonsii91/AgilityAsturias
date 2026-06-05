@@ -7,7 +7,8 @@
     ],
     "bugfixes": [
       "¡Mejoras de lectura y diseño táctil! Hemos corregido un pequeño problema de desalineación en los botones del panel de control de patrocinadores, haciendo que los iconos se vean perfectamente centrados y aumentando ligeramente el tamaño del botón para que resulte más cómodo pulsarlo con el dedo desde el teléfono móvil a pie de pista.",
-      "¡Acceso a patrocinadores en móvil! Añadido el enlace directo a la sección de Patrocinadores en el menú lateral de dispositivos móviles, tanto para visitantes generales como para socios del club."
+      "¡Acceso a patrocinadores en móvil! Añadido el enlace directo a la sección de Patrocinadores en el menú lateral de dispositivos móviles, tanto para visitantes generales como para socios del club.",
+      "¡Ayuda en la reproducción de vídeos! Hemos mejorado el mensaje de error que aparece si un vídeo no se puede reproducir por problemas de permisos de red, indicando ahora de forma exacta y personalizada el nombre de la dirección web (dominio) que debe ser autorizada para solucionar la visualización."
     ]
   },
   {
