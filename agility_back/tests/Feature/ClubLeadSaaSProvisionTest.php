@@ -48,4 +48,32 @@ class ClubLeadSaaSProvisionTest extends TestCase
         // Verify password hashes and matches
         $this->assertTrue(\Illuminate\Support\Facades\Hash::check('mysecurepassword123', $user->password));
     }
+
+    public function test_ssl_status_endpoint_validation()
+    {
+        // Invalid slug format (e.g. contains uppercase or special characters not allowed)
+        $response = $this->getJson('/api/club-leads/status/Invalid_Slug!');
+        $response->assertStatus(400);
+        $response->assertJsonPath('ready', false);
+
+        // Club not found
+        $response = $this->getJson('/api/club-leads/status/non-existent-club');
+        $response->assertStatus(404);
+        $response->assertJsonPath('ready', false);
+    }
+
+    public function test_ssl_status_endpoint_local_env()
+    {
+        // Setup a Club
+        $club = Club::create([
+            'name' => 'Club Local Test',
+            'slug' => 'local-test',
+        ]);
+
+        // In testing environment (not production), it should return ready immediately
+        $response = $this->getJson('/api/club-leads/status/local-test');
+        $response->assertStatus(200);
+        $response->assertJsonPath('ready', true);
+    }
 }
+

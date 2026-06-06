@@ -19,6 +19,7 @@ export class JoinSaas {
   isSubmitted = false;
   isSubmitting = false;
   isProvisioning = false;
+  sslTimeout = false;
   provisioningProgress = 0;
   provisioningMessage = '';
   selectedPlan = signal<string | null>(null);
@@ -42,35 +43,81 @@ export class JoinSaas {
     this.selectedPlan.set(null);
   }
 
-  startProvisioning() {
+  startProvisioning(slug: string) {
     this.isProvisioning = true;
+    this.sslTimeout = false;
     this.provisioningProgress = 0;
     this.provisioningMessage = 'Creando base de datos y configuraciones iniciales...';
 
-    const duration = 45000; // 45 seconds
-    const intervalTime = 100; // Update every 100ms
-    const totalSteps = duration / intervalTime;
+    const maxDuration = 55000; // 55 seconds max timeout
+    const intervalTime = 100; // Update progress every 100ms
+    const totalSteps = maxDuration / intervalTime;
     let currentStep = 0;
+    let isSslReady = false;
 
-    const interval = setInterval(() => {
+    // Start polling the backend SSL status endpoint every 2.5 seconds
+    const pollIntervalTime = 2500;
+    const pollInterval = setInterval(() => {
+      this.http.get<{ ready: boolean }>(`${environment.apiUrl}/club-leads/status/${slug}`).subscribe({
+        next: (res) => {
+          if (res && res.ready) {
+            isSslReady = true;
+            clearInterval(pollInterval);
+          }
+        },
+        error: (err) => {
+          console.warn('Error checking SSL status:', err);
+        }
+      });
+    }, pollIntervalTime);
+
+    // Smooth progress bar animation
+    const progressInterval = setInterval(() => {
       currentStep++;
-      this.provisioningProgress = Math.min(Math.round((currentStep / totalSteps) * 100), 100);
+      const timeElapsed = currentStep * intervalTime;
 
-      // Update message based on progress
-      if (this.provisioningProgress < 25) {
-        this.provisioningMessage = 'Creando base de datos y configuraciones iniciales...';
-      } else if (this.provisioningProgress < 50) {
-        this.provisioningMessage = 'Configurando subdominio y enrutamiento de red...';
-      } else if (this.provisioningProgress < 85) {
-        this.provisioningMessage = 'Generando certificado de seguridad SSL (Let\'s Encrypt)...';
+      if (isSslReady) {
+        // SSL is ready! Quickly animate progress to 100% and finish
+        this.provisioningProgress = Math.min(this.provisioningProgress + 10, 100);
+        this.provisioningMessage = '¡Todo listo! Verificación de conexión segura completada.';
+        
+        if (this.provisioningProgress >= 100) {
+          clearInterval(progressInterval);
+          clearInterval(pollInterval);
+          this.isProvisioning = false;
+          this.isSubmitted = true;
+        }
       } else {
-        this.provisioningMessage = 'Verificando conexión segura y finalizando...';
-      }
+        // SSL is not ready yet. Increase progress bar up to 90%
+        if (this.provisioningProgress < 90) {
+          // Slowly increase progress up to 90% over the first 40 seconds
+          this.provisioningProgress = Math.min(Math.round((timeElapsed / 40000) * 90), 90);
+        } else if (this.provisioningProgress >= 90 && this.provisioningProgress < 95) {
+          // Even slower increase after 90%
+          if (currentStep % 10 === 0) {
+            this.provisioningProgress++;
+          }
+        }
 
-      if (currentStep >= totalSteps) {
-        clearInterval(interval);
-        this.isProvisioning = false;
-        this.isSubmitted = true;
+        // Update messaging based on progress
+        if (this.provisioningProgress < 25) {
+          this.provisioningMessage = 'Creando base de datos y configuraciones iniciales...';
+        } else if (this.provisioningProgress < 50) {
+          this.provisioningMessage = 'Configurando subdominio y enrutamiento de red...';
+        } else if (this.provisioningProgress < 85) {
+          this.provisioningMessage = 'Generando certificado de seguridad SSL (Let\'s Encrypt)...';
+        } else {
+          this.provisioningMessage = 'Verificando conexión segura y finalizando...';
+        }
+
+        // Timeout fallback
+        if (timeElapsed >= maxDuration) {
+          clearInterval(progressInterval);
+          clearInterval(pollInterval);
+          this.sslTimeout = true;
+          this.isProvisioning = false;
+          this.isSubmitted = true;
+        }
       }
     }, intervalTime);
   }
@@ -83,7 +130,8 @@ export class JoinSaas {
       this.http.post(`${environment.apiUrl}/club-leads`, leadData).subscribe({
         next: (res) => {
           this.isSubmitting = false;
-          this.startProvisioning();
+          const slug = this.leadForm.get('slug')?.value;
+          this.startProvisioning(slug);
           console.log('Lead request submitted:', res);
         },
         error: (err) => {

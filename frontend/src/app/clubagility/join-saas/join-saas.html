@@ -223,9 +223,15 @@
               <p style="margin: 1rem 0 0 0; font-size: 0.875rem; color: #047857;">
                 <strong>Datos de Acceso:</strong> Usa tu email (<strong>{{ leadForm.get('email')?.value }}</strong>) y la contraseña que acabas de elegir para iniciar sesión como Gestor.
               </p>
-              <p style="margin: 0.75rem 0 0 0; font-size: 0.78rem; color: #047857; line-height: 1.4; border-top: 1px dashed rgba(16, 185, 129, 0.3); padding-top: 0.75rem; font-style: italic;">
-                * Nota: El certificado de seguridad SSL (HTTPS) ya está activo y configurado. Puedes acceder a tu club de forma segura de inmediato.
-              </p>
+              @if (!sslTimeout) {
+                <p style="margin: 0.75rem 0 0 0; font-size: 0.78rem; color: #047857; line-height: 1.4; border-top: 1px dashed rgba(16, 185, 129, 0.3); padding-top: 0.75rem; font-style: italic;">
+                  * Nota: El certificado de seguridad SSL (HTTPS) ya está activo y configurado. Puedes acceder a tu club de forma segura de inmediato.
+                </p>
+              } @else {
+                <p style="margin: 0.75rem 0 0 0; font-size: 0.78rem; color: #b45309; line-height: 1.4; border-top: 1px dashed rgba(180, 83, 9, 0.3); padding-top: 0.75rem; font-style: italic;">
+                  * Nota: El certificado de seguridad SSL (HTTPS) está tardando un poco más en activarse en segundo plano. Si tu navegador muestra un aviso de "Sitio no seguro", espera 1 minuto y recarga la página.
+                </p>
+              }
             </div>
           </div>
         }

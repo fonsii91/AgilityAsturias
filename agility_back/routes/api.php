@@ -28,6 +28,7 @@ use App\Http\Controllers\SponsorController;
 
 // Public Routes
 Route::post('/club-leads', [\App\Http\Controllers\ClubLeadController::class, 'store']);
+Route::get('/club-leads/status/{slug}', [\App\Http\Controllers\ClubLeadController::class, 'checkSslStatus']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/reset-password', [AuthController::class, 'resetPasswordWithToken']);

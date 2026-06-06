@@ -174,4 +174,62 @@ class ClubLeadController extends Controller
 
         return response()->json(['message' => 'Lead deleted successfully']);
     }
+
+    public function checkSslStatus(Request $request, $slug)
+    {
+        // 1. Validate slug format
+        if (!preg_match('/^[a-z0-9-]+$/', $slug)) {
+            return response()->json(['ready' => false, 'error' => 'Invalid slug format'], 400);
+        }
+
+        // 2. Verify club exists
+        $clubExists = \App\Models\Club::where('slug', $slug)->exists();
+        if (!$clubExists) {
+            return response()->json(['ready' => false, 'error' => 'Club not found'], 404);
+        }
+
+        // 3. For local or non-production environment, return ready immediately
+        if (config('app.env') !== 'production') {
+            return response()->json(['ready' => true, 'env' => config('app.env')]);
+        }
+
+        // 4. Check if the domain is listed in the SSL state file
+        $stateFile = '/root/current_ssl_domains.txt';
+        if (!file_exists($stateFile)) {
+            return response()->json(['ready' => false, 'reason' => 'SSL state file not found']);
+        }
+
+        $domains = file_get_contents($stateFile);
+        if (!str_contains($domains, $slug . '.clubagility.com')) {
+            return response()->json(['ready' => false, 'reason' => 'Subdomain not registered in SSL state yet']);
+        }
+
+        // 5. Attempt an SSL connection to verify the certificate is active and Nginx is serving it
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, "https://{$slug}.clubagility.com");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HEADER, true);
+        curl_setopt($ch, CURLOPT_NOBODY, true); // We only need headers/handshake, no body
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 3); // 3 seconds timeout
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+
+        $response = curl_exec($ch);
+        $err = curl_errno($ch);
+        $errmsg = curl_error($ch);
+        curl_close($ch);
+
+        if ($err === 0) {
+            return response()->json(['ready' => true]);
+        }
+
+        return response()->json([
+            'ready' => false,
+            'reason' => 'SSL handshake failed',
+            'curl_error' => $errmsg,
+            'curl_errno' => $err
+        ]);
+    }
 }
+
