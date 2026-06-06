@@ -194,7 +194,7 @@ class ClubLeadController extends Controller
         }
 
         // 4. Check if the domain is listed in the SSL state file
-        $stateFile = '/root/current_ssl_domains.txt';
+        $stateFile = storage_path('app/current_ssl_domains.txt');
         if (!file_exists($stateFile)) {
             return response()->json(['ready' => false, 'reason' => 'SSL state file not found']);
         }

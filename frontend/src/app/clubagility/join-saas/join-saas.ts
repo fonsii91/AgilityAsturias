@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -14,6 +14,7 @@ import { environment } from '../../../environments/environment';
 export class JoinSaas {
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
+  private cdr = inject(ChangeDetectorRef);
   
   leadForm: FormGroup;
   isSubmitted = false;
@@ -48,6 +49,7 @@ export class JoinSaas {
     this.sslTimeout = false;
     this.provisioningProgress = 0;
     this.provisioningMessage = 'Creando base de datos y configuraciones iniciales...';
+    this.cdr.detectChanges();
 
     const maxDuration = 55000; // 55 seconds max timeout
     const intervalTime = 100; // Update progress every 100ms
@@ -58,66 +60,77 @@ export class JoinSaas {
     // Start polling the backend SSL status endpoint every 2.5 seconds
     const pollIntervalTime = 2500;
     const pollInterval = setInterval(() => {
-      this.http.get<{ ready: boolean }>(`${environment.apiUrl}/club-leads/status/${slug}`).subscribe({
-        next: (res) => {
-          if (res && res.ready) {
-            isSslReady = true;
-            clearInterval(pollInterval);
+      try {
+        this.http.get<{ ready: boolean }>(`${environment.apiUrl}/club-leads/status/${slug}`).subscribe({
+          next: (res) => {
+            if (res && res.ready) {
+              isSslReady = true;
+              clearInterval(pollInterval);
+            }
+          },
+          error: (err) => {
+            console.warn('Error checking SSL status:', err);
           }
-        },
-        error: (err) => {
-          console.warn('Error checking SSL status:', err);
-        }
-      });
+        });
+      } catch (pollErr) {
+        console.error('Error during status poll initiation:', pollErr);
+      }
     }, pollIntervalTime);
 
     // Smooth progress bar animation
     const progressInterval = setInterval(() => {
-      currentStep++;
-      const timeElapsed = currentStep * intervalTime;
+      try {
+        currentStep++;
+        const timeElapsed = currentStep * intervalTime;
 
-      if (isSslReady) {
-        // SSL is ready! Quickly animate progress to 100% and finish
-        this.provisioningProgress = Math.min(this.provisioningProgress + 10, 100);
-        this.provisioningMessage = '¡Todo listo! Verificación de conexión segura completada.';
-        
-        if (this.provisioningProgress >= 100) {
-          clearInterval(progressInterval);
-          clearInterval(pollInterval);
-          this.isProvisioning = false;
-          this.isSubmitted = true;
-        }
-      } else {
-        // SSL is not ready yet. Increase progress bar up to 90%
-        if (this.provisioningProgress < 90) {
-          // Slowly increase progress up to 90% over the first 40 seconds
-          this.provisioningProgress = Math.min(Math.round((timeElapsed / 40000) * 90), 90);
-        } else if (this.provisioningProgress >= 90 && this.provisioningProgress < 95) {
-          // Even slower increase after 90%
-          if (currentStep % 10 === 0) {
-            this.provisioningProgress++;
+        if (isSslReady) {
+          // SSL is ready! Quickly animate progress to 100% and finish
+          this.provisioningProgress = Math.min(this.provisioningProgress + 10, 100);
+          this.provisioningMessage = '¡Todo listo! Verificación de conexión segura completada.';
+          
+          if (this.provisioningProgress >= 100) {
+            clearInterval(progressInterval);
+            clearInterval(pollInterval);
+            this.isProvisioning = false;
+            this.isSubmitted = true;
+          }
+        } else {
+          // SSL is not ready yet. Increase progress bar up to 90%
+          if (this.provisioningProgress < 90) {
+            // Slowly increase progress up to 90% over the first 40 seconds
+            this.provisioningProgress = Math.min(Math.round((timeElapsed / 40000) * 90), 90);
+          } else if (this.provisioningProgress >= 90 && this.provisioningProgress < 95) {
+            // Even slower increase after 90%
+            if (currentStep % 10 === 0) {
+              this.provisioningProgress++;
+            }
+          }
+
+          // Update messaging based on progress
+          if (this.provisioningProgress < 25) {
+            this.provisioningMessage = 'Creando base de datos y configuraciones iniciales...';
+          } else if (this.provisioningProgress < 50) {
+            this.provisioningMessage = 'Configurando subdominio y enrutamiento de red...';
+          } else if (this.provisioningProgress < 85) {
+            this.provisioningMessage = 'Generando certificado de seguridad SSL (Let\'s Encrypt)...';
+          } else {
+            this.provisioningMessage = 'Verificando conexión segura y finalizando...';
+          }
+
+          // Timeout fallback
+          if (timeElapsed >= maxDuration) {
+            clearInterval(progressInterval);
+            clearInterval(pollInterval);
+            this.sslTimeout = true;
+            this.isProvisioning = false;
+            this.isSubmitted = true;
           }
         }
 
-        // Update messaging based on progress
-        if (this.provisioningProgress < 25) {
-          this.provisioningMessage = 'Creando base de datos y configuraciones iniciales...';
-        } else if (this.provisioningProgress < 50) {
-          this.provisioningMessage = 'Configurando subdominio y enrutamiento de red...';
-        } else if (this.provisioningProgress < 85) {
-          this.provisioningMessage = 'Generando certificado de seguridad SSL (Let\'s Encrypt)...';
-        } else {
-          this.provisioningMessage = 'Verificando conexión segura y finalizando...';
-        }
-
-        // Timeout fallback
-        if (timeElapsed >= maxDuration) {
-          clearInterval(progressInterval);
-          clearInterval(pollInterval);
-          this.sslTimeout = true;
-          this.isProvisioning = false;
-          this.isSubmitted = true;
-        }
+        // Force Angular to render the updated state
+        this.cdr.detectChanges();
+      } catch (progressErr) {
+        console.error('Error inside progressInterval callback:', progressErr);
       }
     }, intervalTime);
   }

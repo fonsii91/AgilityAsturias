@@ -5,7 +5,7 @@ set -e
 DB_USER="agility"
 DB_PASS="dbpassword123"
 DB_NAME="agility_asturias"
-STATE_FILE="/root/current_ssl_domains.txt"
+STATE_FILE="/var/www/agilityasturias/agility_back/storage/app/current_ssl_domains.txt"
 
 # Base domains
 DOMAINS="agilityasturias.com www.agilityasturias.com clubagility.com www.clubagility.com admin.clubagility.com www.admin.clubagility.com"
