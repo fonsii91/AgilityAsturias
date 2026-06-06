@@ -200,14 +200,14 @@
             
             <div class="club-access-box" style="margin: 1.5rem auto; padding: 1.25rem; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; border-radius: 0.5rem; text-align: left; max-width: 500px;">
               <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #065f46;">Enlace de acceso a tu Club:</p>
-              <a [href]="'https://' + leadForm.get('slug')?.value + '.clubagility.com'" target="_blank" style="font-size: 1.15rem; font-weight: bold; color: #059669; text-decoration: underline; word-break: break-all;">
+              <a [href]="'https://' + leadForm.get('slug')?.value + '.clubagility.com'" target="_blank" rel="noopener noreferrer" style="font-size: 1.15rem; font-weight: bold; color: #059669; text-decoration: underline; word-break: break-all;">
                 https://{{ leadForm.get('slug')?.value }}.clubagility.com
               </a>
               <p style="margin: 1rem 0 0 0; font-size: 0.875rem; color: #047857;">
                 <strong>Datos de Acceso:</strong> Usa tu email (<strong>{{ leadForm.get('email')?.value }}</strong>) y la contraseña que acabas de elegir para iniciar sesión como Gestor.
               </p>
-              <p style="margin: 0.5rem 0 0 0; font-size: 0.75rem; color: #047857; font-style: italic;">
-                * Nota: El certificado de seguridad SSL se está activando en segundo plano en el servidor. Estará listo en menos de 1 minuto.
+              <p style="margin: 0.75rem 0 0 0; font-size: 0.78rem; color: #047857; line-height: 1.4; border-top: 1px dashed rgba(16, 185, 129, 0.3); padding-top: 0.75rem;">
+                <strong>⚠️ Nota importante:</strong> Estamos activando el certificado de seguridad de tu web en segundo plano. Este proceso suele tardar unos <strong>5 minutos</strong>. Hasta que termine, es normal si tu navegador te muestra un aviso de <strong>"Sitio no seguro"</strong> al hacer clic en el enlace. Puedes entrar de todos modos o esperar unos minutos a que la advertencia desaparezca sola.
               </p>
             </div>
           </div>
