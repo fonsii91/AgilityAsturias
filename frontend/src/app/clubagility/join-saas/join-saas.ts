@@ -18,6 +18,9 @@ export class JoinSaas {
   leadForm: FormGroup;
   isSubmitted = false;
   isSubmitting = false;
+  isProvisioning = false;
+  provisioningProgress = 0;
+  provisioningMessage = '';
   selectedPlan = signal<string | null>(null);
 
   constructor() {
@@ -39,6 +42,39 @@ export class JoinSaas {
     this.selectedPlan.set(null);
   }
 
+  startProvisioning() {
+    this.isProvisioning = true;
+    this.provisioningProgress = 0;
+    this.provisioningMessage = 'Creando base de datos y configuraciones iniciales...';
+
+    const duration = 45000; // 45 seconds
+    const intervalTime = 100; // Update every 100ms
+    const totalSteps = duration / intervalTime;
+    let currentStep = 0;
+
+    const interval = setInterval(() => {
+      currentStep++;
+      this.provisioningProgress = Math.min(Math.round((currentStep / totalSteps) * 100), 100);
+
+      // Update message based on progress
+      if (this.provisioningProgress < 25) {
+        this.provisioningMessage = 'Creando base de datos y configuraciones iniciales...';
+      } else if (this.provisioningProgress < 50) {
+        this.provisioningMessage = 'Configurando subdominio y enrutamiento de red...';
+      } else if (this.provisioningProgress < 85) {
+        this.provisioningMessage = 'Generando certificado de seguridad SSL (Let\'s Encrypt)...';
+      } else {
+        this.provisioningMessage = 'Verificando conexión segura y finalizando...';
+      }
+
+      if (currentStep >= totalSteps) {
+        clearInterval(interval);
+        this.isProvisioning = false;
+        this.isSubmitted = true;
+      }
+    }, intervalTime);
+  }
+
   onSubmit() {
     if (this.leadForm.valid) {
       this.isSubmitting = true;
@@ -46,8 +82,8 @@ export class JoinSaas {
       
       this.http.post(`${environment.apiUrl}/club-leads`, leadData).subscribe({
         next: (res) => {
-          this.isSubmitted = true;
           this.isSubmitting = false;
+          this.startProvisioning();
           console.log('Lead request submitted:', res);
         },
         error: (err) => {

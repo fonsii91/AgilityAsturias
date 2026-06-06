@@ -112,7 +112,7 @@
       </button>
 
       <div class="glass-card form-container">
-        @if (!isSubmitted) {
+        @if (!isSubmitted && !isProvisioning) {
           <div class="form-header">
             <div class="selected-plan-badge">Plan seleccionado: <strong>{{ selectedPlan() }}</strong></div>
             <h2>Solicita el Alta de tu Club</h2>
@@ -192,6 +192,23 @@
               Completar Solicitud
             </button>
           </form>
+        } @else if (isProvisioning) {
+          <div class="provisioning-container">
+            <div class="spinner-container">
+              <div class="premium-loader"></div>
+              <div class="progress-percent">{{ provisioningProgress }}%</div>
+            </div>
+            <h2>Creando tu Club...</h2>
+            <p class="provisioning-text">
+              {{ provisioningMessage }}
+            </p>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" [style.width.%]="provisioningProgress"></div>
+            </div>
+            <p class="provisioning-note">
+              * Esto tardará unos segundos mientras configuramos las bases de datos y el certificado de seguridad SSL para tu subdominio.
+            </p>
+          </div>
         } @else {
           <div class="success-message" style="text-align: center;">
             <span class="material-icons success-icon" style="font-size: 4rem; color: #10b981; margin-bottom: 1rem;">check_circle</span>
@@ -206,8 +223,8 @@
               <p style="margin: 1rem 0 0 0; font-size: 0.875rem; color: #047857;">
                 <strong>Datos de Acceso:</strong> Usa tu email (<strong>{{ leadForm.get('email')?.value }}</strong>) y la contraseña que acabas de elegir para iniciar sesión como Gestor.
               </p>
-              <p style="margin: 0.75rem 0 0 0; font-size: 0.78rem; color: #047857; line-height: 1.4; border-top: 1px dashed rgba(16, 185, 129, 0.3); padding-top: 0.75rem;">
-                <strong>⚠️ Nota importante:</strong> Estamos activando el certificado de seguridad de tu web en segundo plano. Este proceso suele tardar unos <strong>5 minutos</strong>. Hasta que termine, es normal si tu navegador te muestra un aviso de <strong>"Sitio no seguro"</strong> al hacer clic en el enlace. Puedes entrar de todos modos o esperar unos minutos a que la advertencia desaparezca sola.
+              <p style="margin: 0.75rem 0 0 0; font-size: 0.78rem; color: #047857; line-height: 1.4; border-top: 1px dashed rgba(16, 185, 129, 0.3); padding-top: 0.75rem; font-style: italic;">
+                * Nota: El certificado de seguridad SSL (HTTPS) ya está activo y configurado. Puedes acceder a tu club de forma segura de inmediato.
               </p>
             </div>
           </div>
