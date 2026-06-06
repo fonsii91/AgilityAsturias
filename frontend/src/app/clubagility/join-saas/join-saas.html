@@ -125,7 +125,11 @@
                 <label for="name">Nombre del Club</label>
                 <input type="text" id="name" formControlName="name" placeholder="Ej. Club Agility Madrid">
                 @if (leadForm.get('name')?.invalid && leadForm.get('name')?.touched) {
-                  <span class="error-msg">El nombre es obligatorio</span>
+                  @if (leadForm.get('name')?.errors?.['backendError']) {
+                    <span class="error-msg">{{ leadForm.get('name')?.errors?.['backendError'] }}</span>
+                  } @else {
+                    <span class="error-msg">El nombre es obligatorio</span>
+                  }
                 }
               </div>
 
@@ -136,7 +140,11 @@
                   <span class="addon">.clubagility.com</span>
                 </div>
                 @if (leadForm.get('slug')?.invalid && leadForm.get('slug')?.touched) {
-                  <span class="error-msg">Solo letras minúsculas y guiones</span>
+                  @if (leadForm.get('slug')?.errors?.['backendError']) {
+                    <span class="error-msg">{{ leadForm.get('slug')?.errors?.['backendError'] }}</span>
+                  } @else {
+                    <span class="error-msg">Solo letras minúsculas y guiones</span>
+                  }
                 }
               </div>
             </div>
@@ -146,7 +154,11 @@
                 <label for="email">Email de contacto</label>
                 <input type="email" id="email" formControlName="email" placeholder="hola@tuclub.com">
                 @if (leadForm.get('email')?.invalid && leadForm.get('email')?.touched) {
-                  <span class="error-msg">Introduce un email válido</span>
+                  @if (leadForm.get('email')?.errors?.['backendError']) {
+                    <span class="error-msg">{{ leadForm.get('email')?.errors?.['backendError'] }}</span>
+                  } @else {
+                    <span class="error-msg">Introduce un email válido</span>
+                  }
                 }
               </div>
 
@@ -154,7 +166,11 @@
                 <label for="phone">Teléfono</label>
                 <input type="tel" id="phone" formControlName="phone" placeholder="Ej. +34 600 000 000">
                 @if (leadForm.get('phone')?.invalid && leadForm.get('phone')?.touched) {
-                  <span class="error-msg">El teléfono es obligatorio</span>
+                  @if (leadForm.get('phone')?.errors?.['backendError']) {
+                    <span class="error-msg">{{ leadForm.get('phone')?.errors?.['backendError'] }}</span>
+                  } @else {
+                    <span class="error-msg">El teléfono es obligatorio</span>
+                  }
                 }
               </div>
             </div>
@@ -163,7 +179,11 @@
                 <label for="password">Contraseña de Administrador</label>
                 <input type="password" id="password" formControlName="password" placeholder="Elige la contraseña para tu cuenta (mín. 6 caracteres)">
                 @if (leadForm.get('password')?.invalid && leadForm.get('password')?.touched) {
-                  <span class="error-msg">La contraseña debe tener al menos 6 caracteres</span>
+                  @if (leadForm.get('password')?.errors?.['backendError']) {
+                    <span class="error-msg">{{ leadForm.get('password')?.errors?.['backendError'] }}</span>
+                  } @else {
+                    <span class="error-msg">La contraseña debe tener al menos 6 caracteres</span>
+                  }
                 }
               </div>
             </div>

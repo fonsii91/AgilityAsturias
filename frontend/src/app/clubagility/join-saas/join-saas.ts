@@ -53,7 +53,17 @@ export class JoinSaas {
         error: (err) => {
           this.isSubmitting = false;
           console.error('Error submitting lead:', err);
-          alert('Hubo un error al enviar tu solicitud. Inténtalo de nuevo más tarde.');
+          if (err.status === 422 && err.error?.errors) {
+            const errors = err.error.errors;
+            Object.keys(errors).forEach(key => {
+              const control = this.leadForm.get(key);
+              if (control) {
+                control.setErrors({ backendError: errors[key][0] });
+              }
+            });
+          } else {
+            alert('Hubo un error al enviar tu solicitud. Inténtalo de nuevo más tarde.');
+          }
         }
       });
     } else {
