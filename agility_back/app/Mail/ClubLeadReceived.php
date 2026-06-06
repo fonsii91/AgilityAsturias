@@ -16,13 +16,15 @@ class ClubLeadReceived extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public $lead;
+    public $activationLink;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(ClubLead $lead)
+    public function __construct(ClubLead $lead, string $activationLink = null)
     {
         $this->lead = $lead;
+        $this->activationLink = $activationLink;
     }
 
     /**
