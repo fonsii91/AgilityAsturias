@@ -445,14 +445,30 @@
 
 .addon-input {
   display: flex;
+  align-items: stretch;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.addon-input:focus-within {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 .addon-input input {
   flex: 1;
-  border-right: none;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  border: none !important;
+  background: transparent !important;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  color: #0f172a;
+  outline: none !important;
+  box-shadow: none !important;
   min-width: 0;
+  margin: 0 !important;
 }
 
 .addon-input .addon {
@@ -460,19 +476,16 @@
   align-items: center;
   padding: 0 1rem;
   background: #f1f5f9;
-  border: 2px solid #e2e8f0;
-  border-left: none;
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
+  border-left: 2px solid #e2e8f0;
   color: #64748b;
   font-weight: 500;
   font-size: 0.95rem;
   white-space: nowrap;
+  transition: border-color 0.2s ease;
 }
 
-.addon-input input:focus + .addon {
-  border-color: #3b82f6;
-  border-left-color: #e2e8f0;
+.addon-input:focus-within .addon {
+  border-left-color: #3b82f6;
 }
 
 .error-msg {
