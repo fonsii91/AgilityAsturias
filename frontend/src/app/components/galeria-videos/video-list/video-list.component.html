@@ -264,8 +264,8 @@
         </div>
 
         <div class="bento-content">
-          <h3 class="bento-title" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+          <h3 class="bento-title" [title]="video.title || video.dog?.name + ' - ' + (video.manga_type || 'Agility') + ' ' + video.date">
+            {{ video.title || (video.dog?.name + ' - ' + (video.manga_type || 'Agility') + ' ' + video.date) }}
           </h3>
 
           <div class="bento-tags-row">
@@ -301,7 +301,7 @@
             </button>
             }
 
-            @if (video.status === 'local') {
+            @if (video.status === 'local' || (video.status === 'completed' && video.bunny_video_id)) {
             <button (click)="downloadVideo($event, video)" class="yt-action-btn" title="Descargar">
               <span class="material-icons">download</span>
             </button>
@@ -356,7 +356,7 @@
             <span class="material-icons" [style.color]="video.in_public_gallery ? '#1abc9c' : 'inherit'">public</span>
           </button>
           }
-          @if (video.status === 'local') {
+          @if (video.status === 'local' || (video.status === 'completed' && video.bunny_video_id)) {
           <button (click)="downloadVideo($event, video)" class="action-bubble" title="Descargar">
             <span class="material-icons">download</span>
           </button>
@@ -401,8 +401,8 @@
               {{ video.date | date:'dd/MM/yyyy' }}
             </span>
           </div>
-          <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+          <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - ' + (video.manga_type || 'Agility') + ' ' + video.date">
+            {{ video.title || (video.dog?.name + ' - ' + (video.manga_type || 'Agility') + ' ' + video.date) }}
           </div>
         </div>
         <div class="video-uploader-cover-small">
@@ -499,6 +499,18 @@
             <option [value]="comp.id">{{ comp.nombre ||
               comp.lugar }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : '' }}</option>
             }
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tipo de Manga *</label>
+        <div class="select-wrapper">
+          <select name="manga_type" [(ngModel)]="editData.manga_type" required class="form-input">
+            <option value="Agility 1">Agility 1</option>
+            <option value="Agility 2">Agility 2</option>
+            <option value="Jumping 1">Jumping 1</option>
+            <option value="Jumping 2">Jumping 2</option>
+            <option value="Otra">Otra</option>
           </select>
         </div>
       </div>

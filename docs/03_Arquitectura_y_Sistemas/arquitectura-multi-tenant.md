@@ -114,6 +114,39 @@ No todos los clubes de la plataforma requieren o utilizan todas las funcionalida
     *   **Control de Navegación y Menús:** Los enlaces del navbar (`navbar.component.html`) y el sidenav móvil (`app.html`) se ocultan o muestran usando signals computados (`provisionFondosEnabled()`).
     *   **Restricciones de Rol en Módulos:** Ciertos módulos pueden excluir completamente a determinados roles de forma explícita. Por ejemplo, el módulo de provisión de fondos oculta y bloquea cualquier acceso a los usuarios con rol `staff` (entrenadores y monitores), tanto en las rutas del frontend como en la respuesta del controlador de la API backend, para salvaguardar la privacidad financiera de los socios.
 
+---
 
+## 7. Aprovisionamiento Inmediato y Automatización de SSL (HTTPS)
 
+El proceso de registro en el SaaS (`join-saas.ts`) crea un flujo dinámico y seguro de aprovisionamiento inmediato del club:
 
+1. **Definición de Contraseña en el Registro**:
+   * El formulario de registro solicita y valida la contraseña deseada por el gestor (`Validators.minLength(6)`).
+   * Al crear el usuario administrador del club en el backend, la contraseña se hashea y almacena directamente, permitiendo el login inmediato sin esperar correos de activación temporales.
+2. **Ejecución Asíncrona de SSL**:
+   * Para evitar bloqueos y *504 Gateway Timeout* en Nginx, tras la transacción en base de datos, el backend lanza en segundo plano el script de Let's Encrypt de forma desvinculada: `nohup sudo /root/auto_ssl.sh < /dev/null > /dev/null 2>&1 &`.
+   * El script `/root/auto_ssl.sh` extrae los subdominios de la base de datos, los compara con la lista previa y amplía el certificado multi-dominio mediante `certbot --nginx --expand`.
+3. **Sondeo Inteligente en Frontend (Polling)**:
+   * En lugar de un temporizador estático, el frontend realiza peticiones periódicas (cada 2.5 segundos) a `GET /api/club-leads/status/{slug}`.
+   * El backend valida el estado de la conexión segura intentando un handshake HTTPS real (`CURLOPT_SSL_VERIFYPEER => true`) a través de un canal seguro de loopback contra `https://{slug}.clubagility.com`.
+   * El listado de dominios autorizados de Certbot se sincroniza de forma segura mediante un archivo de estado ubicado en el almacenamiento interno de Laravel (`storage/app/current_ssl_domains.txt`) accesible por `www-data`.
+   * Una vez que el handshake es exitoso y el backend devuelve `{ ready: true }`, el cargador del frontend completa su barra al 100% de inmediato y muestra el botón verde de acceso seguro con el candado SSL activo.
+   * Se incluye una salvaguarda de tiempo límite (55 segundos). Si el sondeo expira, el frontend muestra una advertencia de precaución explicando de forma no técnica que el certificado se completará en segundo plano y que espere unos instantes si detecta advertencias en su navegador.
+
+---
+
+## 8. Ciclo de Vida del Tenant: Borrado en Cascada y Limpieza de Recursos
+
+Para garantizar la integridad del almacenamiento local y externo (SaaS limpio), cuando se elimina un club a través de la interfaz administrativa global, se ejecuta un borrado profundo en cascada mediante hooks Eloquent:
+
+1. **Evento de Borrado en `Club.php`:**
+   * Al eliminar la fila del Club, el hook `deleting` recupera y elimina de forma recursiva los modelos relacionados utilizando `each->delete()` para disparar sus respectivos eventos:
+     * **Vídeos:** Borra todos los registros asociados en la base de datos de vídeos del club.
+     * **Perros:** Elimina los perros asociados a la base de datos del club.
+     * **Usuarios:** Elimina todas las cuentas de usuarios de ese club.
+     * **Logo Local:** Elimina el archivo físico del logotipo cargado en el disco público del servidor.
+2. **Limpieza del Almacenamiento Externo Bunny.net:**
+   * El hook `deleting` del modelo `Video.php` intercepta la eliminación de cada registro de vídeo:
+     * Si contiene un `bunny_video_id`, realiza una solicitud de API REST `DELETE` a `https://video.bunnycdn.com/library/{libraryId}/videos/{bunny_video_id}` utilizando la clave API configurada para liberar espacio en Bunny.net Stream.
+     * Elimina el archivo temporal o el fragmento `.mp4` local si estuviera presente en el disco `public` del servidor.
+     * Limpia los cachés de métricas de almacenamiento asociados al club (`club_{id}_bunny_storage_bytes`).

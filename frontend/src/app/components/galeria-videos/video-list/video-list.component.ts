@@ -354,7 +354,8 @@ export class VideoListComponent implements OnInit {
             title: video.title || '',
             date: video.date || '',
             dog_id: video.dog_id || (video.dog ? video.dog.id : ''),
-            competition_id: video.competition_id || (video.competition ? video.competition.id : '')
+            competition_id: video.competition_id || (video.competition ? video.competition.id : ''),
+            manga_type: video.manga_type || 'Agility 1'
         };
         this.cdr.detectChanges();
     }

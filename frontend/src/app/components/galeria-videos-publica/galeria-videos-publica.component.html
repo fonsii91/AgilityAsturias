@@ -83,8 +83,8 @@
               {{ video.date | date:'dd/MM/yyyy' }}
             </span>
           </div>
-          <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - Agility ' + video.date">
-            {{ video.title || (video.dog?.name + ' - Agility ' + video.date) }}
+          <div class="video-title-cover-bottom" [title]="video.title || video.dog?.name + ' - ' + (video.manga_type || 'Agility') + ' ' + video.date">
+            {{ video.title || (video.dog?.name + ' - ' + (video.manga_type || 'Agility') + ' ' + video.date) }}
           </div>
         </div>
         <div class="dog-name-cover-small" title="Ver perfil de {{video.dog?.name}}">

@@ -49,6 +49,30 @@ class ClubLeadSaaSProvisionTest extends TestCase
         $this->assertTrue(\Illuminate\Support\Facades\Hash::check('mysecurepassword123', $user->password));
     }
 
+    public function test_phone_validation_rejects_letters()
+    {
+        // Setup a Plan in the DB
+        \App\Models\Plan::create([
+            'name' => 'Pro Plan',
+            'slug' => 'profesional',
+            'price' => 19,
+        ]);
+
+        $payload = [
+            'name' => 'Club Deportivo Asturias',
+            'slug' => 'deportivo-asturias',
+            'email' => 'manager@asturias.com',
+            'phone' => '600abc123', // Contains letters
+            'password' => 'mysecurepassword123',
+            'plan_selected' => 'Pro',
+        ];
+
+        $response = $this->postJson('/api/club-leads', $payload);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['phone']);
+    }
+
     public function test_ssl_status_endpoint_validation()
     {
         // Invalid slug format (e.g. contains uppercase or special characters not allowed)

@@ -62,6 +62,13 @@ sequenceDiagram
    `https://iframe.mediadelivery.net/play/{libraryId}/{bunnyVideoGuid}/playlist.m3u8`
    Este manifiesto se carga directamente en el reproductor del club (`SmartVideoPlayerComponent`) usando la biblioteca `hls.js`, manteniendo la misma interfaz web y controles unificados sin usar iframes de terceros.
 
+4. **Eliminación y Limpieza Automática (Bunny Stream API):**
+   * Cuando se elimina un registro de vídeo en Laravel (ya sea de forma individual o a través del borrado en cascada del club), el modelo `Video.php` intercepta el evento `deleting`.
+   * Si el campo `bunny_video_id` está presente, el backend realiza una petición HTTP DELETE a la API de Bunny:
+     `DELETE https://video.bunnycdn.com/library/{libraryId}/videos/{bunnyVideoGuid}`
+     autenticada con el `BUNNY_API_KEY` (`AccessKey`).
+   * Esto elimina inmediatamente el archivo de vídeo codificado de los servidores de Bunny.net, optimizando la cuota de espacio en disco de forma transparente.
+
 ---
 
 ## 📜 3. Subida Local + YouTube (Driver Legacy)

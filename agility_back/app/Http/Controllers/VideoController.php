@@ -475,12 +475,62 @@ class VideoController extends Controller
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
+        $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $video->title ?? ($video->dog->name ?? 'video_agility'));
+
+        if ($video->bunny_video_id) {
+            $libraryId = config('services.bunny.library_id');
+            $pullZone = config('services.bunny.pull_zone') ?: "iframe.mediadelivery.net/play/{$libraryId}";
+            
+            $resolutions = ['play_720p.mp4', 'play_480p.mp4', 'play_360p.mp4', 'play_1080p.mp4', 'play_240p.mp4'];
+            $bestResolution = null;
+
+            $client = new \GuzzleHttp\Client();
+            foreach ($resolutions as $res) {
+                try {
+                    $url = "https://{$pullZone}/{$video->bunny_video_id}/{$res}";
+                    $response = $client->request('HEAD', $url);
+                    if ($response->getStatusCode() === 200) {
+                        $bestResolution = $res;
+                        break;
+                    }
+                } catch (\Exception $e) {
+                    // Resolution not available, check next
+                }
+            }
+
+            if (!$bestResolution) {
+                $bestResolution = 'play_720p.mp4'; // Fallback guess
+            }
+
+            $downloadUrl = "https://{$pullZone}/{$video->bunny_video_id}/{$bestResolution}";
+            $filename = "{$safeTitle}.mp4";
+
+            $headers = [
+                'Content-Type' => 'video/mp4',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ];
+
+            return response()->streamDownload(function () use ($downloadUrl) {
+                try {
+                    $client = new \GuzzleHttp\Client();
+                    $response = $client->request('GET', $downloadUrl, ['stream' => true]);
+                    $body = $response->getBody();
+                    while (!$body->eof()) {
+                        echo $body->read(1024 * 8);
+                        ob_flush();
+                        flush();
+                    }
+                } catch (\Exception $e) {
+                    \Illuminate\Support\Facades\Log::error("Error streaming Bunny video: " . $e->getMessage());
+                }
+            }, $filename, $headers);
+        }
+
         if (!$video->local_path || !Storage::disk('public')->exists($video->local_path)) {
             return response()->json(['message' => 'Video not found or is not local'], 404);
         }
 
         $extension = pathinfo($video->local_path, PATHINFO_EXTENSION);
-        $safeTitle = preg_replace('/[^a-zA-Z0-9_\-]/', '_', $video->title ?? ($video->dog->name ?? 'video_agility'));
         $filename = "{$safeTitle}.{$extension}";
 
         return Storage::disk('public')->download($video->local_path, $filename);

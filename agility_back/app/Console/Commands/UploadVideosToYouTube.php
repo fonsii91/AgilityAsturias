@@ -68,7 +68,8 @@ class UploadVideosToYouTube extends Command
                 $snippet = new Google_Service_YouTube_VideoSnippet();
                 $dogName = $video->dog ? $video->dog->name : 'Unknown';
                 $compName = $video->competition ? $video->competition->name : '';
-                $title = "{$dogName} - Agility {$video->date}";
+                $mangaType = $video->manga_type ?: 'Agility';
+                $title = "{$dogName} - {$mangaType} {$video->date}";
                 if ($compName) {
                     $title .= " - {$compName}";
                 }

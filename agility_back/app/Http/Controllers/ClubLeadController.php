@@ -21,12 +21,13 @@ class ClubLeadController extends Controller
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:clubs,slug',
             'email' => 'required|email|max:255|unique:users,email',
-            'phone' => 'required|string|max:20',
+            'phone' => 'required|string|regex:/^\+?[0-9\s\-]+$/|max:20',
             'password' => 'required|string|min:6',
             'plan_selected' => 'required|string|max:50',
         ], [
             'slug.unique' => 'Este subdominio ya está registrado para otro club.',
             'email.unique' => 'Este correo electrónico ya está registrado en la plataforma.',
+            'phone.regex' => 'Introduce un número de teléfono válido (solo números, espacios o guiones, opcionalmente comenzando con +).',
         ]);
 
         try {

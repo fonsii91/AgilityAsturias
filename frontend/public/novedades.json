@@ -3,10 +3,12 @@
     "version": "1.1.50",
     "date": "2026-06-06",
     "features": [
-      "¡Registro y activación instantánea de nuevos clubes! Ahora, al solicitar un plan, tu club se crea y configura automáticamente con sus colores y módulos al instante, permitiéndote acceder de forma inmediata sin esperas."
+      "¡Registro y activación instantánea de nuevos clubes! Ahora, al solicitar un plan, tu club se crea y configura automáticamente con sus colores y módulos al instante, permitiéndote acceder de forma inmediata sin esperas.",
+      "¡Descarga de vídeos desde la nube de Bunny.net! Hemos habilitado la opción de descarga de vídeos directamente para aquellos alojados en la plataforma Bunny.net. La aplicación buscará y descargará automáticamente la mejor resolución disponible para que puedas guardarla directamente en la memoria de tu teléfono."
     ],
     "bugfixes": [
-      "¡Corregido el botón de pantalla completa en iPhones! Solucionamos un problema que impedía a los usuarios de iPhone ampliar los vídeos a pantalla completa desde la galería. Ahora podrás expandir tus vídeos de entrenamiento y competición a pantalla completa con total normalidad, y el reproductor sincronizará correctamente si estaba pausado o reproduciéndose al cerrarlo."
+      "¡Corregido el botón de pantalla completa en iPhones! Solucionamos un problema que impedía a los usuarios de iPhone ampliar los vídeos a pantalla completa desde la galería. Ahora podrás expandir tus vídeos de entrenamiento y competición a pantalla completa con total normalidad, y el reproductor sincronizará correctamente si estaba pausado o reproduciéndose al cerrarlo.",
+      "¡Elige y edita el tipo de manga en tus vídeos! Corregimos el error que hacía que al subir un vídeo y marcarlo como Jumping se mostrase siempre con el título de Agility tanto en la galería como en la subida a YouTube. Además, ahora puedes corregir y actualizar el tipo de manga (Agility 1/2, Jumping 1/2, etc.) en tus vídeos existentes desde la opción de editar."
     ]
   },
   {

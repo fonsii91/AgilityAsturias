@@ -168,6 +168,8 @@
                 @if (leadForm.get('phone')?.invalid && leadForm.get('phone')?.touched) {
                   @if (leadForm.get('phone')?.errors?.['backendError']) {
                     <span class="error-msg">{{ leadForm.get('phone')?.errors?.['backendError'] }}</span>
+                  } @else if (leadForm.get('phone')?.errors?.['pattern']) {
+                    <span class="error-msg">Introduce un número de teléfono válido (solo números, espacios, guiones o +)</span>
                   } @else {
                     <span class="error-msg">El teléfono es obligatorio</span>
                   }
