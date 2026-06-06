@@ -121,7 +121,7 @@
 
           <form [formGroup]="leadForm" (ngSubmit)="onSubmit()" class="lead-form">
             <div class="form-row">
-              <div class="input-group">
+              <div class="input-group" style="flex: 1 1 100%;">
                 <label for="name">Nombre del Club</label>
                 <input type="text" id="name" formControlName="name" placeholder="Ej. Club Agility Madrid">
                 @if (leadForm.get('name')?.invalid && leadForm.get('name')?.touched) {
@@ -132,8 +132,10 @@
                   }
                 }
               </div>
+            </div>
 
-              <div class="input-group">
+            <div class="form-row">
+              <div class="input-group" style="flex: 1 1 100%;">
                 <label for="slug">Subdominio deseado</label>
                 <div class="addon-input">
                   <input type="text" id="slug" formControlName="slug" placeholder="tu-club">
