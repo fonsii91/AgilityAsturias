@@ -33,7 +33,8 @@ import Hls from 'hls.js';
     
       @if (!youtubeUrl() && localUrl()) {
         <video #localVideo [src]="isNativeHls() ? localUrl() : null" class="video-local" playsinline webkit-playsinline loop preload="metadata" [muted]="isMuted"
-        (playing)="isPlaying = true" (pause)="isPlaying = false" (timeupdate)="onTimeUpdate($event)" (click)="togglePlay()" (error)="onVideoError($event)"></video>
+        (playing)="isPlaying = true" (pause)="isPlaying = false" (timeupdate)="onTimeUpdate($event)" (click)="togglePlay()" (error)="onVideoError($event)"
+        (webkitendfullscreen)="onWebKitEndFullscreen($event)"></video>
         
         @if (hasError()) {
           <div class="video-error-overlay">
@@ -318,6 +319,11 @@ export class SmartVideoPlayerComponent implements OnInit, OnDestroy {
     this.progress = percentage * 100;
   }
 
+  onWebKitEndFullscreen(event: Event) {
+    const video = event.target as HTMLVideoElement;
+    this.isPlaying = !video.paused;
+  }
+
   toggleFullscreen(event: Event) {
     event.stopPropagation();
     const localVideoRef = this.localVideoRef();
@@ -329,12 +335,16 @@ export class SmartVideoPlayerComponent implements OnInit, OnDestroy {
         videoNode.requestFullscreen().catch(() => {});
       } else if ((videoNode as any).webkitRequestFullscreen) {
         (videoNode as any).webkitRequestFullscreen();
+      } else if ((videoNode as any).webkitEnterFullscreen) {
+        (videoNode as any).webkitEnterFullscreen();
       }
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if ((document as any).webkitExitFullscreen) {
         (document as any).webkitExitFullscreen();
+      } else if ((videoNode as any).webkitExitFullscreen) {
+        (videoNode as any).webkitExitFullscreen();
       }
     }
   }
