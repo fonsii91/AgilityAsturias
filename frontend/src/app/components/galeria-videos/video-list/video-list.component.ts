@@ -253,7 +253,10 @@ export class VideoListComponent implements OnInit {
                 }
             });
 
-            if (!response.ok) throw new Error('Download failed');
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || 'No se pudo descargar el vídeo');
+            }
 
             const blob = await response.blob();
             const downloadUrl = window.URL.createObjectURL(blob);
@@ -277,7 +280,8 @@ export class VideoListComponent implements OnInit {
 
         } catch (error) {
             console.error('Download error:', error);
-            this.toastService.error('No se pudo descargar el vídeo');
+            const msg = error instanceof Error ? error.message : 'No se pudo descargar el vídeo';
+            this.toastService.error(msg);
         }
     }
 

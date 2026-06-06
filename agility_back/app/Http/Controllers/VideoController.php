@@ -483,6 +483,7 @@ class VideoController extends Controller
             
             $resolutions = ['play_720p.mp4', 'play_480p.mp4', 'play_360p.mp4', 'play_1080p.mp4', 'play_240p.mp4'];
             $bestResolution = null;
+            $lastExceptionMessage = null;
 
             $client = new \GuzzleHttp\Client();
             foreach ($resolutions as $res) {
@@ -494,12 +495,22 @@ class VideoController extends Controller
                         break;
                     }
                 } catch (\Exception $e) {
-                    // Resolution not available, check next
+                    $lastExceptionMessage = $e->getMessage();
                 }
             }
 
             if (!$bestResolution) {
-                $bestResolution = 'play_720p.mp4'; // Fallback guess
+                $message = 'El vídeo no está disponible para descargar en Bunny Stream.';
+                if ($lastExceptionMessage) {
+                    if (str_contains($lastExceptionMessage, '403 Forbidden')) {
+                        $message = 'El dominio de descarga de Bunny Stream está suspendido o no configurado (403 Forbidden). Por favor, revisa la facturación o la configuración del CDN en el panel de Bunny.net.';
+                    } elseif (str_contains($lastExceptionMessage, '404 Not Found')) {
+                        $message = 'El archivo de vídeo no se encuentra en Bunny Stream (404 Not Found). Asegúrate de activar la opción "Enable MP4 Fallback" en la configuración de la videoteca de Bunny.';
+                    } else {
+                        $message .= ' Detalle: ' . $lastExceptionMessage;
+                    }
+                }
+                return response()->json(['message' => $message], 404);
             }
 
             $downloadUrl = "https://{$pullZone}/{$video->bunny_video_id}/{$bestResolution}";
