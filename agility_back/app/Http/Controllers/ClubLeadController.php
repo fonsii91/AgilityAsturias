@@ -135,9 +135,9 @@ class ClubLeadController extends Controller
                 \Log::warning('Could not send database notifications: ' . $notifEx->getMessage());
             }
 
-            // Trigger SSL generation asynchronously in production
+            // Trigger SSL generation asynchronously in production (detached to prevent 504 timeouts)
             if (config('app.env') === 'production') {
-                shell_exec('sudo /root/auto_ssl.sh > /dev/null 2>&1 &');
+                shell_exec('nohup sudo /root/auto_ssl.sh < /dev/null > /dev/null 2>&1 &');
             }
 
         } catch (\Exception $e) {
