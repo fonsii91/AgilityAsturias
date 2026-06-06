@@ -22,6 +22,7 @@ class ClubLeadController extends Controller
             'slug' => 'required|string|max:255|regex:/^[a-z0-9-]+$/|unique:clubs,slug',
             'email' => 'required|email|max:255|unique:users,email',
             'phone' => 'required|string|max:20',
+            'password' => 'required|string|min:6',
             'plan_selected' => 'required|string|max:50',
         ], [
             'slug.unique' => 'Este subdominio ya está registrado para otro club.',
@@ -81,12 +82,12 @@ class ClubLeadController extends Controller
                     'settings' => $settings,
                 ]);
 
-                // Create initial Manager user
+                // Create initial Manager user using user-supplied password
                 $resetToken = \Illuminate\Support\Str::random(60);
                 $user = \App\Models\User::create([
                     'name' => $validated['name'] . ' Admin',
                     'email' => $validated['email'],
-                    'password' => \Illuminate\Support\Facades\Hash::make(\Illuminate\Support\Str::random(24)),
+                    'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
                     'role' => 'manager',
                     'club_id' => $club->id,
                     'reset_token' => $resetToken,
@@ -118,13 +119,26 @@ class ClubLeadController extends Controller
                 $activationLink = "https://{$validated['slug']}.clubagility.com/reset-password?token={$resetToken}";
             }
 
-            // Send emails
-            Mail::to($lead->email)->send(new ClubLeadReceived($lead, $activationLink));
-            Mail::to('fonsii@clubagility.com')->send(new NewClubLeadAdmin($lead));
+            // Send emails (wrapped in try-catch to prevent crash if mail server is not configured)
+            try {
+                Mail::to($lead->email)->send(new ClubLeadReceived($lead, $activationLink));
+                Mail::to('fonsii@clubagility.com')->send(new NewClubLeadAdmin($lead));
+            } catch (\Exception $mailEx) {
+                \Log::warning('Could not send SaaS subscription notification emails: ' . $mailEx->getMessage());
+            }
 
             // Send database notification to admin users
-            $admins = \App\Models\User::where('role', 'admin')->get();
-            \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewClubLeadNotification($lead));
+            try {
+                $admins = \App\Models\User::where('role', 'admin')->get();
+                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewClubLeadNotification($lead));
+            } catch (\Exception $notifEx) {
+                \Log::warning('Could not send database notifications: ' . $notifEx->getMessage());
+            }
+
+            // Trigger SSL generation asynchronously in production
+            if (config('app.env') === 'production') {
+                shell_exec('sudo /root/auto_ssl.sh > /dev/null 2>&1 &');
+            }
 
         } catch (\Exception $e) {
             \Log::error('Error during club auto-provisioning: ' . $e->getMessage());

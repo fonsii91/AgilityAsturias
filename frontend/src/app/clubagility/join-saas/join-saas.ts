@@ -25,7 +25,8 @@ export class JoinSaas {
       name: ['', [Validators.required, Validators.minLength(3)]],
       slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required]]
+      phone: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
