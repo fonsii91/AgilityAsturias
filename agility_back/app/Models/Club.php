@@ -23,17 +23,58 @@ class Club extends Model
 
     public function users()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(\App\Models\User::class);
+    }
+
+    public function dogs()
+    {
+        return $this->hasMany(\App\Models\Dog::class);
+    }
+
+    public function videos()
+    {
+        return $this->hasMany(\App\Models\Video::class);
     }
 
     public function plan()
     {
-        return $this->belongsTo(Plan::class);
+        return $this->belongsTo(\App\Models\Plan::class);
     }
 
     public function gamificationSeasons()
     {
-        return $this->hasMany(GamificationSeason::class);
+        return $this->hasMany(\App\Models\GamificationSeason::class);
+    }
+
+    protected static function booted()
+    {
+        static::deleting(function ($club) {
+            // Delete all videos of the club via Eloquent to trigger file cleanups (Bunny.net & Local)
+            \App\Models\Video::withoutGlobalScopes()
+                ->where('club_id', $club->id)
+                ->get()
+                ->each
+                ->delete();
+
+            // Delete all dogs of the club via Eloquent to trigger their delete events (which also cleans up their videos)
+            \App\Models\Dog::withoutGlobalScopes()
+                ->where('club_id', $club->id)
+                ->get()
+                ->each
+                ->delete();
+
+            // Delete all users of the club via Eloquent to trigger their delete events (which also cleans up their videos)
+            \App\Models\User::withoutGlobalScopes()
+                ->where('club_id', $club->id)
+                ->get()
+                ->each
+                ->delete();
+
+            // Delete local logo if exists
+            if ($club->logo_url && !str_starts_with($club->logo_url, 'http') && \Illuminate\Support\Facades\Storage::disk('public')->exists($club->logo_url)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($club->logo_url);
+            }
+        });
     }
 
     /**
