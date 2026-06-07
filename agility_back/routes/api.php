@@ -48,6 +48,7 @@ Route::post('/webhooks/bunny', [VideoController::class, 'bunnyWebhook']);
 Route::get('/videos/{id}/stream/{file}', [VideoController::class, 'streamProxy'])->where('file', '.*');
 
 Route::get('/time-slots', [TimeSlotController::class, 'index']);
+Route::get('/plans-public', [\App\Http\Controllers\SubscriptionAdminController::class, 'getPlans']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);

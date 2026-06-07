@@ -1,8 +1,27 @@
-import { Component, inject, signal, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, signal, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+
+interface Feature {
+  id: number;
+  slug: string;
+  name: string;
+  type: string;
+  description: string;
+}
+
+interface Plan {
+  id: number;
+  name: string;
+  slug: string;
+  price: string;
+  description: string;
+  is_active: boolean;
+  video_storage_limit_gb?: number;
+  features?: Feature[];
+}
 
 @Component({
   selector: 'app-join-saas',
@@ -11,7 +30,7 @@ import { environment } from '../../../environments/environment';
   templateUrl: './join-saas.html',
   styleUrl: './join-saas.css',
 })
-export class JoinSaas {
+export class JoinSaas implements OnInit {
   private fb = inject(FormBuilder);
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
@@ -25,6 +44,9 @@ export class JoinSaas {
   provisioningMessage = '';
   selectedPlan = signal<string | null>(null);
 
+  plans = signal<Plan[]>([]);
+  isLoading = signal<boolean>(true);
+
   constructor() {
     this.leadForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
@@ -35,8 +57,43 @@ export class JoinSaas {
     });
   }
 
-  selectPlan(planName: string) {
-    this.selectedPlan.set(planName);
+  ngOnInit() {
+    this.loadPlans();
+  }
+
+  async loadPlans() {
+    this.isLoading.set(true);
+    try {
+      const plansData = await this.http.get<Plan[]>(`${environment.apiUrl}/plans-public`).toPromise();
+      if (plansData) {
+        // Sort plans by price ascending
+        const sorted = plansData
+          .filter(p => p.is_active)
+          .sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+        this.plans.set(sorted);
+      }
+    } catch (error) {
+      console.error('Error loading plans', error);
+    } finally {
+      this.isLoading.set(false);
+    }
+  }
+
+  getIntegerPart(price: string | number | undefined): string {
+    if (price === undefined) return '0';
+    const num = typeof price === 'string' ? parseFloat(price) : price;
+    return Math.floor(num).toString();
+  }
+
+  getDecimalPart(price: string | number | undefined): string {
+    if (price === undefined) return '00';
+    const num = typeof price === 'string' ? parseFloat(price) : price;
+    const decimal = (num - Math.floor(num)).toFixed(2);
+    return decimal.split('.')[1] || '00';
+  }
+
+  selectPlan(plan: Plan) {
+    this.selectedPlan.set(plan.name);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
