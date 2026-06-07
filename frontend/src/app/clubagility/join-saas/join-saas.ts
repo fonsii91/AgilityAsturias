@@ -21,6 +21,9 @@ interface Plan {
   is_active: boolean;
   video_storage_limit_gb?: number;
   features?: Feature[];
+  promo_price?: string | null;
+  promo_duration_months?: number | null;
+  promo_label?: string | null;
 }
 
 @Component({

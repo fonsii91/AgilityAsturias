@@ -30,10 +30,21 @@
                 <h3>{{ plan.name }}</h3>
                 <p class="card-desc">{{ plan.description }}</p>
               </div>
-              <div class="price">
-                <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.price) }}</span>@if (getDecimalPart(plan.price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.price) }}</span>}<span class="period">/mes</span>
-              </div>
-              <p class="billing-info">&nbsp;</p>
+              
+              @if (plan.promo_price && plan.promo_duration_months && plan.promo_duration_months > 0) {
+                <div class="price-strike">
+                  <span class="strike-amount">{{ getIntegerPart(plan.price) }}€/mes</span> <span class="save-badge">{{ plan.promo_label || 'Oferta' }}</span>
+                </div>
+                <div class="price">
+                  <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.promo_price) }}</span>@if (getDecimalPart(plan.promo_price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.promo_price) }}</span>}<span class="period">/mes</span>
+                </div>
+                <p class="billing-info">Durante los primeros {{ plan.promo_duration_months }} meses. <strong>Luego {{ getIntegerPart(plan.price) }}€/mes.</strong></p>
+              } @else {
+                <div class="price">
+                  <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.price) }}</span>@if (getDecimalPart(plan.price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.price) }}</span>}<span class="period">/mes</span>
+                </div>
+                <p class="billing-info">&nbsp;</p>
+              }
               
               <button class="btn-select-plan outline-btn" (click)="selectPlan(plan)">
                 Elegir {{ plan.name.replace('Plan ', '') }}
@@ -59,13 +70,21 @@
                 <h3>{{ plan.name }}</h3>
                 <p class="card-desc">{{ plan.description }}</p>
               </div>
-              <div class="price-strike">
-                <span class="strike-amount">49€/mes</span> <span class="save-badge">Oferta Lanzamiento</span>
-              </div>
-              <div class="price">
-                <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.price) }}</span>@if (getDecimalPart(plan.price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.price) }}</span>}<span class="period">/mes</span>
-              </div>
-              <p class="billing-info">Durante los primeros 2 meses. <strong>Luego 49€/mes.</strong></p>
+              
+              @if (plan.promo_price && plan.promo_duration_months && plan.promo_duration_months > 0) {
+                <div class="price-strike">
+                  <span class="strike-amount">{{ getIntegerPart(plan.price) }}€/mes</span> <span class="save-badge">{{ plan.promo_label || 'Oferta' }}</span>
+                </div>
+                <div class="price">
+                  <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.promo_price) }}</span>@if (getDecimalPart(plan.promo_price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.promo_price) }}</span>}<span class="period">/mes</span>
+                </div>
+                <p class="billing-info">Durante los primeros {{ plan.promo_duration_months }} meses. <strong>Luego {{ getIntegerPart(plan.price) }}€/mes.</strong></p>
+              } @else {
+                <div class="price">
+                  <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.price) }}</span>@if (getDecimalPart(plan.price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.price) }}</span>}<span class="period">/mes</span>
+                </div>
+                <p class="billing-info">&nbsp;</p>
+              }
               
               <button class="btn-select-plan primary-btn btn-glow" (click)="selectPlan(plan)">
                 Elegir {{ plan.name.replace('Plan ', '') }}
@@ -95,10 +114,21 @@
                 <h3>{{ plan.name }}</h3>
                 <p class="card-desc">{{ plan.description }}</p>
               </div>
-              <div class="price">
-                <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.price) }}</span>@if (getDecimalPart(plan.price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.price) }}</span>}<span class="period">/mes</span>
-              </div>
-              <p class="billing-info">&nbsp;</p>
+              
+              @if (plan.promo_price && plan.promo_duration_months && plan.promo_duration_months > 0) {
+                <div class="price-strike">
+                  <span class="strike-amount">{{ getIntegerPart(plan.price) }}€/mes</span> <span class="save-badge">{{ plan.promo_label || 'Oferta' }}</span>
+                </div>
+                <div class="price">
+                  <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.promo_price) }}</span>@if (getDecimalPart(plan.promo_price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.promo_price) }}</span>}<span class="period">/mes</span>
+                </div>
+                <p class="billing-info">Durante los primeros {{ plan.promo_duration_months }} meses. <strong>Luego {{ getIntegerPart(plan.price) }}€/mes.</strong></p>
+              } @else {
+                <div class="price">
+                  <span class="currency">€</span><span class="amount">{{ getIntegerPart(plan.price) }}</span>@if (getDecimalPart(plan.price) !== '00') {<span class="decimals" style="font-size: 1.5rem; vertical-align: super; font-weight: 600;">,{{ getDecimalPart(plan.price) }}</span>}<span class="period">/mes</span>
+                </div>
+                <p class="billing-info">&nbsp;</p>
+              }
               
               <button class="btn-select-plan outline-btn" (click)="selectPlan(plan)">
                 Elegir {{ plan.name.replace('Plan ', '') }}

@@ -24,6 +24,9 @@ interface Plan {
   is_active: boolean;
   video_storage_limit_gb?: number;
   features?: Feature[];
+  promo_price?: string | null;
+  promo_duration_months?: number | null;
+  promo_label?: string | null;
 }
 
 @Component({
@@ -49,7 +52,10 @@ export class AdminSuscripcionesComponent implements OnInit {
     price: '0.00',
     description: '',
     is_active: true,
-    video_storage_limit_gb: 10
+    video_storage_limit_gb: 10,
+    promo_price: null,
+    promo_duration_months: null,
+    promo_label: 'Oferta Lanzamiento'
   });
 
   // Edit Plan form state
@@ -140,7 +146,10 @@ export class AdminSuscripcionesComponent implements OnInit {
         price: plan.price,
         description: plan.description,
         is_active: plan.is_active,
-        video_storage_limit_gb: plan.video_storage_limit_gb
+        video_storage_limit_gb: plan.video_storage_limit_gb,
+        promo_price: plan.promo_price,
+        promo_duration_months: plan.promo_duration_months,
+        promo_label: plan.promo_label
       }).toPromise();
 
       if (updated) {
@@ -161,7 +170,10 @@ export class AdminSuscripcionesComponent implements OnInit {
         price: plan.price,
         description: plan.description,
         is_active: plan.is_active,
-        video_storage_limit_gb: plan.video_storage_limit_gb
+        video_storage_limit_gb: plan.video_storage_limit_gb,
+        promo_price: plan.promo_price,
+        promo_duration_months: plan.promo_duration_months,
+        promo_label: plan.promo_label
       }).toPromise();
     } catch (error) {
       console.error('Error updating plan storage limit', error);
@@ -176,7 +188,7 @@ export class AdminSuscripcionesComponent implements OnInit {
       if (created) {
         this.plans.update(plans => [...plans, created]);
         this.showNewPlanForm.set(false);
-        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10 });
+        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10, promo_price: null, promo_duration_months: null, promo_label: 'Oferta Lanzamiento' });
       }
     } catch (error) {
       console.error('Error creating plan', error);

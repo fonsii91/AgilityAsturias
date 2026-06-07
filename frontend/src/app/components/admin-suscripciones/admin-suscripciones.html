@@ -35,6 +35,18 @@
         <label>Límite de Almacenamiento (GB)</label>
         <input type="number" [(ngModel)]="newPlan().video_storage_limit_gb" min="0" placeholder="Ej. 10">
       </div>
+      <div class="form-group">
+        <label>Precio Oferta (€) (Opcional)</label>
+        <input type="number" [(ngModel)]="newPlan().promo_price" step="0.01" placeholder="Ej. 19.00">
+      </div>
+      <div class="form-group">
+        <label>Duración Oferta (Meses)</label>
+        <input type="number" [(ngModel)]="newPlan().promo_duration_months" min="0" placeholder="Ej. 2">
+      </div>
+      <div class="form-group">
+        <label>Etiqueta Oferta</label>
+        <input type="text" [(ngModel)]="newPlan().promo_label" placeholder="Ej. Oferta Lanzamiento">
+      </div>
       <div class="form-group full-width">
         <label>Descripción corta</label>
         <input type="text" [(ngModel)]="newPlan().description" placeholder="Descripción comercial">
@@ -66,6 +78,18 @@
       <div class="form-group">
         <label>Límite de Almacenamiento (GB)</label>
         <input type="number" [(ngModel)]="editingPlan()!.video_storage_limit_gb" min="0" placeholder="Ej. 10">
+      </div>
+      <div class="form-group">
+        <label>Precio Oferta (€) (Opcional)</label>
+        <input type="number" [(ngModel)]="editingPlan()!.promo_price" step="0.01" placeholder="Ej. 19.00">
+      </div>
+      <div class="form-group">
+        <label>Duración Oferta (Meses)</label>
+        <input type="number" [(ngModel)]="editingPlan()!.promo_duration_months" min="0" placeholder="Ej. 2">
+      </div>
+      <div class="form-group">
+        <label>Etiqueta Oferta</label>
+        <input type="text" [(ngModel)]="editingPlan()!.promo_label" placeholder="Ej. Oferta Lanzamiento">
       </div>
       <div class="form-group full-width">
         <label>Descripción corta</label>
