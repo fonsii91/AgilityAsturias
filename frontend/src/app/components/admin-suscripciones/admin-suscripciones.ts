@@ -52,6 +52,9 @@ export class AdminSuscripcionesComponent implements OnInit {
     video_storage_limit_gb: 10
   });
 
+  // Edit Plan form state
+  editingPlan = signal<Plan | null>(null);
+
   ngOnInit() {
     this.loadData();
   }
@@ -112,6 +115,42 @@ export class AdminSuscripcionesComponent implements OnInit {
 
   toggleNewPlanForm() {
     this.showNewPlanForm.update(v => !v);
+    if (this.showNewPlanForm()) {
+      this.editingPlan.set(null); // Close edit form if creating new
+    }
+  }
+
+  editPlan(plan: Plan) {
+    this.editingPlan.set({ ...plan });
+    this.showNewPlanForm.set(false); // Close new plan form if editing
+  }
+
+  cancelEdit() {
+    this.editingPlan.set(null);
+  }
+
+  async savePlan() {
+    const plan = this.editingPlan();
+    if (!plan) return;
+
+    try {
+      const updated = await this.http.put<Plan>(`${this.apiUrl}/plans/${plan.id}`, {
+        name: plan.name,
+        slug: plan.slug,
+        price: plan.price,
+        description: plan.description,
+        is_active: plan.is_active,
+        video_storage_limit_gb: plan.video_storage_limit_gb
+      }).toPromise();
+
+      if (updated) {
+        this.plans.update(plans => plans.map(p => p.id === plan.id ? { ...p, ...updated } : p));
+        this.editingPlan.set(null);
+      }
+    } catch (error) {
+      console.error('Error updating plan', error);
+      alert('Error al actualizar el plan. Asegúrate de que el slug es único.');
+    }
   }
 
   async updatePlanStorageLimit(plan: Plan) {

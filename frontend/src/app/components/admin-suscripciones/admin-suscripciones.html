@@ -47,6 +47,38 @@
   </div>
   }
 
+  @if (editingPlan()) {
+  <div class="form-card">
+    <h3>Editar Plan: {{ editingPlan()?.name }}</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nombre del Plan</label>
+        <input type="text" [(ngModel)]="editingPlan()!.name" placeholder="Ej. Plan Básico">
+      </div>
+      <div class="form-group">
+        <label>Slug (Identificador único)</label>
+        <input type="text" [(ngModel)]="editingPlan()!.slug" placeholder="Ej. basico">
+      </div>
+      <div class="form-group">
+        <label>Precio Mensual (€)</label>
+        <input type="number" [(ngModel)]="editingPlan()!.price" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Límite de Almacenamiento (GB)</label>
+        <input type="number" [(ngModel)]="editingPlan()!.video_storage_limit_gb" min="0" placeholder="Ej. 10">
+      </div>
+      <div class="form-group full-width">
+        <label>Descripción corta</label>
+        <input type="text" [(ngModel)]="editingPlan()!.description" placeholder="Descripción comercial">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-secondary" (click)="cancelEdit()">Cancelar</button>
+      <button class="btn-primary" (click)="savePlan()">Guardar Cambios</button>
+    </div>
+  </div>
+  }
+
   <div class="matrix-card">
     <div class="matrix-wrapper">
       <table class="features-matrix">
@@ -56,7 +88,12 @@
             @for (plan of plans(); track plan.id) {
             <th class="plan-col">
               <div class="plan-header">
-                <h4>{{ plan.name }}</h4>
+                <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 0.25rem;">
+                  <h4 style="margin: 0;">{{ plan.name }}</h4>
+                  <button mat-icon-button color="primary" (click)="editPlan(plan)" matTooltip="Editar Plan" style="width: 28px; height: 28px; line-height: 28px;">
+                    <mat-icon style="font-size: 16px; width: 16px; height: 16px;">edit</mat-icon>
+                  </button>
+                </div>
                 <span class="price">{{ plan.price }}€/mes</span>
               </div>
             </th>
