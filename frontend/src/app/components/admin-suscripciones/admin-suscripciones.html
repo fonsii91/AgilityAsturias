@@ -59,8 +59,8 @@
         <input type="text" [(ngModel)]="newPlan().description" placeholder="Descripción comercial">
       </div>
       <div class="form-group full-width">
-        <label>Funcionalidades Comerciales (Una por línea. Usa '+' para incluidas, '-' para no incluidas, '*' para destacados/regalos)</label>
-        <textarea [(ngModel)]="newPlan().marketing_features" rows="5" placeholder="Ej:&#10;+ Subdominio propio (.clubagility.com)&#10;- Módulo Salud (ACWR)&#10;* Galería de vídeos: 200GB (100GB extra de regalo)"></textarea>
+        <label>Funcionalidades Comerciales (Una por línea. Usa '+' para incluidas, '++' para incluidas en negrita, '-' para no incluidas, '*' para destacados/regalos)</label>
+        <textarea [(ngModel)]="newPlan().marketing_features" rows="5" placeholder="Ej:&#10;++ Todo lo del Plan Básico&#10;+ Subdominio propio (.clubagility.com)&#10;- Módulo Salud (ACWR)&#10;* Galería de vídeos: 200GB (100GB extra de regalo)"></textarea>
       </div>
     </div>
     <div class="form-actions">
@@ -114,8 +114,8 @@
         <input type="text" [(ngModel)]="editingPlan()!.description" placeholder="Descripción comercial">
       </div>
       <div class="form-group full-width">
-        <label>Funcionalidades Comerciales (Una por línea. Usa '+' para incluidas, '-' para no incluidas, '*' para destacados/regalos)</label>
-        <textarea [(ngModel)]="editingPlan()!.marketing_features" rows="5" placeholder="Ej:&#10;+ Subdominio propio (.clubagility.com)&#10;- Módulo Salud (ACWR)&#10;* Galería de vídeos: 200GB (100GB extra de regalo)"></textarea>
+        <label>Funcionalidades Comerciales (Una por línea. Usa '+' para incluidas, '++' para incluidas en negrita, '-' para no incluidas, '*' para destacados/regalos)</label>
+        <textarea [(ngModel)]="editingPlan()!.marketing_features" rows="5" placeholder="Ej:&#10;++ Todo lo del Plan Básico&#10;+ Subdominio propio (.clubagility.com)&#10;- Módulo Salud (ACWR)&#10;* Galería de vídeos: 200GB (100GB extra de regalo)"></textarea>
       </div>
     </div>
     <div class="form-actions">

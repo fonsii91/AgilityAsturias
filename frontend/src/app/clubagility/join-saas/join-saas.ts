@@ -90,7 +90,10 @@ export class JoinSaas implements OnInit {
       .map(line => line.trim())
       .filter(Boolean)
       .map(line => {
-        if (line.startsWith('+')) {
+        if (line.startsWith('++')) {
+          const textVal = line.substring(2).trim();
+          return { text: `<strong>${textVal}</strong>`, status: 'check' };
+        } else if (line.startsWith('+')) {
           const textVal = line.substring(1).trim();
           return { text: textVal, status: 'check' };
         } else if (line.startsWith('-')) {
