@@ -55,22 +55,22 @@ class SubscriptionSeeder extends Seeder
         // Create plans
         $planBasico = Plan::firstOrCreate(['slug' => 'basico'], [
             'name' => 'Plan Básico',
-            'price' => 0.00,
-            'description' => 'Plan gratuito inicial para gestión de socios y reservas básicas.',
+            'price' => 29.00,
+            'description' => 'Plan inicial para gestión de socios y reservas.',
             'is_active' => true,
         ]);
 
         $planPro = Plan::firstOrCreate(['slug' => 'profesional'], [
             'name' => 'Plan Profesional',
-            'price' => 29.99,
-            'description' => 'Plan completo con seguimiento de competiciones (RSCE y RFEC).',
+            'price' => 49.00,
+            'description' => 'Plan completo con seguimiento de competiciones (RSCE y RFEC) y recursos.',
             'is_active' => true,
         ]);
 
         $planElite = Plan::firstOrCreate(['slug' => 'elite'], [
             'name' => 'Plan Élite',
-            'price' => 49.99,
-            'description' => 'Todo lo del plan pro más módulo de salud y recursos avanzados.',
+            'price' => 79.00,
+            'description' => 'Todo lo del plan pro más módulo de salud, galería de vídeos y recursos avanzados.',
             'is_active' => true,
         ]);
 

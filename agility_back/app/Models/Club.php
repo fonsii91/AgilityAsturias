@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Cashier\Billable;
 
 class Club extends Model
 {
+    use Billable;
+
     protected $fillable = [
         'name',
         'slug',
@@ -14,6 +17,9 @@ class Club extends Model
         'settings',
         'settings_ranking',
         'plan_id',
+        'stripe_id',
+        'pm_type',
+        'pm_last_four',
     ];
 
     protected $casts = [

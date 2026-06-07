@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, Injector } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { TenantService } from '../services/tenant.service';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -8,11 +8,12 @@ export function featureGuard(featureSlug: string): CanActivateFn {
     return async (route, state) => {
         const tenantService = inject(TenantService);
         const router = inject(Router);
+        const injector = inject(Injector);
 
         // Wait for tenant info loading to complete
         if (tenantService.isTenantLoading()) {
             await firstValueFrom(
-                toObservable(tenantService.isTenantLoading).pipe(
+                toObservable(tenantService.isTenantLoading, { injector }).pipe(
                     filter(loading => !loading)
                 )
             );

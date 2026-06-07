@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Observable, tap } from 'rxjs';
 import { AnalyticsService } from './analytics.service';
+import { TenantService } from './tenant.service';
 
 export interface AppNotification {
     id: string;
@@ -28,12 +29,16 @@ export interface AppNotification {
 export class NotificationService {
     private http = inject(HttpClient);
     private analytics = inject(AnalyticsService);
+    private tenantService = inject(TenantService);
     private apiUrl = `${environment.apiUrl}/notifications`;
 
     notificationsSignal = signal<AppNotification[]>([]);
     unreadCountSignal = signal<number>(0);
 
     loadNotifications() {
+        if (this.tenantService.tenantInfo()?.subscribed === false) {
+            return;
+        }
         this.http.get<AppNotification[]>(this.apiUrl).subscribe({
             next: (data) => {
                 this.notificationsSignal.set(data);

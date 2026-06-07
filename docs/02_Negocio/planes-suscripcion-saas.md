@@ -42,3 +42,11 @@ Este documento detalla los distintos planes de suscripción (SaaS) ofrecidos par
 
 ---
 *Garantía: Todos los planes incluyen una garantía de devolución del dinero de 30 días, pudiendo cancelar en cualquier momento.*
+
+## Control de Suscripción Automatizado
+El estado del plan contratado por cada club se sincroniza y valida en tiempo real mediante nuestra integración de pasarela de pagos con **Stripe**. 
+
+*   **Pago Obligatorio:** No se ofrecen periodos de prueba gratuitos. Para activar la cuenta del club en la plataforma, se requiere la contratación del plan y el registro de la tarjeta de pago de forma inmediata.
+*   **Gestión de Planes:** La actualización, modificación o cancelación de los planes se realiza a través de la sección de Facturación de la aplicación (que delega de forma segura en el Stripe Customer Portal).
+*   **Control de Acceso:** En caso de impago o cancelación definitiva de la suscripción, se suspende automáticamente el acceso a la plataforma según la lógica técnica detallada en [[suscripciones-stripe]].
+

@@ -23,6 +23,8 @@ class ClubController extends Controller
                     'settings_ranking' => $club->settings_ranking,
                     'plan_id' => $club->plan_id,
                     'features' => $club->plan ? $club->plan->features->pluck('slug') : [],
+                    'subscribed' => $club->subscribed('default'),
+                    'stripe_status' => $club->subscription('default') ? $club->subscription('default')->stripe_status : 'inactive',
                 ]);
             }
         }

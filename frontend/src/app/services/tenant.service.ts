@@ -24,6 +24,8 @@ export interface TenantInfo {
   settings_ranking?: any | null;
   plan_id?: number | null;
   features?: string[];
+  subscribed?: boolean;
+  stripe_status?: string;
 }
 
 @Injectable({

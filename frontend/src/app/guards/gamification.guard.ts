@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, Injector } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { TenantService } from '../services/tenant.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -9,11 +9,12 @@ export const gamificationGuard: CanActivateFn = async (route, state) => {
     const tenantService = inject(TenantService);
     const router = inject(Router);
     const snackBar = inject(MatSnackBar);
+    const injector = inject(Injector);
 
     // Wait for tenant info loading to complete
     if (tenantService.isTenantLoading()) {
         await firstValueFrom(
-            toObservable(tenantService.isTenantLoading).pipe(
+            toObservable(tenantService.isTenantLoading, { injector }).pipe(
                 filter(loading => !loading)
             )
         );

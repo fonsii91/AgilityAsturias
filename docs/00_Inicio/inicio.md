@@ -36,6 +36,7 @@ Bases técnicas, seguridad, infraestructura y ciclo de vida de los datos.
 
 ### 🔌 04. Integraciones
 Conexiones externas y analítica.
+*   **[[suscripciones-stripe]]**: Gestión del ciclo de vida y facturación de clubes mediante Stripe y Laravel Cashier.
 *   **[[integracion-flowagility]]**: Web scraping con Playwright para Phoenix LiveView e importación de competiciones y marcas.
 *   **[[estrategia-analytics]]**: Plan de implantación de Google Analytics 4 (GA4) y cumplimiento estricto del GDPR (Consent Mode v2).
 *   **[[gestion-videos]]**: Nueva especificación y flujo para la gestión de vídeos en la plataforma.

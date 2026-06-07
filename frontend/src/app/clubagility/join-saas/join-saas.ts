@@ -64,6 +64,32 @@ export class JoinSaas implements OnInit {
 
   ngOnInit() {
     this.loadPlans();
+    this.checkStripeRedirect();
+  }
+
+  checkStripeRedirect() {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('stripe_success') === 'true' && params.get('slug')) {
+        const slug = params.get('slug')!;
+        const email = params.get('email') || '';
+        const planName = params.get('plan') || 'Seleccionado';
+
+        // Populate leadForm values so they can be shown in the success screen
+        this.leadForm.patchValue({
+          slug: slug,
+          email: email
+        });
+
+        // Set the plan title to transition into Vista 2 (provisioning view)
+        this.selectedPlan.set(planName);
+
+        // Start the provisioning animation
+        this.startProvisioning(slug);
+      }
+    } catch (e) {
+      console.error('Error checking Stripe redirect parameters:', e);
+    }
   }
 
   async loadPlans() {
@@ -232,11 +258,17 @@ export class JoinSaas implements OnInit {
       this.isSubmitting = true;
       const leadData = { ...this.leadForm.value, plan_selected: this.selectedPlan() };
       
-      this.http.post(`${environment.apiUrl}/club-leads`, leadData).subscribe({
+      this.http.post<{ stripe_checkout_url?: string }>(`${environment.apiUrl}/club-leads`, leadData).subscribe({
         next: (res) => {
           this.isSubmitting = false;
-          const slug = this.leadForm.get('slug')?.value;
-          this.startProvisioning(slug);
+          if (res && res.stripe_checkout_url) {
+            // Redirect user to Stripe Checkout
+            window.location.href = res.stripe_checkout_url;
+          } else {
+            // Fallback (e.g. no Stripe Price ID configured)
+            const slug = this.leadForm.get('slug')?.value;
+            this.startProvisioning(slug);
+          }
           console.log('Lead request submitted:', res);
         },
         error: (err) => {

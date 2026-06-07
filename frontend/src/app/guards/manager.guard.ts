@@ -1,4 +1,4 @@
-import { inject } from '@angular/core';
+import { inject, Injector } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { toObservable } from '@angular/core/rxjs-interop';
@@ -7,10 +7,11 @@ import { filter, firstValueFrom } from 'rxjs';
 export const managerGuard: CanActivateFn = async (route, state) => {
     const authService = inject(AuthService);
     const router = inject(Router);
+    const injector = inject(Injector);
 
     if (authService.checkAuthLoading()) {
         await firstValueFrom(
-            toObservable(authService.checkAuthLoading).pipe(
+            toObservable(authService.checkAuthLoading, { injector }).pipe(
                 filter(loading => !loading)
             )
         );

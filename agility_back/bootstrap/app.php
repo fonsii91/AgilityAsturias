@@ -20,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'gamification.enabled' => \App\Http\Middleware\CheckGamificationEnabled::class,
             'provision_fondos.enabled' => \App\Http\Middleware\CheckProvisionFondosEnabled::class,
+            'subscription.active' => \App\Http\Middleware\CheckSubscriptionActive::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

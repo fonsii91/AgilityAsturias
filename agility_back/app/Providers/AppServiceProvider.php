@@ -22,5 +22,8 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production' || str_contains(config('app.url'), 'https://')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
+
+        // Configure Laravel Cashier to use the Club model for billing
+        \Laravel\Cashier\Cashier::useCustomerModel(\App\Models\Club::class);
     }
 }

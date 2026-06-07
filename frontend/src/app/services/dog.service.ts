@@ -4,6 +4,7 @@ import { Dog } from '../models/dog.model';
 import { environment } from '../../environments/environment';
 import { AnalyticsService } from './analytics.service';
 import { OnboardingService } from './onboarding';
+import { TenantService } from './tenant.service';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +13,7 @@ export class DogService {
     private http = inject(HttpClient);
     private analytics = inject(AnalyticsService);
     private onboardingService = inject(OnboardingService);
+    private tenantService = inject(TenantService);
     private apiUrl = `${environment.apiUrl}/dogs`;
     private dogsSignal = signal<Dog[]>([]);
     private allDogsSignal = signal<Dog[]>([]);
@@ -22,6 +24,9 @@ export class DogService {
     }
 
     loadUserDogs(): Promise<Dog[]> {
+        if (this.tenantService.tenantInfo()?.subscribed === false) {
+            return Promise.resolve([]);
+        }
         return new Promise((resolve, reject) => {
             this.http.get<any[]>(this.apiUrl).subscribe({
                 next: (data) => {
@@ -40,6 +45,9 @@ export class DogService {
     }
 
     loadAllDogs() {
+        if (this.tenantService.tenantInfo()?.subscribed === false) {
+            return;
+        }
         this.http.get<any[]>(`${this.apiUrl}/all`).subscribe({
             next: (data) => {
                 const dogs = data.map(d => this.mapDog(d));

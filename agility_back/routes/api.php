@@ -45,6 +45,7 @@ Route::get('/sponsors', [SponsorController::class, 'index']);
 Route::get('/public-videos', [VideoController::class, 'publicIndex']);
 Route::post('/webhooks/bitmovin', [VideoController::class, 'webhook']);
 Route::post('/webhooks/bunny', [VideoController::class, 'bunnyWebhook']);
+Route::post('/webhooks/stripe', [\Laravel\Cashier\Http\Controllers\WebhookController::class, 'handleWebhook']);
 Route::get('/videos/{id}/stream/{file}', [VideoController::class, 'streamProxy'])->where('file', '.*');
 
 Route::get('/time-slots', [TimeSlotController::class, 'index']);
@@ -57,8 +58,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/user/profile', [AuthController::class, 'updateProfile']);
 
-    // Rutas protegidas por rol (admin, gestor, staff)
-    Route::middleware(['role:admin,manager,staff'])->group(function () {
+    // Rutas de Facturación y Suscripción (exentas de bloqueo por suscripción inactiva)
+    Route::post('/billing/checkout', [\App\Http\Controllers\BillingController::class, 'checkout']);
+    Route::post('/billing/portal', [\App\Http\Controllers\BillingController::class, 'portal']);
+    Route::get('/billing/status', [\App\Http\Controllers\BillingController::class, 'status']);
+    Route::get('/billing/invoices', [\App\Http\Controllers\BillingController::class, 'invoices']);
+    Route::get('/billing/invoices/{invoice}/download', [\App\Http\Controllers\BillingController::class, 'downloadInvoice'])->name('billing.invoice-download');
+
+    // Resto de rutas protegidas por suscripción activa
+    Route::middleware(['subscription.active'])->group(function () {
+        // Rutas protegidas por rol (admin, gestor, staff)
+        Route::middleware(['role:admin,manager,staff'])->group(function () {
         Route::get('/users', [AuthController::class, 'index']);
         Route::post('/users/{id}/role', [AuthController::class, 'updateRole']);
         Route::post('/users/{id}/delete', [AuthController::class, 'destroy']);
@@ -330,6 +340,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         });
     });
 
-
+    });
 
 });

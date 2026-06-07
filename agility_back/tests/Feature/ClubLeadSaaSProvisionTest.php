@@ -33,6 +33,11 @@ class ClubLeadSaaSProvisionTest extends TestCase
 
         $response->assertStatus(201);
         $response->assertJsonPath('lead.status', 'approved');
+        $response->assertJsonStructure([
+            'message',
+            'lead',
+            'stripe_checkout_url'
+        ]);
 
         // Check Club is created
         $club = Club::where('slug', 'deportivo-asturias')->first();

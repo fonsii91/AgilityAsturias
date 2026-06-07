@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
 import { ToastService } from './toast.service';
+import { TenantService } from './tenant.service';
 
 export interface OnboardingStep {
   id: string;
@@ -44,6 +45,7 @@ export class OnboardingService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
   private toastService = inject(ToastService);
+  private tenantService = inject(TenantService);
   private apiUrl = environment.apiUrl;
 
   progress = signal<any>({});
@@ -117,6 +119,9 @@ export class OnboardingService {
   }
 
   fetchProgress() {
+    if (this.tenantService.tenantInfo()?.subscribed === false) {
+      return;
+    }
     this.http.get<{ onboarding_progress: any }>(`${this.apiUrl}/user/onboarding`).subscribe({
       next: (res) => {
         this.progress.set(res.onboarding_progress || {});

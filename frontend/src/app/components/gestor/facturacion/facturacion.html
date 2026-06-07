@@ -1,0 +1,189 @@
+<div class="billing-container">
+  <!-- Cabecera -->
+  <div class="billing-header">
+    <div class="header-icon-container">
+      <span class="material-icons header-icon">credit_card</span>
+    </div>
+    <div class="header-text">
+      <h1>Suscripción y Facturación</h1>
+      <p>Administra los pagos del club, cambia de plan y consulta tus facturas anteriores.</p>
+    </div>
+  </div>
+
+  <!-- Banners de Notificaciones -->
+  <div *ngIf="successMsg()" class="alert-banner success-banner fade-in">
+    <span class="material-icons">check_circle</span>
+    <div>
+      <strong>¡Pago completado con éxito!</strong> Tu suscripción se ha activado y los módulos del club están disponibles.
+    </div>
+  </div>
+
+  <div *ngIf="cancelMsg()" class="alert-banner error-banner fade-in">
+    <span class="material-icons">error</span>
+    <div>
+      <strong>Transacción cancelada.</strong> No se ha realizado ningún cobro. Puedes intentarlo de nuevo cuando quieras.
+    </div>
+  </div>
+
+  <!-- Estado de Carga -->
+  <div *ngIf="isLoading()" class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando información de facturación...</p>
+  </div>
+
+  <!-- Estado de Redirección -->
+  <div *ngIf="isRedirecting()" class="loading-state redirect-state">
+    <div class="spinner"></div>
+    <p>Conectando de forma segura con Stripe...</p>
+  </div>
+
+  <div *ngIf="!isLoading() && !isRedirecting() && status()">
+    <!-- CASO A: SUSCRIPCIÓN ACTIVA -->
+    <div *ngIf="status()?.subscribed" class="active-subscription-card pop-in">
+      <div class="card-glow"></div>
+      <div class="card-content">
+        <div class="plan-details">
+          <span class="active-badge">Activo</span>
+          <h3>{{ status()?.plan_name }}</h3>
+          <p class="plan-price">
+            {{ status()?.plan_slug === 'profesional' ? '49 € / mes' : (status()?.plan_slug === 'elite' ? '79 € / mes' : '29 € / mes') }}
+          </p>
+          <div class="details-list">
+            <div class="detail-item" *ngIf="status()?.ends_at">
+              <span class="material-icons">calendar_today</span>
+              <span>Próxima renovación: {{ status()?.ends_at | date:'dd/MM/yyyy' }}</span>
+            </div>
+            <div class="detail-item" *ngIf="status()?.pm_last_four">
+              <span class="material-icons">payment</span>
+              <span>Tarjeta: **** **** **** {{ status()?.pm_last_four }} ({{ status()?.pm_type | uppercase }})</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="plan-actions">
+          <button class="primary-btn btn-glow" (click)="openPortal()">
+            <span class="material-icons">settings</span>
+            Gestionar en Stripe
+          </button>
+          <p class="action-desc">Haz clic aquí para cambiar tu tarjeta, descargar facturas o cancelar la suscripción.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASO B: SIN SUSCRIPCIÓN ACTIVA -->
+    <div *ngIf="!status()?.subscribed" class="inactive-subscription-area">
+      <div class="inactive-alert pop-in">
+        <span class="material-icons alert-icon">warning</span>
+        <div class="alert-info">
+          <h3>Se requiere una suscripción activa</h3>
+          <p>Tu club no tiene ningún plan de pago configurado o se encuentra suspendido. Elige uno de nuestros planes a continuación para desbloquear la plataforma de manera inmediata.</p>
+        </div>
+      </div>
+
+      <!-- Pricing Cards -->
+      <div class="pricing-grid">
+        <!-- Plan Básico -->
+        <div *ngIf="getPlanBySlug('basico') as plan" class="pricing-card basic-card pop-in" style="animation-delay: 0.1s;">
+          <div class="card-header">
+            <h4>{{ plan.name }}</h4>
+            <div class="price">
+              <span class="amount">{{ getIntegerPart(plan.price) }}€</span>
+              <span class="period">/mes</span>
+            </div>
+            <p class="desc">{{ plan.description }}</p>
+          </div>
+          <div class="card-features">
+            <ul>
+              <li *ngFor="let feat of getMarketingFeatures(plan)">
+                <span class="material-icons check-icon">check</span>
+                <span [innerHTML]="feat.text"></span>
+              </li>
+            </ul>
+          </div>
+          <button class="outline-btn" (click)="subscribe(plan.slug)">Elegir {{ plan.name.replace('Plan ', '') }}</button>
+        </div>
+
+        <!-- Plan Pro -->
+        <div *ngIf="getPlanBySlug('profesional') as plan" class="pricing-card pro-card featured pop-in" style="animation-delay: 0.2s;">
+          <div class="featured-badge">{{ plan.promo_label || 'Más Popular' }}</div>
+          <div class="card-header">
+            <h4>{{ plan.name }}</h4>
+            <div class="price-discount" *ngIf="plan.promo_price && plan.promo_duration_months">
+              <span class="old-price">{{ getIntegerPart(plan.price) }}€/mes</span>
+              <span class="discount-badge">Oferta de Lanzamiento</span>
+            </div>
+            <div class="price">
+              <span class="amount">{{ plan.promo_price ? getIntegerPart(plan.promo_price) : getIntegerPart(plan.price) }}€</span>
+              <span class="period">/mes</span>
+            </div>
+            <p class="promo-text" *ngIf="plan.promo_price && plan.promo_duration_months">
+              Durante {{ plan.promo_duration_months }} meses. Después {{ getIntegerPart(plan.price) }}€/mes.
+            </p>
+            <p class="desc">{{ plan.description }}</p>
+          </div>
+          <div class="card-features">
+            <ul>
+              <li *ngFor="let feat of getMarketingFeatures(plan)">
+                <span class="material-icons check-icon">check</span>
+                <span [innerHTML]="feat.text"></span>
+              </li>
+            </ul>
+          </div>
+          <button class="primary-btn btn-glow" (click)="subscribe(plan.slug)">Elegir {{ plan.name.replace('Plan ', '') }}</button>
+        </div>
+
+        <!-- Plan Élite -->
+        <div *ngIf="getPlanBySlug('elite') as plan" class="pricing-card elite-card pop-in" style="animation-delay: 0.3s;">
+          <div class="card-header">
+            <h4>{{ plan.name }}</h4>
+            <div class="price">
+              <span class="amount">{{ getIntegerPart(plan.price) }}€</span>
+              <span class="period">/mes</span>
+            </div>
+            <p class="desc">{{ plan.description }}</p>
+          </div>
+          <div class="card-features">
+            <ul>
+              <li *ngFor="let feat of getMarketingFeatures(plan)">
+                <span class="material-icons check-icon">check</span>
+                <span [innerHTML]="feat.text"></span>
+              </li>
+            </ul>
+          </div>
+          <button class="outline-btn" (click)="subscribe(plan.slug)">Elegir {{ plan.name.replace('Plan ', '') }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Historial de Facturas -->
+    <div class="invoices-section pop-in" *ngIf="invoices().length > 0">
+      <h3>Historial de Facturas</h3>
+      <p class="section-desc">Aquí puedes consultar e imprimir tus recibos de pago anteriores.</p>
+      
+      <div class="table-container">
+        <table class="invoices-table">
+          <thead>
+            <tr>
+              <th>ID de Factura</th>
+              <th>Fecha de Emisión</th>
+              <th>Total Pagado</th>
+              <th class="actions-col">Acción</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let invoice of invoices()">
+              <td>{{ invoice.id }}</td>
+              <td>{{ invoice.date | date:'dd/MM/yyyy' }}</td>
+              <td>{{ invoice.total }}</td>
+              <td class="actions-col">
+                <button class="download-btn" (click)="downloadInvoice(invoice)">
+                  <span class="material-icons">download</span> Descargar PDF
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
