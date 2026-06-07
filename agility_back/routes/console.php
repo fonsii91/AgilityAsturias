@@ -235,4 +235,62 @@ Artisan::command('video:complete-bunny {id}', function ($id) {
     return 0;
 })->purpose('Simulates Bunny webhook callback to mark a video as completed in local development');
 
+Artisan::command('video:reencode-all-bunny', function () {
+    $libraryId = config('services.bunny.library_id');
+    $apiKey = config('services.bunny.api_key');
+
+    if (empty($libraryId) || empty($apiKey)) {
+        $this->error('Bunny library ID or API key is not configured in .env.');
+        return 1;
+    }
+
+    $videos = \App\Models\Video::withoutGlobalScopes()
+        ->whereNotNull('bunny_video_id')
+        ->where('status', 'completed')
+        ->get();
+
+    $total = $videos->count();
+    if ($total === 0) {
+        $this->info('No videos found with a Bunny video ID.');
+        return 0;
+    }
+
+    $this->info("Found {$total} videos to reencode on Bunny Stream.");
+    if (!$this->confirm("Do you want to send re-encode requests to Bunny Stream for all {$total} videos?")) {
+        $this->info('Cancelled.');
+        return 0;
+    }
+
+    $bar = $this->output->createProgressBar($total);
+    $bar->start();
+
+    $successCount = 0;
+    $failCount = 0;
+
+    foreach ($videos as $video) {
+        try {
+            $response = \Illuminate\Support\Facades\Http::withHeaders([
+                'AccessKey' => $apiKey,
+                'accept' => 'application/json',
+            ])->post("https://video.bunnycdn.com/library/{$libraryId}/videos/{$video->bunny_video_id}/reencode");
+
+            if ($response->successful()) {
+                $successCount++;
+            } else {
+                $failCount++;
+                \Illuminate\Support\Facades\Log::warning("Failed to trigger reencode for video {$video->id} (Bunny GUID: {$video->bunny_video_id}): " . $response->body());
+            }
+        } catch (\Exception $e) {
+            $failCount++;
+            \Illuminate\Support\Facades\Log::error("Error triggering reencode for video {$video->id}: " . $e->getMessage());
+        }
+        $bar->advance();
+    }
+
+    $bar->finish();
+    $this->newLine();
+    $this->info("Done! Successfully queued {$successCount} videos for reencoding. Failed: {$failCount}.");
+    return 0;
+})->purpose('Bulk trigger re-encode for all Bunny Stream videos to generate new resolutions and fallbacks');
+
 

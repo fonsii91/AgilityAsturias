@@ -484,15 +484,25 @@ class VideoController extends Controller
             $resolutions = ['play_720p.mp4', 'play_480p.mp4', 'play_360p.mp4', 'play_1080p.mp4', 'play_240p.mp4'];
             $bestResolution = null;
             $lastExceptionMessage = null;
+            $statusCode = null;
 
-            $client = new \GuzzleHttp\Client();
+            $referer = request()->headers->get('referer') ?: config('app.url');
+            $userAgent = request()->header('User-Agent') ?: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36';
+
             foreach ($resolutions as $res) {
                 try {
                     $url = "https://{$pullZone}/{$video->bunny_video_id}/{$res}";
-                    $response = $client->request('HEAD', $url);
-                    if ($response->getStatusCode() === 200) {
+                    $response = \Illuminate\Support\Facades\Http::withHeaders([
+                        'Referer' => $referer,
+                        'User-Agent' => $userAgent,
+                    ])->head($url);
+
+                    $statusCode = $response->status();
+                    if ($statusCode === 200) {
                         $bestResolution = $res;
                         break;
+                    } else {
+                        $response->throw();
                     }
                 } catch (\Exception $e) {
                     $lastExceptionMessage = $e->getMessage();
@@ -501,14 +511,12 @@ class VideoController extends Controller
 
             if (!$bestResolution) {
                 $message = 'El vídeo no está disponible para descargar en Bunny Stream.';
-                if ($lastExceptionMessage) {
-                    if (str_contains($lastExceptionMessage, '403 Forbidden')) {
-                        $message = 'El dominio de descarga de Bunny Stream está suspendido o no configurado (403 Forbidden). Por favor, revisa la facturación o la configuración del CDN en el panel de Bunny.net.';
-                    } elseif (str_contains($lastExceptionMessage, '404 Not Found')) {
-                        $message = 'El archivo de vídeo no se encuentra en Bunny Stream (404 Not Found). Asegúrate de activar la opción "Enable MP4 Fallback" en la configuración de la videoteca de Bunny.';
-                    } else {
-                        $message .= ' Detalle: ' . $lastExceptionMessage;
-                    }
+                if ($statusCode === 403 || ($lastExceptionMessage && str_contains($lastExceptionMessage, '403'))) {
+                    $message = 'El dominio de descarga de Bunny Stream está suspendido o no configurado (403 Forbidden). Por favor, revisa la facturación o la configuración del CDN en el panel de Bunny.net.';
+                } elseif ($statusCode === 404 || ($lastExceptionMessage && str_contains($lastExceptionMessage, '404'))) {
+                    $message = 'El archivo de vídeo no se encuentra en Bunny Stream (404 Not Found). Asegúrate de activar la opción "Enable MP4 Fallback" en la configuración de la videoteca de Bunny.';
+                } elseif ($lastExceptionMessage) {
+                    $message .= ' Detalle: ' . $lastExceptionMessage;
                 }
                 return response()->json(['message' => $message], 404);
             }
@@ -521,11 +529,16 @@ class VideoController extends Controller
                 'Content-Disposition' => 'attachment; filename="' . $filename . '"',
             ];
 
-            return response()->streamDownload(function () use ($downloadUrl) {
+            return response()->streamDownload(function () use ($downloadUrl, $referer, $userAgent) {
                 try {
-                    $client = new \GuzzleHttp\Client();
-                    $response = $client->request('GET', $downloadUrl, ['stream' => true]);
-                    $body = $response->getBody();
+                    $response = \Illuminate\Support\Facades\Http::withHeaders([
+                        'Referer' => $referer,
+                        'User-Agent' => $userAgent,
+                    ])->withOptions([
+                        'stream' => true,
+                    ])->get($downloadUrl);
+
+                    $body = $response->toPsrResponse()->getBody();
                     while (!$body->eof()) {
                         echo $body->read(1024 * 8);
                         ob_flush();

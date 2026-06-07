@@ -469,4 +469,116 @@ class BunnyVideoTest extends TestCase
         // Assert local file was deleted
         \Illuminate\Support\Facades\Storage::disk('public')->assertMissing('clubs/testclub/videos/test.mp4');
     }
+
+    public function test_bunny_video_download_success()
+    {
+        $video = Video::create([
+            'club_id' => $this->club->id,
+            'dog_id' => $this->dog->id,
+            'user_id' => $this->user->id,
+            'date' => now()->format('Y-m-d'),
+            'title' => 'Carrera de Test',
+            'status' => 'completed',
+            'bunny_video_id' => 'bunny-video-guid-success',
+            'orientation' => 'vertical',
+            'manga_type' => 'Agility 1',
+            'is_public' => true
+        ]);
+
+        $libraryId = config('services.bunny.library_id');
+        
+        // Mock HEAD request for play_720p.mp4 to return 200, and GET request to return video content
+        Http::fake([
+            "https://iframe.mediadelivery.net/play/{$libraryId}/bunny-video-guid-success/play_720p.mp4" => function ($request) {
+                if ($request->method() === 'HEAD') {
+                    // Check that Referer and User-Agent are forwarded
+                    $this->assertEquals('https://testclub.agilityasturias.com/', $request->header('Referer')[0] ?? null);
+                    $this->assertEquals('TestBrowser/1.0', $request->header('User-Agent')[0] ?? null);
+                    return Http::response(null, 200);
+                }
+                if ($request->method() === 'GET') {
+                    // Check that Referer and User-Agent are forwarded
+                    $this->assertEquals('https://testclub.agilityasturias.com/', $request->header('Referer')[0] ?? null);
+                    $this->assertEquals('TestBrowser/1.0', $request->header('User-Agent')[0] ?? null);
+                    return Http::response('mock video content stream', 200, [
+                        'Content-Type' => 'video/mp4'
+                    ]);
+                }
+                return Http::response(null, 404);
+            }
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders([
+                'Referer' => 'https://testclub.agilityasturias.com/',
+                'User-Agent' => 'TestBrowser/1.0'
+            ])
+            ->get("/api/videos/{$video->id}/download");
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Disposition', 'attachment; filename=Carrera_de_Test.mp4');
+        $this->assertEquals('mock video content stream', $response->streamedContent());
+    }
+
+    public function test_bunny_video_download_403_forbidden()
+    {
+        $video = Video::create([
+            'club_id' => $this->club->id,
+            'dog_id' => $this->dog->id,
+            'user_id' => $this->user->id,
+            'date' => now()->format('Y-m-d'),
+            'title' => 'Carrera de Test',
+            'status' => 'completed',
+            'bunny_video_id' => 'bunny-video-guid-403',
+            'orientation' => 'vertical',
+            'manga_type' => 'Agility 1',
+            'is_public' => true
+        ]);
+
+        $libraryId = config('services.bunny.library_id');
+        
+        // Mock all resolutions to return 403 Forbidden
+        Http::fake([
+            "https://iframe.mediadelivery.net/play/{$libraryId}/bunny-video-guid-403/*" => Http::response(null, 403)
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson("/api/videos/{$video->id}/download");
+
+        $response->assertStatus(404);
+        $response->assertJsonFragment([
+            'message' => 'El dominio de descarga de Bunny Stream está suspendido o no configurado (403 Forbidden). Por favor, revisa la facturación o la configuración del CDN en el panel de Bunny.net.'
+        ]);
+    }
+
+    public function test_bunny_video_download_404_not_found()
+    {
+        $video = Video::create([
+            'club_id' => $this->club->id,
+            'dog_id' => $this->dog->id,
+            'user_id' => $this->user->id,
+            'date' => now()->format('Y-m-d'),
+            'title' => 'Carrera de Test',
+            'status' => 'completed',
+            'bunny_video_id' => 'bunny-video-guid-404',
+            'orientation' => 'vertical',
+            'manga_type' => 'Agility 1',
+            'is_public' => true
+        ]);
+
+        $libraryId = config('services.bunny.library_id');
+        
+        // Mock all resolutions to return 404 Not Found
+        Http::fake([
+            "https://iframe.mediadelivery.net/play/{$libraryId}/bunny-video-guid-404/*" => Http::response(null, 404)
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->getJson("/api/videos/{$video->id}/download");
+
+        $response->assertStatus(404);
+        $response->assertJsonFragment([
+            'message' => 'El archivo de vídeo no se encuentra en Bunny Stream (404 Not Found). Asegúrate de activar la opción "Enable MP4 Fallback" en la configuración de la videoteca de Bunny.'
+        ]);
+    }
 }
