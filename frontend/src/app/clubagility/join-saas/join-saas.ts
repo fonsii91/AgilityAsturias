@@ -66,17 +66,17 @@ export class JoinSaas implements OnInit {
     try {
       const plansData = await this.http.get<Plan[]>(`${environment.apiUrl}/plans-public`).toPromise();
       if (plansData) {
-        // Sort plans by price ascending
-        const sorted = plansData
-          .filter(p => p.is_active)
-          .sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
-        this.plans.set(sorted);
+        this.plans.set(plansData.filter(p => p.is_active));
       }
     } catch (error) {
       console.error('Error loading plans', error);
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  getPlanBySlug(slug: string): Plan | undefined {
+    return this.plans().find(p => p.slug === slug);
   }
 
   getIntegerPart(price: string | number | undefined): string {
