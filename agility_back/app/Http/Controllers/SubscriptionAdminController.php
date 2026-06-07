@@ -31,7 +31,8 @@ class SubscriptionAdminController extends Controller
             'promo_price' => 'nullable|numeric|min:0',
             'promo_duration_months' => 'nullable|integer|min:0',
             'promo_label' => 'nullable|string|max:255',
-            'is_featured' => 'boolean'
+            'is_featured' => 'boolean',
+            'marketing_features' => 'nullable|string'
         ]);
 
         $plan = Plan::create($validated);
@@ -55,7 +56,8 @@ class SubscriptionAdminController extends Controller
             'promo_price' => 'nullable|numeric|min:0',
             'promo_duration_months' => 'nullable|integer|min:0',
             'promo_label' => 'nullable|string|max:255',
-            'is_featured' => 'boolean'
+            'is_featured' => 'boolean',
+            'marketing_features' => 'nullable|string'
         ]);
 
         $plan->update($validated);

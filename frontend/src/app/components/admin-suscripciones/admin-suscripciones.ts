@@ -28,6 +28,7 @@ interface Plan {
   promo_duration_months?: number | null;
   promo_label?: string | null;
   is_featured?: boolean;
+  marketing_features?: string | null;
 }
 
 @Component({
@@ -57,7 +58,8 @@ export class AdminSuscripcionesComponent implements OnInit {
     promo_price: null,
     promo_duration_months: null,
     promo_label: 'Oferta Lanzamiento',
-    is_featured: false
+    is_featured: false,
+    marketing_features: ''
   });
 
   // Edit Plan form state
@@ -152,7 +154,8 @@ export class AdminSuscripcionesComponent implements OnInit {
         promo_price: plan.promo_price,
         promo_duration_months: plan.promo_duration_months,
         promo_label: plan.promo_label,
-        is_featured: plan.is_featured
+        is_featured: plan.is_featured,
+        marketing_features: plan.marketing_features
       }).toPromise();
 
       if (updated) {
@@ -182,7 +185,8 @@ export class AdminSuscripcionesComponent implements OnInit {
         promo_price: plan.promo_price,
         promo_duration_months: plan.promo_duration_months,
         promo_label: plan.promo_label,
-        is_featured: plan.is_featured
+        is_featured: plan.is_featured,
+        marketing_features: plan.marketing_features
       }).toPromise();
     } catch (error) {
       console.error('Error updating plan storage limit', error);
@@ -201,7 +205,7 @@ export class AdminSuscripcionesComponent implements OnInit {
           this.plans.update(plans => [...plans, created]);
         }
         this.showNewPlanForm.set(false);
-        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10, promo_price: null, promo_duration_months: null, promo_label: 'Oferta Lanzamiento', is_featured: false });
+        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10, promo_price: null, promo_duration_months: null, promo_label: 'Oferta Lanzamiento', is_featured: false, marketing_features: '' });
       }
     } catch (error) {
       console.error('Error creating plan', error);

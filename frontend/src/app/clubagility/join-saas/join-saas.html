@@ -54,13 +54,23 @@
               </button>
               
               <ul class="pricing-features">
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Subdominio propio (.clubagility.com)</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Página web pública</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Gestión de reservas</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Calendario y eventos</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Registro de perros y alertas</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Tablón y Clasificación interna</li>
-                <li class="missing"><span class="material-icons cross-icon">close</span> Módulo Salud (ACWR)</li>
+                @for (feat of getMarketingFeatures(plan); track feat.text) {
+                  @if (feat.status === 'check') {
+                    <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> <span [innerHTML]="feat.text"></span></li>
+                  } @else if (feat.status === 'cross') {
+                    <li class="missing"><span class="material-icons cross-icon">close</span> <span [innerHTML]="feat.text"></span></li>
+                  } @else if (feat.status === 'gift') {
+                    <li class="gift-feature">
+                      <span class="material-icons gift-icon">card_giftcard</span>
+                      <div class="gift-text">
+                        <strong [innerHTML]="feat.text"></strong>
+                        @if (feat.subtext) {
+                          <span class="gift-subtext">({{ feat.subtext }})</span>
+                        }
+                      </div>
+                    </li>
+                  }
+                }
               </ul>
             </div>
           }
@@ -96,18 +106,23 @@
               </button>
               
               <ul class="pricing-features">
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> <strong>Todo lo del Plan Básico</strong></li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Página de bienvenida personalizada</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Módulo de Salud Deportiva</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Seguimiento Canina (RSCE) y Caza (RFEC)</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Acceso a recursos</li>
-                <li class="gift-feature">
-                  <span class="material-icons gift-icon">card_giftcard</span>
-                  <div class="gift-text">
-                    <strong>Galería de vídeos: {{ plan.video_storage_limit_gb || 200 }}GB</strong>
-                    <span class="gift-subtext">(100GB extra de regalo)</span>
-                  </div>
-                </li>
+                @for (feat of getMarketingFeatures(plan); track feat.text) {
+                  @if (feat.status === 'check') {
+                    <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> <span [innerHTML]="feat.text"></span></li>
+                  } @else if (feat.status === 'cross') {
+                    <li class="missing"><span class="material-icons cross-icon">close</span> <span [innerHTML]="feat.text"></span></li>
+                  } @else if (feat.status === 'gift') {
+                    <li class="gift-feature">
+                      <span class="material-icons gift-icon">card_giftcard</span>
+                      <div class="gift-text">
+                        <strong [innerHTML]="feat.text"></strong>
+                        @if (feat.subtext) {
+                          <span class="gift-subtext">({{ feat.subtext }})</span>
+                        }
+                      </div>
+                    </li>
+                  }
+                }
               </ul>
             </div>
           }
@@ -143,9 +158,23 @@
               </button>
               
               <ul class="pricing-features">
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> <strong>Todo lo del Plan Pro</strong></li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Dominio web propio personalizado</li>
-                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Galería de vídeos ({{ plan.video_storage_limit_gb ? plan.video_storage_limit_gb + 'GB' : '1TB' }})</li>
+                @for (feat of getMarketingFeatures(plan); track feat.text) {
+                  @if (feat.status === 'check') {
+                    <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> <span [innerHTML]="feat.text"></span></li>
+                  } @else if (feat.status === 'cross') {
+                    <li class="missing"><span class="material-icons cross-icon">close</span> <span [innerHTML]="feat.text"></span></li>
+                  } @else if (feat.status === 'gift') {
+                    <li class="gift-feature">
+                      <span class="material-icons gift-icon">card_giftcard</span>
+                      <div class="gift-text">
+                        <strong [innerHTML]="feat.text"></strong>
+                        @if (feat.subtext) {
+                          <span class="gift-subtext">({{ feat.subtext }})</span>
+                        }
+                      </div>
+                    </li>
+                  }
+                }
               </ul>
             </div>
           }

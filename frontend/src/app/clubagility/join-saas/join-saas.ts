@@ -25,6 +25,7 @@ interface Plan {
   promo_duration_months?: number | null;
   promo_label?: string | null;
   is_featured?: boolean;
+  marketing_features?: string | null;
 }
 
 @Component({
@@ -81,6 +82,33 @@ export class JoinSaas implements OnInit {
 
   getPlanBySlug(slug: string): Plan | undefined {
     return this.plans().find(p => p.slug === slug);
+  }
+
+  getMarketingFeatures(plan: Plan | undefined): { text: string; subtext?: string; status: 'check' | 'cross' | 'gift' }[] {
+    if (!plan || !plan.marketing_features) return [];
+    return plan.marketing_features.split('\n')
+      .map(line => line.trim())
+      .filter(Boolean)
+      .map(line => {
+        if (line.startsWith('+')) {
+          const textVal = line.substring(1).trim();
+          return { text: textVal, status: 'check' };
+        } else if (line.startsWith('-')) {
+          const textVal = line.substring(1).trim();
+          return { text: textVal, status: 'cross' };
+        } else if (line.startsWith('*')) {
+          const textVal = line.substring(1).trim();
+          const parenIdx = textVal.indexOf('(');
+          if (parenIdx !== -1 && textVal.endsWith(')')) {
+            const main = textVal.substring(0, parenIdx).trim();
+            const sub = textVal.substring(parenIdx + 1, textVal.length - 1).trim();
+            return { text: main, subtext: sub, status: 'gift' };
+          }
+          return { text: textVal, status: 'gift' };
+        } else {
+          return { text: line, status: 'check' };
+        }
+      });
   }
 
   getIntegerPart(price: string | number | undefined): string {

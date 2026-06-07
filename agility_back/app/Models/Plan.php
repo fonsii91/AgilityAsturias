@@ -20,6 +20,7 @@ class Plan extends Model
         'promo_duration_months',
         'promo_label',
         'is_featured',
+        'marketing_features',
     ];
 
     protected $casts = [
