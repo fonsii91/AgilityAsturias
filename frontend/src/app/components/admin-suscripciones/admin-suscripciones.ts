@@ -27,6 +27,7 @@ interface Plan {
   promo_price?: string | null;
   promo_duration_months?: number | null;
   promo_label?: string | null;
+  is_featured?: boolean;
 }
 
 @Component({
@@ -55,7 +56,8 @@ export class AdminSuscripcionesComponent implements OnInit {
     video_storage_limit_gb: 10,
     promo_price: null,
     promo_duration_months: null,
-    promo_label: 'Oferta Lanzamiento'
+    promo_label: 'Oferta Lanzamiento',
+    is_featured: false
   });
 
   // Edit Plan form state
@@ -149,11 +151,17 @@ export class AdminSuscripcionesComponent implements OnInit {
         video_storage_limit_gb: plan.video_storage_limit_gb,
         promo_price: plan.promo_price,
         promo_duration_months: plan.promo_duration_months,
-        promo_label: plan.promo_label
+        promo_label: plan.promo_label,
+        is_featured: plan.is_featured
       }).toPromise();
 
       if (updated) {
-        this.plans.update(plans => plans.map(p => p.id === plan.id ? { ...p, ...updated } : p));
+        // Since saving a featured plan sets others to unfeatured in backend, reload all plans to keep client in sync
+        if (plan.is_featured) {
+          this.loadData();
+        } else {
+          this.plans.update(plans => plans.map(p => p.id === plan.id ? { ...p, ...updated } : p));
+        }
         this.editingPlan.set(null);
       }
     } catch (error) {
@@ -173,7 +181,8 @@ export class AdminSuscripcionesComponent implements OnInit {
         video_storage_limit_gb: plan.video_storage_limit_gb,
         promo_price: plan.promo_price,
         promo_duration_months: plan.promo_duration_months,
-        promo_label: plan.promo_label
+        promo_label: plan.promo_label,
+        is_featured: plan.is_featured
       }).toPromise();
     } catch (error) {
       console.error('Error updating plan storage limit', error);
@@ -186,9 +195,13 @@ export class AdminSuscripcionesComponent implements OnInit {
     try {
       const created = await this.http.post<Plan>(`${this.apiUrl}/plans`, this.newPlan()).toPromise();
       if (created) {
-        this.plans.update(plans => [...plans, created]);
+        if (created.is_featured) {
+          this.loadData();
+        } else {
+          this.plans.update(plans => [...plans, created]);
+        }
         this.showNewPlanForm.set(false);
-        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10, promo_price: null, promo_duration_months: null, promo_label: 'Oferta Lanzamiento' });
+        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10, promo_price: null, promo_duration_months: null, promo_label: 'Oferta Lanzamiento', is_featured: false });
       }
     } catch (error) {
       console.error('Error creating plan', error);

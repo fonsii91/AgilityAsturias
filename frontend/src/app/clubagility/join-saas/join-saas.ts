@@ -24,6 +24,7 @@ interface Plan {
   promo_price?: string | null;
   promo_duration_months?: number | null;
   promo_label?: string | null;
+  is_featured?: boolean;
 }
 
 @Component({

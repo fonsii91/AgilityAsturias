@@ -19,6 +19,11 @@ class Plan extends Model
         'promo_price',
         'promo_duration_months',
         'promo_label',
+        'is_featured',
+    ];
+
+    protected $casts = [
+        'is_featured' => 'boolean',
     ];
 
     public function features()

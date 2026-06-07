@@ -47,6 +47,13 @@
         <label>Etiqueta Oferta</label>
         <input type="text" [(ngModel)]="newPlan().promo_label" placeholder="Ej. Oferta Lanzamiento">
       </div>
+      <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-top: 1.8rem;">
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="newPlan().is_featured">
+          <span class="slider round"></span>
+        </label>
+        <span style="font-size: 0.9rem; font-weight: 500; color: #475569;">Destacar Plan (Borde azul, badge y pop-out)</span>
+      </div>
       <div class="form-group full-width">
         <label>Descripción corta</label>
         <input type="text" [(ngModel)]="newPlan().description" placeholder="Descripción comercial">
@@ -90,6 +97,13 @@
       <div class="form-group">
         <label>Etiqueta Oferta</label>
         <input type="text" [(ngModel)]="editingPlan()!.promo_label" placeholder="Ej. Oferta Lanzamiento">
+      </div>
+      <div class="form-group" style="display: flex; align-items: center; gap: 12px; margin-top: 1.8rem;">
+        <label class="switch">
+          <input type="checkbox" [(ngModel)]="editingPlan()!.is_featured">
+          <span class="slider round"></span>
+        </label>
+        <span style="font-size: 0.9rem; font-weight: 500; color: #475569;">Destacar Plan (Borde azul, badge y pop-out)</span>
       </div>
       <div class="form-group full-width">
         <label>Descripción corta</label>

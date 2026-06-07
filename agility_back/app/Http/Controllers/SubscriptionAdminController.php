@@ -30,10 +30,16 @@ class SubscriptionAdminController extends Controller
             'video_storage_limit_gb' => 'nullable|integer|min:0',
             'promo_price' => 'nullable|numeric|min:0',
             'promo_duration_months' => 'nullable|integer|min:0',
-            'promo_label' => 'nullable|string|max:255'
+            'promo_label' => 'nullable|string|max:255',
+            'is_featured' => 'boolean'
         ]);
 
         $plan = Plan::create($validated);
+        
+        if ($plan->is_featured) {
+            Plan::where('id', '!=', $plan->id)->update(['is_featured' => false]);
+        }
+
         return response()->json($plan->load('features'), 201);
     }
 
@@ -48,10 +54,16 @@ class SubscriptionAdminController extends Controller
             'video_storage_limit_gb' => 'nullable|integer|min:0',
             'promo_price' => 'nullable|numeric|min:0',
             'promo_duration_months' => 'nullable|integer|min:0',
-            'promo_label' => 'nullable|string|max:255'
+            'promo_label' => 'nullable|string|max:255',
+            'is_featured' => 'boolean'
         ]);
 
         $plan->update($validated);
+
+        if ($plan->is_featured) {
+            Plan::where('id', '!=', $plan->id)->update(['is_featured' => false]);
+        }
+
         return response()->json($plan->load('features'));
     }
 

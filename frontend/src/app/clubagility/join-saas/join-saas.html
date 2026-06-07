@@ -25,7 +25,10 @@
         <div class="pricing-grid">
           <!-- PLAN 1: BÁSICO -->
           @if (getPlanBySlug('basico'); as plan) {
-            <div class="pricing-card basic-card pop-in" style="animation-delay: 0.1s;">
+            <div [class]="'pricing-card pop-in ' + (plan.is_featured ? 'pro-card' : 'basic-card')" style="animation-delay: 0.1s;">
+              @if (plan.is_featured) {
+                <div class="most-popular-badge">MÁS POPULAR</div>
+              }
               <div class="card-header">
                 <h3>{{ plan.name }}</h3>
                 <p class="card-desc">{{ plan.description }}</p>
@@ -46,17 +49,17 @@
                 <p class="billing-info">&nbsp;</p>
               }
               
-              <button class="btn-select-plan outline-btn" (click)="selectPlan(plan)">
+              <button [class]="'btn-select-plan ' + (plan.is_featured ? 'primary-btn btn-glow' : 'outline-btn')" (click)="selectPlan(plan)">
                 Elegir {{ plan.name.replace('Plan ', '') }}
               </button>
               
               <ul class="pricing-features">
-                <li><span class="material-icons check-icon">check</span> Subdominio propio (.clubagility.com)</li>
-                <li><span class="material-icons check-icon">check</span> Página web pública</li>
-                <li><span class="material-icons check-icon">check</span> Gestión de reservas</li>
-                <li><span class="material-icons check-icon">check</span> Calendario y eventos</li>
-                <li><span class="material-icons check-icon">check</span> Registro de perros y alertas</li>
-                <li><span class="material-icons check-icon">check</span> Tablón y Clasificación interna</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Subdominio propio (.clubagility.com)</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Página web pública</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Gestión de reservas</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Calendario y eventos</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Registro de perros y alertas</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Tablón y Clasificación interna</li>
                 <li class="missing"><span class="material-icons cross-icon">close</span> Módulo Salud (ACWR)</li>
               </ul>
             </div>
@@ -64,8 +67,10 @@
 
           <!-- PLAN 2: PRO (THE STAR) -->
           @if (getPlanBySlug('profesional') || getPlanBySlug('pro'); as plan) {
-            <div class="pricing-card pro-card pop-in" style="animation-delay: 0.2s;">
-              <div class="most-popular-badge">MÁS POPULAR</div>
+            <div [class]="'pricing-card pop-in ' + (plan.is_featured ? 'pro-card' : 'basic-card')" style="animation-delay: 0.2s;">
+              @if (plan.is_featured) {
+                <div class="most-popular-badge">MÁS POPULAR</div>
+              }
               <div class="card-header">
                 <h3>{{ plan.name }}</h3>
                 <p class="card-desc">{{ plan.description }}</p>
@@ -86,16 +91,16 @@
                 <p class="billing-info">&nbsp;</p>
               }
               
-              <button class="btn-select-plan primary-btn btn-glow" (click)="selectPlan(plan)">
+              <button [class]="'btn-select-plan ' + (plan.is_featured ? 'primary-btn btn-glow' : 'outline-btn')" (click)="selectPlan(plan)">
                 Elegir {{ plan.name.replace('Plan ', '') }}
               </button>
               
               <ul class="pricing-features">
-                <li><span class="material-icons check-icon">check_circle</span> <strong>Todo lo del Plan Básico</strong></li>
-                <li><span class="material-icons check-icon">check_circle</span> Página de bienvenida personalizada</li>
-                <li><span class="material-icons check-icon">check_circle</span> Módulo de Salud Deportiva</li>
-                <li><span class="material-icons check-icon">check_circle</span> Seguimiento Canina (RSCE) y Caza (RFEC)</li>
-                <li><span class="material-icons check-icon">check_circle</span> Acceso a recursos</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> <strong>Todo lo del Plan Básico</strong></li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Página de bienvenida personalizada</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Módulo de Salud Deportiva</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Seguimiento Canina (RSCE) y Caza (RFEC)</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Acceso a recursos</li>
                 <li class="gift-feature">
                   <span class="material-icons gift-icon">card_giftcard</span>
                   <div class="gift-text">
@@ -109,7 +114,10 @@
 
           <!-- PLAN 3: ÉLITE -->
           @if (getPlanBySlug('elite'); as plan) {
-            <div class="pricing-card elite-card pop-in" style="animation-delay: 0.3s;">
+            <div [class]="'pricing-card pop-in ' + (plan.is_featured ? 'pro-card' : 'elite-card')" style="animation-delay: 0.3s;">
+              @if (plan.is_featured) {
+                <div class="most-popular-badge">MÁS POPULAR</div>
+              }
               <div class="card-header">
                 <h3>{{ plan.name }}</h3>
                 <p class="card-desc">{{ plan.description }}</p>
@@ -130,14 +138,14 @@
                 <p class="billing-info">&nbsp;</p>
               }
               
-              <button class="btn-select-plan outline-btn" (click)="selectPlan(plan)">
+              <button [class]="'btn-select-plan ' + (plan.is_featured ? 'primary-btn btn-glow' : 'outline-btn')" (click)="selectPlan(plan)">
                 Elegir {{ plan.name.replace('Plan ', '') }}
               </button>
               
               <ul class="pricing-features">
-                <li><span class="material-icons check-icon">check</span> <strong>Todo lo del Plan Pro</strong></li>
-                <li><span class="material-icons check-icon">check</span> Dominio web propio personalizado</li>
-                <li><span class="material-icons check-icon">check</span> Galería de vídeos ({{ plan.video_storage_limit_gb ? plan.video_storage_limit_gb + 'GB' : '1TB' }})</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> <strong>Todo lo del Plan Pro</strong></li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Dominio web propio personalizado</li>
+                <li><span class="material-icons check-icon">{{ plan.is_featured ? 'check_circle' : 'check' }}</span> Galería de vídeos ({{ plan.video_storage_limit_gb ? plan.video_storage_limit_gb + 'GB' : '1TB' }})</li>
               </ul>
             </div>
           }
