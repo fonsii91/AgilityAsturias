@@ -1,0 +1,97 @@
+.dialog-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 24px 16px;
+    text-align: center;
+}
+
+.icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin-bottom: 16px;
+}
+
+.icon-circle mat-icon {
+    font-size: 36px;
+    height: 36px;
+    width: 36px;
+}
+
+/* Destructive Variant */
+.dialog-header.destructive .icon-circle {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.dialog-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.dialog-content {
+    text-align: center;
+    font-size: 1.05rem;
+    color: #333;
+    padding: 0 32px 24px;
+    margin: 0;
+}
+
+.warning-box {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+    padding: 14px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.verification-instruction {
+    margin-bottom: 16px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.expected-value {
+    font-weight: bold;
+    color: #d32f2f;
+    background-color: #f5f5f5;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 1rem;
+    border: 1px dashed #ccc;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+.verification-field {
+    width: 100%;
+}
+
+.dialog-actions {
+    padding: 16px 24px;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-cancel {
+    border-radius: 20px;
+    padding: 0 24px;
+}
+
+.btn-confirm {
+    border-radius: 20px;
+    padding: 0 32px;
+    font-weight: 600;
+}

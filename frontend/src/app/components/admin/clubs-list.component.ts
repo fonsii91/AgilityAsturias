@@ -9,6 +9,8 @@ import { ToastService } from '../../services/toast.service';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { environment } from '../../../environments/environment';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { SafeDeleteDialog } from '../shared/safe-delete-dialog/safe-delete-dialog';
 
 interface Plan {
   id: number;
@@ -19,7 +21,7 @@ interface Plan {
 @Component({
   selector: 'app-clubs-list',
   standalone: true,
-  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, RouterModule, FormsModule],
+  imports: [CommonModule, MatTableModule, MatButtonModule, MatIconModule, RouterModule, FormsModule, MatDialogModule],
   template: `
     <div class="p-6">
       <div class="flex justify-between items-center mb-6">
@@ -230,6 +232,7 @@ export class ClubsListComponent implements OnInit {
   private toast = inject(ToastService);
   private http = inject(HttpClient);
   private router = inject(Router);
+  private dialog = inject(MatDialog);
 
   clubs = signal<Club[]>([]);
   plans = signal<Plan[]>([]);
@@ -294,15 +297,26 @@ export class ClubsListComponent implements OnInit {
   }
 
   deleteClub(club: Club) {
-    if (confirm(`¿Estás seguro de eliminar el club ${club.name}? Esta acción no se puede deshacer.`)) {
-      this.clubService.deleteClub(club.id).subscribe({
-        next: () => {
-          this.toast.success('Club eliminado');
-          this.loadClubs();
-        },
-        error: () => this.toast.error('Error al eliminar club')
-      });
-    }
+    const dialogRef = this.dialog.open(SafeDeleteDialog, {
+      width: '450px',
+      data: {
+        title: 'Eliminar Club',
+        expectedValue: club.name,
+        placeholder: 'Escribe el nombre del club para confirmar'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(confirmed => {
+      if (confirmed) {
+        this.clubService.deleteClub(club.id).subscribe({
+          next: () => {
+            this.toast.success('Club eliminado');
+            this.loadClubs();
+          },
+          error: () => this.toast.error('Error al eliminar club')
+        });
+      }
+    });
   }
 
   loadLeads() {

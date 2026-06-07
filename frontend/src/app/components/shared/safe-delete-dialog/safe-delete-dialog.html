@@ -1,0 +1,29 @@
+<div class="dialog-header destructive">
+    <div class="icon-circle">
+        <mat-icon>warning</mat-icon>
+    </div>
+    <h2 mat-dialog-title class="dialog-title">{{ data.title }}</h2>
+</div>
+<mat-dialog-content class="dialog-content">
+    <div class="warning-box">
+        <strong>¡Atención!</strong> Esta acción es permanente. Se eliminará el club y <strong>todos los datos relacionados</strong> (competiciones, resultados, participantes, etc.). Esta acción no se puede deshacer.
+    </div>
+    
+    <p class="verification-instruction">
+        Para confirmar la eliminación, escribe el nombre del club: <span class="expected-value">{{ data.expectedValue }}</span>
+    </p>
+
+    <mat-form-field appearance="outline" class="verification-field">
+        <input matInput 
+               [placeholder]="data.placeholder || 'Escribe el nombre del club'" 
+               [(ngModel)]="userInput" 
+               (keyup.enter)="isValid && onConfirm()"
+               autocomplete="off">
+    </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button class="btn-cancel" (click)="onCancel()">{{ data.cancelText || 'Cancelar' }}</button>
+    <button mat-flat-button color="warn" class="btn-confirm" [disabled]="!isValid" (click)="onConfirm()">
+        {{ data.confirmText || 'Eliminar Permanentemente' }}
+    </button>
+</mat-dialog-actions>
