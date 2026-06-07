@@ -510,11 +510,11 @@ class VideoController extends Controller
             }
 
             if (!$bestResolution) {
-                $message = 'El vídeo no está disponible para descargar en Bunny Stream.';
+                $message = 'Este vídeo no se puede descargar por un problema de permisos en el servidor de almacenamiento. Por favor, contacta con el administrador de tu club.';
                 if ($statusCode === 403 || ($lastExceptionMessage && str_contains($lastExceptionMessage, '403'))) {
-                    $message = 'El dominio de descarga de Bunny Stream está suspendido o no configurado (403 Forbidden). Por favor, revisa la facturación o la configuración del CDN en el panel de Bunny.net.';
+                    $message = 'El vídeo no se puede descargar por un problema de permisos de seguridad en el servidor de almacenamiento. Por favor, contacta con el administrador de tu club.';
                 } elseif ($statusCode === 404 || ($lastExceptionMessage && str_contains($lastExceptionMessage, '404'))) {
-                    $message = 'El archivo de vídeo no se encuentra en Bunny Stream (404 Not Found). Asegúrate de activar la opción "Enable MP4 Fallback" en la configuración de la videoteca de Bunny.';
+                    $message = 'Este vídeo no está disponible para descarga directa (los vídeos antiguos o sin copia de seguridad en alta resolución no se pueden descargar). Si necesitas conservarlo, contacta con el administrador de tu club.';
                 } elseif ($lastExceptionMessage) {
                     $message .= ' Detalle: ' . $lastExceptionMessage;
                 }
