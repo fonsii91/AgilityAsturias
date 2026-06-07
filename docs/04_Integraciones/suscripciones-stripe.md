@@ -1,12 +1,12 @@
 # Integración de Suscripciones SaaS con Stripe
 
-Este documento detalla el diseño técnico y la arquitectura de integración para gestionar y controlar las suscripciones de los clubes a la plataforma **ClubAgility** utilizando la pasarela de pagos **Stripe** y la librería oficial **Laravel Cashier** en el backend.
+Este documento detalla el diseño técnico, la arquitectura de integración y las guías de resolución de problemas para gestionar y controlar las suscripciones de los clubes a la plataforma **ClubAgility** utilizando la pasarela de pagos **Stripe** y la librería oficial **Laravel Cashier** en el backend.
 
 ---
 
 ## 1. Arquitectura General y Entidad Facturable
 
-En la arquitectura *Single Database, Multi-Tenant* de ClubAgility, la unidad operativa y aislada es el **Club** (`App\Models\Club`). Por lo tanto, la facturación y el estado de la suscripción se asocian directamente al Club, y no a los usuarios individuales.
+En la arquitectura *Single Database, Multi-Tenant* de ClubAgility, la unidad operativa y aislada es el **Club** ([Club](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/Club.php)). Por lo tanto, la facturación y el estado de la suscripción se asocian directamente al Club, y no a los usuarios individuales.
 
 *   **Billable Entity:** El modelo `Club` actúa como el cliente facturable en Stripe.
 *   **Gestor del Pago:** El usuario con rol `manager` (Responsable del Club) es el encargado de dar de alta el club, configurar el método de pago y gestionar las facturas.
@@ -64,7 +64,7 @@ Se añaden las tablas estándar de Cashier para controlar el estado de las suscr
 *   **`subscription_items`**: Permite asociar múltiples productos/precios a una sola suscripción.
 
 ### C. Configuración del Modelo `Club.php`
-Se integra el trait `Billable` de Cashier en el modelo:
+Se integra el trait `Billable` de Cashier en el modelo y se configura el modelo de cliente en `AppServiceProvider.php` usando `Cashier::useCustomerModel(Club::class)`:
 
 ```php
 namespace App\Models;
@@ -101,9 +101,10 @@ class Club extends Model
 Para asegurar la viabilidad comercial y el filtrado de registros inactivos, el onboarding requiere el registro de un método de pago y suscripción inmediata:
 
 1.  **Registro Inicial:** El gestor del club rellena el formulario de solicitud en la web comercial principal (`join-saas`).
-2.  **Aprovisionamiento de Cuenta:** El backend crea la cuenta del club en base de datos local y el usuario con rol `manager`.
-3.  **Redirección Forzada a Pago:** El usuario es redirigido inmediatamente a la pasarela Stripe Checkout. El acceso al panel completo del club permanece bloqueado.
-4.  **Activación de la Cuenta:** Una vez completado el pago en Stripe, el backend recibe la confirmación (vía webhook o callback de éxito) y activa la suscripción local. El club queda disponible para su configuración completa.
+2.  **Creación de Cuenta Inactiva:** El backend crea la cuenta del club en la base de datos local y un usuario con rol `manager` (Gestor del club).
+3.  **Redirección a Stripe Checkout:** En lugar de forzar al usuario a entrar al panel para realizar el pago, al hacer clic en **Completar Solicitud** se genera una sesión de Stripe Checkout en el backend ([ClubLeadController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/ClubLeadController.php)) y se redirige al usuario de manera inmediata a la pasarela segura de Stripe.
+4.  **Retorno y Aprovisionamiento Seguro:** Tras realizar el pago con éxito, Stripe redirige al usuario a la landing comercial principal con los parámetros `stripe_success=true` y el `slug` del club. Esto dispara de manera segura la animación del flujo de aprovisionamiento de la base de datos de tenant, configuración de Nginx y generación de certificados SSL mediante Let's Encrypt.
+5.  **Confirmación y Activación:** Una vez completado el pago, el backend recibe el webhook `checkout.session.completed` de Stripe y activa la suscripción en la base de datos. El club queda disponible para su uso de forma inmediata.
 
 ---
 
@@ -111,101 +112,123 @@ Para asegurar la viabilidad comercial y el filtrado de registros inactivos, el o
 
 La aplicación ofrece tres planes de suscripción. El **Plan Pro** incluye un descuento automático de lanzamiento durante los dos primeros meses:
 
-*   **Plan Básico:** 29 € / mes (Pago inmediato completo).
-*   **Plan Pro (Recomendado):** 49 € / mes (Precio de lanzamiento: **19 € / mes durante los primeros 2 meses**, luego 49 € / mes).
-*   **Plan Élite:** 79 € / mes (Pago inmediato completo).
+*   **Plan Básico:** 29 € / mes (Precio Stripe: `STRIPE_PRICE_BASICO`).
+*   **Plan Pro (Recomendado):** 49 € / mes (Precio Stripe: `STRIPE_PRICE_PRO` con el cupón `STRIPE_COUPON_PRO_LAUNCH`, que rebaja la cuota a **19 € / mes durante los primeros 2 meses**).
+*   **Plan Élite:** 79 € / mes (Precio Stripe: `STRIPE_PRICE_ELITE`).
 
-### Integración de Stripe Coupons
+### Lógica del Checkout en Backend (`POST /api/billing/checkout`):
 
-Para gestionar la oferta de lanzamiento del Plan Pro, se utiliza la funcionalidad nativa de **Cupones de Stripe**. 
+Se encuentra definida en [BillingController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/BillingController.php):
 
-1.  **Configuración en Stripe:** Se crea un cupón con duración de 2 meses y un descuento mensual de 30 € (dejando el precio neto del Plan Pro en 19 €/mes).
-2.  **Lógica del Checkout en Backend (`POST /api/billing/checkout`):**
-    ```php
-    public function checkout(Request $request)
-    {
-        $club = app('active_club');
-        $planSlug = $request->input('plan_slug');
-        $priceId = config("cashier.plans.{$planSlug}.price_id");
+```php
+public function checkout(Request $request)
+{
+    $user = $request->user();
+    if ($user->role !== 'manager' && $user->role !== 'admin') {
+        return response()->json(['message' => 'No autorizado.'], 403);
+    }
 
-        $subscription = $club->newSubscription('default', $priceId);
+    $club = app()->bound('active_club_id') ? Club::find(app('active_club_id')) : $user->club;
 
-        // Si selecciona el Plan Pro, aplicamos automáticamente el cupón de la oferta de lanzamiento
-        if ($planSlug === 'profesional') {
-            $couponId = config('cashier.plans.profesional.coupon_id'); // Cupón de Stripe
+    $validated = $request->validate([
+        'plan_slug' => 'required|string|in:basico,profesional,elite',
+    ]);
+
+    $planSlug = $validated['plan_slug'];
+    $priceId = match ($planSlug) {
+        'basico' => env('STRIPE_PRICE_BASICO'),
+        'profesional' => env('STRIPE_PRICE_PRO'),
+        'elite' => env('STRIPE_PRICE_ELITE'),
+    };
+
+    $subscription = $club->newSubscription('default', $priceId);
+
+    if ($planSlug === 'profesional') {
+        $couponId = env('STRIPE_COUPON_PRO_LAUNCH');
+        if ($couponId) {
             $subscription->withCoupon($couponId);
         }
-
-        return $subscription->checkout([
-            'success_url' => route('billing.success', ['slug' => $club->slug]),
-            'cancel_url' => route('billing.index', ['slug' => $club->slug]),
-        ]);
     }
-    ```
-3.  **Redirección y Pago:** El gestor es redirigido a la pasarela segura de Stripe, donde ve el desglose del descuento aplicado (paga 20 € hoy, y se le informa del cambio a 50 € a partir del tercer mes).
-4.  **Confirmación:** Stripe procesa el cargo inicial y redirige de vuelta al club.
+
+    $host = $request->getHost();
+    $scheme = $request->secure() ? 'https' : 'http';
+    $successUrl = "{$scheme}://{$host}/configuracion/facturacion?success=true&session_id={CHECKOUT_SESSION_ID}";
+    $cancelUrl = "{$scheme}://{$host}/configuracion/facturacion?cancel=true";
+
+    $checkoutSession = $subscription->checkout([
+        'success_url' => $successUrl,
+        'cancel_url' => $cancelUrl,
+    ]);
+
+    return response()->json(['url' => $checkoutSession->url]);
+}
+```
 
 ---
 
-## 5. Portal de Facturación Autogestionado (Stripe Customer Portal)
+## 5. Portal de Facturación Autogestionado (Stripe Customer Portal) e Invoices
 
-No se implementa un CRUD de tarjetas ni descarga local de facturas. Se delega al **Stripe Customer Portal**.
+La gestión de tarjetas, cambios de plan y descargas de facturas se delega al **Stripe Customer Portal** y a endpoints específicos del backend.
 
-*   **Acceso:** En la sección de Configuración > Suscripción del club, el gestor dispone del botón **Gestionar Facturación**.
-*   **Generación del Enlace:** El backend expone el endpoint `POST /api/billing/portal` que devuelve una URL temporal y firmada:
-    ```php
-    public function portal(Request $request)
-    {
-        $club = app('active_club');
-        return response()->json([
-            'url' => $club->billingPortalUrl(route('billing.index', ['slug' => $club->slug]))
-        ]);
-    }
-    ```
-*   **Acciones en el Portal:** El gestor puede:
-    *   Añadir o cambiar tarjetas de crédito.
-    *   Ver el precio del plan activo y la próxima fecha de renovación.
-    *   **Cancelar la suscripción:** La cancelación programará la baja de la suscripción para el final del ciclo de facturación actual.
-    *   Consultar e imprimir facturas anteriores.
+*   **Acceso:** En la sección de Configuración > Facturación del club, el gestor dispone del botón **Gestionar en Stripe**.
+*   **Generación del Enlace:** El backend expone el endpoint `POST /api/billing/portal` que devuelve una URL temporal y firmada del portal de Stripe.
+*   **Historial de Facturas:** La vista de facturación carga el listado de facturas consultando a `GET /api/billing/invoices`.
+    > [!IMPORTANT]
+    > **Resolución de Errores de Invoices (500 Error):**
+    > Anteriormente, el formateo del total de la factura realizaba operaciones matemáticas sobre un string con formato de moneda, lo cual fallaba. Ahora se retorna `$invoice->total()` directamente de Laravel Cashier para evitar errores de parseo de moneda en el backend.
+*   **Descarga de Facturas:** Para descargar una factura, el frontend abre en una pestaña nueva la dirección del endpoint `/api/billing/invoices/{invoice}/download`.
+    > [!IMPORTANT]
+    > **Firma del Endpoint de Descarga:**
+    > La firma del método en [BillingController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/BillingController.php#L190) se simplificó a `downloadInvoice(Request $request, $invoice)` para asegurar que el parámetro coincida de manera exacta con el marcador `{invoice}` de la ruta `/api/billing/invoices/{invoice}/download` definida en `api.php`. Esto evita errores de inyección y de coincidencia de parámetros en Laravel.
 
 ---
 
 ## 6. Control de Acceso y Middleware de Bloqueo
 
-El middleware de protección `CheckSubscriptionActive` verifica estrictamente la existencia de una suscripción activa.
+El middleware de protección [CheckSubscriptionActive.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Middleware/CheckSubscriptionActive.php) verifica estrictamente la existencia de una suscripción activa.
 
-### A. Lógica del Middleware
-
-Este middleware intercepta las peticiones de todos los usuarios pertenecientes al club (excepto rutas públicas y endpoints de facturación):
+### Lógica del Middleware:
+Este middleware intercepta las peticiones de todos los usuarios pertenecientes al club (excepto rutas públicas y endpoints exentos):
 
 ```php
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use App\Models\Club;
 
 class CheckSubscriptionActive
 {
     public function handle(Request $request, Closure $next)
     {
-        $club = app('active_club');
+        $club = app()->bound('active_club_id') ? Club::find(app('active_club_id')) : null;
+        if (!$club && $request->user()) {
+            $club = $request->user()->club;
+        }
 
-        // Validar únicamente que cuente con una suscripción activa
+        // Si no hay club (consola/seeder) o el usuario es admin global, permitir libre acceso
+        if (!$club || ($request->user() && $request->user()->role === 'admin')) {
+            return $next($request);
+        }
+
+        // Verificar si el club tiene la suscripción activa
         if ($club->subscribed('default')) {
             return $next($request);
         }
 
-        // Si la suscripción está suspendida/expirada:
-        if ($request->user() && $request->user()->role === 'manager') {
-            // El Gestor puede acceder únicamente para regularizar la situación.
-            // Si intenta ir a endpoints no relacionados con facturación, recibe 402 Payment Required
-            if (!$request->is('api/billing/*') && !$request->is('api/tenant/info')) {
+        // Si la suscripción no está activa:
+        if ($request->user()) {
+            if ($request->user()->role === 'manager') {
+                // El Gestor puede acceder únicamente a endpoints de facturación, info de club, sesión o usuario
+                if ($request->is('api/billing/*') || $request->is('api/tenant/info') || $request->is('api/logout') || $request->is('api/user')) {
+                    return $next($request);
+                }
+
                 return response()->json([
                     'error' => 'subscription_expired',
-                    'message' => 'Tu periodo de suscripción ha expirado. Por favor, regulariza el pago.'
+                    'message' => 'La suscripción del club ha expirado. Por favor, realiza el pago para reactivar el servicio.'
                 ], 402);
             }
-            return $next($request);
         }
 
         // Socios y Staff son bloqueados con 403 Forbidden en cualquier petición privada
@@ -217,57 +240,77 @@ class CheckSubscriptionActive
 }
 ```
 
-### B. Aplicación en Rutas (`api.php`)
-El middleware se inyecta en el grupo general de rutas autenticadas:
-
-```php
-Route::middleware(['auth:sanctum', 'subscription.active'])->group(function () {
-    // Rutas de reservas, perros, vídeos, salud, etc.
-});
-```
-
 ---
 
-## 7. Sincronización mediante Webhooks de Stripe
+## 7. Sincronización y Pruebas con Webhooks de Stripe
 
-Los webhooks permiten recibir notificaciones de eventos ocurridos directamente en Stripe (ej: un fallo en el cobro recurrente de la suscripción mensual) para actualizar nuestra base de datos.
+Los webhooks permiten recibir notificaciones de eventos ocurridos en Stripe para actualizar la base de datos de forma asíncrona.
 
-Se configura la ruta `/api/webhooks/stripe` redirigida al webhook oficial de Cashier:
-
-```
-POST https://api.clubagility.com/api/webhooks/stripe
-```
-
-### Eventos Clave a Escuchar:
-
-1.  **`invoice.payment_succeeded`**:
-    *   **Acción:** Confirma el cobro de la mensualidad. El sistema extiende la vigencia de la suscripción local.
-2.  **`invoice.payment_failed`**:
-    *   **Acción:** Registra el impago de la suscripción.
-    *   **Comportamiento de Gracia:** Cashier cambia el estado a `past_due`. El club entra en un "periodo de gracia" de 3 días donde se envía un email automático al gestor solicitando la actualización de la tarjeta. Transcurrido este tiempo, Stripe reintenta el cobro. Si falla definitivamente, la suscripción pasa a `unpaid` y se bloquea el acceso al club.
-3.  **`customer.subscription.deleted`**:
-    *   **Acción:** Ocurre cuando la suscripción se cancela definitivamente.
-    *   **Comportamiento:** El backend rebaja el `plan_id` del club o suspende el acceso del club de forma definitiva, impidiendo cualquier operación.
+*   **Ruta local del Webhook:** `/api/webhooks/stripe`.
+*   **Pruebas en Entorno Local (Laravel Herd):** Como Herd sirve la aplicación en puerto 80 a través de Nginx (`http://agility_back.test`), la herramienta Stripe CLI debe configurarse para redirigir los eventos a ese dominio virtual y no al puerto por defecto 8000.
+    > [!IMPORTANT]
+    > **Prefijo HTTP Obligatorio:**
+    > Al configurar el comando de reenvío de webhooks localmente, debes especificar la URL completa incluyendo el esquema `http://`. De lo contrario, Stripe CLI fallará o ignorará el envío:
+    > ```bash
+    > stripe listen --forward-to http://agility_back.test/api/webhooks/stripe
+    > ```
+*   **Firma del Secreto:** El valor de `STRIPE_WEBHOOK_SECRET` impreso al iniciar `stripe listen` (con formato `whsec_...`) debe copiarse fielmente al archivo `.env` del backend para validar y procesar las firmas de los webhooks entrantes.
 
 ---
 
 ## 8. Interfaz de Usuario y Guards (Frontend Angular)
 
-El frontend de Angular maneja la experiencia de usuario relacionada con los pagos e impide la navegación libre si se detecta un estado de impago o expiración.
+### A. Guards de Ruta y Contexto de Inyección (toObservable)
+En Angular 18+, los guards asíncronos (`async/await`) pierden el contexto de inyección tras un `await`. Para evitar errores `NG0203` al usar `toObservable()`, los guards (como [subscription-active.guard.ts](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/guards/subscription-active.guard.ts)) capturan el `Injector` síncronamente al inicio del método y lo pasan explícitamente como opción al transformar señales a observables:
+```typescript
+const injector = inject(Injector);
 
-### A. Vista de Facturación (`/configuracion/facturacion`)
-Un componente premium exclusivo para administradores/gestores del club que muestra:
-*   **Tarjeta de Resumen:** Nombre del plan activo, precio mensual y fecha de renovación.
-*   **Desglose Promocional:** Si el club está en el periodo de descuento (meses 1 y 2 del plan Pro), muestra un banner aclaratorio informando del descuento y de la fecha de paso al precio regular.
-*   **Sección de Acciones:**
-    *   Botón *Suscribirse ahora* (redirige a Stripe Checkout si está Caducado).
-    *   Botón *Gestionar Datos de Facturación* (llama al endpoint para redirigir al Stripe Customer Portal).
-*   **Historial de Facturas:** Tabla que consulta a `GET /api/billing/invoices` y permite ver un listado básico con links de descarga rápida en formato PDF.
+// Esperar a que cargue la autenticación si está en proceso
+if (authService.checkAuthLoading()) {
+    await firstValueFrom(
+        toObservable(authService.checkAuthLoading, { injector }).pipe(
+            filter(loading => !loading)
+        )
+    );
+}
+```
 
-### B. Interceptores de Red y Guards de Ruta
+### B. Mitigación de Errores 402 en la Consola
+Para evitar que se realicen llamadas HTTP innecesarias que resulten en errores molestos de tipo `402 (Payment Required)` en la consola del navegador cuando el club está bloqueado, los servicios de frontend (tales como [DogService](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/services/dog.service.ts), [NotificationService](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/services/notification.service.ts) y [OnboardingService](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/services/onboarding.ts)) inyectan `TenantService` y cancelan preventivamente sus peticiones si la suscripción está inactiva:
+```typescript
+if (this.tenantService.tenantInfo()?.subscribed === false) {
+    return; // Cancela la petición antes de realizar la llamada HTTP
+}
+```
 
-*   **`SubscriptionGuard`**: Protege las rutas principales de Angular (`reservas`, `perros`, `salud`, `videos`, etc.). Si la información cargada en el `TenantService` devuelve que el club está en estado inactivo/impago:
-    *   Si el usuario actual es `manager`, le fuerza a redirigirse a la vista de facturación (`/configuracion/facturacion`).
-    *   Si el usuario es `member` o `staff`, le redirige a `/suscripcion-suspendida`.
-*   **`SubscriptionSuspendedComponent`**: Pantalla a pantalla completa que se muestra a los socios si el club no paga. Ofrece una estética limpia (modo oscuro, gradientes sutiles) con el lema del club suspendido e instrucciones para que se pongan en contacto con la directiva del club para volver a activar el servicio.
-*   **HTTP Interceptor**: Si la API devuelve un código **402 Payment Required**, el interceptor de Angular captura el error y redirige inmediatamente al usuario a la página de facturación.
+### C. Protección de la Ruta Raíz
+La ruta raíz `/` (asociada al `HomeComponent` del subdominio) incluye el guard `subscriptionActiveGuard`. Esto asegura que los usuarios de clubes suspendidos no puedan permanecer en la página de bienvenida y sean redirigidos de inmediato a la sección de facturación (si son Gestores) o a la pantalla de suspensión de servicio (`/suscripcion-suspendida`) en caso de socios o entrenadores.
+
+---
+
+## 9. Solución de Problemas y Guía de Desarrollo Local (FAQ & Troubleshooting)
+
+### P: El pago en Stripe simulado fue correcto, pero al loguearme me sigue saliendo "Se requiere una suscripción activa". ¿Qué pasa?
+**R:** Esto se debe casi con total seguridad a que el backend local no está recibiendo los webhooks de Stripe. En desarrollo local, Stripe no puede conectarse a tu máquina directamente. Tienes que arrancar la utilidad Stripe CLI:
+1.  Asegúrate de tener Stripe CLI instalado.
+2.  Ejecuta: `stripe listen --forward-to http://agility_back.test/api/webhooks/stripe`
+3.  Copia el secreto devuelto (`whsec_...`) en tu `.env` bajo `STRIPE_WEBHOOK_SECRET`.
+4.  Realiza de nuevo una simulación de registro y pago, o provoca un cobro exitoso ficticio con `stripe trigger checkout.session.completed`.
+
+### P: ¿Cómo puedo simular o activar manualmente la suscripción de un Club localmente sin usar Webhooks?
+**R:** Si no tienes conexión a internet o quieres saltarte la verificación de Stripe de forma manual para probar otras partes de la aplicación, puedes simular la suscripción activa ejecutando la siguiente línea de código en **Tinker** (`php artisan tinker`) o en un script de desarrollo:
+
+```php
+$club = \App\Models\Club::where('slug', 'asturias-test')->first();
+$club->subscriptions()->create([
+    'type' => 'default',
+    'stripe_id' => 'sub_mock_' . uniqid(),
+    'stripe_status' => 'active',
+    'stripe_price' => env('STRIPE_PRICE_PRO'),
+    'quantity' => 1,
+]);
+```
+Esto creará un registro de suscripción ficticio de estado `active` asociado al club, desbloqueando inmediatamente todos sus endpoints protegidos.
+
+### P: Tengo errores del tipo "NG0203: toObservable() can only be used within an injection context..." al navegar por las páginas.
+**R:** Este error ocurre en Angular cuando intentas utilizar la reactividad de señales a observables (`toObservable`) después de realizar operaciones asíncronas (`await`). Asegúrate de que los guards de tu ruta sigan el patrón de inyección síncrona del `Injector` al inicio del guard y lo pasen explícitamente como opción al observable, tal y como se detalla en la **Sección 8.A** de este documento.
