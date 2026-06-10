@@ -286,6 +286,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Galería de Fotos interna
         Route::get('/photos', [PhotoController::class, 'index']);
         Route::get('/photos/storage-stats', [PhotoController::class, 'storageStats']);
+        Route::get('/photos/{id}/download', [PhotoController::class, 'download']);
         Route::post('/photos', [PhotoController::class, 'store']);
         Route::post('/photos/{id}', [PhotoController::class, 'update']);
         Route::post('/photos/{id}/delete', [PhotoController::class, 'destroy']);

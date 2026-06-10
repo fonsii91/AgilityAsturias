@@ -202,6 +202,27 @@ class PhotoController extends Controller
         return response()->json(['message' => 'Etiqueta eliminada.']);
     }
 
+    public function download(Request $request, $id)
+    {
+        $photo = ClubPhoto::findOrFail($id);
+
+        $diskName = ClubPhoto::storageDisk();
+        $disk = Storage::disk($diskName);
+
+        if (!$disk->exists($photo->path)) {
+            return response()->json(['message' => 'La foto no existe en el almacenamiento.'], 404);
+        }
+
+        $safeTitle = $photo->title 
+            ? Str::slug($photo->title) 
+            : 'foto_' . $photo->id;
+
+        $extension = pathinfo($photo->path, PATHINFO_EXTENSION) ?: 'webp';
+        $filename = "{$safeTitle}.{$extension}";
+
+        return $disk->download($photo->path, $filename);
+    }
+
     public function storageStats()
     {
         return response()->json($this->getClubPhotoStorageStats());

@@ -6,10 +6,10 @@ status: implementado
 
 # 📸 Galería de Fotos Interna del Club
 
-Especificación de la nueva funcionalidad de **galería de fotos interna** por club, hermana de la videoteca (ver [[gestion-videos]]). Permite a socios y staff subir fotografías que se comprimen en el navegador y se almacenan en **Mega S4** (almacenamiento S3-compatible ya configurado en el backend), con etiquetado de perros y miembros, clasificación por categorías y cuota de almacenamiento según el plan de suscripción del club.
+Especificación de la nueva funcionalidad de **galería de fotos interna** por club, hermana de la videoteca (ver [[gestion-videos]]). Permite a socios y staff subir fotografías que se comprimen en el navegador y se almacenan en **Mega S4** (almacenamiento S3-compatible ya configurado en el backend), con etiquetado de perros y miembros, clasificación por categorías, descarga individual de fotos en resolución display y cuota de almacenamiento según el plan de suscripción del club.
 
 > [!NOTE] Diferencia con la galería pública existente
-> No confundir con el modelo `GalleryImage` actual, que alimenta la galería de la **landing pública** del club (ver [[presencia-publica]]). Esta funcionalidad es una **fototeca interna** para miembros autenticados (aislada por tenant, ver [[arquitectura-multi-tenant]]). Como extensión futura, una foto interna podrá "promocionarse" a la galería pública (equivalente al flag `in_public_gallery` de los vídeos).
+> No confundir con el modelo `GalleryImage` actual, que alimenta la galería de la **landing pública** del club (ver [[presencia-publica]]). Esta funcionalidad es una **fototeca interna** para miembros autenticados (aislada por tenant, ver [[arquitectura-multi-tenant]]). Como extensión futura, una foto interna podrá "promocionarse" a la galería pública (equivalente al flag `in_public_gallery` de los vídeos). También se permite la descarga individual de las fotos.
 
 ---
 
@@ -171,7 +171,7 @@ Comportamiento al acercarse al límite (reutilizando el patrón de la videoteca)
 | Controlador (cuota, filtros, etiquetas) | `agility_back/app/Http/Controllers/PhotoController.php` |
 | Migraciones | `2026_06_10_120000_create_club_photos_tables.php` y `2026_06_10_120100_add_photo_storage_limit_gb_to_plans_table.php` |
 | Disco Flysystem | `config/filesystems.php` → disco `mega_s4`; selección vía `PHOTO_UPLOAD_DISK` (`public` por defecto, `mega_s4` en producción) |
-| Rutas API | `GET/POST /api/photos`, `POST /api/photos/{id}`, `POST /api/photos/{id}/delete`, `POST /api/photos/{id}/untag-self`, `GET /api/photos/storage-stats` |
+| Rutas API | `GET/POST /api/photos`, `GET /api/photos/{id}/download`, `POST /api/photos/{id}`, `POST /api/photos/{id}/delete`, `POST /api/photos/{id}/untag-self`, `GET /api/photos/storage-stats` |
 | Subida en lote (2 pasos) | `frontend/src/app/components/galeria-fotos/upload-photos/` |
 | Galería + lightbox | `frontend/src/app/components/galeria-fotos/photo-list/` (rutas `/galeria-fotos` y `/galeria-fotos/subir`) |
 | Lectura EXIF en cliente | `frontend/src/app/utils/exif-date.util.ts` |

@@ -8,6 +8,7 @@ import { CompetitionService } from '../../../services/competition.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { Photo, PhotoStorageStats, PHOTO_CATEGORIES, PHOTO_TYPES, photoCategoryLabel, photoTypeLabel } from '../../../models/photo.model';
+import { environment } from '../../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -49,6 +50,7 @@ export class PhotoListComponent implements OnInit {
     selectedPhoto = signal<Photo | null>(null);
     isEditingTags = signal<boolean>(false);
     isDeleting = signal<boolean>(false);
+    showSidebar = signal<boolean>(true);
     members = signal<{ id: number; name: string }[]>([]);
 
     ngOnInit() {
@@ -130,7 +132,12 @@ export class PhotoListComponent implements OnInit {
     openPhoto(photo: Photo) {
         this.selectedPhoto.set(photo);
         this.isEditingTags.set(false);
+        this.showSidebar.set(true);
         document.body.style.overflow = 'hidden';
+    }
+
+    toggleSidebar() {
+        this.showSidebar.update(v => !v);
     }
 
     closePhoto() {
@@ -192,6 +199,60 @@ export class PhotoListComponent implements OnInit {
             this.toastService.success('Te has quitado de la foto.');
         } catch {
             this.toastService.error('No se pudo quitar la etiqueta.');
+        }
+    }
+
+    getDownloadUrl(photo: Photo): string {
+        if (!photo.id) return '#';
+        return `${environment.apiUrl}/photos/${photo.id}/download`;
+    }
+
+    async downloadPhoto(photo: Photo) {
+        if (!photo.id) return;
+
+        const url = this.getDownloadUrl(photo);
+
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('access_token') || ''}`
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || 'No se pudo descargar la foto');
+            }
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+
+            let extension = 'webp';
+            if (photo.url) {
+                const cleanUrl = photo.url.split('?')[0];
+                extension = cleanUrl.split('.').pop() || 'webp';
+            }
+            
+            const safeTitle = (photo.title || 'foto_' + photo.id).replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            a.download = `${safeTitle}.${extension}`;
+
+            document.body.appendChild(a);
+            a.click();
+
+            setTimeout(() => {
+                window.URL.revokeObjectURL(downloadUrl);
+                document.body.removeChild(a);
+            }, 100);
+
+            this.toastService.success('Descarga iniciada.');
+        } catch (error) {
+            console.error('Download error:', error);
+            const msg = error instanceof Error ? error.message : 'No se pudo descargar la foto';
+            this.toastService.error(msg);
         }
     }
 

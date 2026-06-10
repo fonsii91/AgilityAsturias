@@ -3,7 +3,9 @@
     "version": "1.1.52",
     "date": "2026-06-10",
     "features": [
-      "¡Mejoras de velocidad en la galería de fotos! Hemos optimizado la carga y visualización de tus imágenes preferidas para que la navegación sea mucho más rápida y fluida en cualquier dispositivo."
+      "¡Mejoras de velocidad en la galería de fotos! Hemos optimizado la carga y visualización de tus imágenes preferidas para que la navegación sea mucho más rápida y fluida en cualquier dispositivo.",
+      "¡Descarga de fotos disponible! Ahora puedes guardar tus fotos favoritas de la galería directamente en tu móvil u ordenador con un solo clic.",
+      "¡Nueva vista de fotos a pantalla completa! Rediseñamos el visor de fotos para que se adapte a pantalla completa en tu móvil. Además, ahora puedes ocultar los detalles de la foto con el nuevo botón de información para verla a tamaño completo y sin distracciones, todo con un elegante y cómodo diseño oscuro."
     ],
     "bugfixes": [
       "¡Solucionado el solapamiento de menús y ventanas emergentes! Corregimos un problema que hacía que el menú de navegación superior y lateral se mostraran por encima de la vista de fotos ampliadas y de los diálogos de confirmación. Ahora, cualquier ventana de ayuda o visor flotará correctamente sobre el fondo.",

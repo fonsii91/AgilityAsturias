@@ -106,9 +106,12 @@
 <!-- ============ Lightbox ============ -->
 @if (selectedPhoto(); as photo) {
 <div class="lightbox-backdrop" (click)="closePhoto()">
-  <div class="lightbox-content" (click)="$event.stopPropagation()">
+  <div class="lightbox-content" [class.sidebar-hidden]="!showSidebar()" (click)="$event.stopPropagation()">
 
     <button class="lightbox-close" (click)="closePhoto()"><span class="material-icons">close</span></button>
+    <button class="lightbox-info-toggle" (click)="toggleSidebar()" title="Información y etiquetas">
+      <span class="material-icons">{{ showSidebar() ? 'info' : 'info_outline' }}</span>
+    </button>
     <button class="lightbox-nav nav-prev" (click)="navigatePhoto(-1)"><span
         class="material-icons">chevron_left</span></button>
     <button class="lightbox-nav nav-next" (click)="navigatePhoto(1)"><span
@@ -118,6 +121,7 @@
       <img [src]="photo.url" [alt]="photo.title || ''" />
     </div>
 
+    @if (showSidebar()) {
     <div class="lightbox-sidebar">
       <div class="sidebar-section">
         @if (photo.title) { <h3>{{ photo.title }}</h3> }
@@ -184,6 +188,9 @@
       </div>
 
       <div class="sidebar-actions">
+        <button class="btn-sidebar btn-download" (click)="downloadPhoto(photo)">
+          <span class="material-icons">download</span> Descargar foto
+        </button>
         @if (isTaggedSelf(photo)) {
         <button class="btn-sidebar btn-untag" (click)="untagSelf(photo)">
           <span class="material-icons">person_remove</span> Quitarme de esta foto
@@ -196,6 +203,7 @@
         }
       </div>
     </div>
+    }
   </div>
 </div>
 }

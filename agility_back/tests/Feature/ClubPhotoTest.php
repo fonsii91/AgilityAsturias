@@ -209,4 +209,17 @@ class ClubPhotoTest extends TestCase
         $this->assertEquals(0, ClubPhoto::withoutGlobalScopes()->count());
         Storage::disk('public')->assertMissing($path);
     }
+
+    public function test_un_miembro_puede_descargar_una_foto()
+    {
+        $this->actingAs($this->user)->postJson('/api/photos', $this->uploadPayload([
+            'title' => 'Foto de prueba'
+        ]));
+        $photo = ClubPhoto::withoutGlobalScopes()->first();
+
+        $response = $this->actingAs($this->otherUser)->getJson("/api/photos/{$photo->id}/download");
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Disposition', 'attachment; filename=foto-de-prueba.jpg');
+    }
 }
