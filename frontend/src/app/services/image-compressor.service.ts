@@ -7,7 +7,7 @@ export class ImageCompressorService {
 
     constructor() { }
 
-    compress(file: File): Promise<File> {
+    compress(file: File, options?: { maxDimension?: number; quality?: number; forceWebp?: boolean; suffix?: string }): Promise<File> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -20,8 +20,8 @@ export class ImageCompressorService {
                     if (!ctx) return reject('Canvas context not available');
 
                     // Max dimensions
-                    const MAX_WIDTH = 800;
-                    const MAX_HEIGHT = 800;
+                    const MAX_WIDTH = options?.maxDimension ?? 800;
+                    const MAX_HEIGHT = options?.maxDimension ?? 800;
                     let width = img.width;
                     let height = img.height;
 
@@ -42,18 +42,18 @@ export class ImageCompressorService {
                     ctx.drawImage(img, 0, 0, width, height);
 
                     const isTransparent = file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/svg+xml';
-                    const outputType = isTransparent ? 'image/webp' : 'image/jpeg';
-                    const ext = isTransparent ? '.webp' : '.jpg';
+                    const outputType = (options?.forceWebp || isTransparent) ? 'image/webp' : 'image/jpeg';
+                    const ext = outputType === 'image/webp' ? '.webp' : '.jpg';
 
                     canvas.toBlob((blob) => {
                         if (!blob) return reject('Compression failed');
-                        const newFilename = file.name.replace(/\.[^/.]+$/, "") + ext;
+                        const newFilename = file.name.replace(/\.[^/.]+$/, "") + (options?.suffix ?? '') + ext;
                         const compressedFile = new File([blob], newFilename, {
                             type: outputType,
                             lastModified: Date.now(),
                         });
                         resolve(compressedFile);
-                    }, outputType, 0.8); 
+                    }, outputType, options?.quality ?? 0.8);
                 };
                 img.onerror = (error) => reject(error);
             };

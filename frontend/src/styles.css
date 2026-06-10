@@ -613,3 +613,11 @@ app-toast { position: relative; z-index: 2147483647; display: block; }
     display: none;
 }
 
+/* Fix stacking context for inline modals to render above sticky navbar globally */
+mat-sidenav-container,
+mat-sidenav-content,
+.sidenav-container {
+    z-index: auto !important;
+}
+
+

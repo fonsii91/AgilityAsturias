@@ -59,6 +59,7 @@ class SubscriptionControlTest extends TestCase
         // El club no tiene suscripción activa (no se ha registrado pago en Stripe)
         $response = $this->actingAs($this->manager, 'sanctum')
             ->withHeader('X-Club-Slug', 'asturias-test')
+            ->withHeader('X-Test-Check-Subscription', 'true')
             ->getJson('/api/dogs');
 
         $response->assertStatus(402);
@@ -69,6 +70,7 @@ class SubscriptionControlTest extends TestCase
     {
         $response = $this->actingAs($this->member, 'sanctum')
             ->withHeader('X-Club-Slug', 'asturias-test')
+            ->withHeader('X-Test-Check-Subscription', 'true')
             ->getJson('/api/dogs');
 
         $response->assertStatus(403);
@@ -80,6 +82,7 @@ class SubscriptionControlTest extends TestCase
         // El endpoint /api/billing/status debe estar accesible
         $response = $this->actingAs($this->manager, 'sanctum')
             ->withHeader('X-Club-Slug', 'asturias-test')
+            ->withHeader('X-Test-Check-Subscription', 'true')
             ->getJson('/api/billing/status');
 
         $response->assertStatus(200);
@@ -101,6 +104,7 @@ class SubscriptionControlTest extends TestCase
         // Ahora el manager debería poder consultar /api/dogs sin error 402
         $response = $this->actingAs($this->manager, 'sanctum')
             ->withHeader('X-Club-Slug', 'asturias-test')
+            ->withHeader('X-Test-Check-Subscription', 'true')
             ->getJson('/api/dogs');
 
         $response->assertStatus(200); // Devuelve array vacío de perros de forma normal
@@ -110,6 +114,7 @@ class SubscriptionControlTest extends TestCase
     {
         $response = $this->actingAs($this->manager, 'sanctum')
             ->withHeader('X-Club-Slug', 'asturias-test')
+            ->withHeader('X-Test-Check-Subscription', 'true')
             ->getJson('/api/billing/invoices');
 
         $response->assertStatus(200);
@@ -120,6 +125,7 @@ class SubscriptionControlTest extends TestCase
     {
         $response = $this->actingAs($this->manager, 'sanctum')
             ->withHeader('X-Club-Slug', 'asturias-test')
+            ->withHeader('X-Test-Check-Subscription', 'true')
             ->getJson('/api/billing/invoices/in_123/download');
 
         $response->assertStatus(404);

@@ -1,0 +1,247 @@
+<div class="form-container auth-card">
+  <div class="logo-area">
+    <div class="logo-circle">
+      <span class="material-icons">add_a_photo</span>
+    </div>
+    <h2>{{ step() === 1 ? 'Subir Fotos' : 'Completa los detalles' }}</h2>
+    <p>{{ step() === 1 ? 'Sube un lote de fotos a la galería del club.' : 'Opcional: etiqueta perros y miembros, o termina sin más.' }}</p>
+  </div>
+
+  <!-- Alerta de almacenamiento casi lleno -->
+  @if (storageStats() && storageStats()!.percentage >= 90) {
+  <div class="storage-warning-banner">
+    <span class="material-icons warning-icon">warning</span>
+    <div class="warning-text-container">
+      <strong>¡Almacenamiento de fotos casi lleno ({{ storageStats()!.percentage | number:'1.0-0' }}%)!</strong>
+      <p>Queda muy poco espacio para nuevas fotos en el club. Te recomendamos borrar fotos antiguas desde la galería o
+        solicitar al administrador subir a un plan superior con mayor capacidad.</p>
+    </div>
+  </div>
+  }
+
+  <!-- ============ PASO 1: lote + metadatos comunes ============ -->
+  @if (step() === 1) {
+  <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+    <div class="form-group">
+      <label>Categoría *</label>
+      <div class="input-wrapper">
+        <select formControlName="category"
+          [ngClass]="{ 'is-invalid': uploadForm.get('category')?.invalid && uploadForm.get('category')?.touched }">
+          <option value="" disabled selected>¿De qué es este lote de fotos?</option>
+          @for (cat of categories; track cat.value) {
+          <option [value]="cat.value">{{ cat.label }}</option>
+          }
+        </select>
+        <span class="material-icons">collections</span>
+      </div>
+      @if (uploadForm.get('category')?.invalid && uploadForm.get('category')?.touched) {
+      <div class="field-error-text">La categoría es obligatoria.</div>
+      }
+    </div>
+
+    @if (isCompetitionCategory) {
+    <div class="form-group">
+      <label>Competición *</label>
+      <div class="input-wrapper">
+        <select formControlName="competition_id"
+          [ngClass]="{ 'is-invalid': uploadForm.get('competition_id')?.invalid && uploadForm.get('competition_id')?.touched }">
+          <option value="" disabled selected>Selecciona la competición</option>
+          @for (comp of pastAndCurrentCompetitions; track comp) {
+          <option [value]="comp.id">
+            {{ comp.nombre }} {{ comp.fechaEvento ? '(' + (comp.fechaEvento | date:'dd/MM/yyyy') + ')' : '' }}
+          </option>
+          }
+        </select>
+        <span class="material-icons">emoji_events</span>
+      </div>
+      @if (uploadForm.get('competition_id')?.invalid && uploadForm.get('competition_id')?.touched) {
+      <div class="field-error-text">Indica de qué competición son las fotos.</div>
+      }
+    </div>
+    }
+
+    <div class="form-group">
+      <label>Fecha de las fotos *</label>
+      <div class="input-wrapper">
+        <input type="date" formControlName="taken_at"
+          [ngClass]="{ 'is-invalid': uploadForm.get('taken_at')?.invalid && uploadForm.get('taken_at')?.touched }" />
+        <span class="material-icons">calendar_today</span>
+      </div>
+      <small class="field-hint">Se rellena sola con la fecha de captura de la primera foto si está disponible.</small>
+    </div>
+
+    <!-- Zona de selección múltiple -->
+    <div class="form-group">
+      <label>Fotos * <span class="label-note">(Hasta 30 por lote, máx 20MB cada una. Se comprimen
+          automáticamente.)</span></label>
+
+      <div class="drag-drop-zone" [class.drag-over]="isDragging()" (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
+        <div class="drag-content">
+          <span class="material-icons drag-icon">add_photo_alternate</span>
+          <p class="drag-title">Haz click o arrastra tus fotos aquí</p>
+          <p class="drag-subtitle">JPG, PNG, WebP o HEIC — puedes seleccionar varias a la vez</p>
+        </div>
+        <input #fileInput type="file" accept="image/*" multiple (change)="onFilesSelected($event)"
+          style="display: none;" />
+      </div>
+    </div>
+
+    <!-- Rejilla de previsualización del lote -->
+    @if (items().length > 0) {
+    <div class="batch-summary">
+      <strong>{{ items().length }}</strong> foto{{ items().length === 1 ? '' : 's' }} en el lote
+      @if (isUploading()) {
+      <span class="batch-progress">— subiendo {{ uploadedCount() }}/{{ items().length }}</span>
+      }
+    </div>
+
+    <div class="preview-grid">
+      @for (item of items(); track item.previewUrl) {
+      <div class="preview-cell" [class.cell-error]="item.status === 'error'">
+        <img [src]="item.previewUrl" [alt]="item.file.name" loading="lazy" />
+
+        @if (item.status === 'pending' && !isUploading()) {
+        <button type="button" class="cell-remove" (click)="removeItem(item)" title="Quitar foto">
+          <span class="material-icons">close</span>
+        </button>
+        }
+
+        <div class="cell-status">
+          @switch (item.status) {
+          @case ('compressing') { <span class="cell-badge badge-working"><span class="mini-spinner"></span>
+            Comprimiendo</span> }
+          @case ('uploading') { <span class="cell-badge badge-working"><span class="mini-spinner"></span> Subiendo</span> }
+          @case ('done') { <span class="cell-badge badge-done"><span class="material-icons">check_circle</span></span> }
+          @case ('error') {
+          <span class="cell-badge badge-error" [title]="item.error">
+            <span class="material-icons">error</span>
+            <button type="button" class="retry-btn" (click)="retryItem(item)">Reintentar</button>
+          </span>
+          }
+          }
+        </div>
+      </div>
+      }
+    </div>
+    }
+
+    @if (errorItems().length > 0 && !isUploading() && doneItems().length > 0) {
+    <button type="button" class="btn-link-danger" (click)="continueWithoutFailed()">
+      Continuar sin las {{ errorItems().length }} fotos fallidas
+    </button>
+    }
+
+    @if (!isUploading()) {
+    <div class="form-actions">
+      <button type="button" class="btn-cancel" (click)="cancel()">
+        <span class="material-icons">arrow_back</span>
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="uploadForm.invalid || items().length === 0" class="btn-primary">
+        Subir {{ items().length > 0 ? items().length : '' }} foto{{ items().length === 1 ? '' : 's' }}
+        <span class="material-icons">send</span>
+      </button>
+    </div>
+    } @else {
+    <div class="status-card upload-card">
+      <div class="status-icon">
+        <div class="spinner-blue"></div>
+      </div>
+      <div class="status-content">
+        <strong>Subiendo el lote… {{ uploadedCount() }}/{{ items().length }}</strong>
+        <p>No cierres esta página hasta que terminen todas las fotos.</p>
+      </div>
+    </div>
+    }
+  </form>
+  }
+
+  <!-- ============ PASO 2: refinado opcional ============ -->
+  @if (step() === 2) {
+  <div class="step2-container">
+    <div class="step2-intro">
+      <span class="material-icons">check_circle</span>
+      <p>¡{{ doneItems().length }} foto{{ doneItems().length === 1 ? '' : 's' }} ya en la galería! Si quieres, añade
+        detalles a cada una. Este paso es <strong>opcional</strong>: tú u otros socios podéis etiquetar más tarde.</p>
+    </div>
+
+    @for (item of doneItems(); track item.previewUrl) {
+    <div class="detail-card" [class.detail-saved]="item.saved">
+      <img class="detail-thumb" [src]="item.previewUrl" [alt]="item.file.name" loading="lazy" />
+
+      <div class="detail-fields">
+        <div class="detail-row">
+          <div class="detail-field">
+            <label>Tipo de foto</label>
+            <select [(ngModel)]="item.photoType" (ngModelChange)="markDirty(item)">
+              <option value="">Sin especificar</option>
+              @for (type of photoTypes; track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="detail-field">
+            <label>Título / pie de foto</label>
+            <input type="text" [(ngModel)]="item.title" (ngModelChange)="markDirty(item)"
+              placeholder="Ej. Podio de Grado 2" maxlength="255" />
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <div class="detail-field">
+            <label>Perros en la foto</label>
+            <select (change)="addDogTag(item, $event)">
+              <option value="" selected>+ Etiquetar perro</option>
+              @for (dog of sortedDogs; track dog.id) {
+              <option [value]="dog.id">{{ dog.name }}</option>
+              }
+            </select>
+            <div class="tag-chips">
+              @for (dogId of item.dogIds; track dogId) {
+              <span class="tag-chip chip-dog">🐾 {{ dogName(dogId) }}
+                <button type="button" (click)="removeDogTag(item, dogId)">×</button>
+              </span>
+              }
+            </div>
+          </div>
+          <div class="detail-field">
+            <label>Miembros en la foto</label>
+            <select (change)="addUserTag(item, $event)">
+              <option value="" selected>+ Etiquetar miembro</option>
+              @for (member of members(); track member.id) {
+              <option [value]="member.id">{{ member.name }}</option>
+              }
+            </select>
+            <div class="tag-chips">
+              @for (userId of item.userIds; track userId) {
+              <span class="tag-chip chip-user">👤 {{ memberName(userId) }}
+                <button type="button" (click)="removeUserTag(item, userId)">×</button>
+              </span>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-actions">
+          @if (item.saved) {
+          <span class="saved-indicator"><span class="material-icons">check</span> Guardado</span>
+          } @else {
+          <button type="button" class="btn-save-detail" [disabled]="item.saving" (click)="saveItemDetails(item)">
+            {{ item.saving ? 'Guardando…' : 'Guardar detalles' }}
+          </button>
+          }
+        </div>
+      </div>
+    </div>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="btn-primary btn-finish" (click)="finish()">
+        Terminar e ir a la galería <span class="material-icons">photo_library</span>
+      </button>
+    </div>
+  </div>
+  }
+</div>

@@ -60,6 +60,20 @@ return [
             'report' => false,
         ],
 
+        // Mega S4 (S3-compatible). Sin soporte de ACLs ni CORS: servir siempre
+        // mediante URLs prefirmadas generadas por el backend (ver docs galeria-fotos).
+        'mega_s4' => [
+            'driver' => 's3',
+            'key' => env('MEGA_S4_KEY'),
+            'secret' => env('MEGA_S4_SECRET'),
+            'region' => env('MEGA_S4_REGION', 'eu-central-1'),
+            'bucket' => env('MEGA_S4_BUCKET'),
+            'endpoint' => 'https://' . env('MEGA_S4_ENDPOINT', 's4.mega.io'),
+            'use_path_style_endpoint' => true,
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

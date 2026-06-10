@@ -32,8 +32,12 @@
         <input type="number" [(ngModel)]="newPlan().price" step="0.01">
       </div>
       <div class="form-group">
-        <label>Límite de Almacenamiento (GB)</label>
+        <label>Almacenamiento Vídeos (GB)</label>
         <input type="number" [(ngModel)]="newPlan().video_storage_limit_gb" min="0" placeholder="Ej. 10">
+      </div>
+      <div class="form-group">
+        <label>Almacenamiento Fotos (GB)</label>
+        <input type="number" [(ngModel)]="newPlan().photo_storage_limit_gb" min="0" placeholder="Ej. 5">
       </div>
       <div class="form-group">
         <label>Precio Oferta (€) (Opcional)</label>
@@ -87,8 +91,12 @@
         <input type="number" [(ngModel)]="editingPlan()!.price" step="0.01">
       </div>
       <div class="form-group">
-        <label>Límite de Almacenamiento (GB)</label>
+        <label>Almacenamiento Vídeos (GB)</label>
         <input type="number" [(ngModel)]="editingPlan()!.video_storage_limit_gb" min="0" placeholder="Ej. 10">
+      </div>
+      <div class="form-group">
+        <label>Almacenamiento Fotos (GB)</label>
+        <input type="number" [(ngModel)]="editingPlan()!.photo_storage_limit_gb" min="0" placeholder="Ej. 5">
       </div>
       <div class="form-group">
         <label>Precio Oferta (€) (Opcional)</label>
@@ -167,13 +175,32 @@
           <!-- Video Storage Limit Quota Row -->
           <tr>
             <td class="feature-cell">
-              <strong>Límite de Almacenamiento (GB)</strong>
-              <small>Espacio máximo permitido para subir vídeos en Bunny.net</small>
+              <strong>Límite Vídeos (GB)</strong>
+              <small>Espacio máximo para subir vídeos en Bunny.net</small>
             </td>
             @for (plan of plans(); track plan.id) {
             <td class="toggle-cell">
               <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: center;">
                 <input type="number" [(ngModel)]="plan.video_storage_limit_gb" 
+                  (blur)="updatePlanStorageLimit(plan)" 
+                  (keyup.enter)="updatePlanStorageLimit(plan)"
+                  style="width: 70px; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; text-align: center;" 
+                  min="0">
+                <span style="font-size: 0.85rem; color: #64748b; font-weight: 500;">GB</span>
+              </div>
+            </td>
+            }
+          </tr>
+          <!-- Photo Storage Limit Quota Row -->
+          <tr>
+            <td class="feature-cell">
+              <strong>Límite Fotos (GB)</strong>
+              <small>Espacio máximo para subir fotos en Mega S4</small>
+            </td>
+            @for (plan of plans(); track plan.id) {
+            <td class="toggle-cell">
+              <div style="display: inline-flex; align-items: center; gap: 6px; justify-content: center;">
+                <input type="number" [(ngModel)]="plan.photo_storage_limit_gb" 
                   (blur)="updatePlanStorageLimit(plan)" 
                   (keyup.enter)="updatePlanStorageLimit(plan)"
                   style="width: 70px; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; text-align: center;" 

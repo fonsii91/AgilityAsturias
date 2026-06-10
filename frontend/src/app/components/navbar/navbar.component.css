@@ -3,7 +3,7 @@
     padding: 0 2rem;
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 990; /* Lowered from 1000 to prevent overlapping with modales/overlays globally */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: var(--primary-blue, #0056b3) !important;
     color: var(--white) !important;

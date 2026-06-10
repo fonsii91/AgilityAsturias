@@ -62,6 +62,13 @@ class Club extends Model
                 ->each
                 ->delete();
 
+            // Delete all photos of the club via Eloquent to trigger file cleanups (Mega S4 / Local)
+            \App\Models\ClubPhoto::withoutGlobalScopes()
+                ->where('club_id', $club->id)
+                ->get()
+                ->each
+                ->delete();
+
             // Delete all dogs of the club via Eloquent to trigger their delete events (which also cleans up their videos)
             \App\Models\Dog::withoutGlobalScopes()
                 ->where('club_id', $club->id)

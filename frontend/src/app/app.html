@@ -43,6 +43,8 @@
 
           <li *hasFeature="'galeria-videos'"><a routerLink="/galeria-videos" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">movie</span> Vídeos</a></li>
+          <li><a routerLink="/galeria-fotos" routerLinkActive="active-route" (click)="sidenav.close()"><span
+                class="material-icons">photo_library</span> Fotos</a></li>
           }
 
           @if (!authService.isMember()) {

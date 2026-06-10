@@ -58,6 +58,7 @@ class SubscriptionSeeder extends Seeder
             'price' => 29.00,
             'description' => 'Plan inicial para gestión de socios y reservas.',
             'is_active' => true,
+            'photo_storage_limit_gb' => 5,
         ]);
 
         $planPro = Plan::firstOrCreate(['slug' => 'profesional'], [
@@ -65,6 +66,7 @@ class SubscriptionSeeder extends Seeder
             'price' => 49.00,
             'description' => 'Plan completo con seguimiento de competiciones (RSCE y RFEC) y recursos.',
             'is_active' => true,
+            'photo_storage_limit_gb' => 25,
         ]);
 
         $planElite = Plan::firstOrCreate(['slug' => 'elite'], [
@@ -72,6 +74,7 @@ class SubscriptionSeeder extends Seeder
             'price' => 79.00,
             'description' => 'Todo lo del plan pro más módulo de salud, galería de vídeos y recursos avanzados.',
             'is_active' => true,
+            'photo_storage_limit_gb' => 100,
         ]);
 
         // Sync features to plans

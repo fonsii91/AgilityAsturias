@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.1.52",
+    "date": "2026-06-10",
+    "features": [
+      "¡Mejoras de velocidad en la galería de fotos! Hemos optimizado la carga y visualización de tus imágenes preferidas para que la navegación sea mucho más rápida y fluida en cualquier dispositivo."
+    ],
+    "bugfixes": [
+      "¡Solucionado el solapamiento de menús y ventanas emergentes! Corregimos un problema que hacía que el menú de navegación superior y lateral se mostraran por encima de la vista de fotos ampliadas y de los diálogos de confirmación. Ahora, cualquier ventana de ayuda o visor flotará correctamente sobre el fondo.",
+      "¡Visualización de almacenamiento corregida! Solucionamos un detalle estético en el indicador de almacenamiento de fotos para que muestre el progreso de forma correcta y visible incluso cuando se inicia la subida de las primeras imágenes en tu club."
+    ]
+  },
+  {
     "version": "1.1.51",
     "date": "2026-06-07",
     "features": [],

@@ -1,0 +1,201 @@
+<div class="gallery-container">
+
+  <!-- Cabecera -->
+  <div class="gallery-header">
+    <div class="header-titles">
+      <h1><span class="material-icons">photo_library</span> Fotos del Club</h1>
+      @if (storageStats()) {
+      <div class="storage-meter" [class.storage-warning]="storageStats()!.percentage >= 90">
+        <div class="storage-bar">
+          <div class="storage-fill" [style.width.%]="storageStats()!.used_bytes > 0 ? (storageStats()!.percentage < 3 ? 3 : (storageStats()!.percentage > 100 ? 100 : storageStats()!.percentage)) : 0">
+          </div>
+        </div>
+        <span class="storage-text">{{ formatStorage(storageStats()!.used_bytes) }} de {{ storageStats()!.limit_gb }} GB</span>
+      </div>
+      }
+    </div>
+    <button class="btn-upload" routerLink="/galeria-fotos/subir">
+      <span class="material-icons">add_a_photo</span> Subir fotos
+    </button>
+  </div>
+
+  <!-- Filtros: categorías como chips -->
+  <div class="category-chips">
+    <button class="cat-chip" [class.active]="filterCategory() === ''" (click)="filterCategory.set(''); onFilterChange()">
+      Todas
+    </button>
+    @for (cat of categories; track cat.value) {
+    <button class="cat-chip" [class.active]="filterCategory() === cat.value" (click)="selectCategory(cat.value)">
+      <span class="material-icons">{{ cat.icon }}</span> {{ cat.label }}
+    </button>
+    }
+  </div>
+
+  <!-- Filtros secundarios -->
+  <div class="secondary-filters">
+    <div class="filter-field search-field">
+      <span class="material-icons">search</span>
+      <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
+        placeholder="Buscar por título, perro o competición…" />
+    </div>
+
+    <select class="filter-field" [(ngModel)]="filterType" (ngModelChange)="onFilterChange()">
+      <option value="">Tipo: todos</option>
+      @for (type of photoTypes; track type.value) {
+      <option [value]="type.value">{{ type.label }}</option>
+      }
+    </select>
+
+    <select class="filter-field" [(ngModel)]="filterDog" (ngModelChange)="onFilterChange()">
+      <option value="">Perro: todos</option>
+      @for (dog of dogs(); track dog.id) {
+      <option [value]="dog.id">{{ dog.name }}</option>
+      }
+    </select>
+
+    <select class="filter-field" [(ngModel)]="filterCompetition" (ngModelChange)="onFilterChange()">
+      <option value="">Competición: todas</option>
+      @for (comp of competitions(); track comp.id) {
+      <option [value]="comp.id">{{ comp.nombre }}</option>
+      }
+    </select>
+  </div>
+
+  <!-- Rejilla -->
+  @if (photos().length === 0 && !isLoading()) {
+  <div class="empty-state">
+    <span class="material-icons">photo_camera</span>
+    <h3>Todavía no hay fotos{{ filterCategory() || filterType() || filterDog() || filterCompetition() || searchTerm() ? ' con estos filtros' : '' }}</h3>
+    <p>Sé el primero en compartir los momentos del club: entrenamientos, podios, cachorros…</p>
+    <button class="btn-upload" routerLink="/galeria-fotos/subir">
+      <span class="material-icons">add_a_photo</span> Subir las primeras fotos
+    </button>
+  </div>
+  }
+
+  <div class="photo-grid">
+    @for (photo of photos(); track photo.id) {
+    <div class="photo-cell" (click)="openPhoto(photo)">
+      <img [src]="photo.thumb_url" [alt]="photo.title || categoryLabel(photo.category)" loading="lazy" />
+      <div class="photo-overlay">
+        @if (photo.photo_type === 'podio') {
+        <span class="material-icons overlay-icon podium-icon">military_tech</span>
+        }
+        <div class="overlay-info">
+          @if (photo.title) { <span class="overlay-title">{{ photo.title }}</span> }
+          <span class="overlay-meta">{{ photo.taken_at | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+    </div>
+    }
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-row"><div class="spinner-blue"></div></div>
+  }
+
+  @if (!isLoading() && currentPage() < lastPage()) {
+  <div class="load-more-row">
+    <button class="btn-load-more" (click)="loadMore()">
+      Cargar más fotos ({{ photos().length }}/{{ total() }})
+    </button>
+  </div>
+  }
+</div>
+
+<!-- ============ Lightbox ============ -->
+@if (selectedPhoto(); as photo) {
+<div class="lightbox-backdrop" (click)="closePhoto()">
+  <div class="lightbox-content" (click)="$event.stopPropagation()">
+
+    <button class="lightbox-close" (click)="closePhoto()"><span class="material-icons">close</span></button>
+    <button class="lightbox-nav nav-prev" (click)="navigatePhoto(-1)"><span
+        class="material-icons">chevron_left</span></button>
+    <button class="lightbox-nav nav-next" (click)="navigatePhoto(1)"><span
+        class="material-icons">chevron_right</span></button>
+
+    <div class="lightbox-image-wrapper">
+      <img [src]="photo.url" [alt]="photo.title || ''" />
+    </div>
+
+    <div class="lightbox-sidebar">
+      <div class="sidebar-section">
+        @if (photo.title) { <h3>{{ photo.title }}</h3> }
+        <div class="meta-line">
+          <span class="material-icons">collections</span> {{ categoryLabel(photo.category) }}
+          @if (photo.photo_type) { · {{ typeLabel(photo.photo_type) }} }
+        </div>
+        <div class="meta-line">
+          <span class="material-icons">calendar_today</span> {{ photo.taken_at | date:'dd/MM/yyyy' }}
+        </div>
+        @if (photo.competition) {
+        <div class="meta-line">
+          <span class="material-icons">emoji_events</span> {{ photo.competition.nombre }}
+        </div>
+        }
+        @if (photo.user) {
+        <div class="meta-line subtle">
+          <span class="material-icons">cloud_upload</span> Subida por {{ photo.user.name }}
+        </div>
+        }
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-header">
+          <h4>Etiquetas</h4>
+          <button class="btn-edit-tags" (click)="isEditingTags.set(!isEditingTags())">
+            <span class="material-icons">{{ isEditingTags() ? 'done' : 'edit' }}</span>
+            {{ isEditingTags() ? 'Listo' : 'Etiquetar' }}
+          </button>
+        </div>
+
+        <div class="tag-chips">
+          @for (dog of photo.dogs ?? []; track dog.id) {
+          <span class="tag-chip chip-dog">🐾 {{ dog.name }}
+            @if (isEditingTags()) { <button (click)="removeDogTag(photo, dog.id)">×</button> }
+          </span>
+          }
+          @for (member of photo.tagged_users ?? []; track member.id) {
+          <span class="tag-chip chip-user">👤 {{ member.name }}
+            @if (isEditingTags()) { <button (click)="removeUserTag(photo, member.id)">×</button> }
+          </span>
+          }
+          @if ((photo.dogs ?? []).length === 0 && (photo.tagged_users ?? []).length === 0) {
+          <span class="no-tags">Sin etiquetas todavía. ¡Ayuda a etiquetar!</span>
+          }
+        </div>
+
+        @if (isEditingTags()) {
+        <div class="tag-selects">
+          <select (change)="addDogTag(photo, $event)">
+            <option value="" selected>+ Etiquetar perro</option>
+            @for (dog of dogs(); track dog.id) {
+            <option [value]="dog.id">{{ dog.name }}</option>
+            }
+          </select>
+          <select (change)="addUserTag(photo, $event)">
+            <option value="" selected>+ Etiquetar miembro</option>
+            @for (member of members(); track member.id) {
+            <option [value]="member.id">{{ member.name }}</option>
+            }
+          </select>
+        </div>
+        }
+      </div>
+
+      <div class="sidebar-actions">
+        @if (isTaggedSelf(photo)) {
+        <button class="btn-sidebar btn-untag" (click)="untagSelf(photo)">
+          <span class="material-icons">person_remove</span> Quitarme de esta foto
+        </button>
+        }
+        @if (canManage(photo)) {
+        <button class="btn-sidebar btn-delete" [disabled]="isDeleting()" (click)="deletePhoto(photo)">
+          <span class="material-icons">delete</span> {{ isDeleting() ? 'Borrando…' : 'Borrar foto' }}
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+}

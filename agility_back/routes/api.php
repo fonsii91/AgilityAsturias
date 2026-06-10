@@ -10,6 +10,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\PhotoController;
 use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\SuggestionController;
 use App\Http\Controllers\AnnouncementController;
@@ -281,6 +282,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/videos/{id}/delete', [VideoController::class, 'destroy']);
         Route::post('/videos/{id}/toggle-like', [VideoController::class, 'toggleLike']);
         Route::get('/videos/{id}/download', [VideoController::class, 'download']);
+
+        // Galería de Fotos interna
+        Route::get('/photos', [PhotoController::class, 'index']);
+        Route::get('/photos/storage-stats', [PhotoController::class, 'storageStats']);
+        Route::post('/photos', [PhotoController::class, 'store']);
+        Route::post('/photos/{id}', [PhotoController::class, 'update']);
+        Route::post('/photos/{id}/delete', [PhotoController::class, 'destroy']);
+        Route::post('/photos/{id}/untag-self', [PhotoController::class, 'untagSelf']);
 
         // Event Attendance
         Route::post('/competitions/{id}/attend', [CompetitionController::class, 'attend']);

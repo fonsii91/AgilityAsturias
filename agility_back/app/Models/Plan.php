@@ -16,6 +16,7 @@ class Plan extends Model
         'description',
         'is_active',
         'video_storage_limit_gb',
+        'photo_storage_limit_gb',
         'promo_price',
         'promo_duration_months',
         'promo_label',

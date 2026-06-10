@@ -41,6 +41,11 @@ Este documento detalla los distintos planes de suscripción (SaaS) ofrecidos par
   - Galería de vídeos (con capacidad de almacenamiento de 1TB).
 
 ---
+
+> [!NOTE] Cuota de la Galería de Fotos (implementada)
+> La galería de fotos interna (ver [[galeria-fotos]]) añade una cuota de almacenamiento de fotos por plan, ya implementada en el campo `photo_storage_limit_gb` de la tabla `plans`: **Básico 5 GB · Pro 25 GB · Élite 100 GB**.
+
+---
 *Garantía: Todos los planes incluyen una garantía de devolución del dinero de 30 días, pudiendo cancelar en cualquier momento.*
 
 ## Control de Suscripción Automatizado

@@ -61,6 +61,12 @@ return [
         'driver' => env('VIDEO_UPLOAD_DRIVER', 'legacy'),
     ],
 
+    'photos' => [
+        // Disco de Flysystem donde se guardan las fotos de la galería interna.
+        // En producción: 'mega_s4'. En local sin credenciales: 'public'.
+        'disk' => env('PHOTO_UPLOAD_DISK', 'public'),
+    ],
+
     'bunny' => [
         'library_id' => env('BUNNY_LIBRARY_ID'),
         'api_key' => env('BUNNY_API_KEY'),

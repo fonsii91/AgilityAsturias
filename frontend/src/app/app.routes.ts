@@ -315,6 +315,18 @@ export const routes: Routes = [
                 title: titleResolver, data: { pageTitle: '' }
             },
             {
+                path: 'galeria-fotos',
+                loadComponent: () => import('./components/galeria-fotos/photo-list/photo-list.component').then(m => m.PhotoListComponent),
+                canActivate: [memberGuard],
+                title: titleResolver, data: { pageTitle: 'Fotos del Club' }
+            },
+            {
+                path: 'galeria-fotos/subir',
+                loadComponent: () => import('./components/galeria-fotos/upload-photos/upload-photos.component').then(m => m.UploadPhotosComponent),
+                canActivate: [memberGuard],
+                title: titleResolver, data: { pageTitle: 'Subir Fotos' }
+            },
+            {
                 path: 'recursos',
                 loadComponent: () => import('./components/recursos/recursos-list/recursos-list.component').then(m => m.RecursosListComponent),
                 canActivate: [memberGuard],

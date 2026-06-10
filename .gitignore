@@ -51,3 +51,5 @@ deploy_package
 deploy_package.zip
 backend/deploy_package/
 agility_back/deploy_package/
+scratch/
+.claude/

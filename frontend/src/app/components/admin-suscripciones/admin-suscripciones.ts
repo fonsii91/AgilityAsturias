@@ -23,6 +23,7 @@ interface Plan {
   description: string;
   is_active: boolean;
   video_storage_limit_gb?: number;
+  photo_storage_limit_gb?: number;
   features?: Feature[];
   promo_price?: string | null;
   promo_duration_months?: number | null;
@@ -55,6 +56,7 @@ export class AdminSuscripcionesComponent implements OnInit {
     description: '',
     is_active: true,
     video_storage_limit_gb: 10,
+    photo_storage_limit_gb: 5,
     promo_price: null,
     promo_duration_months: null,
     promo_label: 'Oferta Lanzamiento',
@@ -151,6 +153,7 @@ export class AdminSuscripcionesComponent implements OnInit {
         description: plan.description,
         is_active: plan.is_active,
         video_storage_limit_gb: plan.video_storage_limit_gb,
+        photo_storage_limit_gb: plan.photo_storage_limit_gb,
         promo_price: plan.promo_price,
         promo_duration_months: plan.promo_duration_months,
         promo_label: plan.promo_label,
@@ -182,6 +185,7 @@ export class AdminSuscripcionesComponent implements OnInit {
         description: plan.description,
         is_active: plan.is_active,
         video_storage_limit_gb: plan.video_storage_limit_gb,
+        photo_storage_limit_gb: plan.photo_storage_limit_gb,
         promo_price: plan.promo_price,
         promo_duration_months: plan.promo_duration_months,
         promo_label: plan.promo_label,
@@ -205,7 +209,7 @@ export class AdminSuscripcionesComponent implements OnInit {
           this.plans.update(plans => [...plans, created]);
         }
         this.showNewPlanForm.set(false);
-        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10, promo_price: null, promo_duration_months: null, promo_label: 'Oferta Lanzamiento', is_featured: false, marketing_features: '' });
+        this.newPlan.set({ name: '', slug: '', price: '0.00', description: '', is_active: true, video_storage_limit_gb: 10, photo_storage_limit_gb: 5, promo_price: null, promo_duration_months: null, promo_label: 'Oferta Lanzamiento', is_featured: false, marketing_features: '' });
       }
     } catch (error) {
       console.error('Error creating plan', error);

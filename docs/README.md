@@ -21,6 +21,7 @@ Concepto de la aplicación, mapa de características y funcionalidades.
 *   **[[provision-fondos]]**: Especificación de la provisión de fondos de socios (saldo, ingresos, gastos y roles de acceso).
 *   **[[historial-asistencia]]**: Análisis y consulta del histórico y estadísticas de asistencia de miembros (clases y eventos) para el perfil Staff.
 *   **[[gestionar-club]]**: Panel de configuración de identidad visual, marca, contacto y activación de módulos por club.
+*   **[[galeria-fotos]]**: Galería de fotos interna del club con subida en lote, compresión, etiquetado de perros/miembros y almacenamiento en Mega S4 por cuota de plan.
 *   **[[lineas-futuras-roadmap]]**: Futuras líneas de desarrollo (Notificaciones Push, Mapas de pistas, etc.).
 
 ### 💼 02. Negocio
