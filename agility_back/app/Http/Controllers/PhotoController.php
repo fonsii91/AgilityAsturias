@@ -15,7 +15,7 @@ class PhotoController extends Controller
     {
         $query = ClubPhoto::query()->with([
             'user:id,name',
-            'competition:id,nombre,fechaEvento',
+            'competition:id,nombre,fecha_evento',
             'dogs:id,name',
             'taggedUsers:id,name',
         ]);
