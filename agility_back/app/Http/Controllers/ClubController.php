@@ -13,6 +13,7 @@ class ClubController extends Controller
         if (app()->bound('active_club_id')) {
             $club = Club::with('plan.features')->find(app('active_club_id'));
             if ($club) {
+                $bypass = env('BYPASS_SUBSCRIPTIONS', false) || env('STRIPE_BYPASS_SUBSCRIPTIONS', false);
                 return response()->json([
                     'id' => $club->id,
                     'name' => $club->name,
@@ -23,8 +24,8 @@ class ClubController extends Controller
                     'settings_ranking' => $club->settings_ranking,
                     'plan_id' => $club->plan_id,
                     'features' => $club->plan ? $club->plan->features->pluck('slug') : [],
-                    'subscribed' => $club->subscribed('default'),
-                    'stripe_status' => $club->subscription('default') ? $club->subscription('default')->stripe_status : 'inactive',
+                    'subscribed' => $bypass ? true : $club->subscribed('default'),
+                    'stripe_status' => $bypass ? 'active' : ($club->subscription('default') ? $club->subscription('default')->stripe_status : 'inactive'),
                 ]);
             }
         }

@@ -28,6 +28,11 @@ class CheckSubscriptionActive
             return $next($request);
         }
 
+        // Bypass check if subscriptions bypass is enabled via environment
+        if (env('BYPASS_SUBSCRIPTIONS', false) || env('STRIPE_BYPASS_SUBSCRIPTIONS', false)) {
+            return $next($request);
+        }
+
         // Si no hay club o el usuario es admin global, permitir el acceso libre
         if (!$club || ($request->user() && $request->user()->role === 'admin')) {
             return $next($request);

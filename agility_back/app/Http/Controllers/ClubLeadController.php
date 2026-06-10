@@ -143,59 +143,61 @@ class ClubLeadController extends Controller
 
             // Generar sesión de Stripe Checkout para el plan seleccionado
             $stripeCheckoutUrl = null;
-            try {
-                $club = \App\Models\Club::where('slug', $validated['slug'])->first();
-                if ($club) {
-                    $planName = strtolower($validated['plan_selected']);
-                    $planSlug = 'basico';
-                    if (str_contains($planName, 'pro')) {
-                        $planSlug = 'profesional';
-                    } elseif (str_contains($planName, 'elit') || str_contains($planName, 'élite')) {
-                        $planSlug = 'elite';
-                    }
+            if (!(env('BYPASS_SUBSCRIPTIONS', false) || env('STRIPE_BYPASS_SUBSCRIPTIONS', false))) {
+                try {
+                    $club = \App\Models\Club::where('slug', $validated['slug'])->first();
+                    if ($club) {
+                        $planName = strtolower($validated['plan_selected']);
+                        $planSlug = 'basico';
+                        if (str_contains($planName, 'pro')) {
+                            $planSlug = 'profesional';
+                        } elseif (str_contains($planName, 'elit') || str_contains($planName, 'élite')) {
+                            $planSlug = 'elite';
+                        }
 
-                    $priceId = match ($planSlug) {
-                        'basico' => env('STRIPE_PRICE_BASICO'),
-                        'profesional' => env('STRIPE_PRICE_PRO'),
-                        'elite' => env('STRIPE_PRICE_ELITE'),
-                    };
+                        $priceId = match ($planSlug) {
+                            'basico' => env('STRIPE_PRICE_BASICO'),
+                            'profesional' => env('STRIPE_PRICE_PRO'),
+                            'elite' => env('STRIPE_PRICE_ELITE'),
+                        };
 
-                    if ($priceId) {
-                        $subscription = $club->newSubscription('default', $priceId);
-                        if ($planSlug === 'profesional') {
-                            $couponId = env('STRIPE_COUPON_PRO_LAUNCH');
-                            if ($couponId) {
-                                $subscription->withCoupon($couponId);
+                        if ($priceId) {
+                            $subscription = $club->newSubscription('default', $priceId);
+                            if ($planSlug === 'profesional') {
+                                $couponId = env('STRIPE_COUPON_PRO_LAUNCH');
+                                if ($couponId) {
+                                    $subscription->withCoupon($couponId);
+                                }
                             }
+
+                            $scheme = $request->secure() ? 'https' : 'http';
+                            $host = $request->getHost();
+                            
+                            if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
+                                $frontendUrl = env('FRONTEND_URL', 'http://localhost:4200');
+                                $parsedUrl = parse_url($frontendUrl);
+                                $scheme = $parsedUrl['scheme'] ?? 'http';
+                                $hostOnly = $parsedUrl['host'] ?? 'localhost';
+                                $portOnly = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
+                                $returnHost = "{$scheme}://{$hostOnly}{$portOnly}";
+                            } else {
+                                $returnHost = "https://clubagility.com";
+                            }
+
+                            $successUrl = "{$returnHost}/?stripe_success=true&slug={$club->slug}&email=" . urlencode($validated['email']) . "&plan=" . urlencode($validated['plan_selected']) . "&session_id={CHECKOUT_SESSION_ID}";
+                            $cancelUrl = "{$returnHost}/?stripe_cancel=true";
+
+                            $checkoutSession = $subscription->checkout([
+                                'success_url' => $successUrl,
+                                'cancel_url' => $cancelUrl,
+                            ]);
+
+                            $stripeCheckoutUrl = $checkoutSession->url;
                         }
-
-                        $scheme = $request->secure() ? 'https' : 'http';
-                        $host = $request->getHost();
-                        
-                        if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
-                            $frontendUrl = env('FRONTEND_URL', 'http://localhost:4200');
-                            $parsedUrl = parse_url($frontendUrl);
-                            $scheme = $parsedUrl['scheme'] ?? 'http';
-                            $hostOnly = $parsedUrl['host'] ?? 'localhost';
-                            $portOnly = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
-                            $returnHost = "{$scheme}://{$hostOnly}{$portOnly}";
-                        } else {
-                            $returnHost = "https://clubagility.com";
-                        }
-
-                        $successUrl = "{$returnHost}/?stripe_success=true&slug={$club->slug}&email=" . urlencode($validated['email']) . "&plan=" . urlencode($validated['plan_selected']) . "&session_id={CHECKOUT_SESSION_ID}";
-                        $cancelUrl = "{$returnHost}/?stripe_cancel=true";
-
-                        $checkoutSession = $subscription->checkout([
-                            'success_url' => $successUrl,
-                            'cancel_url' => $cancelUrl,
-                        ]);
-
-                        $stripeCheckoutUrl = $checkoutSession->url;
                     }
+                } catch (\Exception $stripeEx) {
+                    \Log::error('Error creando Stripe Checkout en registro de club: ' . $stripeEx->getMessage());
                 }
-            } catch (\Exception $stripeEx) {
-                \Log::error('Error creando Stripe Checkout en registro de club: ' . $stripeEx->getMessage());
             }
 
         } catch (\Exception $e) {

@@ -135,7 +135,8 @@ class BillingController extends Controller
             return response()->json(['message' => 'Club no encontrado.'], 404);
         }
 
-        $subscriptionActive = $club->subscribed('default');
+        $bypass = env('BYPASS_SUBSCRIPTIONS', false) || env('STRIPE_BYPASS_SUBSCRIPTIONS', false);
+        $subscriptionActive = $bypass ? true : $club->subscribed('default');
         $subscription = $club->subscription('default');
         
         $plan = $club->plan;
@@ -144,7 +145,7 @@ class BillingController extends Controller
             'subscribed' => $subscriptionActive,
             'plan_name' => $plan ? $plan->name : 'Ninguno',
             'plan_slug' => $plan ? $plan->slug : null,
-            'stripe_status' => $subscription ? $subscription->stripe_status : 'inactive',
+            'stripe_status' => $bypass ? 'active' : ($subscription ? $subscription->stripe_status : 'inactive'),
             'pm_type' => $club->pm_type,
             'pm_last_four' => $club->pm_last_four,
             'ends_at' => $subscription && $subscription->ends_at ? $subscription->ends_at->toIso8601String() : null,
