@@ -13,7 +13,7 @@ class ClubController extends Controller
         if (app()->bound('active_club_id')) {
             $club = Club::with('plan.features')->find(app('active_club_id'));
             if ($club) {
-                $bypass = env('BYPASS_SUBSCRIPTIONS', false) || env('STRIPE_BYPASS_SUBSCRIPTIONS', false);
+                $bypass = config('services.stripe.bypass_subscriptions');
                 return response()->json([
                     'id' => $club->id,
                     'name' => $club->name,

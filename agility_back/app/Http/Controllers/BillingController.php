@@ -135,7 +135,7 @@ class BillingController extends Controller
             return response()->json(['message' => 'Club no encontrado.'], 404);
         }
 
-        $bypass = env('BYPASS_SUBSCRIPTIONS', false) || env('STRIPE_BYPASS_SUBSCRIPTIONS', false);
+        $bypass = config('services.stripe.bypass_subscriptions');
         $subscriptionActive = $bypass ? true : $club->subscribed('default');
         $subscription = $club->subscription('default');
         

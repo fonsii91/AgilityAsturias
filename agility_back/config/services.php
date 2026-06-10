@@ -73,4 +73,9 @@ return [
         'pull_zone' => env('BUNNY_STREAM_PULL_ZONE'),
     ],
 
+    'stripe' => [
+        'bypass_subscriptions' => env('STRIPE_BYPASS_SUBSCRIPTIONS', false) || env('BYPASS_SUBSCRIPTIONS', false),
+    ],
+
 ];
+

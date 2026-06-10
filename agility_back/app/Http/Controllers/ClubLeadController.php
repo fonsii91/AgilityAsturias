@@ -143,7 +143,7 @@ class ClubLeadController extends Controller
 
             // Generar sesión de Stripe Checkout para el plan seleccionado
             $stripeCheckoutUrl = null;
-            if (!(env('BYPASS_SUBSCRIPTIONS', false) || env('STRIPE_BYPASS_SUBSCRIPTIONS', false))) {
+            if (!config('services.stripe.bypass_subscriptions')) {
                 try {
                     $club = \App\Models\Club::where('slug', $validated['slug'])->first();
                     if ($club) {
