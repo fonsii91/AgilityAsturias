@@ -84,6 +84,7 @@ class ClubLeadController extends Controller
                 ]);
 
                 // Create initial Manager user using user-supplied password
+                // El token de activación se guarda hasheado; 7 días para completar la activación
                 $resetToken = \Illuminate\Support\Str::random(60);
                 $user = \App\Models\User::create([
                     'name' => $validated['name'] . ' Admin',
@@ -91,7 +92,8 @@ class ClubLeadController extends Controller
                     'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
                     'role' => 'manager',
                     'club_id' => $club->id,
-                    'reset_token' => $resetToken,
+                    'reset_token' => hash('sha256', $resetToken),
+                    'reset_token_expires_at' => now()->addDays(7),
                 ]);
 
                 // Attach token to memory instance
@@ -123,7 +125,7 @@ class ClubLeadController extends Controller
             // Send emails (wrapped in try-catch to prevent crash if mail server is not configured)
             try {
                 Mail::to($lead->email)->send(new ClubLeadReceived($lead, $activationLink));
-                Mail::to('fonsii@clubagility.com')->send(new NewClubLeadAdmin($lead));
+                Mail::to(config('mail.admin_address'))->send(new NewClubLeadAdmin($lead));
             } catch (\Exception $mailEx) {
                 \Log::warning('Could not send SaaS subscription notification emails: ' . $mailEx->getMessage());
             }
@@ -155,16 +157,12 @@ class ClubLeadController extends Controller
                             $planSlug = 'elite';
                         }
 
-                        $priceId = match ($planSlug) {
-                            'basico' => env('STRIPE_PRICE_BASICO'),
-                            'profesional' => env('STRIPE_PRICE_PRO'),
-                            'elite' => env('STRIPE_PRICE_ELITE'),
-                        };
+                        $priceId = config("services.stripe.prices.{$planSlug}");
 
                         if ($priceId) {
                             $subscription = $club->newSubscription('default', $priceId);
                             if ($planSlug === 'profesional') {
-                                $couponId = env('STRIPE_COUPON_PRO_LAUNCH');
+                                $couponId = config('services.stripe.coupon_pro_launch');
                                 if ($couponId) {
                                     $subscription->withCoupon($couponId);
                                 }

@@ -48,6 +48,11 @@ export const routes: Routes = [
         title: titleResolver, data: { pageTitle: '' }
     },
     {
+        path: 'forgot-password',
+        loadComponent: () => import('./components/forgot-password/forgot-password').then(m => m.ForgotPasswordComponent),
+        title: titleResolver, data: { pageTitle: '' }
+    },
+    {
         path: 'contacto',
         loadComponent: () => import('./components/contacto/contacto.component').then(m => m.ContactoComponent),
         title: titleResolver, data: { pageTitle: '' }

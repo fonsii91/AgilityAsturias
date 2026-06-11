@@ -104,7 +104,10 @@ Para asegurar la viabilidad comercial y el filtrado de registros inactivos, el o
 2.  **Creación de Cuenta Inactiva:** El backend crea la cuenta del club en la base de datos local y un usuario con rol `manager` (Gestor del club).
 3.  **Redirección a Stripe Checkout:** En lugar de forzar al usuario a entrar al panel para realizar el pago, al hacer clic en **Completar Solicitud** se genera una sesión de Stripe Checkout en el backend ([ClubLeadController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/ClubLeadController.php)) y se redirige al usuario de manera inmediata a la pasarela segura de Stripe.
 4.  **Retorno y Aprovisionamiento Seguro:** Tras realizar el pago con éxito, Stripe redirige al usuario a la landing comercial principal con los parámetros `stripe_success=true` y el `slug` del club. Esto dispara de manera segura la animación del flujo de aprovisionamiento de la base de datos de tenant, configuración de Nginx y generación de certificados SSL mediante Let's Encrypt.
-5.  **Confirmación y Activación:** Una vez completado el pago, el backend recibe el webhook `checkout.session.completed` de Stripe y activa la suscripción en la base de datos. El club queda disponible para su uso de forma inmediata.
+5.  **Confirmación y Activación:** Una vez completado el pago, Stripe emite los webhooks del ciclo de vida de la suscripción. El `WebhookController` de Laravel Cashier procesa el evento **`customer.subscription.created`** (Cashier *no* maneja `checkout.session.completed`) y crea el registro de la suscripción en la base de datos local con estado `active`. El club queda disponible para su uso de forma inmediata.
+
+> [!NOTE]
+> Este flujo tiene un problema conocido de **clubes huérfanos** (el club se crea antes del pago) y está decidido rediseñarlo para aprovisionar solo tras confirmar el pago. Ver la **Sección 10** antes de tocar nada del onboarding.
 
 ---
 
@@ -115,6 +118,24 @@ La aplicación ofrece tres planes de suscripción. El **Plan Pro** incluye un de
 *   **Plan Básico:** 29 € / mes (Precio Stripe: `STRIPE_PRICE_BASICO`).
 *   **Plan Pro (Recomendado):** 49 € / mes (Precio Stripe: `STRIPE_PRICE_PRO` con el cupón `STRIPE_COUPON_PRO_LAUNCH`, que rebaja la cuota a **19 € / mes durante los primeros 2 meses**).
 *   **Plan Élite:** 79 € / mes (Precio Stripe: `STRIPE_PRICE_ELITE`).
+
+### Configuración de Precios y Cupones (config() obligatorio, nunca env())
+
+> [!IMPORTANT]
+> **Nunca leer variables de Stripe con `env()` en runtime.** En producción la configuración está cacheada (`php artisan config:cache`) y `env()` devuelve `null`, rompiendo el checkout en silencio (este bug ya ocurrió con el flag de bypass y con los Price IDs). Todas las claves de Stripe se exponen a través de `config/services.php` y se leen con `config()`:
+
+```php
+// config/services.php
+'stripe' => [
+    'bypass_subscriptions' => env('STRIPE_BYPASS_SUBSCRIPTIONS', false) || env('BYPASS_SUBSCRIPTIONS', false),
+    'prices' => [
+        'basico' => env('STRIPE_PRICE_BASICO'),
+        'profesional' => env('STRIPE_PRICE_PRO'),
+        'elite' => env('STRIPE_PRICE_ELITE'),
+    ],
+    'coupon_pro_launch' => env('STRIPE_COUPON_PRO_LAUNCH'),
+],
+```
 
 ### Lógica del Checkout en Backend (`POST /api/billing/checkout`):
 
@@ -135,16 +156,12 @@ public function checkout(Request $request)
     ]);
 
     $planSlug = $validated['plan_slug'];
-    $priceId = match ($planSlug) {
-        'basico' => env('STRIPE_PRICE_BASICO'),
-        'profesional' => env('STRIPE_PRICE_PRO'),
-        'elite' => env('STRIPE_PRICE_ELITE'),
-    };
+    $priceId = config("services.stripe.prices.{$planSlug}");
 
     $subscription = $club->newSubscription('default', $priceId);
 
     if ($planSlug === 'profesional') {
-        $couponId = env('STRIPE_COUPON_PRO_LAUNCH');
+        $couponId = config('services.stripe.coupon_pro_launch');
         if ($couponId) {
             $subscription->withCoupon($couponId);
         }
@@ -176,7 +193,10 @@ La gestión de tarjetas, cambios de plan y descargas de facturas se delega al **
     > [!IMPORTANT]
     > **Resolución de Errores de Invoices (500 Error):**
     > Anteriormente, el formateo del total de la factura realizaba operaciones matemáticas sobre un string con formato de moneda, lo cual fallaba. Ahora se retorna `$invoice->total()` directamente de Laravel Cashier para evitar errores de parseo de moneda en el backend.
-*   **Descarga de Facturas:** Para descargar una factura, el frontend abre en una pestaña nueva la dirección del endpoint `/api/billing/invoices/{invoice}/download`.
+*   **Descarga de Facturas:** El frontend descarga el PDF mediante `HttpClient` (`responseType: 'blob'`) contra el endpoint `/api/billing/invoices/{invoice}/download` y dispara la descarga local con un enlace temporal (`URL.createObjectURL`).
+    > [!IMPORTANT]
+    > **Por qué la descarga se hace vía HttpClient y no con `window.open`:**
+    > La autenticación del frontend es por token Bearer (interceptor de Angular), no por cookie de sesión. Abrir el endpoint en una pestaña nueva no envía el header `Authorization` y `auth:sanctum` responde 401. Además, la URL absoluta que generaba el backend con `route()` no incluía el prefijo `/backend` del proxy Nginx de producción. Por ambos motivos, el frontend construye la URL a partir de `environment.apiUrl` y descarga el blob con el interceptor de autenticación.
     > [!IMPORTANT]
     > **Firma del Endpoint de Descarga:**
     > La firma del método en [BillingController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/BillingController.php#L190) se simplificó a `downloadInvoice(Request $request, $invoice)` para asegurar que el parámetro coincida de manera exacta con el marcador `{invoice}` de la ruta `/api/billing/invoices/{invoice}/download` definida en `api.php`. Esto evita errores de inyección y de coincidencia de parámetros en Laravel.
@@ -204,6 +224,16 @@ class CheckSubscriptionActive
         $club = app()->bound('active_club_id') ? Club::find(app('active_club_id')) : null;
         if (!$club && $request->user()) {
             $club = $request->user()->club;
+        }
+
+        // Bypass en entorno de testing (salvo que el test pida la comprobación explícitamente)
+        if (app()->environment('testing') && !$request->hasHeader('X-Test-Check-Subscription')) {
+            return $next($request);
+        }
+
+        // Bypass global de suscripciones (ver sección "Bypass temporal" más abajo)
+        if (config('services.stripe.bypass_subscriptions')) {
+            return $next($request);
         }
 
         // Si no hay club (consola/seeder) o el usuario es admin global, permitir libre acceso
@@ -240,6 +270,17 @@ class CheckSubscriptionActive
 }
 ```
 
+### Bypass temporal de suscripciones (`STRIPE_BYPASS_SUBSCRIPTIONS`)
+
+Existe un interruptor de emergencia para desactivar globalmente el control de suscripciones, leído desde `config('services.stripe.bypass_subscriptions')` (variables `STRIPE_BYPASS_SUBSCRIPTIONS` o `BYPASS_SUBSCRIPTIONS` en `.env`). Mientras está activo:
+
+*   El middleware `CheckSubscriptionActive` deja pasar **todas** las peticiones sin comprobar la suscripción.
+*   El endpoint `GET /api/billing/status` reporta `subscribed: true` y `stripe_status: active` aunque no exista suscripción real.
+*   **El registro de clubes nuevos (`join-saas`) se salta por completo el Checkout de Stripe**: el club se aprovisiona sin cliente ni suscripción en Stripe. Al desactivar el bypass, esos clubes quedarán bloqueados y su gestor deberá completar el pago desde Configuración > Facturación.
+
+> [!WARNING]
+> Este bypass es una medida **temporal** para evitar bloqueos en producción. Mientras esté activo no se factura a ningún club. Recordar desactivarlo (`STRIPE_BYPASS_SUBSCRIPTIONS=false` + `php artisan config:cache`) en cuanto se estabilice el flujo de pagos.
+
 ---
 
 ## 7. Sincronización y Pruebas con Webhooks de Stripe
@@ -247,6 +288,9 @@ class CheckSubscriptionActive
 Los webhooks permiten recibir notificaciones de eventos ocurridos en Stripe para actualizar la base de datos de forma asíncrona.
 
 *   **Ruta local del Webhook:** `/api/webhooks/stripe`.
+*   **Ruta del Webhook en producción:** `https://clubagility.com/backend/api/webhooks/stripe` — Nginx proxifica la API bajo el prefijo `/backend`, así que al dar de alta el endpoint en el Dashboard de Stripe hay que incluirlo (la URL sin `/backend` devuelve un 405 de Nginx).
+    > [!WARNING]
+    > **Estado actual de producción (comprobado el 2026-06-11):** el `.env` de producción solo define `STRIPE_BYPASS_SUBSCRIPTIONS`; faltan `STRIPE_KEY`, `STRIPE_SECRET`, `STRIPE_WEBHOOK_SECRET` y los `STRIPE_PRICE_*`. El endpoint del webhook acepta hoy peticiones sin firmar (verificado: un POST falso devuelve HTTP 200). Antes de desactivar el bypass: definir todas las variables, dar de alta el endpoint en el Dashboard de Stripe, copiar su `whsec_...` y ejecutar `php artisan config:cache` (la config está cacheada en el servidor).
 *   **Pruebas en Entorno Local (Laravel Herd):** Como Herd sirve la aplicación en puerto 80 a través de Nginx (`http://agility_back.test`), la herramienta Stripe CLI debe configurarse para redirigir los eventos a ese dominio virtual y no al puerto por defecto 8000.
     > [!IMPORTANT]
     > **Prefijo HTTP Obligatorio:**
@@ -255,6 +299,8 @@ Los webhooks permiten recibir notificaciones de eventos ocurridos en Stripe para
     > stripe listen --forward-to http://agility_back.test/api/webhooks/stripe
     > ```
 *   **Firma del Secreto:** El valor de `STRIPE_WEBHOOK_SECRET` impreso al iniciar `stripe listen` (con formato `whsec_...`) debe copiarse fielmente al archivo `.env` del backend para validar y procesar las firmas de los webhooks entrantes.
+    > [!WARNING]
+    > **La verificación de firma es opcional para Cashier:** si `STRIPE_WEBHOOK_SECRET` no está definido, el `WebhookController` de Cashier **acepta los webhooks sin verificar la firma**, lo que permitiría falsificar eventos de suscripción. Es imprescindible que esta variable esté definida en producción (con el secreto del endpoint configurado en el Dashboard de Stripe, no el de `stripe listen`).
 
 ---
 
@@ -306,7 +352,7 @@ $club->subscriptions()->create([
     'type' => 'default',
     'stripe_id' => 'sub_mock_' . uniqid(),
     'stripe_status' => 'active',
-    'stripe_price' => env('STRIPE_PRICE_PRO'),
+    'stripe_price' => config('services.stripe.prices.profesional'),
     'quantity' => 1,
 ]);
 ```
@@ -314,3 +360,36 @@ Esto creará un registro de suscripción ficticio de estado `active` asociado al
 
 ### P: Tengo errores del tipo "NG0203: toObservable() can only be used within an injection context..." al navegar por las páginas.
 **R:** Este error ocurre en Angular cuando intentas utilizar la reactividad de señales a observables (`toObservable`) después de realizar operaciones asíncronas (`await`). Asegúrate de que los guards de tu ruta sigan el patrón de inyección síncrona del `Injector` al inicio del guard y lo pasen explícitamente como opción al observable, tal y como se detalla en la **Sección 8.A** de este documento.
+
+---
+
+## 10. Clubes Huérfanos y Rediseño Pendiente del Aprovisionamiento
+
+### 🚨 REGLA CRÍTICA: NUNCA borrar los clubes existentes
+
+> [!DANGER]
+> **Los clubes que ya están en producción son los primeros y más importantes clientes de la plataforma y llevan meses almacenando datos.** A fecha 2026-06-11 son (id / slug / alta): `1 agilityasturias` (24-abr), `2 patitas` (24-abr), `3 xanastur` (5-may), `4 leonidogs` (5-may), `5 elnorte` (7-may) y `24 miperro10` (31-may).
+>
+> Reglas inquebrantables para cualquier desarrollo futuro relacionado con suscripciones o limpieza de datos:
+>
+> 1. **"No tener suscripción ni `stripe_id` NUNCA es criterio de borrado.** Todos los clubes existentes se crearon antes de la integración de Stripe (o bajo el bypass) y por tanto no tienen ni cliente de Stripe ni suscripción local. Un job que borre "clubes sin suscripción" los destruiría todos.
+> 2. **Prohibido implementar jobs/comandos de limpieza automática que ejecuten `Club::delete()`.** Cualquier limpieza de clubes huérfanos debe ser manual, club por club, revisada por una persona.
+> 3. **`Club::delete()` es devastador y irreversible:** el hook `booted()` de [Club.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/Club.php) borra en cascada todos los vídeos, fotos, perros y usuarios del club, **incluyendo los archivos remotos en Bunny.net y Mega S4**. No hay papelera ni soft-delete.
+> 4. **Antes de cualquier operación masiva sobre la tabla `clubs`, hacer backup** (ver [[backups-locales]]) y probar primero en local.
+
+### El problema de los clubes huérfanos
+
+En el flujo actual de registro ([ClubLeadController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/ClubLeadController.php)), el club, el usuario `manager`, el email de activación y el certificado SSL se generan **antes** de que el usuario pague. Si el checkout de Stripe se abandona:
+
+*   El **slug queda secuestrado** (`unique:clubs,slug`) y el **email bloqueado** (`unique:users,email`): la misma persona no puede reintentar el registro desde el formulario.
+*   Se acumulan **certificados SSL de clubes fantasma** (Let's Encrypt limita ~50 certificados nuevos por dominio y semana, así que una ráfaga de registros abandonados puede impedir altas legítimas).
+*   No existe ningún proceso de limpieza (y por la regla crítica de arriba, **no debe automatizarse**).
+
+### Decisión de diseño (2026-06-11): aprovisionar solo tras el pago
+
+Está decidido (pendiente de implementar) rediseñar el onboarding para que **el formulario `join-saas` solo cree el `ClubLead`**, y el aprovisionamiento real (club, usuario manager, settings, SSL) ocurra **al confirmarse el pago** vía webhook de Stripe. Implicaciones a resolver cuando se implemente:
+
+*   El checkout de Stripe debe crearse a partir del lead (sin `Club` billable aún), p. ej. con un Checkout de Stripe directo y metadatos del lead, aprovisionando el club en un listener del evento `WebhookReceived` de Cashier.
+*   La animación de aprovisionamiento de la landing (parámetro `stripe_success=true`) hoy asume que el club ya existe al volver de Stripe; deberá esperar/poll al aprovisionamiento real (ya existe el endpoint de comprobación de SSL como referencia).
+*   El email de activación con el token de reset debe enviarse tras el pago, no al rellenar el formulario.
+*   La migración del flujo **no debe tocar los clubes existentes** (ver regla crítica): solo afecta a registros nuevos.

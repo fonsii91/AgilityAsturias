@@ -79,10 +79,12 @@ class PasswordResetTest extends TestCase
 
     public function test_allows_a_user_to_reset_their_password_with_a_valid_token()
     {
+        // El token se guarda hasheado en BD; el enlace lleva el token en claro
         $token = Str::random(60);
         $user = $this->createUser([
             'password' => Hash::make('old_password'),
-            'reset_token' => $token,
+            'reset_token' => hash('sha256', $token),
+            'reset_token_expires_at' => now()->addMinutes(60),
         ]);
 
         $response = $this->postJson("/api/reset-password", [

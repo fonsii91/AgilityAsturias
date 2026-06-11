@@ -259,6 +259,10 @@ export class AuthService {
         return firstValueFrom(this.http.post<{ message: string }>(`${this.apiUrl}/reset-password`, data));
     }
 
+    forgotPassword(email: string): Promise<{ message: string }> {
+        return firstValueFrom(this.http.post<{ message: string }>(`${this.apiUrl}/forgot-password`, { email }));
+    }
+
     // Deprecated alias, kept for compatibility if needed, but redirected to new method
     async updateDisplayName(name: string): Promise<void> {
         return this.updateProfile(name);

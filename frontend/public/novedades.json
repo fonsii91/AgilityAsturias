@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.1.53",
+    "date": "2026-06-11",
+    "features": [
+      "¡Recupera tu contraseña tú mismo! Si alguna vez olvidas tu contraseña, ya no necesitas contactar con los responsables de tu club: ahora encontrarás el enlace '¿Has olvidado tu contraseña?' en la pantalla de inicio de sesión. Escribe tu correo electrónico y te enviaremos al instante un enlace seguro para elegir una contraseña nueva.",
+      "¡Enlaces de recuperación más seguros! Los enlaces para restablecer la contraseña ahora caducan automáticamente pasado un tiempo prudencial y solo pueden usarse una vez, protegiendo mejor tu cuenta frente a accesos no deseados."
+    ],
+    "bugfixes": [
+      "¡Descarga de facturas reparada! Solucionamos un problema que impedía a los responsables del club descargar los recibos de pago en PDF desde la sección de Facturación. Ahora la descarga funciona correctamente con un solo clic."
+    ]
+  },
+  {
     "version": "1.1.52",
     "date": "2026-06-10",
     "features": [

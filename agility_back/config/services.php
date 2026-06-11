@@ -75,6 +75,14 @@ return [
 
     'stripe' => [
         'bypass_subscriptions' => env('STRIPE_BYPASS_SUBSCRIPTIONS', false) || env('BYPASS_SUBSCRIPTIONS', false),
+        // Los precios y cupones deben leerse siempre vía config() y nunca con env()
+        // en runtime: con la config cacheada (php artisan config:cache) env() devuelve null.
+        'prices' => [
+            'basico' => env('STRIPE_PRICE_BASICO'),
+            'profesional' => env('STRIPE_PRICE_PRO'),
+            'elite' => env('STRIPE_PRICE_ELITE'),
+        ],
+        'coupon_pro_launch' => env('STRIPE_COUPON_PRO_LAUNCH'),
     ],
 
 ];

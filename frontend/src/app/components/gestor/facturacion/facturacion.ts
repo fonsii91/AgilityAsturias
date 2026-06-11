@@ -21,7 +21,6 @@ interface Invoice {
   id: string;
   date: string;
   total: string;
-  download_url: string;
 }
 
 interface Feature {
@@ -138,8 +137,28 @@ export class FacturacionComponent implements OnInit {
     }
   }
 
-  downloadInvoice(invoice: Invoice) {
-    window.open(invoice.download_url, '_blank');
+  async downloadInvoice(invoice: Invoice) {
+    // Descarga vía HttpClient para que el interceptor adjunte el token Bearer
+    // (abrir la URL en una pestaña nueva devolvía 401 al no viajar el header).
+    try {
+      const blob = await this.http
+        .get(`${this.apiUrl}/invoices/${invoice.id}/download`, { responseType: 'blob' })
+        .toPromise();
+
+      if (!blob) {
+        throw new Error('Respuesta vacía');
+      }
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `factura-${invoice.date}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error descargando la factura', error);
+      alert('No se pudo descargar la factura. Inténtalo de nuevo.');
+    }
   }
 
   getTranslateStatus(status: string): string {

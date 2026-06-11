@@ -35,13 +35,9 @@ class BillingController extends Controller
         ]);
 
         $planSlug = $validated['plan_slug'];
-        
-        // Determinar el Price ID de Stripe según la configuración del .env
-        $priceId = match ($planSlug) {
-            'basico' => env('STRIPE_PRICE_BASICO'),
-            'profesional' => env('STRIPE_PRICE_PRO'),
-            'elite' => env('STRIPE_PRICE_ELITE'),
-        };
+
+        // Determinar el Price ID de Stripe (vía config() para soportar config:cache)
+        $priceId = config("services.stripe.prices.{$planSlug}");
 
         if (!$priceId) {
             return response()->json(['message' => 'El plan seleccionado no está configurado en la pasarela de Stripe.'], 500);
@@ -53,7 +49,7 @@ class BillingController extends Controller
 
             // Si es el Plan Pro (profesional), aplicamos la oferta de lanzamiento de Stripe
             if ($planSlug === 'profesional') {
-                $couponId = env('STRIPE_COUPON_PRO_LAUNCH');
+                $couponId = config('services.stripe.coupon_pro_launch');
                 if ($couponId) {
                     $subscription->withCoupon($couponId);
                 }
@@ -169,12 +165,11 @@ class BillingController extends Controller
         }
 
         try {
-            $invoices = $club->invoices()->map(function ($invoice) use ($club) {
+            $invoices = $club->invoices()->map(function ($invoice) {
                 return [
                     'id' => $invoice->id,
                     'date' => $invoice->date()->toDateString(),
                     'total' => $invoice->total(),
-                    'download_url' => route('billing.invoice-download', ['invoice' => $invoice->id]),
                 ];
             });
 

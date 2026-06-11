@@ -1,1 +1,0 @@
- = App\Models\Club::where('slug', 'club22')-; -, 'pm_last_four' =; -, 'stripe_id' = . uniqid(), 'stripe_status' =, 'stripe_price' =, 'quantity' =; echo 'Suscripcion activada'; 

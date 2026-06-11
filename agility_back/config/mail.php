@@ -18,6 +18,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin Notification Address
+    |--------------------------------------------------------------------------
+    |
+    | Buzón real que recibe los avisos operativos de la plataforma (nuevos
+    | clubes registrados, etc.). No usar direcciones @clubagility.com salvo
+    | que el dominio tenga MX y buzón configurados.
+    |
+    */
+
+    'admin_address' => env('MAIL_ADMIN_ADDRESS', 'fonsii91op@gmail.com'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Mailer Configurations
     |--------------------------------------------------------------------------
     |

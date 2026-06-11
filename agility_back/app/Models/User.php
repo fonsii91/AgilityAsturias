@@ -31,6 +31,7 @@ class User extends Authenticatable implements FilamentUser
         'google_id',
         'points',
         'reset_token',
+        'reset_token_expires_at',
         'rfec_license',
         'rfec_expiration_date',
         'rfec_category',
@@ -48,6 +49,7 @@ class User extends Authenticatable implements FilamentUser
         'password',
         'remember_token',
         'reset_token',
+        'reset_token_expires_at',
     ];
 
     /**
@@ -59,6 +61,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return [
             'email_verified_at' => 'datetime',
+            'reset_token_expires_at' => 'datetime',
             'password' => 'hashed',
             'rfec_license' => \App\Casts\GracefulEncryption::class,
             'rfec_expiration_date' => \App\Casts\GracefulEncryption::class,

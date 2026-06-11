@@ -76,3 +76,18 @@ Es el perfil técnico de soporte de la plataforma SaaS (desarrolladores y admini
     *   **CRUD de Clubes:** Dar de alta nuevos clubes, configurar bases de datos asociadas y asignar planes de precios SaaS (ver [[planes-suscripcion-saas]]).
     *   **Control de Scrapers:** Monitorizar en vivo el scraper de Playwright para FlowAgility (`AdminScraperMonitorComponent`), revisar trazas de error y forzar re-intentos de sincronización (ver [[integracion-flowagility]]).
     *   **Soporte Técnico:** Resolver incidencias de facturación y fallos de subida a servidores de almacenamiento como YouTube.
+
+---
+
+## 🔐 Autenticación y Recuperación de Contraseñas
+
+La plataforma autentica con tokens Bearer de Laravel Sanctum (login por email/contraseña en el subdominio de cada club). Para la recuperación de contraseñas existen **dos vías complementarias** (rediseñadas el 2026-06-11):
+
+1.  **Self-service ("¿Has olvidado tu contraseña?"):** Enlace en la pantalla de login que lleva a `/forgot-password`. El usuario introduce su email y el backend (`POST /api/forgot-password`, con rate-limiting de 5 peticiones/minuto) envía un correo vía Resend con el enlace de restablecimiento. La respuesta es **siempre neutra** («Si el correo está registrado...») para no revelar qué emails existen en la plataforma.
+2.  **Enlace manual del gestor:** El Staff/Gestor puede generar un enlace de recuperación para un socio desde la gestión de usuarios (útil a pie de pista con socios poco digitales) y hacérselo llegar por cualquier canal.
+
+**Seguridad de los tokens:**
+*   En base de datos solo se guarda el **hash SHA-256** del token; el token en claro únicamente viaja en el enlace. Una fuga de la BD no expone enlaces válidos.
+*   Los tokens **caducan**: 60 minutos (self-service), 24 horas (enlace de gestor) y 7 días (activación inicial de club tras el registro SaaS).
+*   Son de **un solo uso**: se invalidan al consumirse.
+*   Cobertura de pruebas en `tests/Feature/PasswordRecoveryTest.php` y `PasswordResetTest.php`.

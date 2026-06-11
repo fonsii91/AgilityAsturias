@@ -36,6 +36,7 @@ description: Datos para desplegar en producción el proyecto
   * * * * * cd /var/www/agilityasturias/agility_back && /usr/bin/php artisan schedule:run >> /dev/null 2>&1
   ```
   Esta crontab sustituye cualquier endpoint HTTP de scheduler. La subida diaria de videos a YouTube, el autocalibrado de cargas y los backups se definen en `agility_back/routes/console.php`.
+- **[Completado 2026-06-11]** Fase 10: Configurado el correo transaccional de producción con **Resend** vía SMTP (`smtp.resend.com:465`). Dominio `clubagility.com` verificado (DKIM/SPF/MX en Hostinger), variables `MAIL_*` y `RESEND_API_KEY` añadidas al `.env` del backend (backup en `.env.bak-20260611`) y remitente `no-reply@clubagility.com`. Los avisos de administración se envían a la dirección definida en `MAIL_ADMIN_ADDRESS`. Nota: el dominio no tiene MX en el ápex, no se puede recibir correo en `@clubagility.com`.
 - El servidor está activo y accesible por SSH como root utilizando certificados SSH.
 
 ---

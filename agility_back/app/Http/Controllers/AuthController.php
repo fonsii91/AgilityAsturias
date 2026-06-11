@@ -466,20 +466,63 @@ class AuthController extends Controller
             }
         }
 
+        // El token viaja en claro en el enlace pero se guarda hasheado en BD.
+        // Caducidad de 24h: el gestor puede tardar en hacérselo llegar al socio.
         $token = \Illuminate\Support\Str::random(60);
-        $targetUser->reset_token = $token;
+        $targetUser->reset_token = hash('sha256', $token);
+        $targetUser->reset_token_expires_at = now()->addHours(24);
         $targetUser->save();
 
         // Usar el Origin de la petición para soportar subdominios multi-tenant automáticamente
         $origin = $request->header('origin');
         $frontendUrl = $origin ? $origin : env('FRONTEND_URL', 'https://clubagility.com');
-        
+
         $resetLink = rtrim($frontendUrl, '/') . '/reset-password?token=' . $token;
 
         return response()->json([
-            'message' => 'Enlace de recuperación generado',
+            'message' => 'Enlace de recuperación generado (caduca en 24 horas)',
             'link' => $resetLink
         ]);
+    }
+
+    /**
+     * Self-service "olvidé mi contraseña": envía un enlace de reset por correo.
+     * Respuesta siempre neutra para no revelar qué emails están registrados.
+     */
+    public function forgotPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ], [
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.email' => 'Introduce un correo electrónico válido.',
+        ]);
+
+        $neutralResponse = response()->json([
+            'message' => 'Si el correo está registrado, te hemos enviado un enlace para restablecer tu contraseña. Revisa también la carpeta de spam.'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return $neutralResponse;
+        }
+
+        $token = \Illuminate\Support\Str::random(64);
+        $user->reset_token = hash('sha256', $token);
+        $user->reset_token_expires_at = now()->addMinutes(60);
+        $user->save();
+
+        $origin = $request->header('origin');
+        $frontendUrl = $origin ? $origin : env('FRONTEND_URL', 'https://clubagility.com');
+        $resetLink = rtrim($frontendUrl, '/') . '/reset-password?token=' . $token;
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($user->email)->send(new \App\Mail\PasswordResetMail($user, $resetLink));
+        } catch (\Exception $e) {
+            \Log::error('Error enviando correo de recuperación de contraseña: ' . $e->getMessage());
+        }
+
+        return $neutralResponse;
     }
 
     public function generateInviteLink(Request $request)
@@ -517,14 +560,20 @@ class AuthController extends Controller
                 'password.confirmed' => 'Las contraseñas no coinciden.',
             ]);
 
-            $user = User::where('reset_token', $request->token)->first();
+            // Los tokens se almacenan hasheados en BD; el enlace lleva el token en claro
+            $user = User::where('reset_token', hash('sha256', $request->token))->first();
 
             if (!$user) {
                 return response()->json(['message' => 'El enlace de recuperación es inválido o ya ha sido utilizado.'], 400);
             }
 
+            if ($user->reset_token_expires_at && $user->reset_token_expires_at->isPast()) {
+                return response()->json(['message' => 'El enlace de recuperación ha caducado. Solicita uno nuevo.'], 400);
+            }
+
             $user->password = Hash::make($request->password);
             $user->reset_token = null; // Invalidate the token
+            $user->reset_token_expires_at = null;
             $user->save();
 
             return response()->json([
