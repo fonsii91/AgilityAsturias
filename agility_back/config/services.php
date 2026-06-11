@@ -73,6 +73,9 @@ return [
         'pull_zone' => env('BUNNY_STREAM_PULL_ZONE'),
     ],
 
+    // URL del frontend en desarrollo local (en producción los subdominios cuelgan de clubagility.com)
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:4200'),
+
     'stripe' => [
         'bypass_subscriptions' => env('STRIPE_BYPASS_SUBSCRIPTIONS', false) || env('BYPASS_SUBSCRIPTIONS', false),
         // Los precios y cupones deben leerse siempre vía config() y nunca con env()

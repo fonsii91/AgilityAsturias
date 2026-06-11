@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClubLead;
+use App\Services\ClubProvisioningService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use App\Mail\ClubLeadReceived;
-use App\Mail\NewClubLeadAdmin;
+use Illuminate\Support\Facades\Hash;
+use Laravel\Cashier\Cashier;
 
 class ClubLeadController extends Controller
 {
@@ -15,7 +15,7 @@ class ClubLeadController extends Controller
         return response()->json(ClubLead::orderBy('created_at', 'desc')->get());
     }
 
-    public function store(Request $request)
+    public function store(Request $request, ClubProvisioningService $provisioner)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -30,187 +30,103 @@ class ClubLeadController extends Controller
             'phone.regex' => 'Introduce un número de teléfono válido (solo números, espacios o guiones, opcionalmente comenzando con +).',
         ]);
 
+        // La contraseña se guarda hasheada en el lead y se copia al usuario manager al aprovisionar
+        $lead = ClubLead::create([
+            'name' => $validated['name'],
+            'slug' => $validated['slug'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+            'plan_selected' => $validated['plan_selected'],
+            'password' => Hash::make($validated['password']),
+            'status' => 'pending',
+        ]);
+
+        // Con el bypass de suscripciones activo no hay pago: aprovisionar inmediatamente
+        if (config('services.stripe.bypass_subscriptions')) {
+            try {
+                $provisioner->provision($lead);
+            } catch (\Exception $e) {
+                \Log::error('Error during club auto-provisioning: ' . $e->getMessage());
+                \Log::error($e->getTraceAsString());
+                return response()->json([
+                    'message' => 'Ocurrió un error al aprovisionar automáticamente tu club. Por favor contacta con soporte.',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
+
+            return response()->json([
+                'message' => 'Club aprovisionado correctamente.',
+                'lead' => $lead->fresh(),
+                'stripe_checkout_url' => null
+            ], 201);
+        }
+
+        // Flujo normal: el club NO se crea aún. Se genera la sesión de Stripe Checkout
+        // con el lead en los metadatos y el aprovisionamiento ocurre al confirmarse el
+        // pago (webhook checkout.session.completed -> StripeEventListener).
+        $planSlug = $provisioner->resolvePlanSlug($validated['plan_selected']);
+        $priceId = config("services.stripe.prices.{$planSlug}");
+
+        if (!$priceId) {
+            \Log::error("Registro de club sin Price ID configurado para el plan '{$planSlug}' (lead {$lead->id}).");
+            return response()->json([
+                'message' => 'El plan seleccionado no está configurado en la pasarela de pagos. Por favor contacta con soporte.',
+            ], 500);
+        }
+
         try {
-            $lead = \Illuminate\Support\Facades\DB::transaction(function () use ($validated) {
-                $validated['status'] = 'approved';
-                $lead = ClubLead::create($validated);
-
-                // Map subscription plan name to standard slug
-                $planName = strtolower($validated['plan_selected']);
-                $planSlug = 'basico';
-                if (str_contains($planName, 'pro')) {
-                    $planSlug = 'profesional';
-                } elseif (str_contains($planName, 'elit') || str_contains($planName, 'élite')) {
-                    $planSlug = 'elite';
-                }
-
-                $plan = \App\Models\Plan::where('slug', $planSlug)->first() ?: \App\Models\Plan::first();
-
-                // Setup default tenant settings
-                $settings = [
-                    'slogan' => 'Gestiona tu club de Agility con profesionalidad',
-                    'colors' => [
-                        'primary' => '#0073CF',
-                        'accent' => '#E65100',
-                    ],
-                    'homeConfig' => [
-                        'heroImage' => '/Images/Salud/collie-cansancio-1.png',
-                        'ctaImage' => '/Images/Salud/collie-salto-alto.png',
-                    ],
-                    'customizationRequest' => '',
-                    'landing_page_requested' => false,
-                    'gamification_enabled' => in_array($planSlug, ['profesional', 'elite']),
-                    'provision_fondos_enabled' => in_array($planSlug, ['profesional', 'elite']),
-                    'sponsors_enabled' => ($planSlug === 'elite'),
-                    'contact' => [
-                        'phone' => $validated['phone'] ?? '',
-                        'email' => $validated['email'] ?? '',
-                        'addressLine1' => '',
-                        'addressLine2' => '',
-                        'mapUrl' => '',
-                    ],
-                    'social' => [
-                        'instagram' => '',
-                        'facebook' => '',
-                    ]
-                ];
-
-                // Create the Club
-                $club = \App\Models\Club::create([
-                    'name' => $validated['name'],
-                    'slug' => $validated['slug'],
-                    'plan_id' => $plan ? $plan->id : null,
-                    'settings' => $settings,
-                ]);
-
-                // Create initial Manager user using user-supplied password
-                // El token de activación se guarda hasheado; 7 días para completar la activación
-                $resetToken = \Illuminate\Support\Str::random(60);
-                $user = \App\Models\User::create([
-                    'name' => $validated['name'] . ' Admin',
-                    'email' => $validated['email'],
-                    'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
-                    'role' => 'manager',
-                    'club_id' => $club->id,
-                    'reset_token' => hash('sha256', $resetToken),
-                    'reset_token_expires_at' => now()->addDays(7),
-                ]);
-
-                // Attach token to memory instance
-                $lead->activation_token = $resetToken;
-
-                return $lead;
-            });
-
-            // Compute activation link dynamically
-            $resetToken = $lead->activation_token;
+            $scheme = $request->secure() ? 'https' : 'http';
             $host = $request->getHost();
-            
+
             if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
-                $frontendUrl = env('FRONTEND_URL', 'http://localhost:4200');
-                $parsedUrl = parse_url($frontendUrl);
+                $parsedUrl = parse_url(config('services.frontend_url'));
                 $scheme = $parsedUrl['scheme'] ?? 'http';
                 $hostOnly = $parsedUrl['host'] ?? 'localhost';
                 $portOnly = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
-                
-                if ($hostOnly === 'localhost') {
-                    $activationLink = "{$scheme}://{$validated['slug']}.localhost{$portOnly}/reset-password?token={$resetToken}";
-                } else {
-                    $activationLink = "{$scheme}://{$validated['slug']}.{$hostOnly}{$portOnly}/reset-password?token={$resetToken}";
-                }
+                $returnHost = "{$scheme}://{$hostOnly}{$portOnly}";
             } else {
-                $activationLink = "https://{$validated['slug']}.clubagility.com/reset-password?token={$resetToken}";
+                $returnHost = "https://clubagility.com";
             }
 
-            // Send emails (wrapped in try-catch to prevent crash if mail server is not configured)
-            try {
-                Mail::to($lead->email)->send(new ClubLeadReceived($lead, $activationLink));
-                Mail::to(config('mail.admin_address'))->send(new NewClubLeadAdmin($lead));
-            } catch (\Exception $mailEx) {
-                \Log::warning('Could not send SaaS subscription notification emails: ' . $mailEx->getMessage());
-            }
+            $successUrl = "{$returnHost}/?stripe_success=true&slug={$validated['slug']}&email=" . urlencode($validated['email']) . "&plan=" . urlencode($validated['plan_selected']) . "&session_id={CHECKOUT_SESSION_ID}";
+            $cancelUrl = "{$returnHost}/?stripe_cancel=true";
 
-            // Send database notification to admin users
-            try {
-                $admins = \App\Models\User::where('role', 'admin')->get();
-                \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\NewClubLeadNotification($lead));
-            } catch (\Exception $notifEx) {
-                \Log::warning('Could not send database notifications: ' . $notifEx->getMessage());
-            }
+            $sessionParams = [
+                'mode' => 'subscription',
+                'customer_email' => $validated['email'],
+                'line_items' => [[
+                    'price' => $priceId,
+                    'quantity' => 1,
+                ]],
+                'metadata' => ['club_lead_id' => $lead->id],
+                'subscription_data' => [
+                    'metadata' => ['club_lead_id' => $lead->id],
+                ],
+                'success_url' => $successUrl,
+                'cancel_url' => $cancelUrl,
+            ];
 
-            // Trigger SSL generation asynchronously in production (detached to prevent 504 timeouts)
-            if (config('app.env') === 'production') {
-                shell_exec('nohup sudo /root/auto_ssl.sh < /dev/null > /dev/null 2>&1 &');
-            }
-
-            // Generar sesión de Stripe Checkout para el plan seleccionado
-            $stripeCheckoutUrl = null;
-            if (!config('services.stripe.bypass_subscriptions')) {
-                try {
-                    $club = \App\Models\Club::where('slug', $validated['slug'])->first();
-                    if ($club) {
-                        $planName = strtolower($validated['plan_selected']);
-                        $planSlug = 'basico';
-                        if (str_contains($planName, 'pro')) {
-                            $planSlug = 'profesional';
-                        } elseif (str_contains($planName, 'elit') || str_contains($planName, 'élite')) {
-                            $planSlug = 'elite';
-                        }
-
-                        $priceId = config("services.stripe.prices.{$planSlug}");
-
-                        if ($priceId) {
-                            $subscription = $club->newSubscription('default', $priceId);
-                            if ($planSlug === 'profesional') {
-                                $couponId = config('services.stripe.coupon_pro_launch');
-                                if ($couponId) {
-                                    $subscription->withCoupon($couponId);
-                                }
-                            }
-
-                            $scheme = $request->secure() ? 'https' : 'http';
-                            $host = $request->getHost();
-                            
-                            if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
-                                $frontendUrl = env('FRONTEND_URL', 'http://localhost:4200');
-                                $parsedUrl = parse_url($frontendUrl);
-                                $scheme = $parsedUrl['scheme'] ?? 'http';
-                                $hostOnly = $parsedUrl['host'] ?? 'localhost';
-                                $portOnly = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
-                                $returnHost = "{$scheme}://{$hostOnly}{$portOnly}";
-                            } else {
-                                $returnHost = "https://clubagility.com";
-                            }
-
-                            $successUrl = "{$returnHost}/?stripe_success=true&slug={$club->slug}&email=" . urlencode($validated['email']) . "&plan=" . urlencode($validated['plan_selected']) . "&session_id={CHECKOUT_SESSION_ID}";
-                            $cancelUrl = "{$returnHost}/?stripe_cancel=true";
-
-                            $checkoutSession = $subscription->checkout([
-                                'success_url' => $successUrl,
-                                'cancel_url' => $cancelUrl,
-                            ]);
-
-                            $stripeCheckoutUrl = $checkoutSession->url;
-                        }
-                    }
-                } catch (\Exception $stripeEx) {
-                    \Log::error('Error creando Stripe Checkout en registro de club: ' . $stripeEx->getMessage());
+            if ($planSlug === 'profesional') {
+                $couponId = config('services.stripe.coupon_pro_launch');
+                if ($couponId) {
+                    $sessionParams['discounts'] = [['coupon' => $couponId]];
                 }
             }
 
-        } catch (\Exception $e) {
-            \Log::error('Error during club auto-provisioning: ' . $e->getMessage());
-            \Log::error($e->getTraceAsString());
+            $checkoutSession = Cashier::stripe()->checkout->sessions->create($sessionParams);
+
+            $lead->update(['stripe_session_id' => $checkoutSession->id]);
+        } catch (\Exception $stripeEx) {
+            \Log::error('Error creando Stripe Checkout en registro de club: ' . $stripeEx->getMessage());
             return response()->json([
-                'message' => 'Ocurrió un error al aprovisionar automáticamente tu club. Por favor contacta con soporte.',
-                'error' => $e->getMessage()
+                'message' => 'No se pudo iniciar el proceso de pago. Por favor inténtalo de nuevo o contacta con soporte.',
             ], 500);
         }
 
         return response()->json([
-            'message' => 'Club pre-aprovisionado correctamente. Por favor complete el pago.',
+            'message' => 'Solicitud registrada. Por favor complete el pago para aprovisionar su club.',
             'lead' => $lead,
-            'stripe_checkout_url' => $stripeCheckoutUrl
+            'stripe_checkout_url' => $checkoutSession->url
         ], 201);
     }
 

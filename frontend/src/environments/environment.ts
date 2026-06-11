@@ -10,6 +10,8 @@ export const environment = {
         measurementId: "G-N6SP2XNR7Q"
     },
     apiUrl: 'http://agility_back.test/api',
+    // URL pública de cada club; {slug} se sustituye por su subdominio
+    clubUrlTemplate: 'http://{slug}.localhost:4200',
     clubConfig: {
         name: "Nombre del Club",
         slogan: "Slogan de tu club",
