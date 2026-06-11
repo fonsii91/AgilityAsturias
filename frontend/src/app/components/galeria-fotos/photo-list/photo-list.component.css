@@ -616,6 +616,11 @@
     color: #f1f5f9;
 }
 
+.tag-selects select option {
+    background-color: #1e293b;
+    color: #f1f5f9;
+}
+
 .sidebar-actions {
     margin-top: auto;
     display: flex;

@@ -43,6 +43,7 @@ export class PhotoListComponent implements OnInit {
     filterType = signal<string>('');
     filterCompetition = signal<string>('');
     filterDog = signal<string>('');
+    filterMember = signal<string>('');
     searchTerm = signal<string>('');
     private searchDebounce: any = null;
 
@@ -67,6 +68,7 @@ export class PhotoListComponent implements OnInit {
             photo_type: this.filterType() || undefined,
             competition_id: this.filterCompetition() || undefined,
             dog_id: this.filterDog() || undefined,
+            tagged_user_id: this.filterMember() || undefined,
             search: this.searchTerm() || undefined,
         };
     });
