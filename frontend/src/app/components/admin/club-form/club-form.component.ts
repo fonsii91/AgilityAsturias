@@ -21,6 +21,9 @@ interface Plan {
   id: number;
   name: string;
   price: string;
+  slug?: string;
+  is_active?: boolean;
+  features?: { id: number; slug: string; name: string }[];
 }
 
 @Component({
@@ -305,6 +308,9 @@ interface Plan {
                       <span class="slider"></span>
                     </label>
                   </div>
+                  @if (moduleHints['gamification_enabled']) {
+                    <p class="plan-hint"><mat-icon>lock</mat-icon>{{ moduleHints['gamification_enabled'] }}</p>
+                  }
                 </div>
 
                 <hr class="divider">
@@ -319,6 +325,9 @@ interface Plan {
                       <span class="slider"></span>
                     </label>
                   </div>
+                  @if (moduleHints['provision_fondos_enabled']) {
+                    <p class="plan-hint"><mat-icon>lock</mat-icon>{{ moduleHints['provision_fondos_enabled'] }}</p>
+                  }
                 </div>
 
                 <hr class="divider">
@@ -333,6 +342,9 @@ interface Plan {
                       <span class="slider"></span>
                     </label>
                   </div>
+                  @if (moduleHints['liga_norte_enabled']) {
+                    <p class="plan-hint"><mat-icon>lock</mat-icon>{{ moduleHints['liga_norte_enabled'] }}</p>
+                  }
                 </div>
 
                 <hr class="divider">
@@ -347,6 +359,9 @@ interface Plan {
                       <span class="slider"></span>
                     </label>
                   </div>
+                  @if (moduleHints['sponsors_enabled']) {
+                    <p class="plan-hint"><mat-icon>lock</mat-icon>{{ moduleHints['sponsors_enabled'] }}</p>
+                  }
                   @if (form.get('sponsors_enabled')?.value && isEditMode()) {
                     <div style="margin-top: 0.75rem;">
                       <a routerLink="/admin/patrocinadores" class="cancel-btn w-full" mat-stroked-button style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; text-decoration: none;">
@@ -934,6 +949,23 @@ interface Plan {
     input:checked + .slider:before {
       transform: translateX(20px);
     }
+    input:disabled + .slider {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+    .plan-hint {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #B45309;
+    }
+    .plan-hint mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
   `]
 })
 export class ClubFormComponent implements OnInit {
@@ -947,6 +979,7 @@ export class ClubFormComponent implements OnInit {
   private tenantService = inject(TenantService);
   private suggestionService = inject(SuggestionService);
   private onboardingService = inject(OnboardingService);
+  private http = inject(HttpClient);
   
   form!: FormGroup;
   
@@ -968,6 +1001,21 @@ export class ClubFormComponent implements OnInit {
   logoFile: File | null = null;
   heroFile: File | null = null;
   ctaFile: File | null = null;
+
+  // Módulos ligados a features del plan contratado (mismo mapa que
+  // PLAN_GATED_MODULES del backend, que es quien aplica la restricción de
+  // verdad). La asignación feature↔plan se gestiona en /admin/suscripciones.
+  private readonly planGatedModules: Record<string, string> = {
+    gamification_enabled: 'gamificacion',
+    provision_fondos_enabled: 'provision-fondos',
+    sponsors_enabled: 'patrocinadores',
+    liga_norte_enabled: 'liga-norte',
+  };
+
+  // Aviso por toggle: candado (switch bloqueado por plan), con los planes
+  // que sí incluyen el módulo cuando /plans-public responde.
+  moduleHints: Record<string, string> = {};
+  private lockedModuleFeature: Record<string, string> = {};
 
   suggestedPalettes = [
     { name: 'Agility Classic', primary: '#0073CF', accent: '#EAB308' },
@@ -1078,6 +1126,8 @@ export class ClubFormComponent implements OnInit {
             sponsors_enabled: settings.sponsors_enabled === true || settings.sponsors_enabled === 'true'
           });
 
+          this.applyPlanGating(club, settings);
+
         } else {
           this.toast.error('Club no encontrado');
           this.router.navigate(['/admin/clubs']);
@@ -1089,6 +1139,67 @@ export class ClubFormComponent implements OnInit {
         this.isLoading.set(false);
         this.router.navigate(['/admin/clubs']);
       }
+    });
+  }
+
+  /**
+   * Refleja en el formulario la restricción de módulos por plan que aplica el
+   * backend: los módulos cuya feature no está en el plan contratado se
+   * muestran apagados y con el switch bloqueado.
+   */
+  private applyPlanGating(club: Club, settings: any) {
+    this.moduleHints = {};
+    this.lockedModuleFeature = {};
+    if (this.isAdmin()) return;
+    if (!club.plan) return;
+
+    const planFeatures = (club.plan.features || []).map(f => f.slug);
+
+    for (const [key, featureSlug] of Object.entries(this.planGatedModules)) {
+      const control = this.form.get(key);
+      if (!control) continue;
+
+      if (planFeatures.includes(featureSlug)) {
+        control.enable();
+        continue;
+      }
+
+      // El backend fuerza estos módulos a desactivado (al guardar y al bajar
+      // de plan), así que se muestran apagados y bloqueados.
+      control.setValue(false);
+      control.disable();
+      this.moduleHints[key] = 'Tu plan actual no incluye este módulo. Mejora tu plan para activarlo.';
+      this.lockedModuleFeature[key] = featureSlug;
+    }
+
+    if (Object.keys(this.lockedModuleFeature).length > 0) {
+      this.loadPlanAvailabilityHints();
+    }
+  }
+
+  /**
+   * Completa los avisos de módulos bloqueados con los planes que sí incluyen
+   * cada módulo (según la matriz de features de /admin/suscripciones). Si la
+   * petición falla, se conserva el texto genérico.
+   */
+  private loadPlanAvailabilityHints() {
+    this.http.get<Plan[]>(`${environment.apiUrl}/plans-public`).subscribe({
+      next: (plans) => {
+        for (const [key, featureSlug] of Object.entries(this.lockedModuleFeature)) {
+          const names = (plans || [])
+            .filter(p => p.is_active !== false && (p.features || []).some(f => f.slug === featureSlug))
+            .sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
+            .map(p => p.name);
+
+          if (names.length === 0) continue;
+
+          const list = names.length === 1
+            ? names[0]
+            : names.slice(0, -1).join(', ') + ' y ' + names[names.length - 1];
+          this.moduleHints[key] = `Tu plan actual no incluye este módulo. Disponible en: ${list}.`;
+        }
+      },
+      error: () => { /* se mantiene el texto genérico */ }
     });
   }
 

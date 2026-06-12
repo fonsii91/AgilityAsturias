@@ -12,6 +12,15 @@ export interface Club {
     logo_url: string | null;
     settings: any;
     plan_id?: number | null;
+    // Incluido por el backend en GET /admin/clubs/{id} para reflejar en el
+    // formulario qué módulos permite activar el plan contratado (la asignación
+    // de features por plan se gestiona en /admin/suscripciones).
+    plan?: {
+        id: number;
+        slug: string;
+        name: string;
+        features?: { id: number; slug: string; name: string }[];
+    } | null;
     plan_locked?: boolean;
     courtesy_until?: string | null;
     has_active_subscription?: boolean;
