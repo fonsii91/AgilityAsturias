@@ -91,6 +91,28 @@ class CourtesyPeriodTest extends TestCase
         $this->assertNotNull($response->json('courtesy_until'));
     }
 
+    public function test_tenant_info_reports_subscribed_during_courtesy()
+    {
+        // Sin bypass: solo la cortesía debe bastar para que el frontend
+        // (subscription-active guard) permita la navegación.
+        config(['services.stripe.bypass_subscriptions' => false]);
+        $this->club->update(['courtesy_until' => Carbon::now()->addMonth()]);
+
+        $this->asClub($this->manager)->getJson('/api/tenant/info')
+            ->assertStatus(200)
+            ->assertJsonPath('subscribed', true);
+    }
+
+    public function test_tenant_info_reports_not_subscribed_after_courtesy_expires()
+    {
+        config(['services.stripe.bypass_subscriptions' => false]);
+        $this->club->update(['courtesy_until' => Carbon::now()->subDay()]);
+
+        $this->asClub($this->manager)->getJson('/api/tenant/info')
+            ->assertStatus(200)
+            ->assertJsonPath('subscribed', false);
+    }
+
     public function test_admin_can_set_and_clear_courtesy()
     {
         $set = $this->actingAs($this->admin, 'sanctum')

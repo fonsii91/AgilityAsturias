@@ -33,6 +33,12 @@ class ClubController extends Controller
             $club = Club::with('plan.features')->find(app('active_club_id'));
             if ($club) {
                 $bypass = config('services.stripe.bypass_subscriptions');
+                // El periodo de cortesía cuenta como acceso activo: el frontend
+                // usa este flag para permitir la navegación (subscription-active
+                // guard), igual que CheckSubscriptionActive lo permite en la API.
+                $hasAccess = $bypass
+                    || $club->subscribed('default')
+                    || $club->onCourtesyPeriod();
                 return response()->json([
                     'id' => $club->id,
                     'name' => $club->name,
@@ -43,7 +49,7 @@ class ClubController extends Controller
                     'settings_ranking' => $club->settings_ranking,
                     'plan_id' => $club->plan_id,
                     'features' => $club->plan ? $club->plan->features->pluck('slug') : [],
-                    'subscribed' => $bypass ? true : $club->subscribed('default'),
+                    'subscribed' => $hasAccess,
                     'stripe_status' => $bypass ? 'active' : ($club->subscription('default') ? $club->subscription('default')->stripe_status : 'inactive'),
                 ]);
             }
