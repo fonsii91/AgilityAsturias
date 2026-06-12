@@ -9,6 +9,18 @@ class Club extends Model
 {
     use Billable;
 
+    /**
+     * Módulos de settings ligados a una feature del plan contratado. La
+     * asignación feature↔plan se gestiona en la matriz de /admin/suscripciones
+     * y es la única fuente de verdad del acceso a estos módulos.
+     */
+    public const PLAN_GATED_MODULES = [
+        'gamification_enabled' => 'gamificacion',
+        'provision_fondos_enabled' => 'provision-fondos',
+        'sponsors_enabled' => 'patrocinadores',
+        'liga_norte_enabled' => 'liga-norte',
+    ];
+
     protected $fillable = [
         'name',
         'slug',
@@ -102,6 +114,45 @@ class Club extends Model
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($club->logo_url);
             }
         });
+    }
+
+    /**
+     * Apaga en settings los módulos cuya feature no incluye el plan actual.
+     * Se invoca tras cada cambio de plan (panel de admin y sincronización de
+     * Stripe) para que una bajada de plan retire los módulos del plan superior.
+     * Solo desactiva: subir de plan no enciende módulos automáticamente. Las
+     * features sin crear en BD (seeder pendiente) y los clubes sin plan no
+     * restringen nada.
+     */
+    public function syncModuleSettingsWithPlan(): void
+    {
+        $this->refresh();
+
+        if (!$this->plan) {
+            return;
+        }
+
+        $registered = Feature::whereIn('slug', array_values(self::PLAN_GATED_MODULES))
+            ->pluck('slug')->all();
+        $planFeatures = $this->plan->features()->pluck('slug')->all();
+
+        $settings = $this->settings ?? [];
+        $changed = false;
+
+        foreach (self::PLAN_GATED_MODULES as $key => $featureSlug) {
+            if (!in_array($featureSlug, $registered, true) || in_array($featureSlug, $planFeatures, true)) {
+                continue;
+            }
+            if (($settings[$key] ?? null) !== false) {
+                $settings[$key] = false;
+                $changed = true;
+            }
+        }
+
+        if ($changed) {
+            $this->settings = $settings;
+            $this->save();
+        }
     }
 
     /**

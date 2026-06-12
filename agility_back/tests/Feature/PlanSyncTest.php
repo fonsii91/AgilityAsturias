@@ -94,6 +94,54 @@ class PlanSyncTest extends TestCase
         $this->assertEquals($this->elite->id, $this->club->fresh()->plan_id);
     }
 
+    public function test_downgrade_via_stripe_disables_modules_not_in_new_plan()
+    {
+        $gami = \App\Models\Feature::create(['slug' => 'gamificacion', 'name' => 'Gamificación', 'type' => 'boolean']);
+        $this->elite->features()->attach($gami->id);
+        $this->club->update([
+            'plan_id' => $this->elite->id,
+            'settings' => ['gamification_enabled' => true, 'colors' => ['primary' => '#0073CF']],
+        ]);
+
+        $this->fireSubscriptionUpdated('cus_test123', 'price_basico_test');
+
+        $fresh = $this->club->fresh();
+        $this->assertEquals($this->basico->id, $fresh->plan_id);
+        $this->assertFalse($fresh->settings['gamification_enabled']);
+        // El resto de settings no se toca
+        $this->assertEquals('#0073CF', $fresh->settings['colors']['primary'] ?? null);
+    }
+
+    public function test_upgrade_via_stripe_does_not_auto_enable_modules()
+    {
+        $gami = \App\Models\Feature::create(['slug' => 'gamificacion', 'name' => 'Gamificación', 'type' => 'boolean']);
+        $this->elite->features()->attach($gami->id);
+        $this->club->update(['settings' => ['gamification_enabled' => false]]);
+
+        $this->fireSubscriptionUpdated('cus_test123', 'price_elite_test');
+
+        $fresh = $this->club->fresh();
+        $this->assertEquals($this->elite->id, $fresh->plan_id);
+        // Subir de plan no enciende módulos solo: lo decide el gestor
+        $this->assertFalse($fresh->settings['gamification_enabled']);
+    }
+
+    public function test_admin_plan_assignment_disables_modules_not_in_new_plan()
+    {
+        $gami = \App\Models\Feature::create(['slug' => 'gamificacion', 'name' => 'Gamificación', 'type' => 'boolean']);
+        $this->elite->features()->attach($gami->id);
+        $this->club->update([
+            'plan_id' => $this->elite->id,
+            'settings' => ['gamification_enabled' => true],
+        ]);
+
+        $this->actingAs($this->admin, 'sanctum')
+            ->putJson("/api/admin/clubs/{$this->club->id}/plan", ['plan_id' => $this->basico->id])
+            ->assertStatus(200);
+
+        $this->assertFalse($this->club->fresh()->settings['gamification_enabled']);
+    }
+
     public function test_admin_can_lock_plan_via_endpoint()
     {
         $response = $this->actingAs($this->admin, 'sanctum')

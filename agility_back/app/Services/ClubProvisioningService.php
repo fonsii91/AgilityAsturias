@@ -33,6 +33,13 @@ class ClubProvisioningService
             $planSlug = $this->resolvePlanSlug($lead->plan_selected);
             $plan = Plan::where('slug', $planSlug)->first() ?: Plan::first();
 
+            // Los módulos arrancan activados solo si la feature correspondiente
+            // está en el plan (misma fuente que el gating de ClubController:
+            // la matriz de /admin/suscripciones).
+            $planHasFeature = fn (string $slug) => $plan
+                ? $plan->features()->where('slug', $slug)->exists()
+                : false;
+
             $settings = [
                 'slogan' => 'Gestiona tu club de Agility con profesionalidad',
                 'colors' => [
@@ -45,9 +52,10 @@ class ClubProvisioningService
                 ],
                 'customizationRequest' => '',
                 'landing_page_requested' => false,
-                'gamification_enabled' => in_array($planSlug, ['profesional', 'elite']),
-                'provision_fondos_enabled' => in_array($planSlug, ['profesional', 'elite']),
-                'sponsors_enabled' => ($planSlug === 'elite'),
+                'gamification_enabled' => $planHasFeature('gamificacion'),
+                'provision_fondos_enabled' => $planHasFeature('provision-fondos'),
+                'sponsors_enabled' => $planHasFeature('patrocinadores'),
+                'liga_norte_enabled' => $planHasFeature('liga-norte'),
                 'contact' => [
                     'phone' => $lead->phone ?? '',
                     'email' => $lead->email ?? '',

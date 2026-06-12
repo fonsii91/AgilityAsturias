@@ -69,6 +69,12 @@ Interruptores de activación rápida para los módulos de la aplicación:
 *   **Módulo de Provisión de Fondos (`settings.provision_fondos_enabled`):** Activa o desactiva la visualización del saldo e historial financiero para los socios, así como la consola de auditoría para los gestores (ver [[provision-fondos]]).
 *   **Módulo de Patrocinadores (`settings.sponsors_enabled`):** Habilita la sección de patrocinadores en la cara pública de la web. Su activación genera un botón de acceso directo en el panel de configuración que redirige a los gestores y staff al panel de administración CRUD de patrocinadores (ver [[presencia-publica]]).
 
+> [!IMPORTANT] Restricción por plan (implementada en backend)
+> La activación de estos módulos está ligada a las **features del plan** contratado (ver [[planes-suscripcion-saas]]), que el administrador global gestiona desde la matriz de funcionalidades de `/admin/suscripciones`. Cada switch corresponde a una feature: Gamificación → `gamificacion`, Provisión de Fondos → `provision-fondos`, Patrocinadores → `patrocinadores`, Liga Norte → `liga-norte` (asignación inicial del seeder: Básico solo Liga Norte; Profesional añade Gamificación y Fondos; Élite todas). La regla es estricta para evitar que un club contrate un mes el plan superior y conserve sus módulos al bajar:
+> - **Al cambiar de plan** (panel de admin o sincronización desde Stripe), `Club::syncModuleSettingsWithPlan()` desactiva automáticamente los módulos cuya feature no incluye el nuevo plan. Subir de plan no enciende nada solo: lo decide el gestor.
+> - **Al guardar el formulario**, un gestor no puede tener activo ningún módulo fuera de su plan: `ClubController::update` (constante `Club::PLAN_GATED_MODULES`) los fuerza a desactivado.
+> - Salvedades: el administrador global no tiene restricción al editar settings, y los clubes sin plan o las features aún no creadas en base de datos (requiere ejecutar `SubscriptionSeeder` al desplegar) no restringen nada. Los valores iniciales del aprovisionamiento (`ClubProvisioningService`) siguen estas mismas features.
+
 ---
 
 ## 💾 3. Comportamiento de la Interfaz (UX)

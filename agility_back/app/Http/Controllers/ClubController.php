@@ -8,9 +8,24 @@ use App\Models\Club;
 
 class ClubController extends Controller
 {
-    // Claves de settings gestionadas por el backend que nunca deben perderse
-    // al guardar la configuración del club desde el frontend.
-    private const INTERNAL_SETTINGS_KEYS = ['bunny_collection_id'];
+    // Claves de settings que los formularios de gestión pueden editar.
+    // Al actualizar, solo estas claves se toman del cliente; cualquier otra
+    // (internas del backend como bunny_collection_id, o claves futuras)
+    // se conserva tal cual está en base de datos.
+    private const CLIENT_EDITABLE_SETTINGS_KEYS = [
+        'slogan',
+        'colors',
+        'homeConfig',
+        'contact',
+        'social',
+        'gamification_enabled',
+        'provision_fondos_enabled',
+        'liga_norte_enabled',
+        'sponsors_enabled',
+        'customizationRequest',
+        'landing_page_requested',
+        'cancellation_notice_hours',
+    ];
 
     public function current()
     {
@@ -136,7 +151,10 @@ class ClubController extends Controller
         if ($user->role === 'manager' && $user->club_id !== $club->id) {
             return response()->json(['message' => 'Unauthorized. Managers can only view their own club.'], 403);
         }
-        return response()->json($club);
+        // El plan y sus features se incluyen para que el formulario de gestión
+        // pueda reflejar qué módulos permite activar el plan contratado
+        // (PLAN_GATED_MODULES).
+        return response()->json($club->load('plan.features'));
     }
 
     public function store(Request $request)
@@ -211,21 +229,38 @@ class ClubController extends Controller
             throw $e;
         }
 
-        $settings = $request->input('settings');
-        if (is_string($settings)) {
-            $settings = json_decode($settings, true);
+        $incoming = $request->input('settings');
+        if (is_string($incoming)) {
+            $incoming = json_decode($incoming, true);
         }
 
+        // Se parte siempre de los settings actuales y solo se sobrescriben las
+        // claves editables que el cliente envía: las que no envía y las internas
+        // del backend nunca se pierden.
         $currentSettings = $club->settings ?? [];
-        if (!is_array($settings)) {
-            $settings = $currentSettings;
+        $settings = $currentSettings;
+        if (is_array($incoming)) {
+            foreach (self::CLIENT_EDITABLE_SETTINGS_KEYS as $key) {
+                if (array_key_exists($key, $incoming)) {
+                    $settings[$key] = $incoming[$key];
+                }
+            }
         }
 
-        // Claves internas del sistema que el formulario de gestión no conoce:
-        // si el cliente no las envía, se conservan las existentes en lugar de borrarlas.
-        foreach (self::INTERNAL_SETTINGS_KEYS as $key) {
-            if (!array_key_exists($key, $settings) && array_key_exists($key, $currentSettings)) {
-                $settings[$key] = $currentSettings[$key];
+        // Un gestor no puede tener activos módulos cuya feature no incluye su
+        // plan (matriz de /admin/suscripciones): al guardar se fuerzan a
+        // desactivado, en línea con Club::syncModuleSettingsWithPlan() al
+        // cambiar de plan. Sin plan asignado, o con la feature sin crear en BD
+        // (seeder pendiente), no se restringe nada.
+        if ($user->role !== 'admin' && $club->plan) {
+            $registered = \App\Models\Feature::whereIn('slug', array_values(Club::PLAN_GATED_MODULES))
+                ->pluck('slug')->all();
+            $planFeatures = $club->plan->features()->pluck('slug')->all();
+            foreach (Club::PLAN_GATED_MODULES as $key => $featureSlug) {
+                if (in_array($featureSlug, $registered, true)
+                    && !in_array($featureSlug, $planFeatures, true)) {
+                    $settings[$key] = false;
+                }
             }
         }
 
@@ -247,7 +282,16 @@ class ClubController extends Controller
             }
         }
 
+        $planChanged = array_key_exists('plan_id', $updateData)
+            && (int) $updateData['plan_id'] !== (int) $club->plan_id;
+
         $club->update($updateData);
+
+        // Una bajada de plan retira automáticamente los módulos que el nuevo
+        // plan no incluye.
+        if ($planChanged) {
+            $club->syncModuleSettingsWithPlan();
+        }
 
         $this->handleClubFiles($request, $club);
 
@@ -256,9 +300,7 @@ class ClubController extends Controller
 
     private function handleClubFiles(Request $request, Club $club)
     {
-        $settings = $club->settings ?? [];
         $slug = $club->slug;
-        $changed = false;
 
         if ($request->hasFile('logo_file')) {
             if ($club->logo_url && str_contains($club->logo_url, '/storage/')) {
@@ -267,8 +309,11 @@ class ClubController extends Controller
             }
             $path = $request->file('logo_file')->store("clubs/{$slug}/settings", 'public');
             $club->logo_url = asset('storage/' . $path);
-            $changed = true;
+            $club->save();
         }
+
+        $settings = $club->settings ?? [];
+        $homeConfigChanges = [];
 
         if ($request->hasFile('hero_file')) {
             if (isset($settings['homeConfig']['heroImage']) && str_contains($settings['homeConfig']['heroImage'], '/storage/')) {
@@ -276,11 +321,7 @@ class ClubController extends Controller
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             }
             $path = $request->file('hero_file')->store("clubs/{$slug}/settings", 'public');
-            if (!isset($settings['homeConfig'])) {
-                $settings['homeConfig'] = [];
-            }
-            $settings['homeConfig']['heroImage'] = asset('storage/' . $path);
-            $changed = true;
+            $homeConfigChanges['heroImage'] = asset('storage/' . $path);
         }
 
         if ($request->hasFile('cta_file')) {
@@ -289,14 +330,20 @@ class ClubController extends Controller
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($oldPath);
             }
             $path = $request->file('cta_file')->store("clubs/{$slug}/settings", 'public');
-            if (!isset($settings['homeConfig'])) {
-                $settings['homeConfig'] = [];
-            }
-            $settings['homeConfig']['ctaImage'] = asset('storage/' . $path);
-            $changed = true;
+            $homeConfigChanges['ctaImage'] = asset('storage/' . $path);
         }
 
-        if ($changed) {
+        if ($homeConfigChanges) {
+            // Se relee el club justo antes de escribir para no pisar cambios
+            // concurrentes en settings hechos mientras se procesaban los ficheros.
+            $club->refresh();
+            $settings = $club->settings ?? [];
+            if (!isset($settings['homeConfig']) || !is_array($settings['homeConfig'])) {
+                $settings['homeConfig'] = [];
+            }
+            foreach ($homeConfigChanges as $key => $value) {
+                $settings['homeConfig'][$key] = $value;
+            }
             $club->settings = $settings;
             $club->save();
         }

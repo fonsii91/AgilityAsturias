@@ -52,6 +52,33 @@ class SubscriptionSeeder extends Seeder
             'description' => 'Acceso a normativas, tutoriales y recursos educativos del club.'
         ]);
 
+        // Features de los módulos activables desde Gestionar Club. Su asignación
+        // a planes (matriz de /admin/suscripciones) decide qué plan permite a un
+        // gestor activar cada módulo (PLAN_GATED_MODULES en ClubController).
+        $featureGamificacion = Feature::firstOrCreate(['slug' => 'gamificacion'], [
+            'name' => 'Sistema de Gamificación',
+            'type' => 'boolean',
+            'description' => 'Ranking de perros, álbum de stickers y tablón de cazarrecompensas.'
+        ]);
+
+        $featureFondos = Feature::firstOrCreate(['slug' => 'provision-fondos'], [
+            'name' => 'Provisión de Fondos',
+            'type' => 'boolean',
+            'description' => 'Saldo, ingresos y gastos de los socios con consola de auditoría para gestores.'
+        ]);
+
+        $featurePatrocinadores = Feature::firstOrCreate(['slug' => 'patrocinadores'], [
+            'name' => 'Módulo de Patrocinadores',
+            'type' => 'boolean',
+            'description' => 'Sección de patrocinadores en la web pública y gestión de marcas colaboradoras.'
+        ]);
+
+        $featureLigaNorte = Feature::firstOrCreate(['slug' => 'liga-norte'], [
+            'name' => 'Liga Norte',
+            'type' => 'boolean',
+            'description' => 'Clasificación y contenidos de la Liga Norte.'
+        ]);
+
         // Create plans
         $planBasico = Plan::firstOrCreate(['slug' => 'basico'], [
             'name' => 'Plan Básico',
@@ -78,20 +105,24 @@ class SubscriptionSeeder extends Seeder
         ]);
 
         // Sync features to plans
-        // Basic: Only reservations
+        // Basic: Reservations + Liga Norte
         $planBasico->features()->syncWithoutDetaching([
             $featureReservas->id,
+            $featureLigaNorte->id,
         ]);
 
-        // Pro: Reservations + RSCE + RFEC + Resources
+        // Pro: Reservations + RSCE + RFEC + Resources + Gamificación + Fondos + Liga Norte
         $planPro->features()->syncWithoutDetaching([
             $featureReservas->id,
             $featureRsce->id,
             $featureRfec->id,
             $featureRecursos->id,
+            $featureGamificacion->id,
+            $featureFondos->id,
+            $featureLigaNorte->id,
         ]);
 
-        // Elite: All features (Pro + Salud + Videos)
+        // Elite: All features
         $planElite->features()->syncWithoutDetaching([
             $featureReservas->id,
             $featureRsce->id,
@@ -99,6 +130,10 @@ class SubscriptionSeeder extends Seeder
             $featureSalud->id,
             $featureVideos->id,
             $featureRecursos->id,
+            $featureGamificacion->id,
+            $featureFondos->id,
+            $featurePatrocinadores->id,
+            $featureLigaNorte->id,
         ]);
 
         // Assign default 'Pro' plan to all existing clubs so no one loses access suddenly

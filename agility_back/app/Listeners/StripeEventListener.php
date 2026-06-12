@@ -182,6 +182,11 @@ class StripeEventListener
 
         $previous = $club->plan_id;
         $club->update(['plan_id' => $plan->id]);
+
+        // Una bajada de plan retira automáticamente los módulos que el nuevo
+        // plan no incluye.
+        $club->syncModuleSettingsWithPlan();
+
         Log::info("Plan del club {$club->id} sincronizado desde Stripe: {$previous} -> {$plan->id} ({$slug}).");
     }
 

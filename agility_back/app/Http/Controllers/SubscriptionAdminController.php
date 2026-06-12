@@ -98,6 +98,11 @@ class SubscriptionAdminController extends Controller
         }
 
         $club->update($update);
+
+        // Una bajada de plan retira automáticamente los módulos que el nuevo
+        // plan no incluye.
+        $club->syncModuleSettingsWithPlan();
+
         return response()->json($club->load('plan.features'));
     }
 
