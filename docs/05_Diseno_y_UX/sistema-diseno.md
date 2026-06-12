@@ -76,3 +76,19 @@ Las pistas rurales suelen tener mala cobertura. La UI debe ser resiliente:
 2. **Bloqueo de Interfaz (Double-submit prevention):** Durante peticiones POST/PUT/DELETE, deshabilita el botón de envío (`[disabled]="isSaving()"`) al primer toque. Si la red va lenta, el usuario presionará varias veces; evítalo para no duplicar datos.
 3. **Mapeo de Errores (422 Unprocessable Entity):** Muestra los errores de validación del backend directamente en la UI usando `<mat-error>` dentro de cada `<mat-form-field>` correspondiente.
 4. **Optimistic UI (Interacciones Rápidas):** Para acciones muy simples (ej. marcar asistencia a clase), actualiza la UI visualmente de inmediato y haz la llamada a Laravel en segundo plano. Si falla, revierte el botón e informa con un `MatSnackBar` rojo (`color="warn"`).
+
+---
+
+## 7. Optimización de la Navegación y Arquitectura de la Información (Propuesta UX)
+
+Para mitigar la fatiga visual y táctil del usuario a pie de pista bajo condiciones climáticas adversas, se propone la optimización de los menús cargados reduciendo el número de opciones visibles en el menú lateral mediante consolidación semántica y divulgación progresiva.
+
+### 7.1. Reestructuración del Menú Staff (De 7 a 5 elementos principales)
+*   **Consolidación de Asistencia:** Fusionar *Verificar Asistencia* e *Historial Asistencia* bajo un solo ítem llamado **"Control de Asistencia"**. La navegación entre pasar lista y ver el histórico se gestiona internamente mediante pestañas (*Tabs*).
+*   **Agrupación Administrativa:** Mover *Gestión Miembros* y *Gestión Horarios* a un subpanel de configuración o agruparlos bajo el ítem **"Ajustes del Club" / "Administración"** (tareas de baja frecuencia que no requieren estar en la navegación diaria).
+*   **Dashboard Operativo:** Diseñar un panel centralizado para el Staff con tarjetas táctiles de gran tamaño (mínimo 48x48px) en lugar de una lista plana de enlaces.
+
+### 7.2. Reestructuración del Menú Explorar (De 6 a 3 elementos principales)
+*   **Integración Deportiva en "Mi Manada":** Mover *Salud Deportiva (ACWR)*, *Bitácora RSCE* y *Bitácora RFEC* directamente al perfil de cada perro. El usuario debe acceder a estas herramientas desde la ficha del perro correspondiente, no de forma aislada.
+*   **Consolidación de Recursos e Información:** Agrupar *Tablón de Anuncios* y *Recursos* bajo un nuevo bloque semántico llamado **"Comunidad"** o **"Club"**.
+*   **Redefinición Semántica:** Renombrar el apartado *"Explorar"* a *"Comunidad"* o *"Rendimiento"* según los elementos que finalmente albergue, evitando el patrón antipatrón de diseño de "cajón de sastre".
