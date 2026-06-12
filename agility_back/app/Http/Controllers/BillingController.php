@@ -132,11 +132,17 @@ class BillingController extends Controller
         }
 
         $bypass = config('services.stripe.bypass_subscriptions');
-        $subscriptionActive = $bypass ? true : $club->subscribed('default');
         $subscription = $club->subscription('default');
-        
+        $realSubscribed = $club->subscribed('default');
+        $onCourtesy = $club->onCourtesyPeriod();
+
+        // El acceso se concede si hay suscripción real, si está en periodo de cortesía
+        // o si el bypass global está activo. El gestor sigue viendo el banner de cortesía
+        // (on_courtesy) para que migre a pago antes de la fecha límite.
+        $subscriptionActive = $bypass || $realSubscribed || $onCourtesy;
+
         $plan = $club->plan;
-        
+
         return response()->json([
             'subscribed' => $subscriptionActive,
             'plan_name' => $plan ? $plan->name : 'Ninguno',
@@ -145,6 +151,13 @@ class BillingController extends Controller
             'pm_type' => $club->pm_type,
             'pm_last_four' => $club->pm_last_four,
             'ends_at' => $subscription && $subscription->ends_at ? $subscription->ends_at->toIso8601String() : null,
+            // Periodo de cortesía: el gestor mantiene acceso pero debe añadir método de pago
+            // antes de courtesy_until. Solo se marca on_courtesy si NO hay suscripción real.
+            'on_courtesy' => $onCourtesy && !$realSubscribed,
+            'courtesy_until' => $club->courtesy_until ? $club->courtesy_until->toIso8601String() : null,
+            // Indica si el club tiene cliente en Stripe (necesario para el portal de facturación).
+            // Sin cliente real, hay que hacer el primer pago vía Checkout, no abrir el portal.
+            'has_stripe_customer' => $club->hasStripeId(),
         ]);
     }
 

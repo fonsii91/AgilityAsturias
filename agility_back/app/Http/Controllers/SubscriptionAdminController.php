@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Plan;
 use App\Models\Feature;
 use App\Models\Club;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SubscriptionAdminController extends Controller
 {
@@ -85,10 +87,44 @@ class SubscriptionAdminController extends Controller
     public function assignPlanToClub(Request $request, Club $club)
     {
         $validated = $request->validate([
-            'plan_id' => 'nullable|exists:plans,id'
+            'plan_id' => 'nullable|exists:plans,id',
+            // Opcional: fija el plan para que el webhook de Stripe no lo sobrescriba.
+            'plan_locked' => 'sometimes|boolean',
         ]);
 
-        $club->update(['plan_id' => $validated['plan_id']]);
+        $update = ['plan_id' => $validated['plan_id'] ?? null];
+        if ($request->has('plan_locked')) {
+            $update['plan_locked'] = $request->boolean('plan_locked');
+        }
+
+        $club->update($update);
         return response()->json($club->load('plan.features'));
+    }
+
+    /**
+     * Configura (o limpia) el periodo de cortesía de un club desde el panel de admin.
+     * Con courtesy_until en el futuro, el club mantiene acceso aunque no tenga
+     * suscripción de Stripe. Enviar null o vacío lo desactiva.
+     */
+    public function setClubCourtesy(Request $request, Club $club)
+    {
+        $validated = $request->validate([
+            'courtesy_until' => 'nullable|date',
+        ]);
+
+        $until = !empty($validated['courtesy_until'])
+            ? Carbon::parse($validated['courtesy_until'])->endOfDay()
+            : null;
+
+        $club->courtesy_until = $until;
+        $club->save();
+
+        Log::info('Periodo de cortesía actualizado desde admin', [
+            'club_id' => $club->id,
+            'slug' => $club->slug,
+            'courtesy_until' => $until?->toIso8601String(),
+        ]);
+
+        return response()->json($club);
     }
 }

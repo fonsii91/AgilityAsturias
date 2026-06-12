@@ -69,12 +69,52 @@ interface Plan {
         <ng-container matColumnDef="plan">
           <th mat-header-cell *matHeaderCellDef> Plan </th>
           <td mat-cell *matCellDef="let club">
-            <select [ngModel]="club.plan_id" (ngModelChange)="changeClubPlan(club, $event)" class="plan-select">
-              <option [ngValue]="null">Sin Plan (Restringido)</option>
-              @for (plan of plans(); track plan.id) {
-                <option [ngValue]="plan.id">{{ plan.name }}</option>
+            <div class="plan-cell">
+              <select [ngModel]="club.plan_id" (ngModelChange)="changeClubPlan(club, $event)" class="plan-select">
+                <option [ngValue]="null">Sin Plan (Restringido)</option>
+                @for (plan of plans(); track plan.id) {
+                  <option [ngValue]="plan.id">{{ plan.name }}</option>
+                }
+              </select>
+              <button class="lock-btn" [class.locked]="club.plan_locked" (click)="togglePlanLock(club)"
+                      [title]="club.plan_locked
+                        ? 'Plan fijado: el club disfruta de este plan aunque pague otro. Clic para liberar.'
+                        : 'Clic para fijar este plan (no se sincronizará con el precio de Stripe).'">
+                <mat-icon>{{ club.plan_locked ? 'lock' : 'lock_open' }}</mat-icon>
+              </button>
+              @if (club.plan_locked) {
+                <span class="plan-badge locked" title="Plan fijado por el admin; no se sincroniza con Stripe.">
+                  <mat-icon>lock</mat-icon> Fijado
+                </span>
+              } @else if (club.has_active_subscription) {
+                <span class="stripe-badge" title="El plan lo gestiona la suscripción de Stripe. Cambiarlo aquí es solo un override temporal.">
+                  <mat-icon>sync</mat-icon> Stripe
+                </span>
               }
-            </select>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Courtesy Column -->
+        <ng-container matColumnDef="courtesy">
+          <th mat-header-cell *matHeaderCellDef> Cortesía </th>
+          <td mat-cell *matCellDef="let club">
+            <div class="courtesy-cell">
+              <input type="date" class="courtesy-date"
+                     [ngModel]="courtesyInputValue(club)"
+                     (ngModelChange)="changeClubCourtesy(club, $event)"
+                     title="Acceso gratis hasta esta fecha aunque no tenga suscripción">
+              @if (isCourtesyActive(club)) {
+                <span class="courtesy-badge active">Activa</span>
+              } @else if (club.courtesy_until) {
+                <span class="courtesy-badge expired">Expirada</span>
+              }
+              @if (club.courtesy_until) {
+                <button class="courtesy-clear" (click)="changeClubCourtesy(club, '')" title="Quitar cortesía">
+                  <mat-icon>close</mat-icon>
+                </button>
+              }
+            </div>
           </td>
         </ng-container>
 
@@ -202,8 +242,26 @@ interface Plan {
     .font-bold { font-weight: 700; }
     .text-blue-600 { color: #2563eb; }
     .hover\\:underline:hover { text-decoration: underline; }
+    .plan-cell { display: flex; align-items: center; gap: 6px; }
     .plan-select { padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.875rem; background: white; outline: none; }
     .plan-select:focus { border-color: #3b82f6; }
+    .stripe-badge { display: inline-flex; align-items: center; gap: 3px; font-size: 0.62rem; font-weight: 700; padding: 2px 7px 2px 5px; border-radius: 9999px; background: #ede9fe; color: #5b21b6; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
+    .stripe-badge mat-icon { font-size: 13px; width: 13px; height: 13px; }
+    .plan-badge.locked { display: inline-flex; align-items: center; gap: 3px; font-size: 0.62rem; font-weight: 700; padding: 2px 7px 2px 5px; border-radius: 9999px; background: #fef3c7; color: #92400e; text-transform: uppercase; letter-spacing: 0.03em; white-space: nowrap; }
+    .plan-badge.locked mat-icon { font-size: 13px; width: 13px; height: 13px; }
+    .lock-btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid #cbd5e1; background: white; color: #94a3b8; cursor: pointer; padding: 3px; border-radius: 4px; line-height: 0; }
+    .lock-btn:hover { color: #475569; border-color: #94a3b8; }
+    .lock-btn.locked { color: #d97706; border-color: #fbbf24; background: #fffbeb; }
+    .lock-btn mat-icon { font-size: 16px; width: 16px; height: 16px; }
+    .courtesy-cell { display: flex; align-items: center; gap: 6px; }
+    .courtesy-date { padding: 4px 8px; border-radius: 4px; border: 1px solid #cbd5e1; font-size: 0.8rem; background: white; outline: none; color: #334155; }
+    .courtesy-date:focus { border-color: #3b82f6; }
+    .courtesy-badge { font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .courtesy-badge.active { background: #d1fae5; color: #065f46; }
+    .courtesy-badge.expired { background: #fee2e2; color: #991b1b; }
+    .courtesy-clear { display: inline-flex; align-items: center; justify-content: center; border: none; background: transparent; color: #94a3b8; cursor: pointer; padding: 0; border-radius: 4px; }
+    .courtesy-clear:hover { color: #ef4444; background: #fef2f2; }
+    .courtesy-clear mat-icon { font-size: 16px; width: 16px; height: 16px; }
     .bg-gray-50 { background-color: #f9fafb; }
     .border-gray-200 { border-color: #e5e7eb; }
     .rounded-lg { border-radius: 0.5rem; }
@@ -238,7 +296,7 @@ export class ClubsListComponent implements OnInit {
   plans = signal<Plan[]>([]);
   leads = signal<ClubLead[]>([]);
   
-  displayedColumns: string[] = ['id', 'name', 'slug', 'domain', 'plan', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'slug', 'domain', 'plan', 'courtesy', 'actions'];
   leadDisplayedColumns: string[] = ['id', 'name', 'slug', 'contact', 'plan', 'status', 'actions'];
 
   ngOnInit(): void {
@@ -262,6 +320,46 @@ export class ClubsListComponent implements OnInit {
       },
       error: () => {
         this.toast.error('Error al actualizar el plan');
+        this.loadClubs(); // reload to revert UI
+      }
+    });
+  }
+
+  togglePlanLock(club: Club) {
+    const newLocked = !club.plan_locked;
+    this.http.put(`${environment.apiUrl}/admin/clubs/${club.id}/plan`, { plan_id: club.plan_id, plan_locked: newLocked }).subscribe({
+      next: () => {
+        club.plan_locked = newLocked;
+        this.toast.success(newLocked
+          ? `Plan de ${club.name} fijado (no se sincroniza con Stripe)`
+          : `Plan de ${club.name} liberado (se sincronizará con Stripe)`);
+      },
+      error: () => {
+        this.toast.error('Error al actualizar el bloqueo del plan');
+        this.loadClubs(); // reload to revert UI
+      }
+    });
+  }
+
+  /** Valor 'yyyy-MM-dd' para el input date a partir del ISO almacenado. */
+  courtesyInputValue(club: Club): string {
+    return club.courtesy_until ? club.courtesy_until.substring(0, 10) : '';
+  }
+
+  /** El periodo de cortesía sigue vigente (fecha futura). */
+  isCourtesyActive(club: Club): boolean {
+    return !!club.courtesy_until && new Date(club.courtesy_until).getTime() > Date.now();
+  }
+
+  changeClubCourtesy(club: Club, value: string) {
+    const courtesyUntil = value || null;
+    this.http.put<Club>(`${environment.apiUrl}/admin/clubs/${club.id}/courtesy`, { courtesy_until: courtesyUntil }).subscribe({
+      next: (updated) => {
+        club.courtesy_until = updated.courtesy_until ?? null;
+        this.toast.success(courtesyUntil ? `Cortesía de ${club.name} actualizada` : `Cortesía de ${club.name} retirada`);
+      },
+      error: () => {
+        this.toast.error('Error al actualizar la cortesía');
         this.loadClubs(); // reload to revert UI
       }
     });

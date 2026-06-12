@@ -12,6 +12,9 @@ export interface Club {
     logo_url: string | null;
     settings: any;
     plan_id?: number | null;
+    plan_locked?: boolean;
+    courtesy_until?: string | null;
+    has_active_subscription?: boolean;
 }
 
 export interface ClubHandoff {

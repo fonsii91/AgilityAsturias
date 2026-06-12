@@ -44,6 +44,12 @@ class CheckSubscriptionActive
             return $next($request);
         }
 
+        // Periodo de cortesía: clubes existentes (o migrados manualmente) mantienen
+        // acceso completo hasta su fecha límite, aunque no tengan suscripción de Stripe.
+        if ($club->onCourtesyPeriod()) {
+            return $next($request);
+        }
+
         // Si la suscripción no está activa:
         if ($request->user()) {
             if ($request->user()->role === 'manager') {

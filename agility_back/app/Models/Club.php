@@ -20,12 +20,26 @@ class Club extends Model
         'stripe_id',
         'pm_type',
         'pm_last_four',
+        'courtesy_until',
+        'plan_locked',
     ];
 
     protected $casts = [
         'settings' => 'array',
         'settings_ranking' => 'array',
+        'courtesy_until' => 'datetime',
+        'plan_locked' => 'boolean',
     ];
+
+    /**
+     * Indica si el club está dentro de un periodo de cortesía vigente.
+     * Mientras lo esté, mantiene acceso completo aunque no tenga suscripción
+     * de Stripe activa (migración escalonada de los clubes existentes a pago real).
+     */
+    public function onCourtesyPeriod(): bool
+    {
+        return $this->courtesy_until !== null && $this->courtesy_until->isFuture();
+    }
 
     public function users()
     {

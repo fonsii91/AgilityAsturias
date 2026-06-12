@@ -184,6 +184,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/admin/plans/{plan}', [\App\Http\Controllers\SubscriptionAdminController::class, 'updatePlan']);
         Route::put('/admin/plans/{plan}/features', [\App\Http\Controllers\SubscriptionAdminController::class, 'syncFeatures']);
         Route::put('/admin/clubs/{club}/plan', [\App\Http\Controllers\SubscriptionAdminController::class, 'assignPlanToClub']);
+        Route::put('/admin/clubs/{club}/courtesy', [\App\Http\Controllers\SubscriptionAdminController::class, 'setClubCourtesy']);
 
         // Scraper Monitor (Admin)
         Route::get('/admin/scraper/status', [CompetitionController::class, 'adminScraperStatus']);

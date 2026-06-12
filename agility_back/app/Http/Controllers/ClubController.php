@@ -119,7 +119,15 @@ class ClubController extends Controller
 
     public function index()
     {
-        return response()->json(Club::all());
+        // Marca cada club con si su plan está gobernado por una suscripción de Stripe
+        // activa (en ese caso el plan_id se sincroniza solo desde Stripe y el selector
+        // manual de /admin/clubs es solo un override).
+        $clubs = Club::all()->map(function (Club $club) {
+            $club->setAttribute('has_active_subscription', $club->subscribed('default'));
+            return $club;
+        });
+
+        return response()->json($clubs);
     }
 
     public function show(Request $request, Club $club)

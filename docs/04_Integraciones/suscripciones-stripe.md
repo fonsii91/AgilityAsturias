@@ -415,8 +415,65 @@ Pasos pendientes, en orden, para activar el cobro real:
    - [ ] `STRIPE_PRICE_BASICO`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_ELITE`, `STRIPE_COUPON_PRO_LAUNCH`.
    - [ ] `php artisan config:cache && php artisan queue:restart` (config cacheada + workers con config en memoria).
    - ⚠️ **`STRIPE_WEBHOOK_SECRET` es crítico**: sin él, Cashier acepta webhooks sin firmar y, con el nuevo flujo, un webhook falsificado podría aprovisionar un club sin pagar.
-3. **Estrategia para los clubes existentes (ANTES de desactivar el bypass):** al poner `STRIPE_BYPASS_SUBSCRIPTIONS=false`, todos los clubes sin suscripción local quedarán bloqueados — eso incluye a los 6 clubes reales (ver regla crítica de la Sección 10) y a cualquier club registrado durante el bypass. Hay que decidir y ejecutar primero cómo se gestionan (cortesía/migración manual a suscripción, contacto con los gestores, etc.). **Pendiente de definir — no desactivar el bypass sin esto.**
+3. **Estrategia para los clubes existentes (ANTES de desactivar el bypass):** al poner `STRIPE_BYPASS_SUBSCRIPTIONS=false`, todos los clubes sin suscripción local quedarían bloqueados — eso incluye a los 6 clubes reales (ver regla crítica de la Sección 10) y a cualquier club registrado durante el bypass. **Decidido (2026-06-12): modelo híbrido cortesía + plazo**, implementado mediante el **periodo de cortesía** (ver Sección 12). Antes de desactivar el bypass en producción:
+   - [ ] `php artisan migrate` (añade la columna `clubs.courtesy_until`).
+   - [ ] `php artisan clubs:grant-courtesy --until=2026-08-12` (revisar la tabla previa y confirmar). Concede 2 meses de cortesía a los clubes existentes sin suscripción. Añadir `--send-email` para avisar a los gestores (correo a clientes reales — hacerlo de forma consciente).
 4. **Activación y prueba real:**
    - [ ] `STRIPE_BYPASS_SUBSCRIPTIONS=false` + `php artisan config:cache`.
    - [ ] Registro real de un club de prueba con tarjeta real (reembolsable desde el Dashboard): verificar redirección a Checkout, webhook entregado (Dashboard → Webhooks → intentos), club y suscripción creados, correo de activación recibido y acceso del manager sin bloqueo.
    - [ ] Borrar manualmente el club de prueba (manual, club por club — ver regla crítica) y reembolsar el pago.
+
+---
+
+## 12. Periodo de Cortesía (migración escalonada de clubes existentes)
+
+Para no cortar el servicio a los clubes existentes al activar el cobro real, se implementó (2026-06-12) un **periodo de cortesía**: un plazo durante el cual el club mantiene acceso completo aunque no tenga suscripción de Stripe, dándole tiempo a añadir un método de pago.
+
+### A. Modelo de datos
+*   Columna `clubs.courtesy_until` (timestamp nullable, migración `2026_06_12_000000_add_courtesy_until_to_clubs_table`).
+*   Helper [Club::onCourtesyPeriod()](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/Club.php): `true` si `courtesy_until` existe y está en el futuro.
+
+### B. Control de acceso
+*   [CheckSubscriptionActive.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Middleware/CheckSubscriptionActive.php): tras comprobar `subscribed('default')`, deja pasar también si `onCourtesyPeriod()`. Cuando la fecha vence, vuelve el bloqueo normal (402 gestor / 403 socios y staff).
+*   `GET /api/billing/status` reporta `subscribed: true` durante la cortesía (para que socios/staff no se bloqueen) y añade `on_courtesy` (solo `true` si NO hay suscripción real) y `courtesy_until` para el banner.
+
+### C. Frontend
+*   [facturacion](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/frontend/src/app/components/gestor/facturacion/facturacion.ts) muestra un **banner de cortesía** (ámbar) con la cuenta atrás de días y, debajo, las tarjetas de planes para que el gestor active el pago. La tarjeta de "suscripción activa" solo aparece con suscripción de pago real (`subscribed && !on_courtesy`).
+
+### D. Comando de aprovisionamiento
+*   `php artisan clubs:grant-courtesy` ([GrantClubCourtesy.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Console/Commands/GrantClubCourtesy.php)). Opciones: `--until=YYYY-MM-DD` (por defecto +2 meses), `--ids=1,2,3` (por defecto, todos los clubes sin suscripción activa), `--send-email` (avisa a los gestores con [CourtesyPeriodNotice](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Mail/CourtesyPeriodNotice.php)) y `--force`.
+*   **SOLO escribe `courtesy_until`**: nunca borra ni toca otros campos, es idempotente y registra cada asignación en logs. Cumple la regla crítica de la Sección 10 (no destruir clubes existentes).
+
+### E. Configuración visual desde el panel de admin
+*   En **Administrar → Gestión de Clubes** (`/admin/clubs`) cada club tiene una columna **Cortesía** con un selector de fecha (fija `courtesy_until`), una etiqueta de estado (Activa/Expirada) y un botón para retirarla. Guarda al vuelo contra `PUT /api/admin/clubs/{club}/courtesy` ([SubscriptionAdminController@setClubCourtesy](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/SubscriptionAdminController.php)).
+*   Dos caminos complementarios: el **comando** para operaciones en lote (al activar el cobro), y la **columna** para ajustes puntuales por club.
+
+---
+
+## 13. Sincronización del Plan (funciones) con la Suscripción de Stripe
+
+> [!IMPORTANT]
+> Hay **dos conceptos de "plan" separados** que deben mantenerse sincronizados:
+> *   **`clubs.plan_id`** → gobierna las **funciones y límites** del club (gamificación, provisión de fondos, patrocinadores, cuota de almacenamiento). Es lo que consulta el gating de features.
+> *   **`subscriptions.stripe_price`** → gobierna **lo que se factura** en Stripe.
+
+Desde 2026-06-12, [StripeEventListener.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Listeners/StripeEventListener.php) **sincroniza `plan_id` desde el precio de Stripe**:
+
+*   En los eventos `customer.subscription.created` y `customer.subscription.updated` (upgrade/downgrade desde el portal, renovaciones), localiza el club por su cliente de Stripe (`stripe_id`) y ajusta `plan_id` al plan del precio facturado.
+*   También al aprovisionar tras el pago (`syncSubscription`), el `plan_id` se fija desde el precio real comprado.
+*   El mapeo es **precio → slug** vía `config('services.stripe.prices')` → `Plan::where('slug', …)`. Un precio no reconocido se ignora (se registra un warning) y no cambia el plan.
+
+**Consecuencia para el panel de admin:** el selector de plan de `/admin/clubs` sigue existiendo pero ahora es un **override manual**. Para clubes con suscripción de Stripe activa se muestra una etiqueta **"Stripe"** (el `index` de [ClubController](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/ClubController.php) expone `has_active_subscription`): cambiarlo a mano es solo temporal porque el siguiente evento de suscripción lo volverá a sincronizar. El selector es plenamente útil para clubes **sin** Stripe (cortesía, cuentas de cortesía, los 6 clubes existentes).
+
+### Plan fijado (`plan_locked`) — funciones por encima del precio pagado
+
+Para ofrecer a un club las **funciones de un plan superior al que paga** (ej. clubes fundadores: servicios de Élite al precio de Básico) existe el flag `clubs.plan_locked`:
+
+*   Con `plan_locked = true`, [StripeEventListener::applyPlanFromPrice()](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Listeners/StripeEventListener.php) **omite la sincronización**: el club conserva el `plan_id` que le asignó el admin aunque pague un precio distinto en Stripe.
+*   Se controla desde `/admin/clubs` con un **botón de candado** en la columna Plan (badge ámbar **"Fijado"**). Persiste vía `PUT /api/admin/clubs/{club}/plan` con `plan_locked` (en [SubscriptionAdminController@assignPlanToClub](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/SubscriptionAdminController.php); enviar el plan sin el flag no lo altera).
+*   Al liberar el candado (`plan_locked = false`), el siguiente evento de suscripción vuelve a sincronizar el plan con el precio de Stripe.
+
+**Cobertura de tests:** [CourtesyPeriodTest](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/tests/Feature/CourtesyPeriodTest.php) (acceso durante/bloqueo tras la cortesía, status, endpoint admin) y [PlanSyncTest](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/tests/Feature/PlanSyncTest.php) (sync desde precio, precio/cliente desconocido, plan fijado, endpoints de bloqueo/liberación).
+
+> [!NOTE]
+> **Limpieza pendiente de la tabla `plans`:** existen dos filas de Básico duplicadas (`basic`/"Basico" id 1 y `basico`/"Plan Básico" id 2). El mapeo usa el slug `basico` (id 2); la fila `basic` (id 1) es legacy. Conviene consolidarlas para evitar confusión.
