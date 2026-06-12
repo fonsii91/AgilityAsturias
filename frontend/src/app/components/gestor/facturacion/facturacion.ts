@@ -1,10 +1,11 @@
 import { Component, OnInit, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 
 interface BillingStatus {
@@ -15,6 +16,9 @@ interface BillingStatus {
   pm_type: string | null;
   pm_last_four: string | null;
   ends_at: string | null;
+  on_courtesy?: boolean;
+  courtesy_until?: string | null;
+  has_stripe_customer?: boolean;
 }
 
 interface Invoice {
@@ -50,13 +54,14 @@ interface Plan {
 @Component({
   selector: 'app-facturacion',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, MatSnackBarModule],
   templateUrl: './facturacion.html',
   styleUrls: ['./facturacion.css']
 })
 export class FacturacionComponent implements OnInit {
   private http = inject(HttpClient);
   private route = inject(ActivatedRoute);
+  private snackBar = inject(MatSnackBar);
   private apiUrl = `${environment.apiUrl}/billing`;
 
   status = signal<BillingStatus | null>(null);
@@ -110,12 +115,12 @@ export class FacturacionComponent implements OnInit {
       if (response && response.url) {
         window.location.href = response.url;
       } else {
-        alert('No se pudo generar la sesión de pago.');
+        this.notifyError('No se pudo generar la sesión de pago.');
         this.isRedirecting.set(false);
       }
     } catch (error) {
       console.error('Error al iniciar suscripción', error);
-      alert('Ocurrió un error al conectar con Stripe.');
+      this.notifyError(this.extractErrorMessage(error, 'Ocurrió un error al conectar con Stripe.'));
       this.isRedirecting.set(false);
     }
   }
@@ -127,14 +132,24 @@ export class FacturacionComponent implements OnInit {
       if (response && response.url) {
         window.location.href = response.url;
       } else {
-        alert('No se pudo generar el portal de facturación.');
+        this.notifyError('No se pudo generar el portal de facturación.');
         this.isRedirecting.set(false);
       }
     } catch (error) {
       console.error('Error al abrir portal de facturación', error);
-      alert('Ocurrió un error al conectar con el portal de Stripe.');
+      this.notifyError(this.extractErrorMessage(error, 'Ocurrió un error al conectar con el portal de Stripe.'));
       this.isRedirecting.set(false);
     }
+  }
+
+  /** Extrae el mensaje del backend (JSON { message }) si existe; si no, usa el genérico. */
+  private extractErrorMessage(error: unknown, fallback: string): string {
+    const backendMessage = (error as HttpErrorResponse)?.error?.message;
+    return typeof backendMessage === 'string' && backendMessage.length > 0 ? backendMessage : fallback;
+  }
+
+  private notifyError(message: string): void {
+    this.snackBar.open(message, 'Cerrar', { duration: 5000, panelClass: ['error-snackbar'] });
   }
 
   async downloadInvoice(invoice: Invoice) {
@@ -157,8 +172,26 @@ export class FacturacionComponent implements OnInit {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error descargando la factura', error);
-      alert('No se pudo descargar la factura. Inténtalo de nuevo.');
+      this.notifyError('No se pudo descargar la factura. Inténtalo de nuevo.');
     }
+  }
+
+  /**
+   * Hay suscripción de pago REAL: activa, con cliente en Stripe y fuera de cortesía.
+   * Solo en este caso tiene sentido mostrar la tarjeta "Activo" con el portal de Stripe.
+   * Un club en cortesía (o con datos mock sin cliente) debe ver los planes para pagar.
+   */
+  hasPaidSubscription(): boolean {
+    const s = this.status();
+    return !!s?.subscribed && !!s?.has_stripe_customer && !s?.on_courtesy;
+  }
+
+  /** Días restantes del periodo de cortesía (0 si no aplica o ya pasó). */
+  courtesyDaysLeft(): number {
+    const until = this.status()?.courtesy_until;
+    if (!until) return 0;
+    const diffMs = new Date(until).getTime() - Date.now();
+    return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
   }
 
   getTranslateStatus(status: string): string {

@@ -38,8 +38,21 @@
   </div>
 
   <div *ngIf="!isLoading() && !isRedirecting() && status()">
-    <!-- CASO A: SUSCRIPCIÓN ACTIVA -->
-    <div *ngIf="status()?.subscribed" class="active-subscription-card pop-in">
+    <!-- Banner de PERIODO DE CORTESÍA -->
+    <div *ngIf="status()?.on_courtesy" class="alert-banner courtesy-banner fade-in">
+      <span class="material-icons">card_giftcard</span>
+      <div>
+        <strong>Periodo de cortesía activo.</strong>
+        Tu club mantiene el acceso completo sin coste
+        <ng-container *ngIf="status()?.courtesy_until">
+          hasta el <strong>{{ status()?.courtesy_until | date:'dd/MM/yyyy' }}</strong>
+          ({{ courtesyDaysLeft() }} {{ courtesyDaysLeft() === 1 ? 'día restante' : 'días restantes' }})</ng-container>.
+        Añade un método de pago antes de esa fecha para que el servicio no se interrumpa.
+      </div>
+    </div>
+
+    <!-- CASO A: SUSCRIPCIÓN ACTIVA (de pago real con cliente en Stripe) -->
+    <div *ngIf="hasPaidSubscription()" class="active-subscription-card pop-in">
       <div class="card-glow"></div>
       <div class="card-content">
         <div class="plan-details">
@@ -70,13 +83,23 @@
       </div>
     </div>
 
-    <!-- CASO B: SIN SUSCRIPCIÓN ACTIVA -->
-    <div *ngIf="!status()?.subscribed" class="inactive-subscription-area">
-      <div class="inactive-alert pop-in">
+    <!-- CASO B: SIN SUSCRIPCIÓN DE PAGO REAL (primer pago, cortesía o suspendido) -->
+    <div *ngIf="!hasPaidSubscription()" class="inactive-subscription-area">
+      <!-- Suspendido: sin acceso ni cortesía -->
+      <div *ngIf="!status()?.subscribed && !status()?.on_courtesy" class="inactive-alert pop-in">
         <span class="material-icons alert-icon">warning</span>
         <div class="alert-info">
           <h3>Se requiere una suscripción activa</h3>
           <p>Tu club no tiene ningún plan de pago configurado o se encuentra suspendido. Elige uno de nuestros planes a continuación para desbloquear la plataforma de manera inmediata.</p>
+        </div>
+      </div>
+
+      <!-- Con acceso pero pendiente del primer pago (sin cortesía: la cortesía ya tiene su banner) -->
+      <div *ngIf="status()?.subscribed && !status()?.on_courtesy" class="inactive-alert pop-in first-payment-alert">
+        <span class="material-icons alert-icon">credit_card</span>
+        <div class="alert-info">
+          <h3>Activa tu método de pago</h3>
+          <p>Tu club está activo, pero aún no has completado el primer pago. Elige tu plan a continuación para configurar la suscripción y asegurar el servicio sin interrupciones.</p>
         </div>
       </div>
 
