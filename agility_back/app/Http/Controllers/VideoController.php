@@ -969,75 +969,12 @@ class VideoController extends Controller
     }
     
     /**
-     * Devuelve el ID de la colección Bunny del club. Si no está en settings,
-     * la busca por slug en Bunny Stream (y opcionalmente la crea) y la persiste.
+     * Devuelve el ID de la colección Bunny del club (ver BunnyCollectionService).
      */
     private function resolveBunnyCollectionId(\App\Models\Club $club, string $libraryId, string $apiKey, bool $createIfMissing = false): ?string
     {
-        $settings = $club->settings ?? [];
-
-        if (!empty($settings['bunny_collection_id'])) {
-            return $settings['bunny_collection_id'];
-        }
-
-        if (empty($club->slug)) {
-            return null;
-        }
-
-        $clubSlug = $club->slug;
-        $collectionId = null;
-
-        try {
-            // Search for existing collection in Bunny Stream
-            $searchResponse = \Illuminate\Support\Facades\Http::withHeaders([
-                'AccessKey' => $apiKey,
-                'Accept' => 'application/json',
-            ])->get("https://video.bunnycdn.com/library/{$libraryId}/collections", [
-                'search' => $clubSlug,
-                'perPage' => 100,
-            ]);
-
-            if ($searchResponse->successful()) {
-                $collections = $searchResponse->json()['items'] ?? [];
-                foreach ($collections as $col) {
-                    if (isset($col['name']) && strtolower($col['name']) === strtolower($clubSlug)) {
-                        $collectionId = $col['guid'];
-                        break;
-                    }
-                }
-            }
-
-            // If not found, create a new collection in Bunny Stream
-            if (!$collectionId && $createIfMissing) {
-                $createResponse = \Illuminate\Support\Facades\Http::withHeaders([
-                    'AccessKey' => $apiKey,
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json',
-                ])->post("https://video.bunnycdn.com/library/{$libraryId}/collections", [
-                    'name' => $clubSlug,
-                ]);
-
-                if ($createResponse->successful()) {
-                    $createdCol = $createResponse->json();
-                    $collectionId = $createdCol['guid'] ?? null;
-                } else {
-                    \Illuminate\Support\Facades\Log::warning("Failed to create Bunny Stream collection for club {$clubSlug}", [
-                        'response' => $createResponse->body()
-                    ]);
-                }
-            }
-
-            // Save the found or created collection ID in club settings
-            if ($collectionId) {
-                $settings['bunny_collection_id'] = $collectionId;
-                $club->settings = $settings;
-                $club->save();
-            }
-        } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error("Error handling Bunny Stream collection for club {$clubSlug}: " . $e->getMessage());
-        }
-
-        return $collectionId;
+        return app(\App\Services\BunnyCollectionService::class)
+            ->resolveCollectionId($club, $libraryId, $apiKey, $createIfMissing);
     }
 
     private function formatBytes($bytes, $precision = 2)

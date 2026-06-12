@@ -96,55 +96,8 @@ class UploadLocalVideosToBunny extends Command
             // Resolve Bunny collection
             $collectionId = null;
             if ($club && $club->slug) {
-                $clubSlug = $club->slug;
-                $settings = $club->settings ?? [];
-
-                if (!empty($settings['bunny_collection_id'])) {
-                    $collectionId = $settings['bunny_collection_id'];
-                } else {
-                    try {
-                        $searchResponse = Http::withHeaders([
-                            'AccessKey' => $apiKey,
-                            'Accept' => 'application/json',
-                        ])->get("https://video.bunnycdn.com/library/{$libraryId}/collections", [
-                            'search' => $clubSlug,
-                            'perPage' => 100,
-                        ]);
-
-                        if ($searchResponse->successful()) {
-                            $collections = $searchResponse->json()['items'] ?? [];
-                            foreach ($collections as $col) {
-                                if (isset($col['name']) && strtolower($col['name']) === strtolower($clubSlug)) {
-                                    $collectionId = $col['guid'];
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (!$collectionId) {
-                            $createResponse = Http::withHeaders([
-                                'AccessKey' => $apiKey,
-                                'Content-Type' => 'application/json',
-                                'Accept' => 'application/json',
-                            ])->post("https://video.bunnycdn.com/library/{$libraryId}/collections", [
-                                'name' => $clubSlug,
-                            ]);
-
-                            if ($createResponse->successful()) {
-                                $createdCol = $createResponse->json();
-                                $collectionId = $createdCol['guid'] ?? null;
-                            }
-                        }
-
-                        if ($collectionId) {
-                            $settings['bunny_collection_id'] = $collectionId;
-                            $club->settings = $settings;
-                            $club->save();
-                        }
-                    } catch (\Exception $e) {
-                        Log::error("Artisan Upload: Error handling Bunny collection for club {$clubSlug}: " . $e->getMessage());
-                    }
-                }
+                $collectionId = app(\App\Services\BunnyCollectionService::class)
+                    ->resolveCollectionId($club, $libraryId, $apiKey, true);
             }
 
             // Create Video placeholder in Bunny

@@ -125,6 +125,11 @@ class BunnyVideoTest extends TestCase
 
     public function test_bunny_video_store_uses_existing_collection_from_bunny_and_caches_it()
     {
+        // Con settings no vacíos se ejerce la rama del update atómico (JSON_SET),
+        // que además debe conservar las claves existentes.
+        $this->club->settings = ['colors' => ['primary' => '#123456']];
+        $this->club->save();
+
         Http::fake([
             // GET collections list (finds collection)
             'https://video.bunnycdn.com/library/674294/collections?search=testclub&perPage=100' => Http::response([
@@ -165,8 +170,10 @@ class BunnyVideoTest extends TestCase
             return true;
         });
 
-        // Verify club settings cached the collection ID
-        $this->assertEquals('mock-collection-guid-888', $this->club->fresh()->settings['bunny_collection_id'] ?? null);
+        // Verify club settings cached the collection ID and preserved existing keys
+        $settings = $this->club->fresh()->settings;
+        $this->assertEquals('mock-collection-guid-888', $settings['bunny_collection_id'] ?? null);
+        $this->assertEquals('#123456', $settings['colors']['primary'] ?? null);
     }
 
     public function test_bunny_video_store_uses_cached_collection_id_without_querying_bunny_api()
