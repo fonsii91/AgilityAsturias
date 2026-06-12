@@ -96,18 +96,21 @@ class Club extends Model
 
 ---
 
-## 3. Ciclo de Vida del Tenant: Registro y Pago Obligatorio
+## 3. Ciclo de Vida del Tenant: Registro y Aprovisionamiento Tras el Pago
 
-Para asegurar la viabilidad comercial y el filtrado de registros inactivos, el onboarding requiere el registro de un método de pago y suscripción inmediata:
+Desde el rediseño de 2026-06-11, **el club NO se crea hasta que Stripe confirma el pago**. El formulario de registro solo crea un `ClubLead` y todo el aprovisionamiento ocurre en el webhook:
 
 1.  **Registro Inicial:** El gestor del club rellena el formulario de solicitud en la web comercial principal (`join-saas`).
-2.  **Creación de Cuenta Inactiva:** El backend crea la cuenta del club en la base de datos local y un usuario con rol `manager` (Gestor del club).
-3.  **Redirección a Stripe Checkout:** En lugar de forzar al usuario a entrar al panel para realizar el pago, al hacer clic en **Completar Solicitud** se genera una sesión de Stripe Checkout en el backend ([ClubLeadController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/ClubLeadController.php)) y se redirige al usuario de manera inmediata a la pasarela segura de Stripe.
-4.  **Retorno y Aprovisionamiento Seguro:** Tras realizar el pago con éxito, Stripe redirige al usuario a la landing comercial principal con los parámetros `stripe_success=true` y el `slug` del club. Esto dispara de manera segura la animación del flujo de aprovisionamiento de la base de datos de tenant, configuración de Nginx y generación de certificados SSL mediante Let's Encrypt.
-5.  **Confirmación y Activación:** Una vez completado el pago, Stripe emite los webhooks del ciclo de vida de la suscripción. El `WebhookController` de Laravel Cashier procesa el evento **`customer.subscription.created`** (Cashier *no* maneja `checkout.session.completed`) y crea el registro de la suscripción en la base de datos local con estado `active`. El club queda disponible para su uso de forma inmediata.
+2.  **Creación del Lead:** El backend ([ClubLeadController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/ClubLeadController.php)) crea únicamente un registro `ClubLead` con estado `pending`, guardando la contraseña elegida **ya hasheada** en la columna `club_leads.password`. No se crea club, ni usuario, ni SSL, ni se envía ningún correo todavía.
+3.  **Redirección a Stripe Checkout:** Se genera una sesión de Checkout en modo `subscription` directamente con el cliente de Stripe (`Cashier::stripe()->checkout->sessions->create(...)`, sin entidad billable aún), incluyendo `club_lead_id` en los `metadata` de la sesión y de la suscripción, `customer_email` prellenado y el cupón de lanzamiento si el plan es Pro. El usuario es redirigido a la pasarela. Si la creación de la sesión falla, se devuelve un 500 y el lead queda en `pending` (reintentable).
+4.  **Aprovisionamiento vía Webhook:** Al completarse el pago, Cashier dispara el evento `WebhookReceived` y el listener [StripeEventListener.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Listeners/StripeEventListener.php) procesa **`checkout.session.completed`**: localiza el lead por los metadatos y delega en [ClubProvisioningService.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Services/ClubProvisioningService.php), que crea el club (con `stripe_id` del cliente de la sesión), el usuario `manager` (copiando el hash de contraseña del lead), los settings por plan, **envía el correo de activación al gestor y el aviso al admin**, notifica a los admins en base de datos y lanza la generación del SSL. El lead pasa a `approved` con `provisioned_at` y `club_id` (idempotente ante reintentos del webhook).
+5.  **Sincronización de la Suscripción:** Como el webhook `customer.subscription.created` suele llegar **antes** de que el club exista (y Cashier lo descarta al no encontrar el billable), el propio listener recupera la suscripción de Stripe y crea el registro local (`subscriptions` + `subscription_items`). Si esta sincronización fallara, el siguiente `customer.subscription.updated` del ciclo de vida la crearía vía Cashier.
+6.  **Retorno y Animación:** Stripe redirige al usuario a la landing con `stripe_success=true&slug=...`. La animación de aprovisionamiento sondea `GET /api/club-leads/status/{slug}`, que devuelve 404 mientras el webhook no haya creado el club (el frontend tolera el error y sigue sondeando) y `ready: true` cuando el club existe y el SSL responde.
 
 > [!NOTE]
-> Este flujo tiene un problema conocido de **clubes huérfanos** (el club se crea antes del pago) y está decidido rediseñarlo para aprovisionar solo tras confirmar el pago. Ver la **Sección 10** antes de tocar nada del onboarding.
+> **Casos de conflicto:** si entre el registro y el pago otro lead ocupa el mismo slug/email (o el aprovisionamiento falla por cualquier motivo), el listener marca el lead con estado `error`, lo registra en logs y envía un correo a `config('mail.admin_address')` para gestión manual (posible reembolso desde el Dashboard de Stripe).
+>
+> **Flujo con bypass activo** (`STRIPE_BYPASS_SUBSCRIPTIONS=true`, estado actual de producción): no hay pago, y `ClubLeadController@store` aprovisiona inmediatamente con el mismo `ClubProvisioningService` (correo de activación incluido), devolviendo `stripe_checkout_url: null`.
 
 ---
 
@@ -377,19 +380,43 @@ Esto creará un registro de suscripción ficticio de estado `active` asociado al
 > 3. **`Club::delete()` es devastador y irreversible:** el hook `booted()` de [Club.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/Club.php) borra en cascada todos los vídeos, fotos, perros y usuarios del club, **incluyendo los archivos remotos en Bunny.net y Mega S4**. No hay papelera ni soft-delete.
 > 4. **Antes de cualquier operación masiva sobre la tabla `clubs`, hacer backup** (ver [[backups-locales]]) y probar primero en local.
 
-### El problema de los clubes huérfanos
+### El problema histórico de los clubes huérfanos (resuelto el 2026-06-11)
 
-En el flujo actual de registro ([ClubLeadController.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Http/Controllers/ClubLeadController.php)), el club, el usuario `manager`, el email de activación y el certificado SSL se generan **antes** de que el usuario pague. Si el checkout de Stripe se abandona:
+En el flujo de registro original, el club, el usuario `manager`, el email de activación y el certificado SSL se generaban **antes** de que el usuario pagara. Si el checkout de Stripe se abandonaba:
 
-*   El **slug queda secuestrado** (`unique:clubs,slug`) y el **email bloqueado** (`unique:users,email`): la misma persona no puede reintentar el registro desde el formulario.
-*   Se acumulan **certificados SSL de clubes fantasma** (Let's Encrypt limita ~50 certificados nuevos por dominio y semana, así que una ráfaga de registros abandonados puede impedir altas legítimas).
-*   No existe ningún proceso de limpieza (y por la regla crítica de arriba, **no debe automatizarse**).
+*   El **slug quedaba secuestrado** (`unique:clubs,slug`) y el **email bloqueado** (`unique:users,email`): la misma persona no podía reintentar el registro desde el formulario.
+*   Se acumulaban **certificados SSL de clubes fantasma** (Let's Encrypt limita ~50 certificados nuevos por dominio y semana).
 
-### Decisión de diseño (2026-06-11): aprovisionar solo tras el pago
+### Rediseño implementado (2026-06-11): aprovisionar solo tras el pago
 
-Está decidido (pendiente de implementar) rediseñar el onboarding para que **el formulario `join-saas` solo cree el `ClubLead`**, y el aprovisionamiento real (club, usuario manager, settings, SSL) ocurra **al confirmarse el pago** vía webhook de Stripe. Implicaciones a resolver cuando se implemente:
+El onboarding se rediseñó tal y como estaba decidido — ver la **Sección 3** para el flujo completo:
 
-*   El checkout de Stripe debe crearse a partir del lead (sin `Club` billable aún), p. ej. con un Checkout de Stripe directo y metadatos del lead, aprovisionando el club en un listener del evento `WebhookReceived` de Cashier.
-*   La animación de aprovisionamiento de la landing (parámetro `stripe_success=true`) hoy asume que el club ya existe al volver de Stripe; deberá esperar/poll al aprovisionamiento real (ya existe el endpoint de comprobación de SSL como referencia).
-*   El email de activación con el token de reset debe enviarse tras el pago, no al rellenar el formulario.
-*   La migración del flujo **no debe tocar los clubes existentes** (ver regla crítica): solo afecta a registros nuevos.
+*   El formulario `join-saas` solo crea el `ClubLead` (con la contraseña hasheada en `club_leads.password`). Un checkout abandonado deja un lead `pending` inocuo: no reserva slug ni email, no genera SSL y permite reintentar el registro.
+*   El checkout de Stripe se crea directamente a partir del lead (sin `Club` billable aún), con `club_lead_id` en los metadatos; el aprovisionamiento ocurre en [StripeEventListener.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Listeners/StripeEventListener.php) (evento `WebhookReceived` de Cashier) usando [ClubProvisioningService.php](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Services/ClubProvisioningService.php).
+*   El email de activación con el token de reset se envía **tras el pago** (o inmediatamente en el flujo con bypass).
+*   La animación de aprovisionamiento de la landing no necesitó cambios: el sondeo de `GET /api/club-leads/status/{slug}` tolera el 404 mientras el webhook no haya creado el club y sigue sondeando.
+*   La migración del flujo **no tocó los clubes existentes** (ver regla crítica): solo afecta a registros nuevos. Columnas nuevas en `club_leads`: `password`, `stripe_session_id`, `club_id`, `provisioned_at` (requiere `php artisan migrate` al desplegar).
+*   Pueden quedar leads abandonados acumulándose en `club_leads` (estado `pending` sin `provisioned_at`); son inofensivos y visibles en el panel de administración para limpieza manual.
+
+---
+
+## 11. Checklist: qué falta para que la integración funcione al 100% en producción
+
+**Estado a 2026-06-11:** el código del flujo completo (lead → checkout → webhook → aprovisionamiento → correo de activación → suscripción local) está **desplegado y probado end-to-end en local** con claves de test (pago real simulado con `4242...`, webhook vía `stripe listen`, correo y suscripción verificados). En producción sigue **dormido bajo el bypass** (`STRIPE_BYPASS_SUBSCRIPTIONS=true`): los registros nuevos se aprovisionan sin pago, como hasta ahora.
+
+Pasos pendientes, en orden, para activar el cobro real:
+
+1. **Dashboard de Stripe (modo live):**
+   - [ ] Crear los 3 productos con sus precios recurrentes mensuales: Básico 29 €, Pro 49 €, Élite 79 €.
+   - [ ] Crear el cupón de lanzamiento del Plan Pro (rebaja a 19 €/mes los 2 primeros meses).
+   - [ ] Dar de alta el endpoint del webhook: `https://clubagility.com/backend/api/webhooks/stripe` (⚠️ con el prefijo `/backend`). Eventos mínimos: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, `invoice.payment_failed`. Copiar el `whsec_...` del endpoint.
+2. **`.env` del servidor** (`/var/www/agilityasturias/agility_back/.env`):
+   - [ ] `STRIPE_KEY` (pk_live), `STRIPE_SECRET` (sk_live), `STRIPE_WEBHOOK_SECRET` (whsec del paso anterior).
+   - [ ] `STRIPE_PRICE_BASICO`, `STRIPE_PRICE_PRO`, `STRIPE_PRICE_ELITE`, `STRIPE_COUPON_PRO_LAUNCH`.
+   - [ ] `php artisan config:cache && php artisan queue:restart` (config cacheada + workers con config en memoria).
+   - ⚠️ **`STRIPE_WEBHOOK_SECRET` es crítico**: sin él, Cashier acepta webhooks sin firmar y, con el nuevo flujo, un webhook falsificado podría aprovisionar un club sin pagar.
+3. **Estrategia para los clubes existentes (ANTES de desactivar el bypass):** al poner `STRIPE_BYPASS_SUBSCRIPTIONS=false`, todos los clubes sin suscripción local quedarán bloqueados — eso incluye a los 6 clubes reales (ver regla crítica de la Sección 10) y a cualquier club registrado durante el bypass. Hay que decidir y ejecutar primero cómo se gestionan (cortesía/migración manual a suscripción, contacto con los gestores, etc.). **Pendiente de definir — no desactivar el bypass sin esto.**
+4. **Activación y prueba real:**
+   - [ ] `STRIPE_BYPASS_SUBSCRIPTIONS=false` + `php artisan config:cache`.
+   - [ ] Registro real de un club de prueba con tarjeta real (reembolsable desde el Dashboard): verificar redirección a Checkout, webhook entregado (Dashboard → Webhooks → intentos), club y suscripción creados, correo de activación recibido y acceso del manager sin bloqueo.
+   - [ ] Borrar manualmente el club de prueba (manual, club por club — ver regla crítica) y reembolsar el pago.

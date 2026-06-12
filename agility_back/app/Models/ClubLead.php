@@ -15,6 +15,23 @@ class ClubLead extends Model
         'email',
         'phone',
         'plan_selected',
+        'password',
         'status',
+        'stripe_session_id',
+        'club_id',
+        'provisioned_at',
     ];
+
+    protected $hidden = [
+        'password',
+    ];
+
+    protected $casts = [
+        'provisioned_at' => 'datetime',
+    ];
+
+    public function club()
+    {
+        return $this->belongsTo(Club::class);
+    }
 }

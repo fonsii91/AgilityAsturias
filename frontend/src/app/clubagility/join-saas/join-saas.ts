@@ -153,6 +153,11 @@ export class JoinSaas implements OnInit {
     return decimal.split('.')[1] || '00';
   }
 
+  getClubUrl(): string {
+    const slug = this.leadForm.get('slug')?.value || '';
+    return environment.clubUrlTemplate.replace('{slug}', slug);
+  }
+
   selectPlan(plan: Plan) {
     this.selectedPlan.set(plan.name);
     window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -1,6 +1,8 @@
 export const environment = {
     production: true, // Asumimos que configuraremos su propio pipeline de pre-producción
     apiUrl: 'http://localhost:3000', // Esta URL apuntaría al backend o droplet de Patitas Felices
+    // URL pública de cada club; {slug} se sustituye por su subdominio
+    clubUrlTemplate: 'https://{slug}.clubagility.com',
     clubConfig: {
         name: "Patitas Felices",
         slogan: "Saltando juntos, creando momentos inolvidables.",

@@ -4,7 +4,8 @@
     "date": "2026-06-11",
     "features": [
       "¡Recupera tu contraseña tú mismo! Si alguna vez olvidas tu contraseña, ya no necesitas contactar con los responsables de tu club: ahora encontrarás el enlace '¿Has olvidado tu contraseña?' en la pantalla de inicio de sesión. Escribe tu correo electrónico y te enviaremos al instante un enlace seguro para elegir una contraseña nueva.",
-      "¡Enlaces de recuperación más seguros! Los enlaces para restablecer la contraseña ahora caducan automáticamente pasado un tiempo prudencial y solo pueden usarse una vez, protegiendo mejor tu cuenta frente a accesos no deseados."
+      "¡Enlaces de recuperación más seguros! Los enlaces para restablecer la contraseña ahora caducan automáticamente pasado un tiempo prudencial y solo pueden usarse una vez, protegiendo mejor tu cuenta frente a accesos no deseados.",
+      "¡Alta de clubes más segura y ordenada! Hemos mejorado el proceso de creación de nuevos clubes: tu club se configura automáticamente justo después de confirmar la suscripción y recibirás un correo de bienvenida con tu enlace de acceso y la activación de tu cuenta de gestor. Además, si el proceso de pago se interrumpe, ahora puedes volver a intentarlo con el mismo nombre y correo sin problemas."
     ],
     "bugfixes": [
       "¡Descarga de facturas reparada! Solucionamos un problema que impedía a los responsables del club descargar los recibos de pago en PDF desde la sección de Facturación. Ahora la descarga funciona correctamente con un solo clic."
