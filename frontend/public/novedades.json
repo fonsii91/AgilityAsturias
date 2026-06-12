@@ -2,10 +2,15 @@
   {
     "version": "1.1.54",
     "date": "2026-06-12",
-    "features": [],
+    "features": [
+      "¡Acceso directo a la Facturación! Los responsables del club ahora cuentan con un enlace de 'Facturación' en su menú de Gestor (también desde el móvil) para consultar su plan, descargar recibos y gestionar el pago de la suscripción sin rodeos.",
+      "¡Pantalla de pagos más clara! Si tu club aún no ha completado la activación del pago, la sección de facturación ahora te lo explica con un aviso claro y te muestra los planes disponibles para activarlo en un par de clics. Y si tu club disfruta de un periodo de cortesía, verás la fecha límite y los días restantes para que nada te pille por sorpresa."
+    ],
     "bugfixes": [
       "¡Contador de almacenamiento de vídeos corregido! El indicador de espacio de la videoteca mostraba \"0 B\" aunque el club tuviera vídeos subidos. Ahora vuelve a reflejar el espacio realmente ocupado por tus vídeos y, además, ya no se reinicia al guardar cambios en la configuración del club.",
-      "¡Dato de espacio disponible más fiable! Si el servicio de vídeos tarda en responder en un momento puntual, la aplicación ya no se queda mostrando un almacenamiento incorrecto durante varios minutos, sino que lo vuelve a comprobar al instante."
+      "¡Dato de espacio disponible más fiable! Si el servicio de vídeos tarda en responder en un momento puntual, la aplicación ya no se queda mostrando un almacenamiento incorrecto durante varios minutos, sino que lo vuelve a comprobar al instante.",
+      "¡Página de Suscripción y Facturación renovada! Corregimos los colores de esta sección, que mostraba textos casi invisibles y tarjetas oscuras que no encajaban con el resto de la aplicación. Ahora luce el mismo estilo claro y legible que las demás pantallas.",
+      "¡Avisos más útiles en la facturación! Los mensajes de esta sección ya no aparecen como ventanas emergentes del navegador: ahora se muestran como notificaciones discretas y explican el motivo real de cada problema para que sepas exactamente qué hacer."
     ]
   },
   {
