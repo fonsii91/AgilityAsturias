@@ -146,8 +146,10 @@
                 class="material-icons">query_stats</span> Canina (RSCE)</a></li>
           <li><a routerLink="/admin/scraper-monitor" routerLinkActive="active-route"><span
                 class="material-icons">sync</span> Monitor Scraping</a></li>
+          @if (ligaNorteEnabled()) {
           <li><a routerLink="/admin/liga-norte" routerLinkActive="active-route"><span
                 class="material-icons">emoji_events</span> Liga Norte</a></li>
+          }
           <li><a routerLink="/admin/avatares" routerLinkActive="active-route"><span
                 class="material-icons">auto_awesome</span> Avatares IA</a></li>
           <li><a routerLink="/admin/onboarding-monitor" routerLinkActive="active-route"><span
@@ -164,8 +166,10 @@
         <ul class="dropdown-menu-list">
           <li *hasFeature="'salud-canina'"><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route"><span
                 class="material-icons">favorite</span> Salud Deportiva</a></li>
+          @if (ligaNorteEnabled()) {
           <li><a routerLink="/explorar/liga-norte" routerLinkActive="active-route"><span
                 class="material-icons">emoji_events</span> Liga Norte</a></li>
+          }
           <li *hasFeature="'modulo-canina'"><a routerLink="/bitacora-rsce" routerLinkActive="active-route"><span
                 class="material-icons">analytics</span> Canina (RSCE)</a></li>
           <li *hasFeature="'modulo-caza'"><a routerLink="/bitacora-rfec" routerLinkActive="active-route"><span class="material-icons">pets</span>

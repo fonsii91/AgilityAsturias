@@ -20,6 +20,7 @@ import { managerGuard } from './guards/manager.guard';
 import { featureGuard } from './guards/feature.guard';
 import { gamificationGuard } from './guards/gamification.guard';
 import { provisionFondosGuard } from './guards/provision-fondos.guard';
+import { ligaNorteGuard } from './guards/liga-norte.guard';
 import { subscriptionActiveGuard } from './guards/subscription-active.guard';
 
 export const routes: Routes = [
@@ -178,7 +179,7 @@ export const routes: Routes = [
             {
                 path: 'admin/liga-norte',
                 loadComponent: () => import('./components/admin-liga-norte/admin-liga-norte').then(m => m.AdminLigaNorteComponent),
-                canActivate: [staffGuard],
+                canActivate: [staffGuard, ligaNorteGuard],
                 title: titleResolver, data: { pageTitle: 'Administrar Liga Norte' }
             },
             {
@@ -376,7 +377,7 @@ export const routes: Routes = [
             {
                 path: 'explorar/liga-norte',
                 loadComponent: () => import('./components/clasificacion-liga-norte/clasificacion-liga-norte').then(m => m.ClasificacionLigaNorteComponent),
-                canActivate: [memberGuard],
+                canActivate: [memberGuard, ligaNorteGuard],
                 title: titleResolver, data: { pageTitle: 'Clasificación Liga Norte' }
             },
             {

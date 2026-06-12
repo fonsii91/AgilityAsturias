@@ -324,6 +324,20 @@ interface Plan {
                 <hr class="divider">
 
                 <div class="input-group">
+                  <label>Sección Liga Norte</label>
+                  <p class="help-text" style="margin-top: 2px; margin-bottom: 12px;">Activa o desactiva la clasificación y los contenidos de la Liga Norte (tanto para los miembros en Explorar como el panel de administración/scraping).</p>
+                  <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0;">
+                    <span style="font-size: 0.875rem; font-weight: 500; color: #475569;">Módulo Liga Norte</span>
+                    <label class="switch">
+                      <input type="checkbox" formControlName="liga_norte_enabled">
+                      <span class="slider"></span>
+                    </label>
+                  </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="input-group">
                   <label>Módulo de Patrocinadores</label>
                   <p class="help-text" style="margin-top: 2px; margin-bottom: 12px;">Habilita la sección de patrocinadores en la cara pública y la gestión de marcas colaboradoras.</p>
                   <div style="display: flex; align-items: center; justify-content: space-between; padding: 0.5rem 0;">
@@ -1028,6 +1042,7 @@ export class ClubFormComponent implements OnInit {
       mapUrl: [''],
       gamification_enabled: [true],
       provision_fondos_enabled: [true],
+      liga_norte_enabled: [true],
       sponsors_enabled: [false]
     });
   }
@@ -1059,6 +1074,7 @@ export class ClubFormComponent implements OnInit {
             mapUrl: settings.contact?.mapUrl || '',
             gamification_enabled: settings.gamification_enabled !== false,
             provision_fondos_enabled: settings.provision_fondos_enabled !== false,
+            liga_norte_enabled: settings.liga_norte_enabled !== false,
             sponsors_enabled: settings.sponsors_enabled === true || settings.sponsors_enabled === 'true'
           });
 
@@ -1165,6 +1181,7 @@ export class ClubFormComponent implements OnInit {
       landing_page_requested: this.clubData?.settings?.landing_page_requested || false,
       gamification_enabled: formValue.gamification_enabled,
       provision_fondos_enabled: formValue.provision_fondos_enabled,
+      liga_norte_enabled: formValue.liga_norte_enabled,
       sponsors_enabled: formValue.sponsors_enabled,
       contact: {
         phone: formValue.phone,

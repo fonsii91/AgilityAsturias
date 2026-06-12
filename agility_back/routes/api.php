@@ -139,10 +139,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/admin/videos/{id}/retry', [VideoController::class, 'retryUpload']);
 
         // Liga Norte
-        Route::get('/admin/liga-norte/imports', [LigaNorteController::class, 'listImports']);
-        Route::post('/admin/liga-norte/imports/{id}/process', [LigaNorteController::class, 'processImport']);
-        Route::post('/admin/liga-norte/imports/{id}/approve', [LigaNorteController::class, 'approveImport']);
-        Route::post('/admin/liga-norte/imports/{id}/delete', [LigaNorteController::class, 'deleteImport']);
+        Route::middleware(['liga_norte.enabled'])->group(function () {
+            Route::get('/admin/liga-norte/imports', [LigaNorteController::class, 'listImports']);
+            Route::post('/admin/liga-norte/imports/{id}/process', [LigaNorteController::class, 'processImport']);
+            Route::post('/admin/liga-norte/imports/{id}/approve', [LigaNorteController::class, 'approveImport']);
+            Route::post('/admin/liga-norte/imports/{id}/delete', [LigaNorteController::class, 'deleteImport']);
+        });
 
     });
 
@@ -307,8 +309,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         // Scraper Tracks for members
         Route::get('/scraper/last-tracks', [CompetitionController::class, 'memberScraperLastTracks']);
 
-        // Liga Norte Public Standings
-        Route::get('/liga-norte/standings', [LigaNorteController::class, 'getStandings']);
+        Route::middleware(['liga_norte.enabled'])->group(function () {
+            // Liga Norte Public Standings
+            Route::get('/liga-norte/standings', [LigaNorteController::class, 'getStandings']);
+        });
 
         // Provisión de Fondos (Finanzas)
         Route::middleware(['provision_fondos.enabled'])->group(function () {
