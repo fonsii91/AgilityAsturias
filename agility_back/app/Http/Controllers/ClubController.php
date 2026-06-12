@@ -8,6 +8,10 @@ use App\Models\Club;
 
 class ClubController extends Controller
 {
+    // Claves de settings gestionadas por el backend que nunca deben perderse
+    // al guardar la configuración del club desde el frontend.
+    private const INTERNAL_SETTINGS_KEYS = ['bunny_collection_id'];
+
     public function current()
     {
         if (app()->bound('active_club_id')) {
@@ -202,6 +206,19 @@ class ClubController extends Controller
         $settings = $request->input('settings');
         if (is_string($settings)) {
             $settings = json_decode($settings, true);
+        }
+
+        $currentSettings = $club->settings ?? [];
+        if (!is_array($settings)) {
+            $settings = $currentSettings;
+        }
+
+        // Claves internas del sistema que el formulario de gestión no conoce:
+        // si el cliente no las envía, se conservan las existentes en lugar de borrarlas.
+        foreach (self::INTERNAL_SETTINGS_KEYS as $key) {
+            if (!array_key_exists($key, $settings) && array_key_exists($key, $currentSettings)) {
+                $settings[$key] = $currentSettings[$key];
+            }
         }
 
         $updateData = [

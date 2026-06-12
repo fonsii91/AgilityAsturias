@@ -56,6 +56,25 @@ class ManagerRoleCapabilitiesTest extends TestCase
     }
 
     /** @test */
+    public function updating_club_settings_preserves_internal_bunny_collection_id()
+    {
+        $this->club->settings = ['bunny_collection_id' => 'mock-collection-guid-333', 'colors' => ['primary' => '#0073CF']];
+        $this->club->save();
+
+        $response = $this->actingAs($this->manager)->putJson("/api/admin/clubs/{$this->club->id}", [
+            'name' => 'Updated Club Name',
+            'slug' => 'updated-club',
+            'settings' => ['colors' => ['primary' => '#ff0000']]
+        ]);
+
+        $response->assertStatus(200);
+
+        $settings = $this->club->fresh()->settings;
+        $this->assertEquals('#ff0000', $settings['colors']['primary'] ?? null);
+        $this->assertEquals('mock-collection-guid-333', $settings['bunny_collection_id'] ?? null);
+    }
+
+    /** @test */
     public function manager_cannot_update_other_clubs()
     {
         $otherClub = Club::create([

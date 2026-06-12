@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.1.54",
+    "date": "2026-06-12",
+    "features": [],
+    "bugfixes": [
+      "¡Contador de almacenamiento de vídeos corregido! El indicador de espacio de la videoteca mostraba \"0 B\" aunque el club tuviera vídeos subidos. Ahora vuelve a reflejar el espacio realmente ocupado por tus vídeos y, además, ya no se reinicia al guardar cambios en la configuración del club.",
+      "¡Dato de espacio disponible más fiable! Si el servicio de vídeos tarda en responder en un momento puntual, la aplicación ya no se queda mostrando un almacenamiento incorrecto durante varios minutos, sino que lo vuelve a comprobar al instante."
+    ]
+  },
+  {
     "version": "1.1.53",
     "date": "2026-06-11",
     "features": [

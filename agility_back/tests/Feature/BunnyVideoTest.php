@@ -213,6 +213,64 @@ class BunnyVideoTest extends TestCase
         });
     }
 
+    public function test_storage_stats_resolves_missing_collection_id_by_slug_and_persists_it()
+    {
+        Http::fake([
+            // GET collections list (finds collection by slug)
+            'https://video.bunnycdn.com/library/674294/collections?search=testclub&perPage=100' => Http::response([
+                'items' => [
+                    [
+                        'guid' => 'mock-collection-guid-111',
+                        'name' => 'testclub'
+                    ]
+                ],
+                'totalItems' => 1
+            ], 200),
+            // GET collection detail with totalSize
+            'https://video.bunnycdn.com/library/674294/collections/mock-collection-guid-111' => Http::response([
+                'guid' => 'mock-collection-guid-111',
+                'name' => 'testclub',
+                'videoCount' => 2,
+                'totalSize' => 123456789
+            ], 200),
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders(['X-Club-Slug' => 'testclub'])
+            ->getJson('/api/videos');
+
+        $response->assertStatus(200);
+        $this->assertEquals(123456789, $response->json('storage.used_bytes'));
+
+        // The recovered collection ID is persisted in club settings for future requests
+        $this->assertEquals('mock-collection-guid-111', $this->club->fresh()->settings['bunny_collection_id'] ?? null);
+
+        // Reading stats must never create new collections in Bunny
+        Http::assertNotSent(function ($request) {
+            return $request->method() === 'POST' && str_ends_with($request->url(), '/collections');
+        });
+    }
+
+    public function test_storage_stats_does_not_cache_failed_bunny_responses()
+    {
+        $this->club->settings = ['bunny_collection_id' => 'mock-collection-guid-222'];
+        $this->club->save();
+
+        Http::fake([
+            'https://video.bunnycdn.com/library/674294/collections/mock-collection-guid-222' => Http::response(null, 500),
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->withHeaders(['X-Club-Slug' => 'testclub'])
+            ->getJson('/api/videos');
+
+        $response->assertStatus(200);
+        $this->assertEquals(0, $response->json('storage.used_bytes'));
+
+        // A failed Bunny response must not freeze "0 B" in the cache
+        $this->assertNull(\Illuminate\Support\Facades\Cache::get("club_{$this->club->id}_bunny_storage_bytes"));
+    }
+
     public function test_bunny_video_uploaded_transitions_to_encoding()
     {
         $video = Video::create([
