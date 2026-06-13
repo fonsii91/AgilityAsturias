@@ -32,6 +32,22 @@
     z-index: 1;
 }
 
+/* Placeholder cuando el perro no tiene foto: degradado pizarra + icono. */
+.hero-profile-bento.no-photo {
+    background: linear-gradient(135deg, #475569 0%, #334155 100%);
+}
+
+.hero-placeholder-icon {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 6rem;
+    color: rgba(255, 255, 255, 0.35);
+    z-index: 0;
+    user-select: none;
+}
+
 .profile-content {
     position: relative;
     z-index: 2;

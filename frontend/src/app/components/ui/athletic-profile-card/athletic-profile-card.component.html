@@ -2,8 +2,12 @@
   style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
 
   <!-- Dog Profile Header -->
-  <div class="hero-profile-bento" [ngStyle]="{'background-image': 'url(' + heroImageUrl() + ')'}"
+  <div class="hero-profile-bento" [class.no-photo]="!heroImageUrl()"
+    [ngStyle]="heroImageUrl() ? {'background-image': 'url(' + heroImageUrl() + ')'} : {}"
     style="border-radius: 0; box-shadow: none; transition: background-image 0.5s ease-in-out;">
+    @if (!heroImageUrl()) {
+      <span class="material-icons hero-placeholder-icon">pets</span>
+    }
     <div class="profile-gradient-overlay"></div>
     <div class="profile-content">
       <h1 class="hero-dog-name m-0">{{ dogName() }}</h1>

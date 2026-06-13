@@ -58,10 +58,11 @@ export class SaludDeportivaComponent implements OnInit {
 
   heroImageUrl = computed(() => {
     const dog = this.selectedDog();
-    if (!dog) return '/placeholder-dog.jpg';
+    if (!dog) return '';
 
     // Se mantiene siempre la foto original del perro como foto principal.
-    return dog.photo_url || '/placeholder-dog.jpg';
+    // Vacío si no tiene foto: la tarjeta muestra entonces un placeholder.
+    return dog.photo_url || '';
   });
 
   hasTrainingProfile = computed(() => {
