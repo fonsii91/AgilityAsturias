@@ -46,9 +46,13 @@ class ClubProvisioningService
             $planSlug = $this->resolvePlanSlug($lead->plan_selected);
             $plan = Plan::where('slug', $planSlug)->first() ?: Plan::first();
 
-            // Los módulos arrancan activados solo si la feature correspondiente
-            // está en el plan (misma fuente que el gating de ClubController:
-            // la matriz de /admin/suscripciones).
+            // Política de arranque de módulos (decisión UX):
+            //  - Gamificación: ON si el plan la incluye. Es el núcleo de engagement y
+            //    da vida al club desde el primer día (clasificación, etc.).
+            //  - Provisión de Fondos, Patrocinadores y Liga Norte: OFF por defecto
+            //    aunque el plan los incluya. Manejan dinero/cara pública/nicho y en
+            //    vacío dan mala imagen; el gestor los activa cuando esté listo desde
+            //    Configuración del club (siguen visibles y gobernados por el plan).
             $planHasFeature = fn (string $slug) => $plan
                 ? $plan->features()->where('slug', $slug)->exists()
                 : false;
@@ -68,9 +72,9 @@ class ClubProvisioningService
                 'customizationRequest' => '',
                 'landing_page_requested' => false,
                 'gamification_enabled' => $planHasFeature('gamificacion'),
-                'provision_fondos_enabled' => $planHasFeature('provision-fondos'),
-                'sponsors_enabled' => $planHasFeature('patrocinadores'),
-                'liga_norte_enabled' => $planHasFeature('liga-norte'),
+                'provision_fondos_enabled' => false,
+                'sponsors_enabled' => false,
+                'liga_norte_enabled' => false,
                 'contact' => [
                     'phone' => $lead->phone ?? '',
                     'email' => $lead->email ?? '',
