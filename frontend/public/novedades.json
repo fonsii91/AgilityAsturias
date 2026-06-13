@@ -1,5 +1,17 @@
 [
   {
+    "version": "1.1.55",
+    "date": "2026-06-13",
+    "features": [
+      "¡Tu plan, más claro que nunca! En 'Gestionar Club', los interruptores de los módulos opcionales (Gamificación, Provisión de Fondos, Patrocinadores y Liga Norte) ahora te indican si están incluidos en tu plan. Si alguno no lo está, verás directamente en qué planes está disponible, para que puedas valorar una mejora de suscripción con toda la información.",
+      "¡Cambios de plan sin sorpresas! Cuando tu club cambie de plan, los módulos opcionales se ajustan automáticamente a lo que incluye el nuevo plan, manteniendo siempre tu configuración coherente con tu suscripción."
+    ],
+    "bugfixes": [
+      "¡Navegación restablecida durante el periodo de cortesía! Si tu club disfruta de un periodo de cortesía, ya puedes moverte por todas las secciones con normalidad; antes, algunas pantallas redirigían por error a la página de facturación aunque el acceso estuviera garantizado.",
+      "¡Configuración del club más sólida! Hemos blindado el guardado de los ajustes del club para que los cambios realizados desde distintas pantallas (identidad y colores, reglas de reserva, peticiones de personalización…) no puedan pisarse entre sí ni perderse al guardar."
+    ]
+  },
+  {
     "version": "1.1.54",
     "date": "2026-06-12",
     "features": [
