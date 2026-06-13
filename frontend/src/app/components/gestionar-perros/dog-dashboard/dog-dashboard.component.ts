@@ -72,9 +72,6 @@ import { OnboardingService } from '../../../services/onboarding';
             <a routerLink="entrenamiento" routerLinkActive="active" class="nav-tab" style="--active-color: var(--primary-color);">
               <span class="material-icons-outlined">fitness_center</span> Entrenamiento
             </a>
-            <a routerLink="salud" routerLinkActive="active" class="nav-tab" style="--active-color: var(--primary-color);">
-              <span class="material-icons-outlined">medical_services</span> Salud
-            </a>
             <a routerLink="documentacion" routerLinkActive="active" class="nav-tab" style="--active-color: var(--primary-color);">
               <span class="material-icons-outlined">folder_shared</span> Documentos
             </a>

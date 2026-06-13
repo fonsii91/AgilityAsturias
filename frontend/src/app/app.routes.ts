@@ -264,7 +264,8 @@ export const routes: Routes = [
                             { path: '', redirectTo: 'resumen', pathMatch: 'full' },
                             { path: 'resumen', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogSummaryComponent) },
                             { path: 'entrenamiento', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogTrainingComponent) },
-                            { path: 'salud', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogHealthComponent) },
+                            // Pestaña "Salud" retirada por ahora (solo placeholder). El componente
+                            // DogHealthComponent se conserva para reactivarla cuando tenga contenido.
                             { path: 'documentacion', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogDocsComponent) },
                             { path: 'familia', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogFamilyComponent) },
                             { path: 'ajustes', loadComponent: () => import('./components/gestionar-perros').then(m => m.DogSettingsComponent) }
