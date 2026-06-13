@@ -75,17 +75,18 @@ class ClubLeadController extends Controller
         }
 
         try {
-            $scheme = $request->secure() ? 'https' : 'http';
-            $host = $request->getHost();
-
-            if (str_contains($host, 'localhost') || str_contains($host, '127.0.0.1')) {
+            // El host de retorno depende del entorno, no de la URL del backend:
+            // en local el backend se sirve en dominios como agility_back.test, que
+            // no contienen "localhost", así que detectarlo por host mandaba el
+            // redirect a producción. Se usa el mismo criterio que buildActivationLink.
+            if (config('app.env') === 'production') {
+                $returnHost = "https://clubagility.com";
+            } else {
                 $parsedUrl = parse_url(config('services.frontend_url'));
                 $scheme = $parsedUrl['scheme'] ?? 'http';
                 $hostOnly = $parsedUrl['host'] ?? 'localhost';
                 $portOnly = isset($parsedUrl['port']) ? ':' . $parsedUrl['port'] : '';
                 $returnHost = "{$scheme}://{$hostOnly}{$portOnly}";
-            } else {
-                $returnHost = "https://clubagility.com";
             }
 
             $successUrl = "{$returnHost}/?stripe_success=true&slug={$validated['slug']}&email=" . urlencode($validated['email']) . "&plan=" . urlencode($validated['plan_selected']) . "&session_id={CHECKOUT_SESSION_ID}";
