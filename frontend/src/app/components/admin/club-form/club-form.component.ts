@@ -291,7 +291,9 @@ interface Plan {
               </div>
             </div>
 
-            <!-- Card: Módulos Activos -->
+            <!-- Card: Módulos Activos (solo admin; el gestor los gestiona en
+                 "Funcionalidades del club" -> /configuracion/modulos). -->
+            @if (isAdmin()) {
             <div class="bento-card">
               <div class="card-header purple-header">
                 <div class="icon-box purple-icon"><mat-icon>widgets</mat-icon></div>
@@ -373,6 +375,7 @@ interface Plan {
                 </div>
               </div>
             </div>
+            }
 
           </div>
 

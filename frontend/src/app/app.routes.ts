@@ -90,6 +90,12 @@ export const routes: Routes = [
         canActivate: [managerGuard, subscriptionActiveGuard],
         title: titleResolver, data: { pageTitle: 'Suscripción y Facturación' }
     },
+    {
+        path: 'configuracion/modulos',
+        loadComponent: () => import('./components/gestor/funcionalidades/funcionalidades.component').then(m => m.FuncionalidadesClubComponent),
+        canActivate: [managerGuard, subscriptionActiveGuard],
+        title: titleResolver, data: { pageTitle: 'Funcionalidades del club' }
+    },
 
     // ==========================================
     // Rutas Protegidas por Suscripción Activa

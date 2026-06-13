@@ -1,0 +1,54 @@
+<div class="func-container">
+  <div class="func-header">
+    <h2><span class="material-icons">widgets</span> Funcionalidades del club</h2>
+    <p>Activa los módulos opcionales cuando estés listo para usarlos. Los que no incluye tu plan aparecen bloqueados.</p>
+  </div>
+
+  @if (isLoading()) {
+    <div class="func-loading">
+      <div class="spinner"></div> Cargando módulos...
+    </div>
+  } @else {
+    <div class="modules-grid">
+      @for (m of modules; track m.key) {
+        <div class="module-card" [class.enabled]="isEnabled(m.key)" [class.locked]="isLocked(m)">
+          <div class="module-icon">
+            <span class="material-icons">{{ m.icon }}</span>
+          </div>
+
+          <div class="module-body">
+            <div class="module-title-row">
+              <h3>{{ m.title }}</h3>
+              @if (isLocked(m)) {
+                <span class="status-pill locked"><span class="material-icons">lock</span> No incluido</span>
+              } @else if (isEnabled(m.key)) {
+                <span class="status-pill on">Activo</span>
+              } @else {
+                <span class="status-pill off">Inactivo</span>
+              }
+            </div>
+            <p class="module-desc">{{ m.description }}</p>
+
+            @if (isLocked(m)) {
+              <p class="plan-hint"><span class="material-icons">lock</span> Tu plan actual no incluye este módulo. Mejora tu plan para activarlo.</p>
+            } @else {
+              <div class="module-actions">
+                <label class="switch">
+                  <input type="checkbox" [checked]="isEnabled(m.key)" [disabled]="savingKey() !== null" (change)="toggle(m)">
+                  <span class="slider"></span>
+                </label>
+                <span class="switch-label">{{ isEnabled(m.key) ? 'Activado' : 'Activar' }}</span>
+
+                @if (m.manageLink && isEnabled(m.key)) {
+                  <a class="manage-link" [routerLink]="m.manageLink">
+                    <span class="material-icons">arrow_forward</span> {{ m.manageLabel }}
+                  </a>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
