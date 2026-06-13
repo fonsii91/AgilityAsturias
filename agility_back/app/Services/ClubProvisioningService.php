@@ -55,9 +55,11 @@ class ClubProvisioningService
 
             $settings = [
                 'slogan' => 'Gestiona tu club de Agility con profesionalidad',
+                // Tema por defecto "Slate & Amber" (mismo preset que el selector de
+                // temas del club en /admin/club-form).
                 'colors' => [
-                    'primary' => '#0073CF',
-                    'accent' => '#E65100',
+                    'primary' => '#334155',
+                    'accent' => '#F59E0B',
                 ],
                 'homeConfig' => [
                     'heroImage' => '/Images/Salud/collie-cansancio-1.png',
