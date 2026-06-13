@@ -7,9 +7,16 @@
         <span class="material-icons-outlined spin-icon">sync</span>
       </div>
       }
-      <img [src]="previewUrl || user.photoURL || 'assets/default-user.png'" alt="Avatar"
+      @if (previewUrl || user.photoURL) {
+      <img [src]="previewUrl || user.photoURL" alt="Avatar"
         class="profile-avatar clickable-image" referrerpolicy="no-referrer" style="border-color: var(--accent-orange, #f59e0b);"
-        (click)="openImageModal(previewUrl || user.photoURL || 'assets/default-user.png')">
+        (click)="openImageModal(previewUrl || user.photoURL || null)">
+      } @else {
+      <div class="profile-avatar profile-avatar-placeholder" aria-label="Avatar"
+        style="border-color: var(--accent-orange, #f59e0b); background-color: var(--primary-color, #3b82f6);">
+        {{ (user.name || '?').charAt(0).toUpperCase() }}
+      </div>
+      }
       <label class="camera-btn" title="Cambiar foto" style="background-color: var(--primary-color, #3b82f6);">
         <span class="material-icons-outlined camera-icon">photo_camera</span>
         <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden>

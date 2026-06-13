@@ -32,6 +32,18 @@
     flex-shrink: 0;
 }
 
+/* Placeholder con la inicial del nombre cuando el usuario no tiene foto. */
+.profile-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 2.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    user-select: none;
+}
+
 .upload-overlay {
     position: absolute;
     top: 0; left: 0; right: 0; bottom: 0;

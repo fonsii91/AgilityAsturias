@@ -48,7 +48,14 @@
     @if (authService.currentUserSignal(); as user) {
       <div class="user-info">
         <div class="user-avatar">
-          <img [src]="user.photo_url || 'assets/default-avatar.png'" alt="User photo">
+          @if (user.photo_url) {
+          <img [src]="user.photo_url" alt="User photo">
+          } @else {
+          <div class="user-avatar-placeholder"
+            style="width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background-color:var(--primary-color,#3b82f6);color:#fff;font-weight:700;font-size:1.25rem;text-transform:uppercase;">
+            {{ (user.name || '?').charAt(0) }}
+          </div>
+          }
         </div>
         <div class="user-details">
           <p class="name">{{ user.name }}</p>
