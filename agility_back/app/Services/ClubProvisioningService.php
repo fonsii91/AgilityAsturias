@@ -442,10 +442,17 @@ class ClubProvisioningService
                     $ph->save();
                 }
 
-                // Apuntado a su clase de ESTA semana y de la SIGUIENTE (reservas activas).
+                // Reservas activas de clase: la de la SEMANA PASADA queda sin verificar
+                // (aparece en "Verificación de Asistencia" como sesión pendiente), más
+                // las de ESTA semana y la SIGUIENTE.
                 $upcomingSlot = $createdSlots[$i % count($createdSlots)];
                 $thisWeek = $nextDateFor($upcomingSlot);
-                foreach ([$thisWeek->toDateString(), $thisWeek->copy()->addWeek()->toDateString()] as $resDate) {
+                $resDates = [
+                    $thisWeek->copy()->subWeek()->toDateString(),
+                    $thisWeek->toDateString(),
+                    $thisWeek->copy()->addWeek()->toDateString(),
+                ];
+                foreach ($resDates as $resDate) {
                     $upcoming = new Reservation([
                         'slot_id' => $upcomingSlot->id,
                         'user_id' => $memberUser->id,
