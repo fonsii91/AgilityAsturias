@@ -8,10 +8,30 @@ use App\Models\DogWorkload;
 
 class DogWorkloadController extends Controller
 {
+    /**
+     * ¿Puede el usuario actual consultar la salud (ACWR) de este perro?
+     * Admin y dueño siempre; además el gestor o staff del mismo club, que
+     * necesitan ver la carga de los perros de sus socios desde reservas y el
+     * monitor de salud. Las escrituras siguen restringidas a dueño/admin.
+     */
+    private function canViewDogHealth(Dog $dog): bool
+    {
+        $user = auth()->user();
+        if (!$user) {
+            return false;
+        }
+        if ($user->role === 'admin') {
+            return true;
+        }
+        if ($dog->users()->where('users.id', $user->id)->exists()) {
+            return true;
+        }
+        return in_array($user->role, ['manager', 'staff'], true) && $user->club_id === $dog->club_id;
+    }
+
     public function getAcwrData(Dog $dog)
     {
-        // Security check
-        if (auth()->user()->role !== 'admin' && !$dog->users()->where('users.id', auth()->id())->exists()) {
+        if (!$this->canViewDogHealth($dog)) {
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
@@ -20,7 +40,7 @@ class DogWorkloadController extends Controller
 
     public function getPendingReviews(Dog $dog)
     {
-        if (auth()->user()->role !== 'admin' && !$dog->users()->where('users.id', auth()->id())->exists()) {
+        if (!$this->canViewDogHealth($dog)) {
             return response()->json(['error' => 'No autorizado'], 403);
         }
 
