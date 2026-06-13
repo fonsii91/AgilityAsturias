@@ -117,9 +117,14 @@
   @if (!loading()) {
     <div class="table-container glass-effect">
       @if (displayUsers().length === 0) {
-        <div class="empty-state">
-          No hay usuarios registrados (excepto aministradores).
-        </div>
+        <app-empty-state
+          icon="group_add"
+          title="Aún no tienes socios"
+          message="Invita a tu equipo y a tus socios generando un enlace de invitación. Cuando se registren, aparecerán aquí."
+          ctaLabel="Invitar a tu primer socio"
+          onboardingStep="gestor_equipo"
+          (ctaClick)="generateMemberInviteLink()">
+        </app-empty-state>
       }
       @if (displayUsers().length > 0) {
         <table>

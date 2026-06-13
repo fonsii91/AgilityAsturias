@@ -1,0 +1,27 @@
+<div class="empty-state" [class.no-results]="variant() === 'no-results'">
+  <div class="empty-state-icon">
+    <span class="material-icons">{{ icon() }}</span>
+  </div>
+
+  @if (title()) {
+    <h3 class="empty-state-title">{{ title() }}</h3>
+  }
+
+  @if (message()) {
+    <p class="empty-state-message">{{ message() }}</p>
+  }
+
+  @if (ctaLabel()) {
+    @if (ctaRoute()) {
+      <a class="empty-state-cta" [routerLink]="ctaRoute()" (click)="onCta()">
+        <span class="material-icons">arrow_forward</span>
+        {{ ctaLabel() }}
+      </a>
+    } @else {
+      <button type="button" class="empty-state-cta" (click)="onCta()">
+        <span class="material-icons">arrow_forward</span>
+        {{ ctaLabel() }}
+      </button>
+    }
+  }
+</div>

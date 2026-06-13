@@ -12,11 +12,12 @@ import { TenantService } from '../../services/tenant.service';
 import { ClubAdminService } from '../../services/club-admin.service';
 import { AuthService } from '../../services/auth.service';
 import { firstValueFrom } from 'rxjs';
+import { EmptyStateComponent } from '../../components/ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-gestionar-horarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, RouterModule],
+  imports: [CommonModule, FormsModule, MatIconModule, RouterModule, EmptyStateComponent],
   templateUrl: './gestionar-horarios.component.html',
   styleUrl: './gestionar-horarios.component.css'
 })

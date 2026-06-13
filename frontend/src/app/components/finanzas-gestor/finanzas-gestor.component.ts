@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastService } from '../../services/toast.service';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 export interface UserWithBalance {
   id: number;
@@ -35,7 +36,8 @@ export interface UserWithBalance {
     MatInputModule,
     MatSelectModule,
     MatButtonToggleModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    EmptyStateComponent
   ],
   template: `
     <div class="finanzas-gestor-container" 
@@ -206,13 +208,12 @@ export interface UserWithBalance {
                       </mat-card-content>
                     </mat-card>
                   } @empty {
-                    <div class="empty-state">
-                      <div class="empty-icon-wrapper">
-                        <mat-icon class="empty-icon">account_balance_wallet</mat-icon>
-                      </div>
-                      <h4>Sin movimientos</h4>
-                      <p>No se encontraron movimientos con los criterios aplicados.</p>
-                    </div>
+                    <app-empty-state
+                      icon="account_balance_wallet"
+                      variant="no-results"
+                      title="Sin movimientos"
+                      message="No se encontraron movimientos con los criterios aplicados.">
+                    </app-empty-state>
                   }
                 </div>
               }
@@ -301,10 +302,13 @@ export interface UserWithBalance {
                       </div>
                     </div>
                   } @empty {
-                    <div class="no-activity-box">
-                      <mat-icon>history</mat-icon>
-                      <p>No se registran movimientos recientes en el club.</p>
-                    </div>
+                    <app-empty-state
+                      icon="account_balance_wallet"
+                      title="La caja del club está vacía"
+                      message="Todavía no se ha registrado ningún ingreso ni gasto. Registra el primer movimiento para empezar a llevar las cuentas de tus socios."
+                      ctaLabel="Registrar el primer movimiento"
+                      (ctaClick)="openBulkAddPanel()">
+                    </app-empty-state>
                   }
                 </div>
               </div>

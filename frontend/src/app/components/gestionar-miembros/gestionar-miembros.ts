@@ -7,11 +7,12 @@ import { environment } from '../../../environments/environment';
 import { TenantService } from '../../services/tenant.service';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 import { OnboardingService } from '../../services/onboarding';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-gestionar-miembros',
   standalone: true,
-  imports: [CommonModule, FormsModule, InstruccionesComponent],
+  imports: [CommonModule, FormsModule, InstruccionesComponent, EmptyStateComponent],
   templateUrl: './gestionar-miembros.html',
   styleUrls: ['./gestionar-miembros.css']
 })

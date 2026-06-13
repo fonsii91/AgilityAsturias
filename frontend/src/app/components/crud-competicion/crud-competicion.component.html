@@ -119,11 +119,22 @@
             }
             @if (displayedEvents().length === 0) {
               <tr>
-                <td colspan="5" class="empty-msg" style="text-align: center; padding: 2rem;">
+                <td colspan="5" style="padding: 1rem;">
                   @if (activeTab() === 'proximos') {
-                    No hay eventos próximos registrados actualmente.
+                    <app-empty-state
+                      icon="emoji_events"
+                      title="Aún no hay eventos"
+                      message="Crea tu primer evento o competición. Aparecerá automáticamente en el calendario para que tus socios puedan verlo y apuntarse."
+                      ctaLabel="Crear tu primer evento"
+                      (ctaClick)="initNewCompetition()">
+                    </app-empty-state>
                   } @else {
-                    No hay eventos en el historial.
+                    <app-empty-state
+                      icon="history"
+                      variant="no-results"
+                      title="Historial vacío"
+                      message="Todavía no hay eventos pasados en el historial.">
+                    </app-empty-state>
                   }
                 </td>
               </tr>

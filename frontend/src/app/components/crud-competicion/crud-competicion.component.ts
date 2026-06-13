@@ -9,11 +9,12 @@ import { ToastService } from '../../services/toast.service';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 import { OnboardingService } from '../../services/onboarding';
 import { ScraperAdminService } from '../../services/scraper-admin.service';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
     selector: 'app-crud-competicion',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, MatIconModule, InstruccionesComponent],
+    imports: [CommonModule, ReactiveFormsModule, MatIconModule, InstruccionesComponent, EmptyStateComponent],
     templateUrl: './crud-competicion.component.html',
     styleUrl: './crud-competicion.component.css'
 })

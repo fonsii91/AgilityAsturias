@@ -1,0 +1,92 @@
+:host {
+  display: block;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px dashed #cbd5e1;
+}
+
+/* Halo con el color del club (multi-tenant). color-mix degrada con elegancia;
+   el fallback de --primary-color cubre el dominio principal sin tematizar. */
+.empty-state-icon {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.25rem;
+  background: color-mix(in srgb, var(--primary-color, #0073cf) 12%, transparent);
+}
+
+.empty-state-icon .material-icons {
+  font-size: 2.75rem;
+  color: var(--primary-color, #0073cf);
+}
+
+.empty-state-title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.empty-state-message {
+  margin: 0;
+  max-width: 30rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #64748b;
+}
+
+.empty-state-cta {
+  margin-top: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.4rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--primary-color, #0073cf);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.empty-state-cta:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 14px -4px rgba(0, 0, 0, 0.2);
+}
+
+.empty-state-cta .material-icons {
+  font-size: 1.2rem;
+}
+
+/* Variante "sin resultados" (filtro/búsqueda): más sobria, sin tanto protagonismo. */
+.empty-state.no-results {
+  padding: 2.5rem 1.5rem;
+  background: transparent;
+  border-style: solid;
+  border-color: #e2e8f0;
+}
+
+.empty-state.no-results .empty-state-icon {
+  background: #f1f5f9;
+}
+
+.empty-state.no-results .empty-state-icon .material-icons {
+  color: #94a3b8;
+}

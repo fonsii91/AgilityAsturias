@@ -63,10 +63,13 @@
   }
 
   @if (!isLoading() && announcements().length === 0) {
-  <div class="empty-state">
-    <span class="material-icons">campaign</span>
-    <p>No hay anuncios en el tablón en este momento.</p>
-  </div>
+  <app-empty-state
+    icon="campaign"
+    title="El tablón está en silencio"
+    [message]="canManage ? 'Publica el primer anuncio para dar la bienvenida a tus socios y mantenerles informados.' : 'Todavía no hay anuncios en el tablón. Vuelve pronto.'"
+    [ctaLabel]="canManage ? 'Publicar el primer anuncio' : ''"
+    ctaRoute="/tablon-anuncios/redactar">
+  </app-empty-state>
   }
 
   <div class="announcements-list">

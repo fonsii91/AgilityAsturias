@@ -8,11 +8,12 @@ import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { MatIconModule } from '@angular/material/icon';
 import { OnboardingService } from '../../services/onboarding';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-tablon-anuncios',
   standalone: true,
-  imports: [CommonModule, DatePipe, MatIconModule, RouterModule, FormsModule],
+  imports: [CommonModule, DatePipe, MatIconModule, RouterModule, FormsModule, EmptyStateComponent],
   templateUrl: './tablon-anuncios.component.html',
   styleUrls: ['./tablon-anuncios.component.css']
 })

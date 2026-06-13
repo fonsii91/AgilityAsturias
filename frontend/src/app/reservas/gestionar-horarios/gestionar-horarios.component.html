@@ -116,16 +116,13 @@
         }
 
         @if (timeSlots().length === 0) {
-        <div class="empty-schedule-state">
-          <div class="empty-icon-wrapper">
-            <span class="material-icons">event_busy</span>
-          </div>
-          <h3>Silencio en la pista...</h3>
-          <p>Todavía no hay ningún horario programado.</p>
-          <button class="btn-primary-action" style="margin-top: 1rem;" (click)="openModal()">
-            <span class="material-icons btn-icon-small">add</span> Añadir primer horario
-          </button>
-        </div>
+        <app-empty-state
+          icon="event_busy"
+          title="Silencio en la pista..."
+          message="Todavía no hay ningún horario programado. Crea tu primera clase para que tus socios puedan reservar plaza."
+          ctaLabel="Añadir primer horario"
+          (ctaClick)="openModal()">
+        </app-empty-state>
         }
       </div>
     </div>

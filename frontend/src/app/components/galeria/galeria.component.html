@@ -1,9 +1,10 @@
 <div class="gallery-container">
   <h2>Galería</h2>
+  <!-- Input de fichero a nivel superior para poder dispararlo también desde el estado vacío -->
+  <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
   <!-- Upload Button for Staff -->
   @if (isStaff()) {
     <div class="admin-actions">
-      <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
       <button class="btn-upload" (click)="fileInput.click()" [disabled]="isUploading()">
         @if (!isUploading()) {
           <i class="fas fa-upload"></i>
@@ -13,21 +14,31 @@
     </div>
   }
 
-  <div class="gallery-masonry" [@listAnimation]="images().length">
-    @for (image of images(); track image; let i = $index) {
-      <div class="gallery-item" (click)="openLightbox(i)">
-        <img [src]="image.url" [alt]="image.alt" loading="lazy">
-        @if (isStaff()) {
-          <button class="delete-btn" (click)="deletePhoto(image.id, $event)" title="Eliminar foto">
-            &times;
-          </button>
-        }
-        <div class="overlay">
-          <span>{{ image.alt }}</span>
+  @if (images().length === 0 && !isUploading()) {
+    <app-empty-state
+      icon="photo_library"
+      title="La galería está vacía"
+      [message]="isStaff() ? 'Sube la primera foto para inaugurar la galería pública de tu club.' : 'Todavía no hay fotos en la galería. Vuelve pronto.'"
+      [ctaLabel]="isStaff() ? 'Subir tu primera foto' : ''"
+      (ctaClick)="fileInput.click()">
+    </app-empty-state>
+  } @else {
+    <div class="gallery-masonry" [@listAnimation]="images().length">
+      @for (image of images(); track image; let i = $index) {
+        <div class="gallery-item" (click)="openLightbox(i)">
+          <img [src]="image.url" [alt]="image.alt" loading="lazy">
+          @if (isStaff()) {
+            <button class="delete-btn" (click)="deletePhoto(image.id, $event)" title="Eliminar foto">
+              &times;
+            </button>
+          }
+          <div class="overlay">
+            <span>{{ image.alt }}</span>
+          </div>
         </div>
-      </div>
-    }
-  </div>
+      }
+    </div>
+  }
 </div>
 
 <!-- Lightbox Modal -->

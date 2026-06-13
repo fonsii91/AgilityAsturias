@@ -4,10 +4,23 @@ namespace App\Services;
 
 use App\Mail\ClubLeadReceived;
 use App\Mail\NewClubLeadAdmin;
+use App\Models\Announcement;
 use App\Models\Club;
 use App\Models\ClubLead;
+use App\Models\Competition;
+use App\Models\Dog;
+use App\Models\DogSeasonPoint;
+use App\Models\DogWorkload;
+use App\Models\GamificationSeason;
 use App\Models\Plan;
+use App\Models\PointHistory;
+use App\Models\Reservation;
+use App\Models\RfecTrack;
+use App\Models\RsceTrack;
+use App\Models\TimeSlot;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
@@ -83,7 +96,7 @@ class ClubProvisioningService
 
             // El token de activación se guarda hasheado; 7 días para completar la activación
             $resetToken = Str::random(60);
-            User::create([
+            $manager = User::create([
                 'name' => $lead->name . ' Admin',
                 'email' => $lead->email,
                 // El cast 'hashed' del modelo detecta el hash existente y no lo re-hashea
@@ -100,10 +113,20 @@ class ClubProvisioningService
                 'provisioned_at' => now(),
             ]);
 
-            return ['club' => $club, 'activation_token' => $resetToken];
+            return ['club' => $club, 'activation_token' => $resetToken, 'manager' => $manager];
         });
 
         $club = $result['club'];
+
+        // Datos de bienvenida (perro demo, horario, anuncio, eventos, bitácora canina
+        // y cargas de salud) para que el gestor no se encuentre el club vacío al entrar.
+        // No es crítico: si algo falla se loguea pero NUNCA aborta el aprovisionamiento
+        // del pago, que ya está confirmado en este punto.
+        try {
+            $this->seedWelcomeData($club, $result['manager']);
+        } catch (\Exception $seedEx) {
+            \Log::warning('No se pudieron sembrar los datos de bienvenida del club ' . $club->id . ': ' . $seedEx->getMessage());
+        }
         $activationLink = $this->buildActivationLink($lead->slug, $result['activation_token']);
 
         // Send emails (wrapped in try-catch to prevent crash if mail server is not configured)
@@ -128,6 +151,312 @@ class ClubProvisioningService
         }
 
         return $club;
+    }
+
+    /**
+     * Siembra datos de muestra (borrables) en un club recién aprovisionado para
+     * que el gestor no aterrice en pantallas vacías. Cada modelo lleva club_id
+     * explícito porque el aprovisionamiento corre fuera del contexto de tenant
+     * (lo dispara el webhook de Stripe) y el trait HasClub no lo autoasigna.
+     */
+    public function seedWelcomeData(Club $club, User $manager): void
+    {
+        DB::transaction(function () use ($club, $manager) {
+            $now = Carbon::now();
+
+            // --- 1. Perro de muestra, propiedad del gestor ---
+            // Datos sanos para que el velocímetro de salud no penalice: sin lesiones
+            // previas y ratio altura/peso >= 2.5 (umbrales normales de ACWR).
+            $dog = Dog::create([
+                'name' => 'Rex (ejemplo)',
+                'breed' => 'Border Collie',
+                'birth_date' => $now->copy()->subYears(3)->toDateString(),
+                'rsce_category' => 'M',
+                'rfec_grade' => 'Competición',
+                'rfec_category' => 'Medium',
+                'photo_url' => '/Images/Salud/collie-salto-alto.png',
+                'has_previous_injuries' => false,
+                'weight_kg' => 18,
+                'height_cm' => 53,
+                'club_entry_year' => (int) $now->format('Y'),
+                'club_id' => $club->id,
+            ]);
+            // La propiedad del perro se modela solo en el pivot dog_user. La licencia
+            // RSCE y el grado van en el pivot: sin rsce_license el módulo Canina sale
+            // bloqueado, y con rsce_grade '0' no se muestra el historial de mangas.
+            $dog->users()->attach($manager->id, [
+                'is_primary_owner' => true,
+                'rsce_license' => 'RSCE-EJEMPLO-0001',
+                'rsce_grade' => '1',
+            ]);
+
+            // El módulo Caza (RFEC) se desbloquea con la licencia federativa del
+            // usuario (no del perro): se rellena de ejemplo para que el gestor vea
+            // sus mangas. Es un dato borrable desde su perfil.
+            $manager->rfec_license = 'RFEC-EJEMPLO-0001';
+            $manager->save();
+
+            // --- 2. Horario base: 3 clases recurrentes (date null = semanal) ---
+            $classes = [
+                ['day' => 'Lunes',     'name' => 'Iniciación',   'start_time' => '18:00', 'end_time' => '19:30', 'color' => '#0ea5e9'],
+                ['day' => 'Miércoles', 'name' => 'Intermedio',   'start_time' => '18:00', 'end_time' => '19:30', 'color' => '#f59e0b'],
+                ['day' => 'Viernes',   'name' => 'Competición',  'start_time' => '19:00', 'end_time' => '20:30', 'color' => '#10b981'],
+            ];
+            $createdSlots = [];
+            foreach ($classes as $c) {
+                // club_id no está en el $fillable de TimeSlot: se asigna como atributo.
+                $slot = new TimeSlot([
+                    'day' => $c['day'],
+                    'name' => $c['name'],
+                    'start_time' => $c['start_time'],
+                    'end_time' => $c['end_time'],
+                    'max_bookings' => 6,
+                    'color' => $c['color'],
+                    'date' => null,
+                ]);
+                $slot->club_id = $club->id;
+                $slot->save();
+                $createdSlots[] = $slot;
+            }
+
+            // --- 3. Anuncio de bienvenida (fijado) ---
+            Announcement::create([
+                'user_id' => $manager->id,
+                'title' => '¡Bienvenido a ' . $club->name . '! 🐾',
+                'content' => "Este es el tablón de anuncios de tu club. Aquí podrás avisar a tus socios de novedades, eventos y cambios de horario.\n\nTodos los datos que ves ahora mismo (este anuncio, el perro \"Rex\", las clases del horario y los eventos del calendario) son ejemplos para que veas cómo funciona la plataforma. Puedes editarlos o borrarlos cuando quieras.",
+                'is_pinned' => true,
+                'category' => 'Importante',
+                'club_id' => $club->id,
+            ]);
+
+            // --- 4. Dos eventos en el calendario (club-wide, tipo 'otros') ---
+            // club_id no está en el $fillable de Competition: se asigna como atributo.
+            $events = [
+                ['nombre' => 'Día de creación de la web del club', 'fecha_evento' => $now->toDateString()],
+                ['nombre' => 'Límite para conseguir la recompensa por completar el tutorial', 'fecha_evento' => $now->copy()->addDays(14)->toDateString()],
+            ];
+            foreach ($events as $e) {
+                $event = new Competition([
+                    'nombre' => $e['nombre'],
+                    'fecha_evento' => $e['fecha_evento'],
+                    'tipo' => 'otros',
+                    'lugar' => $club->name,
+                ]);
+                $event->club_id = $club->id;
+                $event->save();
+            }
+
+            // --- 5. Cargas de salud: 8 clases asistidas repartidas en 28 días ---
+            // La primera a ~26 días garantiza salir de "calibrando" (>=14 días). El
+            // grueso son clases por defecto (5 min en pista, RPE 6); las 2 sesiones de
+            // la última semana son algo más exigentes para que la carga aguda supere a
+            // la crónica y el ACWR quede en ~1,1 (verde, ligeramente por encima de la
+            // media), en vez del 1,0 que daría un reparto perfectamente uniforme.
+            $workloads = [
+                ['days' => 26, 'duration_min' => 5, 'intensity_rpe' => 6],
+                ['days' => 23, 'duration_min' => 5, 'intensity_rpe' => 6],
+                ['days' => 19, 'duration_min' => 5, 'intensity_rpe' => 6],
+                ['days' => 16, 'duration_min' => 5, 'intensity_rpe' => 6],
+                ['days' => 12, 'duration_min' => 5, 'intensity_rpe' => 6],
+                ['days' => 9,  'duration_min' => 5, 'intensity_rpe' => 6],
+                ['days' => 5,  'duration_min' => 6, 'intensity_rpe' => 6],
+                ['days' => 2,  'duration_min' => 8, 'intensity_rpe' => 4],
+            ];
+            foreach ($workloads as $w) {
+                DogWorkload::create([
+                    'dog_id' => $dog->id,
+                    'user_id' => $manager->id,
+                    'source_type' => 'auto_attendance',
+                    'source_id' => null,
+                    'date' => $now->copy()->subDays($w['days'])->toDateString(),
+                    'duration_min' => $w['duration_min'],
+                    'intensity_rpe' => $w['intensity_rpe'],
+                    'status' => 'confirmed',
+                    'is_staff_verified' => true,
+                    'club_id' => $club->id,
+                ]);
+            }
+
+            // --- 6. Bitácora: 3 mangas RSCE (canina) + 3 RFEC (caza) ---
+            $rsceMangas = [
+                ['days' => 20, 'manga_type' => 'Agility 1', 'qualification' => 'Excelente a 0', 'speed' => 4.20, 'time' => 32.50, 'faults' => 0, 'refusals' => 0, 'total_penalty' => 0.00,  'is_clean' => true,  'course_length' => 180, 'standard_time' => 42.00],
+                ['days' => 13, 'manga_type' => 'Jumping 1', 'qualification' => 'Excelente a 0', 'speed' => 4.50, 'time' => 28.10, 'faults' => 0, 'refusals' => 0, 'total_penalty' => 0.00,  'is_clean' => true,  'course_length' => 160, 'standard_time' => 38.00],
+                ['days' => 6,  'manga_type' => 'Agility 1', 'qualification' => 'Muy Bueno',     'speed' => 3.80, 'time' => 38.00, 'faults' => 1, 'refusals' => 0, 'total_penalty' => 5.00,  'is_clean' => false, 'course_length' => 175, 'standard_time' => 41.00],
+            ];
+            foreach ($rsceMangas as $m) {
+                RsceTrack::create([
+                    'dog_id' => $dog->id,
+                    'club_id' => $club->id,
+                    'date' => $now->copy()->subDays($m['days'])->toDateString(),
+                    'manga_type' => $m['manga_type'],
+                    'qualification' => $m['qualification'],
+                    'speed' => $m['speed'],
+                    'time' => $m['time'],
+                    'faults' => $m['faults'],
+                    'refusals' => $m['refusals'],
+                    'total_penalty' => $m['total_penalty'],
+                    'is_clean' => $m['is_clean'],
+                    'course_length' => $m['course_length'],
+                    'standard_time' => $m['standard_time'],
+                    'judge_name' => 'Juez de ejemplo',
+                    'location' => $club->name,
+                    'notes' => 'Manga de ejemplo. Puedes borrarla cuando quieras.',
+                ]);
+            }
+
+            $rfecMangas = [
+                ['days' => 18, 'manga_type' => 'Agility 1', 'qualification' => 'Excelente a 0', 'grade' => 'Competición', 'speed' => 4.10, 'time' => 34.20, 'faults' => 0, 'refusals' => 0, 'total_penalty' => 0.00, 'is_clean' => true,  'course_length' => 178, 'standard_time' => 43.00],
+                ['days' => 11, 'manga_type' => 'Jumping 1', 'qualification' => 'Excelente a 0', 'grade' => 'Competición', 'speed' => 4.40, 'time' => 29.80, 'faults' => 0, 'refusals' => 0, 'total_penalty' => 0.00, 'is_clean' => true,  'course_length' => 162, 'standard_time' => 39.00],
+                ['days' => 4,  'manga_type' => 'Agility 1', 'qualification' => 'Muy Bueno',     'grade' => 'Competición', 'speed' => 3.90, 'time' => 37.10, 'faults' => 0, 'refusals' => 1, 'total_penalty' => 5.00, 'is_clean' => false, 'course_length' => 176, 'standard_time' => 41.50],
+            ];
+            foreach ($rfecMangas as $m) {
+                RfecTrack::create([
+                    'dog_id' => $dog->id,
+                    'club_id' => $club->id,
+                    'date' => $now->copy()->subDays($m['days'])->toDateString(),
+                    'manga_type' => $m['manga_type'],
+                    'qualification' => $m['qualification'],
+                    'grade' => $m['grade'],
+                    'speed' => $m['speed'],
+                    'time' => $m['time'],
+                    'faults' => $m['faults'],
+                    'refusals' => $m['refusals'],
+                    'total_penalty' => $m['total_penalty'],
+                    'is_clean' => $m['is_clean'],
+                    'course_length' => $m['course_length'],
+                    'standard_time' => $m['standard_time'],
+                    'judge_name' => 'Juez de ejemplo',
+                    'location' => $club->name,
+                    'notes' => 'Manga de ejemplo. Puedes borrarla cuando quieras.',
+                ]);
+            }
+
+            // --- 7. Temporada de ranking activa + comunidad de ejemplo ---
+            // El ranking necesita una temporada 'ranking' activa y filas en
+            // dog_season_points con puntos > 0. Tras aprovisionar no existe ninguna,
+            // así que se crea aquí junto con 5 socios de ejemplo (cada uno con su
+            // perro, asistencias verificadas que otorgan puntos y una reserva para una
+            // clase de esta semana) para que la clasificación no salga vacía.
+            $season = new GamificationSeason([
+                'name' => 'Temporada de ejemplo',
+                'gamification_type' => 'ranking',
+                'start_date' => $now->copy()->subDays(30)->toDateString(),
+                'status' => 'active',
+            ]);
+            $season->club_id = $club->id;
+            $season->save();
+
+            // Próxima fecha (>= hoy) en la que cae el día del TimeSlot. Sumándole una
+            // semana se obtiene la ocurrencia de la semana siguiente.
+            $dayIso = ['Lunes' => 1, 'Martes' => 2, 'Miércoles' => 3, 'Jueves' => 4, 'Viernes' => 5, 'Sábado' => 6, 'Domingo' => 7];
+            $nextDateFor = function (TimeSlot $slot) use ($now, $dayIso) {
+                $d = $now->copy();
+                $target = $dayIso[$slot->day] ?? 1;
+                while ($d->dayOfWeekIso !== $target) {
+                    $d->addDay();
+                }
+                return $d;
+            };
+
+            // Una manga de puntos para el propio perro del gestor, para que también
+            // aparezca en la clasificación.
+            DogSeasonPoint::create(['dog_id' => $dog->id, 'season_id' => $season->id, 'points' => 21]);
+            $dog->update(['points' => 21]);
+            for ($k = 0; $k < 7; $k++) {
+                $ph = new PointHistory(['dog_id' => $dog->id, 'points' => 3, 'category' => 'Asistencia a entrenamiento', 'season_id' => $season->id]);
+                $ph->club_id = $club->id;
+                $ph->save();
+            }
+
+            // 5 socios de ejemplo: distinto nº de asistencias verificadas -> distinta
+            // puntuación, para que la clasificación tenga orden (15, 12, 9, 6, 3 pts).
+            // Nombres marcados como "(ejemplo)" para que se vea que son datos de prueba.
+            $members = [
+                ['name' => 'Lucía Fernández (ejemplo)', 'dog' => 'Luna (ejemplo)', 'breed' => 'Border Collie',     'attendances' => 5],
+                ['name' => 'Carlos Gómez (ejemplo)',    'dog' => 'Toby (ejemplo)', 'breed' => 'Pastor Australiano', 'attendances' => 4],
+                ['name' => 'Marta Ruiz (ejemplo)',      'dog' => 'Nala (ejemplo)', 'breed' => 'Mestizo',            'attendances' => 3],
+                ['name' => 'Javier López (ejemplo)',    'dog' => 'Max (ejemplo)',  'breed' => 'Border Collie',      'attendances' => 2],
+                ['name' => 'Ana Martín (ejemplo)',      'dog' => 'Kira (ejemplo)', 'breed' => 'Sheltie',            'attendances' => 1],
+            ];
+
+            foreach ($members as $i => $m) {
+                $memberUser = User::create([
+                    'name' => $m['name'],
+                    'email' => 'socio' . ($i + 1) . '.' . $club->slug . '@ejemplo.com',
+                    'password' => Hash::make(Str::random(24)),
+                    'role' => 'member',
+                    'club_id' => $club->id,
+                ]);
+
+                $memberDog = Dog::create([
+                    'name' => $m['dog'],
+                    'breed' => $m['breed'],
+                    'birth_date' => $now->copy()->subYears(3)->toDateString(),
+                    'rsce_category' => 'M',
+                    'has_previous_injuries' => false,
+                    'weight_kg' => 17,
+                    'height_cm' => 50,
+                    'club_entry_year' => (int) $now->format('Y'),
+                    'club_id' => $club->id,
+                ]);
+                $memberDog->users()->attach($memberUser->id, ['is_primary_owner' => true]);
+
+                $points = $m['attendances'] * 3;
+                DogSeasonPoint::create(['dog_id' => $memberDog->id, 'season_id' => $season->id, 'points' => $points]);
+                $memberDog->update(['points' => $points]);
+
+                // Asistencias verificadas pasadas: reserva 'completed' + carga + puntos.
+                // club_id y attendance_verified no están en el $fillable de Reservation.
+                for ($k = 0; $k < $m['attendances']; $k++) {
+                    $slot = $createdSlots[$k % count($createdSlots)];
+                    $date = $now->copy()->subDays(7 + $k * 2)->toDateString();
+
+                    $res = new Reservation([
+                        'slot_id' => $slot->id,
+                        'user_id' => $memberUser->id,
+                        'dog_id' => $memberDog->id,
+                        'date' => $date,
+                        'status' => 'completed',
+                    ]);
+                    $res->club_id = $club->id;
+                    $res->attendance_verified = true;
+                    $res->save();
+
+                    DogWorkload::create([
+                        'dog_id' => $memberDog->id,
+                        'user_id' => $memberUser->id,
+                        'source_type' => 'auto_attendance',
+                        'source_id' => $res->id,
+                        'date' => $date,
+                        'duration_min' => 5,
+                        'intensity_rpe' => 6,
+                        'status' => 'confirmed',
+                        'is_staff_verified' => true,
+                        'club_id' => $club->id,
+                    ]);
+
+                    $ph = new PointHistory(['dog_id' => $memberDog->id, 'points' => 3, 'category' => 'Asistencia a entrenamiento', 'season_id' => $season->id]);
+                    $ph->club_id = $club->id;
+                    $ph->save();
+                }
+
+                // Apuntado a su clase de ESTA semana y de la SIGUIENTE (reservas activas).
+                $upcomingSlot = $createdSlots[$i % count($createdSlots)];
+                $thisWeek = $nextDateFor($upcomingSlot);
+                foreach ([$thisWeek->toDateString(), $thisWeek->copy()->addWeek()->toDateString()] as $resDate) {
+                    $upcoming = new Reservation([
+                        'slot_id' => $upcomingSlot->id,
+                        'user_id' => $memberUser->id,
+                        'dog_id' => $memberDog->id,
+                        'date' => $resDate,
+                        'status' => 'active',
+                    ]);
+                    $upcoming->club_id = $club->id;
+                    $upcoming->attendance_verified = false;
+                    $upcoming->save();
+                }
+            }
+        });
     }
 
     public function resolvePlanSlug(string $planSelected): string

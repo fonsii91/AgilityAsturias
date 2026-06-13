@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DogService } from '../../../services/dog.service';
 import { environment } from '../../../../environments/environment';
+import { EmptyStateComponent } from '../../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-dog-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, EmptyStateComponent],
   template: `
   <div class="gestion-container fade-in">
     <div class="gestion-header">
@@ -23,13 +24,13 @@ import { environment } from '../../../../environments/environment';
     </div>
 
     @if (dogs().length === 0) {
-      <div class="empty-state">
-        <span class="material-icons-outlined empty-icon">sentiment_dissatisfied</span>
-        <p>Todavía no has registrado ningún perro.</p>
-        <button class="btn-primary" routerLink="nuevo" style="margin-top: 1rem;">
-          Añadir tu primer perro
-        </button>
-      </div>
+      <app-empty-state
+        icon="pets"
+        title="Tu manada está vacía"
+        message="Todavía no has registrado ningún perro. Crea el primer perfil para empezar a gestionar sus entrenamientos, salud y competiciones."
+        ctaLabel="Añadir tu primer perro"
+        ctaRoute="/gestionar-perros/nuevo">
+      </app-empty-state>
     } @else {
       <div class="dog-grid">
         @for (dog of dogs(); track dog.id) {
