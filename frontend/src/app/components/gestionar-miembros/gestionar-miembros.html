@@ -142,8 +142,9 @@
                     <img [src]="user.photoURL" alt="Avatar" class="avatar clickable-avatar"
                       referrerpolicy="no-referrer" (click)="openImageZoom(user.photoURL)">
                     } @else {
-                      <img [src]="clubConfig.logoPath" [alt]="clubName() + ' Logo'"
-                        class="avatar default-avatar-placeholder" referrerpolicy="no-referrer">
+                      <div class="avatar avatar-initials" aria-label="Avatar">
+                        {{ (user.displayName || '?').charAt(0).toUpperCase() }}
+                      </div>
                       }
                       <div class="user-details">
                         <span class="user-name">{{ user.displayName }}</span>

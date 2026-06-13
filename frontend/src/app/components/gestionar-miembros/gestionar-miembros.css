@@ -113,6 +113,19 @@ th {
     background: #eee;
 }
 
+/* Placeholder con la inicial del nombre cuando el usuario no tiene foto. */
+.avatar-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-color, #3b82f6);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    user-select: none;
+}
+
 .badge {
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
