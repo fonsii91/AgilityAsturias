@@ -104,6 +104,14 @@
   <!-- ===== Vista Agenda: Próximos eventos ===== -->
   @if (viewMode() === 'proximos') {
   <div class="agenda-view">
+    @if (authService.currentUserSignal()) {
+    <div class="agenda-actions">
+      <button class="add-personal-btn" (click)="openPersonalEventModal()">
+        <span class="material-icons" style="font-size: 18px;">add</span>
+        <span>Añadir evento personal</span>
+      </button>
+    </div>
+    }
     @for (group of upcomingMonths(); track group.key) {
     <div class="agenda-month-group">
       <h2 class="agenda-month-label">{{ group.label }}</h2>
