@@ -29,6 +29,26 @@
           <!-- Generado desde NAV_SECTIONS (NavMenuService) — misma fuente que el
                navbar de escritorio. "Público" se muestra al final en móvil. -->
           @for (section of mobileSections(); track section.id) {
+            @if (section.id === 'publico' && authService.isMember()) {
+            <!-- Para miembros, lo público es de consulta esporádica: se colapsa
+                 al final del menú. Para visitantes (no member) se muestra plano. -->
+            <li class="mobile-nav-group mobile-nav-public">
+              <details>
+                <summary>
+                  <span class="material-icons">{{ section.icon }}</span>
+                  <span class="group-label">{{ section.title }}</span>
+                  <span class="material-icons group-arrow">expand_more</span>
+                </summary>
+                <ul class="mobile-subnav">
+                  @for (item of section.items; track item.label) {
+                  <li><a [routerLink]="item.route" routerLinkActive="active-route"
+                        [routerLinkActiveOptions]="{ exact: !!item.exact }" (click)="sidenav.close()"><span
+                        class="material-icons">{{ item.icon }}</span> {{ item.label }}</a></li>
+                  }
+                </ul>
+              </details>
+            </li>
+            } @else {
             <li class="mobile-nav-divider">{{ section.title }}</li>
             @for (item of section.items; track item.label) {
               @if (item.children) {
@@ -54,6 +74,7 @@
                     [routerLinkActiveOptions]="{ exact: !!item.exact }" (click)="sidenav.close()"><span
                     class="material-icons">{{ item.icon }}</span> {{ item.label }}</a></li>
               }
+            }
             }
           }
         </ul>

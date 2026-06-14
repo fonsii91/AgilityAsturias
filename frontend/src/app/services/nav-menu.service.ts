@@ -101,9 +101,9 @@ export const NAV_SECTIONS: NavSection[] = [
       {
         // Vistas de solo lectura / supervisión. (Puntos Extra se otorga ahora
         // de forma contextual desde la Clasificación, no desde aquí.)
-        label: 'Seguimiento', icon: 'monitoring', children: [
+        label: 'Seguimiento', icon: 'visibility', children: [
           { label: 'Historial Asistencia', icon: 'history', route: '/staff/historial-asistencia' },
-          { label: 'Monitor Reservas', icon: 'visibility', route: '/info-reservas', feature: 'reservas-pistas' },
+          { label: 'Monitor Reservas', icon: 'event_available', route: '/info-reservas', feature: 'reservas-pistas' },
         ],
       },
       {
