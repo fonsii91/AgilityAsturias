@@ -285,6 +285,39 @@ export class PhotoListComponent implements OnInit {
         this.swipeOffset.set(0);
     }
 
+    // ---- Arrastre con ratón en escritorio (otra forma de pasar fotos) ----
+    private mouseDragging = false;
+    private mouseStartX = 0;
+
+    onImagePointerDown(event: PointerEvent) {
+        if (event.pointerType !== 'mouse' || event.button !== 0 || this.isEditingFocal()) return;
+        this.mouseStartX = event.clientX;
+        this.mouseDragging = true;
+        this.isSwiping.set(false);
+        (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
+    }
+
+    onImagePointerMove(event: PointerEvent) {
+        if (!this.mouseDragging) return;
+        const dx = event.clientX - this.mouseStartX;
+        if (!this.isSwiping()) {
+            if (Math.abs(dx) < 10) return;
+            this.isSwiping.set(true);
+        }
+        this.swipeOffset.set(dx);
+    }
+
+    onImagePointerUp() {
+        if (!this.mouseDragging) return;
+        this.mouseDragging = false;
+        const dx = this.swipeOffset();
+        if (this.isSwiping() && Math.abs(dx) > 70) {
+            this.navigatePhoto(dx < 0 ? 1 : -1);
+        }
+        this.isSwiping.set(false);
+        this.swipeOffset.set(0);
+    }
+
     // ---- Punto focal colaborativo (encuadre para object-fit: cover) ----
 
     /** object-position de la foto, con el centro (50/50) como valor por defecto. */

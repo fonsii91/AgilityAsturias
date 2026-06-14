@@ -198,6 +198,7 @@
 @if (selectedPhoto(); as photo) {
 <div class="lightbox-backdrop" (click)="closePhoto()">
   <div class="lightbox-content" [class.sidebar-hidden]="!showSidebar()" [class.focal-editing]="isEditingFocal()"
+    [class.is-dragging]="isSwiping()"
     (click)="$event.stopPropagation()"
     (touchstart)="onTouchStart($event)"
     (touchmove)="onTouchMove($event)"
@@ -217,8 +218,12 @@
     <button class="lightbox-nav nav-next" (click)="navigatePhoto(1)"><span
         class="material-icons">chevron_right</span></button>
 
-    <div class="lightbox-image-wrapper">
-      <img [src]="photo.url" [alt]="photo.title || ''"
+    <div class="lightbox-image-wrapper"
+      (pointerdown)="onImagePointerDown($event)"
+      (pointermove)="onImagePointerMove($event)"
+      (pointerup)="onImagePointerUp()"
+      (pointercancel)="onImagePointerUp()">
+      <img [src]="photo.url" [alt]="photo.title || ''" draggable="false" (dragstart)="$event.preventDefault()"
         [style.object-position]="isEditingFocal() ? (focalDraft().x + '% ' + focalDraft().y + '%') : focalPosition(photo)" />
 
       @if (isEditingFocal()) {

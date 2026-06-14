@@ -574,6 +574,23 @@
     }
 }
 
+/* En escritorio (puntero fino), la imagen se puede arrastrar con el ratón para
+   pasar fotos, además de las flechas. Cursor "agarrar" como pista. */
+@media (hover: hover) and (pointer: fine) {
+    .lightbox-image-wrapper {
+        cursor: grab;
+        user-select: none;
+    }
+
+    .lightbox-content.is-dragging .lightbox-image-wrapper {
+        cursor: grabbing;
+    }
+
+    .lightbox-content.focal-editing .lightbox-image-wrapper {
+        cursor: crosshair;
+    }
+}
+
 /* ============ Punto focal (encuadre colaborativo) ============ */
 /* Mientras se ajusta el encuadre ocultamos la navegación para no estorbar. */
 .lightbox-content.focal-editing .lightbox-nav,
