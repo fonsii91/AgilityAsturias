@@ -143,6 +143,8 @@ class PhotoController extends Controller
             'photo_type' => ['nullable', Rule::in(ClubPhoto::PHOTO_TYPES)],
             'title' => 'nullable|string|max:255',
             'taken_at' => 'sometimes|date',
+            'focal_x' => 'sometimes|integer|between:0,100',
+            'focal_y' => 'sometimes|integer|between:0,100',
             'dog_ids' => 'nullable|array',
             'dog_ids.*' => 'exists:dogs,id',
             'user_ids' => 'nullable|array',
@@ -160,7 +162,8 @@ class PhotoController extends Controller
         // Edición colaborativa: cualquier socio del club puede corregir los metadatos
         // (categoría, competición, tipo/podio, título, fecha), igual que el etiquetado.
         // El aislamiento por club lo garantiza el TenantScope; el borrado sigue restringido.
-        $metadataFields = collect(['category', 'competition_id', 'photo_type', 'title', 'taken_at'])
+        // El punto focal (encuadre para object-fit: cover) también es colaborativo.
+        $metadataFields = collect(['category', 'competition_id', 'photo_type', 'title', 'taken_at', 'focal_x', 'focal_y'])
             ->filter(fn ($field) => $request->has($field));
 
         if ($metadataFields->isNotEmpty()) {

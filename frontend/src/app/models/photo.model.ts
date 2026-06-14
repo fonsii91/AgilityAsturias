@@ -14,6 +14,8 @@ export interface Photo {
     taken_at: string;
     url: string | null;
     thumb_url: string | null;
+    focal_x?: number;
+    focal_y?: number;
     size_bytes: number;
     is_public: boolean;
     created_at: string;

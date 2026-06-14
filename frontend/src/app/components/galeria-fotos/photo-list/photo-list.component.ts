@@ -63,12 +63,17 @@ export class PhotoListComponent implements OnInit {
     showSidebar = signal<boolean>(true);
     members = signal<{ id: number; name: string }[]>([]);
 
-    // Gesto de deslizar vertical en móvil (estilo feed de Instagram)
-    swipeOffset = signal<number>(0);   // desplazamiento vertical (px) mientras se arrastra
+    // Gesto de deslizar horizontal en móvil: pasa la tarjeta entera (imagen + datos)
+    swipeOffset = signal<number>(0);   // desplazamiento horizontal (px) mientras se arrastra
     isSwiping = signal<boolean>(false);
     private touchStartX = 0;
     private touchStartY = 0;
     private touchActive = false;
+
+    // Ajuste colaborativo del punto focal (encuadre con object-fit: cover)
+    isEditingFocal = signal<boolean>(false);
+    focalDraft = signal<{ x: number; y: number }>({ x: 50, y: 50 });
+    private focalDragging = false;
 
     ngOnInit() {
         this.dogService.loadAllDogs();
@@ -197,6 +202,7 @@ export class PhotoListComponent implements OnInit {
         this.selectedPhoto.set(null);
         this.isEditingTags.set(false);
         this.isEditingMeta.set(false);
+        this.isEditingFocal.set(false);
         this.isSwiping.set(false);
         this.swipeOffset.set(0);
         document.body.style.overflow = '';
@@ -216,28 +222,28 @@ export class PhotoListComponent implements OnInit {
             this.selectedPhoto.set(next);
             this.isEditingTags.set(false);
             this.isEditingMeta.set(false);
+            this.isEditingFocal.set(false);
         }
-        // Al acercarse al final de lo cargado, pide la siguiente página para
-        // que el feed vertical no se corte.
+        // Al acercarse al final de lo cargado, pide la siguiente página para no cortar.
         if (direction === 1 && index >= this.photos().length - 3) {
             this.loadMore();
         }
     }
 
-    // ---- Gesto de deslizar vertical (feed estilo Instagram, solo móvil) ----
+    // ---- Gesto de deslizar horizontal (pasa la tarjeta entera, solo móvil) ----
 
     private isMobileViewport(): boolean {
         return typeof window !== 'undefined' && window.innerWidth <= 820;
     }
 
-    /** Opacidad de la imagen durante el arrastre: se atenúa al alejarse. */
+    /** Opacidad de la tarjeta durante el arrastre: se atenúa al alejarse. */
     swipeOpacity = computed<number>(() => {
         const d = Math.abs(this.swipeOffset());
-        return d ? Math.max(0.4, 1 - d / 500) : 1;
+        return d ? Math.max(0.5, 1 - d / 600) : 1;
     });
 
     onTouchStart(event: TouchEvent) {
-        if (!this.isMobileViewport() || event.touches.length !== 1) return;
+        if (this.isEditingFocal() || !this.isMobileViewport() || event.touches.length !== 1) return;
         const t = event.touches[0];
         this.touchStartX = t.clientX;
         this.touchStartY = t.clientY;
@@ -250,26 +256,79 @@ export class PhotoListComponent implements OnInit {
         const t = event.touches[0];
         const dx = t.clientX - this.touchStartX;
         const dy = t.clientY - this.touchStartY;
-        // Antes de decidir, exige un mínimo recorrido y que sea predominantemente vertical.
+        // Solo lo tratamos como swipe si es predominantemente horizontal;
+        // si es vertical, lo dejamos al scroll nativo del panel de datos.
         if (!this.isSwiping()) {
-            if (Math.abs(dy) < 10) return;
-            if (Math.abs(dy) <= Math.abs(dx)) { this.touchActive = false; return; }
+            if (Math.abs(dx) < 10) return;
+            if (Math.abs(dx) <= Math.abs(dy)) { this.touchActive = false; return; }
             this.isSwiping.set(true);
         }
-        this.swipeOffset.set(dy);
+        this.swipeOffset.set(dx);
     }
 
     onTouchEnd() {
         if (!this.touchActive && !this.isSwiping()) return;
-        const dy = this.swipeOffset();
+        const dx = this.swipeOffset();
         const threshold = 70;
-        if (this.isSwiping() && Math.abs(dy) > threshold) {
-            // Deslizar hacia arriba → siguiente foto; hacia abajo → anterior.
-            this.navigatePhoto(dy < 0 ? 1 : -1);
+        if (this.isSwiping() && Math.abs(dx) > threshold) {
+            // Deslizar a la izquierda → siguiente; a la derecha → anterior.
+            this.navigatePhoto(dx < 0 ? 1 : -1);
         }
         this.touchActive = false;
         this.isSwiping.set(false);
         this.swipeOffset.set(0);
+    }
+
+    // ---- Punto focal colaborativo (encuadre para object-fit: cover) ----
+
+    /** object-position de la foto, con el centro (50/50) como valor por defecto. */
+    focalPosition(photo: Photo): string {
+        return `${photo.focal_x ?? 50}% ${photo.focal_y ?? 50}%`;
+    }
+
+    startEditFocal(photo: Photo) {
+        this.focalDraft.set({ x: photo.focal_x ?? 50, y: photo.focal_y ?? 50 });
+        this.isEditingFocal.set(true);
+    }
+
+    stopEditFocal() {
+        this.isEditingFocal.set(false);
+        this.focalDragging = false;
+    }
+
+    private updateFocalFromEvent(event: PointerEvent) {
+        const el = event.currentTarget as HTMLElement;
+        const rect = el.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+        const x = Math.round(Math.min(100, Math.max(0, ((event.clientX - rect.left) / rect.width) * 100)));
+        const y = Math.round(Math.min(100, Math.max(0, ((event.clientY - rect.top) / rect.height) * 100)));
+        this.focalDraft.set({ x, y });
+    }
+
+    onFocalPointerDown(event: PointerEvent) {
+        const el = event.currentTarget as HTMLElement;
+        el.setPointerCapture?.(event.pointerId);
+        this.focalDragging = true;
+        this.updateFocalFromEvent(event);
+    }
+
+    onFocalPointerMove(event: PointerEvent) {
+        if (!this.focalDragging) return;
+        this.updateFocalFromEvent(event);
+    }
+
+    async onFocalPointerUp(photo: Photo) {
+        if (!this.focalDragging) return;
+        this.focalDragging = false;
+        const { x, y } = this.focalDraft();
+        if (photo.focal_x === x && photo.focal_y === y) return;
+        try {
+            const updated = await firstValueFrom(this.photoService.updatePhoto(photo.id, { focal_x: x, focal_y: y }));
+            photo.focal_x = updated.focal_x;
+            photo.focal_y = updated.focal_y;
+        } catch {
+            this.toastService.error('No se pudo guardar el encuadre.');
+        }
     }
 
     // ---- Edición colaborativa de metadatos ----

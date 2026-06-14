@@ -166,7 +166,8 @@
   <div class="photo-grid">
     @for (photo of photos(); track photo.id) {
     <div class="photo-cell" (click)="openPhoto(photo)">
-      <img [src]="photo.thumb_url" [alt]="photo.title || categoryLabel(photo.category)" loading="lazy" />
+      <img [src]="photo.thumb_url" [alt]="photo.title || categoryLabel(photo.category)" loading="lazy"
+        [style.object-position]="focalPosition(photo)" />
       <div class="photo-overlay">
         @if (photo.photo_type === 'podio') {
         <span class="material-icons overlay-icon podium-icon">military_tech</span>
@@ -196,7 +197,15 @@
 <!-- ============ Lightbox ============ -->
 @if (selectedPhoto(); as photo) {
 <div class="lightbox-backdrop" (click)="closePhoto()">
-  <div class="lightbox-content" [class.sidebar-hidden]="!showSidebar()" (click)="$event.stopPropagation()">
+  <div class="lightbox-content" [class.sidebar-hidden]="!showSidebar()" [class.focal-editing]="isEditingFocal()"
+    (click)="$event.stopPropagation()"
+    (touchstart)="onTouchStart($event)"
+    (touchmove)="onTouchMove($event)"
+    (touchend)="onTouchEnd()"
+    (touchcancel)="onTouchEnd()"
+    [style.transform]="swipeOffset() ? 'translateX(' + swipeOffset() + 'px)' : ''"
+    [style.opacity]="swipeOpacity()"
+    [style.transition]="isSwiping() ? 'none' : 'transform 0.2s ease, opacity 0.2s ease'">
 
     <button class="lightbox-close" (click)="closePhoto()"><span class="material-icons">close</span></button>
     <button class="lightbox-info-toggle" (click)="toggleSidebar()"
@@ -208,15 +217,20 @@
     <button class="lightbox-nav nav-next" (click)="navigatePhoto(1)"><span
         class="material-icons">chevron_right</span></button>
 
-    <div class="lightbox-image-wrapper"
-      (touchstart)="onTouchStart($event)"
-      (touchmove)="onTouchMove($event)"
-      (touchend)="onTouchEnd()"
-      (touchcancel)="onTouchEnd()">
+    <div class="lightbox-image-wrapper">
       <img [src]="photo.url" [alt]="photo.title || ''"
-        [style.transform]="swipeOffset() ? 'translateY(' + swipeOffset() + 'px)' : ''"
-        [style.opacity]="swipeOpacity()"
-        [style.transition]="isSwiping() ? 'none' : 'transform 0.2s ease, opacity 0.2s ease'" />
+        [style.object-position]="isEditingFocal() ? (focalDraft().x + '% ' + focalDraft().y + '%') : focalPosition(photo)" />
+
+      @if (isEditingFocal()) {
+      <div class="focal-overlay"
+        (pointerdown)="onFocalPointerDown($event)"
+        (pointermove)="onFocalPointerMove($event)"
+        (pointerup)="onFocalPointerUp(photo)"
+        (pointercancel)="onFocalPointerUp(photo)">
+        <div class="focal-dot" [style.left.%]="focalDraft().x" [style.top.%]="focalDraft().y"></div>
+      </div>
+      <div class="focal-hint">Toca o arrastra para elegir el centro de la foto</div>
+      }
     </div>
 
     @if (showSidebar()) {
@@ -341,6 +355,15 @@
       </div>
 
       <div class="sidebar-actions">
+        @if (!isEditingFocal()) {
+        <button class="btn-sidebar btn-focal" (click)="startEditFocal(photo)">
+          <span class="material-icons">crop</span> Ajustar encuadre
+        </button>
+        } @else {
+        <button class="btn-sidebar btn-focal-done" (click)="stopEditFocal()">
+          <span class="material-icons">done</span> Listo
+        </button>
+        }
         <button class="btn-sidebar btn-download" (click)="downloadPhoto(photo)">
           <span class="material-icons">download</span> Descargar foto
         </button>

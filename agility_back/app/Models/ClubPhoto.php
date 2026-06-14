@@ -43,6 +43,8 @@ class ClubPhoto extends Model
         'taken_at',
         'path',
         'thumb_path',
+        'focal_x',
+        'focal_y',
         'size_bytes',
         'is_public',
     ];
@@ -50,6 +52,8 @@ class ClubPhoto extends Model
     protected $casts = [
         'is_public' => 'boolean',
         'taken_at' => 'date:Y-m-d',
+        'focal_x' => 'integer',
+        'focal_y' => 'integer',
     ];
 
     protected $appends = ['url', 'thumb_url'];

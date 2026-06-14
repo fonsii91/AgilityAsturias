@@ -20,6 +20,8 @@ export interface PhotoUploadMetadata {
     taken_at: string;
     photo_type?: string | null;
     title?: string | null;
+    focal_x?: number;
+    focal_y?: number;
     dog_ids?: number[];
     user_ids?: number[];
 }
