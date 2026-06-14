@@ -363,8 +363,7 @@ export class PhotoListComponent implements OnInit {
         if (photo.focal_x === x && photo.focal_y === y) return;
         try {
             const updated = await firstValueFrom(this.photoService.updatePhoto(photo.id, { focal_x: x, focal_y: y }));
-            photo.focal_x = updated.focal_x;
-            photo.focal_y = updated.focal_y;
+            this.applyPhotoUpdate(updated);
         } catch {
             this.toastService.error('No se pudo guardar el encuadre.');
         }
@@ -402,12 +401,7 @@ export class PhotoListComponent implements OnInit {
         this.isSavingMeta.set(true);
         try {
             const updated = await firstValueFrom(this.photoService.updatePhoto(photo.id, payload));
-            photo.title = updated.title;
-            photo.category = updated.category;
-            photo.photo_type = updated.photo_type;
-            photo.taken_at = updated.taken_at;
-            photo.competition_id = updated.competition_id;
-            photo.competition = updated.competition;
+            this.applyPhotoUpdate(updated);
             this.isEditingMeta.set(false);
             this.toastService.success('Datos actualizados.');
         } catch {
@@ -450,7 +444,7 @@ export class PhotoListComponent implements OnInit {
         try {
             await firstValueFrom(this.photoService.untagSelf(photo.id));
             const user = this.authService.currentUserSignal();
-            photo.tagged_users = (photo.tagged_users ?? []).filter(u => u.id !== user?.id);
+            this.applyPhotoUpdate({ ...photo, tagged_users: (photo.tagged_users ?? []).filter(u => u.id !== user?.id) });
             this.toastService.success('Te has quitado de la foto.');
         } catch {
             this.toastService.error('No se pudo quitar la etiqueta.');
@@ -542,10 +536,21 @@ export class PhotoListComponent implements OnInit {
     private async syncTags(photo: Photo, tags: { dog_ids?: number[]; user_ids?: number[] }) {
         try {
             const updated = await firstValueFrom(this.photoService.updatePhoto(photo.id, tags));
-            photo.dogs = updated.dogs;
-            photo.tagged_users = updated.tagged_users;
+            this.applyPhotoUpdate(updated);
         } catch {
             this.toastService.error('No se pudo actualizar el etiquetado.');
+        }
+    }
+
+    /**
+     * Aplica una actualización de foto de forma inmutable: reemplaza el objeto en
+     * la lista y en la foto seleccionada para que las señales notifiquen y la
+     * vista se refresque al instante (en vez de mutar el objeto in situ).
+     */
+    private applyPhotoUpdate(updated: Photo) {
+        this.photos.update(list => list.map(p => p.id === updated.id ? updated : p));
+        if (this.selectedPhoto()?.id === updated.id) {
+            this.selectedPhoto.set(updated);
         }
     }
 
