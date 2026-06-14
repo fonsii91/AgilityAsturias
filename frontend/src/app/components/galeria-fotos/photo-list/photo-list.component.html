@@ -246,13 +246,7 @@
         [style.object-position]="isEditingFocal() ? (focalDraft().x + '% ' + focalDraft().y + '%') : focalPosition(photo)" />
 
       @if (isEditingFocal()) {
-      <div class="focal-overlay"
-        (pointerdown)="onFocalPointerDown($event)"
-        (pointermove)="onFocalPointerMove($event)"
-        (pointerup)="onFocalPointerUp(photo)"
-        (pointercancel)="onFocalPointerUp(photo)">
-        <div class="focal-dot" [style.left.%]="focalDraft().x" [style.top.%]="focalDraft().y"></div>
-      </div>
+      <div class="focal-dot" [style.left.%]="focalDraft().x" [style.top.%]="focalDraft().y"></div>
       <div class="focal-hint">Toca o arrastra para elegir el centro de la foto</div>
       }
     </div>

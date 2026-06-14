@@ -589,6 +589,12 @@
     display: none;
 }
 
+/* Al ajustar el encuadre, el gesto sobre la imagen lo gestionamos nosotros:
+   desactivamos el desplazamiento nativo para poder arrastrar el punto focal. */
+.lightbox-content.focal-editing .lightbox-image-wrapper {
+    touch-action: none;
+}
+
 /* En escritorio, al ajustar el encuadre la imagen pasa a un marco fijo con
    cover (WYSIWYG: se ve el recorte que se está eligiendo). */
 @media (min-width: 821px) {
@@ -603,14 +609,6 @@
         max-height: none;
         object-fit: cover;
     }
-}
-
-.focal-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 15;
-    cursor: crosshair;
-    touch-action: none;
 }
 
 .focal-dot {

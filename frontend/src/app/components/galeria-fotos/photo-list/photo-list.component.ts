@@ -288,12 +288,22 @@ export class PhotoListComponent implements OnInit {
         this.swipeOffset.set(0);
     }
 
-    // ---- Arrastre con ratón en escritorio (otra forma de pasar fotos) ----
+    // ---- Interacción con la imagen del visor ----
+    // Un único punto de entrada para los punteros sobre la imagen: si se está
+    // ajustando el encuadre coloca el punto focal; si no, arrastra con el ratón
+    // para pasar de foto. Los botones de la barra superior son un subárbol
+    // aparte, así que sus clics nunca pasan por aquí (no quedan bloqueados).
     private mouseDragging = false;
     private mouseStartX = 0;
 
     onImagePointerDown(event: PointerEvent) {
-        if (event.pointerType !== 'mouse' || event.button !== 0 || this.isEditingFocal()) return;
+        if (this.isEditingFocal()) {
+            (event.currentTarget as HTMLElement).setPointerCapture?.(event.pointerId);
+            this.focalDragging = true;
+            this.updateFocalFromEvent(event);
+            return;
+        }
+        if (event.pointerType !== 'mouse' || event.button !== 0) return;
         this.mouseStartX = event.clientX;
         this.mouseDragging = true;
         this.isSwiping.set(false);
@@ -301,6 +311,10 @@ export class PhotoListComponent implements OnInit {
     }
 
     onImagePointerMove(event: PointerEvent) {
+        if (this.isEditingFocal()) {
+            if (this.focalDragging) this.updateFocalFromEvent(event);
+            return;
+        }
         if (!this.mouseDragging) return;
         const dx = event.clientX - this.mouseStartX;
         if (!this.isSwiping()) {
@@ -311,6 +325,10 @@ export class PhotoListComponent implements OnInit {
     }
 
     onImagePointerUp() {
+        if (this.isEditingFocal()) {
+            if (this.focalDragging) { this.focalDragging = false; this.saveFocal(); }
+            return;
+        }
         if (!this.mouseDragging) return;
         this.mouseDragging = false;
         const dx = this.swipeOffset();
@@ -347,21 +365,9 @@ export class PhotoListComponent implements OnInit {
         this.focalDraft.set({ x, y });
     }
 
-    onFocalPointerDown(event: PointerEvent) {
-        const el = event.currentTarget as HTMLElement;
-        el.setPointerCapture?.(event.pointerId);
-        this.focalDragging = true;
-        this.updateFocalFromEvent(event);
-    }
-
-    onFocalPointerMove(event: PointerEvent) {
-        if (!this.focalDragging) return;
-        this.updateFocalFromEvent(event);
-    }
-
-    async onFocalPointerUp(photo: Photo) {
-        if (!this.focalDragging) return;
-        this.focalDragging = false;
+    private async saveFocal() {
+        const photo = this.selectedPhoto();
+        if (!photo) return;
         const { x, y } = this.focalDraft();
         if (photo.focal_x === x && photo.focal_y === y) return;
         try {
