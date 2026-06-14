@@ -208,8 +208,15 @@
     <button class="lightbox-nav nav-next" (click)="navigatePhoto(1)"><span
         class="material-icons">chevron_right</span></button>
 
-    <div class="lightbox-image-wrapper">
-      <img [src]="photo.url" [alt]="photo.title || ''" />
+    <div class="lightbox-image-wrapper"
+      (touchstart)="onTouchStart($event)"
+      (touchmove)="onTouchMove($event)"
+      (touchend)="onTouchEnd()"
+      (touchcancel)="onTouchEnd()">
+      <img [src]="photo.url" [alt]="photo.title || ''"
+        [style.transform]="swipeOffset() ? 'translateY(' + swipeOffset() + 'px)' : ''"
+        [style.opacity]="swipeOpacity()"
+        [style.transition]="isSwiping() ? 'none' : 'transform 0.2s ease, opacity 0.2s ease'" />
     </div>
 
     @if (showSidebar()) {

@@ -63,6 +63,13 @@ export class PhotoListComponent implements OnInit {
     showSidebar = signal<boolean>(true);
     members = signal<{ id: number; name: string }[]>([]);
 
+    // Gesto de deslizar vertical en móvil (estilo feed de Instagram)
+    swipeOffset = signal<number>(0);   // desplazamiento vertical (px) mientras se arrastra
+    isSwiping = signal<boolean>(false);
+    private touchStartX = 0;
+    private touchStartY = 0;
+    private touchActive = false;
+
     ngOnInit() {
         this.dogService.loadAllDogs();
         this.loadPhotos(true);
@@ -190,6 +197,8 @@ export class PhotoListComponent implements OnInit {
         this.selectedPhoto.set(null);
         this.isEditingTags.set(false);
         this.isEditingMeta.set(false);
+        this.isSwiping.set(false);
+        this.swipeOffset.set(0);
         document.body.style.overflow = '';
     }
 
@@ -208,6 +217,59 @@ export class PhotoListComponent implements OnInit {
             this.isEditingTags.set(false);
             this.isEditingMeta.set(false);
         }
+        // Al acercarse al final de lo cargado, pide la siguiente página para
+        // que el feed vertical no se corte.
+        if (direction === 1 && index >= this.photos().length - 3) {
+            this.loadMore();
+        }
+    }
+
+    // ---- Gesto de deslizar vertical (feed estilo Instagram, solo móvil) ----
+
+    private isMobileViewport(): boolean {
+        return typeof window !== 'undefined' && window.innerWidth <= 820;
+    }
+
+    /** Opacidad de la imagen durante el arrastre: se atenúa al alejarse. */
+    swipeOpacity = computed<number>(() => {
+        const d = Math.abs(this.swipeOffset());
+        return d ? Math.max(0.4, 1 - d / 500) : 1;
+    });
+
+    onTouchStart(event: TouchEvent) {
+        if (!this.isMobileViewport() || event.touches.length !== 1) return;
+        const t = event.touches[0];
+        this.touchStartX = t.clientX;
+        this.touchStartY = t.clientY;
+        this.touchActive = true;
+        this.isSwiping.set(false);
+    }
+
+    onTouchMove(event: TouchEvent) {
+        if (!this.touchActive || event.touches.length !== 1) return;
+        const t = event.touches[0];
+        const dx = t.clientX - this.touchStartX;
+        const dy = t.clientY - this.touchStartY;
+        // Antes de decidir, exige un mínimo recorrido y que sea predominantemente vertical.
+        if (!this.isSwiping()) {
+            if (Math.abs(dy) < 10) return;
+            if (Math.abs(dy) <= Math.abs(dx)) { this.touchActive = false; return; }
+            this.isSwiping.set(true);
+        }
+        this.swipeOffset.set(dy);
+    }
+
+    onTouchEnd() {
+        if (!this.touchActive && !this.isSwiping()) return;
+        const dy = this.swipeOffset();
+        const threshold = 70;
+        if (this.isSwiping() && Math.abs(dy) > threshold) {
+            // Deslizar hacia arriba → siguiente foto; hacia abajo → anterior.
+            this.navigatePhoto(dy < 0 ? 1 : -1);
+        }
+        this.touchActive = false;
+        this.isSwiping.set(false);
+        this.swipeOffset.set(0);
     }
 
     // ---- Edición colaborativa de metadatos ----

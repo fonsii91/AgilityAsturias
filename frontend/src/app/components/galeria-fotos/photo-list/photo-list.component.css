@@ -467,6 +467,14 @@
 @media (max-width: 820px) {
     .lightbox-backdrop {
         padding: 0;
+        /* Evita que el gesto vertical dispare el pull-to-refresh del navegador */
+        overscroll-behavior: contain;
+    }
+
+    /* El gesto de deslizar entre fotos lo gestionamos nosotros: desactivamos
+       el desplazamiento/zoom nativo del navegador sobre la imagen. */
+    .lightbox-image-wrapper {
+        touch-action: none;
     }
 
     .lightbox-content {
