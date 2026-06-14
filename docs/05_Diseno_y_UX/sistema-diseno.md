@@ -7,25 +7,36 @@ description: Guía de diseño UX/UI, Angular Material y desarrollo frontend (Ang
 
 ## 1. Contexto de la Aplicación y del Usuario (Dominio)
 Eres un experto en UX/UI, especialista en **Angular Material** y Desarrollador Frontend Senior. Estás diseñando componentes para una app de gestión interna de un **Club de Agility Dog en Asturias**.
-- **Stack:** Frontend en Angular 18+ (usando Angular Material) y Backend en Laravel (API REST).
+- **Stack:** Frontend en **Angular 21** (standalone + signals; Angular Material disponible pero de uso selectivo, ver §4) y Backend en Laravel (API REST).
 - **Entorno Físico Crítico:** Uso **casi 100% en teléfonos móviles**, a pie de pista (al aire libre). Pantallas bajo el sol directo o con lluvia. Cobertura de red (4G/5G) variable o inestable.
 - **Modo de Uso:** Los usuarios (entrenadores/guías) operan el móvil a menudo con **una sola mano (el pulgar)** y con urgencia, porque con la otra mano sujetan perros nerviosos, correas, premios o un cronómetro.
 
 ---
 
-## 2. Agility Asturias Visual Soul & Material Theming
-Integra estos colores como la base del tema de Angular Material. Nunca uses colores hexadecimales hardcodeados en los estilos CSS de los componentes; usa el mapeo nativo del tema o variables CSS.
+## 2. Theming Multi-Tenant y Tokens de Color (as-built)
 
-### Core Palette (Mapeo a Material Design)
-- **Primary Blue (Authority/Confianza):** `--primary-blue: #0073CF;` *(Material `color="primary"`. Uso: Toolbars, botones de acción principal, tabs, iconos destacados).*
-- **Secondary Yellow (Spark/Energy):** `--secondary-yellow: #F6D312;` *(Material `color="accent"` o `tertiary`. Uso: FABs -botones flotantes-, badges, toggles, acciones secundarias rápidas).*
-- **Danger/Error:** `--danger: #EF4444;` *(Material `color="warn"`. Uso: Faltas, rehusos, eliminados en pista, eliminación de registros, errores de validación).*
+La app es **multi-tenant**: cada club ve su propia marca. El color **no se hardcodea nunca** en los componentes; se consume desde **variables CSS (custom properties)** que se definen una sola vez de forma global y que cada tenant puede sobrescribir en tiempo de ejecución.
 
-### Atmosphere & Semantic (Fondos y Feedback)
-- **Background Base:** `--surface-background: #F0F4F8;` *(Fondo de la app detrás de las tarjetas).*
-- **Surface Card:** `--surface-card: #FFFFFF;` *(Fondo de `mat-card` y `mat-bottom-sheet`).*
-- **Text Primary:** `--text-primary: #1E293B;` *(Alto contraste obligatorio para lectura bajo el sol).*
-- **Success:** `--success: #10B981;` *(Pistas limpias "a cero", cuotas al día, perros aptos).*
+### 2.1. Cómo funciona (arquitectura real)
+1. **Tokens por defecto (paleta Asturias):** se declaran en el `:root` de `frontend/src/styles.css`. Son el *fallback* cuando un tenant no trae color propio.
+2. **Override por tenant (runtime):** al arrancar, `TenantService.applyTheming()` (`frontend/src/app/services/tenant.service.ts`) lee `settings.colors` del tenant y hace `document.documentElement.style.setProperty('--primary-color', …)` (y `--primary-blue`, `--accent-orange`). Como se inyecta en `:root`, **toda la app se recolorea sola** sin tocar componentes.
+3. **Derivados automáticos:** las variantes (oscuro/claro/tintes) se calculan con `color-mix()` sobre `--primary-color`, así que basta cambiar el color base para que todo el sistema derive coherente.
+
+> **Regla de oro:** si un color representa la **marca** (acciones, cabeceras, acentos), usa `var(--primary-color)` / `var(--accent-orange)` y, si necesitas un tinte, `color-mix(in srgb, var(--primary-color) X%, white|black)`. **Prohibido** un hex de marca a pelo (`#0073CF`, `#003366`, etc.) en el CSS de un componente.
+
+### 2.2. Tokens canónicos (los que existen de verdad en `styles.css`)
+- **Marca (tenant-overridable):**
+  - `--primary-color` → color de marca del club *(default `var(--primary-blue)` = `#0073CF`)*. Acciones principales, cabeceras, tabs, iconos destacados, botones de "añadir".
+  - `--primary-blue-dark` / `--primary-blue-light` → derivados con `color-mix` para hovers y fondos suaves.
+  - `--accent-orange` → acento del tenant *(p. ej. badge "Asistiré")*.
+- **Acento fijo de la app:** `--accent-color` (= `--secondary-yellow` `#F6D312`). Badges, toggles, acciones rápidas secundarias.
+- **Superficies y fondo:** `--surface-card` (`#fff`, tarjetas) · `--surface-background` / `--background-color` (`#f0f4f8`, fondo tras las tarjetas).
+- **Texto (alto contraste para el sol):** `--text-main` (`#1a1a1a`) · `--text-secondary` (`#4a5568`) · `--text-light` (`#718096`).
+- **Semánticos (constantes en todos los tenants):** `--error-color` (`#e53e3e`, faltas/rehusos/borrados/validación) · `--success-color` (`#38a169`, "a cero", cuotas al día, aptos).
+- **Layout:** `--shadow-sm/md/lg`, `--border-radius-md/lg`, `--spacing-unit`, `--container-width`.
+
+### 2.3. Colores semánticos de feature (constantes, NO de marca)
+Algunos colores identifican una **funcionalidad** y se mantienen fijos entre tenants (no se tematizan): p. ej. en el **Calendario** los eventos personales son verde `#10b981`, los cierres de inscripción rojo, las exhibiciones morado. Son parte de la *identidad del dato*, no de la marca → no usan `--primary-color`. La **acción** sobre ese dato (un botón "Añadir evento personal"), en cambio, sí va tematizada con `var(--primary-color)`: identidad = color semántico; acción = color de marca.
 
 ---
 
@@ -43,8 +54,13 @@ Al generar interfaces, aplica estrictamente estos principios cognitivos y de usa
 
 ---
 
-## 4. Uso Estricto y Estratégico de Angular Material
-Para mantener consistencia y resolver problemas físicos del entorno, utiliza los componentes nativos de `@angular/material` de esta manera exacta:
+## 4. Uso de Angular Material (selectivo) y componentes propios
+
+> **Realidad (as-built):** la app **no** está construida íntegramente sobre Angular Material. La mayoría de vistas son **componentes propios** con HTML/CSS y theming por variables (§2), e iconografía con la fuente web `material-icons(-outlined)`. Material (`@angular/material` + CDK) se usa de forma **selectiva**: sobre todo diálogos (`MatDialog`), avisos (`MatSnackBar`) y algún formulario/overlay puntual. Por eso conviven *overlays/modales propios* (p. ej. el Calendario) con `MatDialog` en otras zonas.
+>
+> Las pautas siguientes describen el **objetivo de UX** (la dirección a la que tender al crear pantallas nuevas), no un estado ya cumplido en todo el código. Al tocar una vista existente, **respeta el patrón que ya use esa vista** y no la mezcles con otro.
+
+Cuando uses Material, hazlo así:
 
 - **Tarjetas vs Tablas:** **PROHIBIDO usar la etiqueta `<table>` o `<table mat-table>` en móvil.** Transforma cualquier listado (historial de pistas, ranking, socios) en una lista vertical de tarjetas (`<mat-card>`).
 - **Formularios Visibles al Sol:** Usa SIEMPRE `<mat-form-field appearance="outline">`. El estilo "outline" dibuja un borde completo alrededor del input, siendo infinitamente más visible bajo la luz del sol que el estilo "fill" (que Material usa por defecto).
@@ -57,7 +73,7 @@ Para mantener consistencia y resolver problemas físicos del entorno, utiliza lo
 
 ---
 
-## 5. Estándares Técnicos Modernos: Angular 18+
+## 5. Estándares Técnicos Modernos: Angular 21
 Es **OBLIGATORIO** usar el paradigma moderno de Angular. Prohibido usar código legado:
 
 - **Componentes Standalone (Obligatorio):** Todo componente debe ser `standalone: true`. **PROHIBIDO crear `NgModules`** o un `MaterialModule` compartido. Importa los módulos de Material individualmente en el array `imports` del componente (ej. `imports: [MatCardModule, MatButtonModule, MatIconModule]`).
