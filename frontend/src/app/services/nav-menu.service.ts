@@ -67,12 +67,14 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: 'Reservas', icon: 'event', route: '/reservas', feature: 'reservas-pistas' },
       { label: 'Calendario', icon: 'calendar_month', route: '/calendario' },
-      { label: 'Clasificación', icon: 'emoji_events', route: '/ranking', setting: 'gamification_enabled' },
+      { label: 'Salud Deportiva', icon: 'favorite', route: '/explorar/salud-deportiva', feature: 'salud-canina' },
       { label: 'Vídeos', icon: 'movie', route: '/galeria-videos', feature: 'galeria-videos' },
       { label: 'Fotos', icon: 'photo_library', route: '/galeria-fotos' },
       {
-        label: 'Rendimiento', icon: 'insights', children: [
-          { label: 'Salud Deportiva', icon: 'favorite', route: '/explorar/salud-deportiva', feature: 'salud-canina' },
+        // Clasificación (ranking gamificado) y Liga Norte son ambas tablas de
+        // posiciones: van juntas, no con las bitácoras personales.
+        label: 'Competición', icon: 'emoji_events', children: [
+          { label: 'Clasificación', icon: 'leaderboard', route: '/ranking', setting: 'gamification_enabled' },
           { label: 'Liga Norte', icon: 'emoji_events', route: '/explorar/liga-norte', setting: 'liga_norte_enabled' },
         ],
       },
@@ -94,14 +96,16 @@ export const NAV_SECTIONS: NavSection[] = [
     id: 'staff', title: 'Staff', icon: 'badge', role: 'staff',
     items: [
       { label: 'Eventos', icon: 'sports_score', route: '/gestionar-competiciones' },
-      { label: 'Monitor Reservas', icon: 'visibility', route: '/info-reservas', feature: 'reservas-pistas' },
+      // Acción diaria a pie de pista: primer nivel.
+      { label: 'Verificar Asistencia', icon: 'fact_check', route: '/admin/asistencia' },
       {
-        label: 'Asistencia', icon: 'fact_check', children: [
-          { label: 'Verificar Asistencia', icon: 'fact_check', route: '/admin/asistencia' },
+        // Vistas de solo lectura / supervisión. (Puntos Extra se otorga ahora
+        // de forma contextual desde la Clasificación, no desde aquí.)
+        label: 'Seguimiento', icon: 'monitoring', children: [
           { label: 'Historial Asistencia', icon: 'history', route: '/staff/historial-asistencia' },
+          { label: 'Monitor Reservas', icon: 'visibility', route: '/info-reservas', feature: 'reservas-pistas' },
         ],
       },
-      { label: 'Puntos Extra', icon: 'military_tech', route: '/admin/puntos-extra', setting: 'gamification_enabled' },
       {
         // Tareas de baja frecuencia, fuera de la navegación diaria.
         label: 'Administración', icon: 'tune', children: [

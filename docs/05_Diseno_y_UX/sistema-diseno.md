@@ -100,12 +100,17 @@ Para mitigar la fatiga visual y táctil del usuario a pie de pista bajo condicio
 **Cambio de modelo (habilitador):** `NavItem` admite un campo `children?: NavItem[]`. Un item con `children` deja de ser un enlace y pasa a ser un **grupo colapsable** bajo un epígrafe semántico. Los grupos se ocultan solos si todos sus hijos quedan filtrados por rol/feature/flag. Esto sustituye al antiguo marcador `header`.
 
 **Lo realizado:**
-*   **Disolución de "Explorar":** la sección desaparece como tal y se reparte dentro de **Miembros** en tres grupos: **Rendimiento** (Salud Deportiva, Liga Norte), **Bitácoras** (RSCE, RFEC) y **Comunidad** (Tablón de Anuncios, Recursos). Se elimina el "cajón de sastre".
-*   **Staff agrupado:** **Asistencia** (Verificar + Historial) y **Administración** (Gestión Miembros + Gestión Horarios) como grupos; lo cotidiano (Eventos, Monitor Reservas, Puntos Extra) queda en primer nivel.
+*   **Disolución de "Explorar":** la sección desaparece y se reparte dentro de **Miembros**. En primer nivel queda lo cotidiano (Reservas, Calendario, Salud Deportiva, Vídeos, Fotos) y el resto en grupos:
+    *   **Competición** (Clasificación + Liga Norte): ambas son tablas de posiciones, por eso van juntas y no con las bitácoras personales.
+    *   **Bitácoras** (RSCE + RFEC): registros oficiales por perro.
+    *   **Comunidad** (Tablón de Anuncios + Recursos).
+    *   *Vídeos y Fotos se mantienen sueltos por su alta frecuencia de uso (engagement diario), no se agrupan.*
+*   **Staff:** **Verificar Asistencia** (acción diaria) queda en primer nivel; el resto se agrupa por eje **acción vs. consulta**: grupo **Seguimiento** (Historial Asistencia + Monitor Reservas, solo lectura) y grupo **Administración** (Gestión Miembros + Gestión Horarios, baja frecuencia).
+*   **Puntos Extra fuera del nav:** se otorga de forma contextual desde la propia Clasificación (botón "Dar Puntos" para Staff en `ranking.component`), co-localizando la acción con su dato.
 *   **Administrar:** el bloque de monitores y revisión se agrupa bajo **Revisar**.
 *   **Renderizado:** en escritorio los grupos aparecen como subsecciones etiquetadas dentro del desplegable; en móvil como `<details>` colapsables (divulgación progresiva real, accesibles por teclado).
 
 **Pendiente (cambios a nivel de componente, fuera del navbar):**
 *   *Tabs* internos reales que fusionen Verificar/Historial de asistencia en una sola pantalla (hoy siguen siendo dos rutas, solo agrupadas en el menú).
-*   Reubicar Salud Deportiva / Bitácoras dentro de la ficha de cada perro (hoy siguen siendo rutas globales, solo agrupadas).
+*   Reubicar Salud Deportiva / Bitácoras dentro de la ficha de cada perro (hoy siguen siendo rutas globales, en primer nivel / agrupadas).
 *   Dashboard operativo de tarjetas para Staff (si se hace, **derivarlo de `NAV_SECTIONS`** para no reintroducir desincronización).
