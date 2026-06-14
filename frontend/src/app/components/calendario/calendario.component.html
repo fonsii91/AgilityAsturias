@@ -3,6 +3,7 @@
     <div class="calendar-header-actions"
       style="display: flex; gap: 1rem; align-items: center; width: 100%; justify-content: space-between; flex-wrap: wrap;">
       
+      @if (viewMode() === 'completo') {
       <div class="year-navigation">
         <button class="nav-btn" (click)="changeYear(-1)">
           <span class="material-icons-outlined">&lt;</span>
@@ -12,8 +13,17 @@
           <span class="material-icons-outlined">&gt;</span>
         </button>
       </div>
+      } @else {
+      <h1 class="agenda-title">Próximos eventos</h1>
+      }
 
       <div class="header-right-actions" style="display: flex; align-items: center; gap: 1rem;">
+
+        <button class="view-toggle-btn" (click)="toggleViewMode()"
+          [title]="viewMode() === 'proximos' ? 'Ver el año completo' : 'Ver solo los próximos eventos'">
+          <span class="material-icons-outlined">{{ viewMode() === 'proximos' ? 'calendar_month' : 'view_agenda' }}</span>
+          <span>{{ viewMode() === 'proximos' ? 'Año completo' : 'Próximos eventos' }}</span>
+        </button>
 
         <app-instrucciones titulo="Guía del Calendario">
           <h4 style="color: var(--primary-dark); margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px;">1.
@@ -91,6 +101,94 @@
     </div>
   </div>
 
+  <!-- ===== Vista Agenda: Próximos eventos ===== -->
+  @if (viewMode() === 'proximos') {
+  <div class="agenda-view">
+    @for (group of upcomingMonths(); track group.key) {
+    <div class="agenda-month-group">
+      <h2 class="agenda-month-label">{{ group.label }}</h2>
+      <div class="events-list">
+        @for (item of group.items; track item) {
+
+        @if (item.kind === 'deadline') {
+        <!-- Cierre de inscripción -->
+        <div class="agenda-card deadline" (click)="openAgendaItem(item)">
+          <div class="agenda-date-chip">
+            <span class="agenda-dow">{{ item.date | date:'EEE' }}</span>
+            <span class="agenda-dnum">{{ item.date | date:'d' }}</span>
+          </div>
+          <div class="agenda-card-body">
+            <span class="event-name" style="color: #d32f2f; font-weight: 600;">
+              <span class="material-icons-outlined" style="font-size: 1.1rem; vertical-align: middle;">warning</span>
+              Cierre inscripción: {{ item.comp.nombre || item.comp.lugar }}
+            </span>
+          </div>
+        </div>
+        } @else if (item.kind === 'personal') {
+        <!-- Evento personal -->
+        <div class="agenda-card" (click)="openAgendaItem(item)" style="border-left: 4px solid #10b981;">
+          <div class="agenda-date-chip">
+            <span class="agenda-dow">{{ item.date | date:'EEE' }}</span>
+            <span class="agenda-dnum">{{ item.date | date:'d' }}</span>
+          </div>
+          <div class="agenda-card-body">
+            <div class="event-preview-header">
+              <span class="event-name">{{ item.pe.title }}</span>
+              <span class="event-type-badge" style="background: #10b981; color: white;">{{ item.pe.type | titlecase }}</span>
+            </div>
+            <div class="event-preview-location"><i class="fas fa-paw" style="margin-right: 4px;"></i> {{ getDogName(item.pe.dog_id) }}</div>
+          </div>
+        </div>
+        } @else {
+        <!-- Competición / Exhibición / Otros -->
+        <div class="agenda-card" (click)="openAgendaItem(item)"
+          [style.border-left]="item.comp.isAttending ? '4px solid #e65100' : (item.comp.tipo === 'otros' ? '4px solid var(--other-bg)' : (item.comp.tipo === 'exhibicion' ? '4px solid #8b5cf6' : '4px solid var(--accent-color)'))">
+          <div class="agenda-date-chip">
+            <span class="agenda-dow">{{ item.date | date:'EEE' }}</span>
+            <span class="agenda-dnum">{{ item.date | date:'d' }}</span>
+          </div>
+          <div class="agenda-card-body">
+            <div class="event-preview-header">
+              <span class="event-name">{{ item.comp.nombre || item.comp.lugar }}</span>
+              <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+                @if (item.comp.isAttending) {
+                <span class="event-type-badge"
+                  style="background: linear-gradient(135deg, #e65100 0%, #ff9800 100%); color: white;">Asistiré</span>
+                }
+                <span class="event-type-badge" [class.type-other]="item.comp.tipo === 'otros'"
+                  [class.type-exhibicion]="item.comp.tipo === 'exhibicion'">
+                  {{ item.comp.tipo === 'otros' ? 'Otro' : (item.comp.tipo === 'exhibicion' ? 'Exhibición' : 'Competición') }}
+                </span>
+              </div>
+            </div>
+            <div class="event-preview-location">
+              📍 {{ item.comp.lugar }}
+              @if (item.end && item.comp.fechaFinEvento && item.comp.fechaFinEvento.substring(0,10) !== item.comp.fechaEvento.substring(0,10)) {
+              <span class="agenda-range">· {{ item.date | date:'d MMM' }} – {{ item.end | date:'d MMM' }}</span>
+              }
+            </div>
+          </div>
+        </div>
+        }
+
+        }
+      </div>
+    </div>
+    }
+
+    @if (upcomingMonths().length === 0) {
+    <div class="agenda-empty">
+      <div class="empty-emoji">📭</div>
+      <h3>No hay eventos próximos</h3>
+      <p>No tienes competiciones ni eventos en el horizonte cercano.</p>
+      <button class="link-btn" (click)="toggleViewMode()">Ver el año completo</button>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- ===== Vista rejilla: Año completo ===== -->
+  @if (viewMode() === 'completo') {
   <div class="months-grid">
     @for (month of months(); track month; let i = $index) {
     <div class="month-card" [id]="'month-' + i">
@@ -102,7 +200,7 @@
         @for (day of month.days; track day) {
         <div class="day" [class.other-month]="day.isOtherMonth" [class.weekend]="day.isWeekend"
           [class.competition]="day.isCompetition" [class.exhibicion]="day.isExhibicion" [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
-          [class.attending]="day.isAttending" [class.personal-event]="day.personalEvents.length > 0"
+          [class.past]="day.isPast" [class.attending]="day.isAttending" [class.personal-event]="day.personalEvents.length > 0"
           (click)="handleDayClick(day)">
           @if (!day.isOtherMonth) {
           <span>{{ day.date | date:'d' }}</span>
@@ -131,6 +229,7 @@
     </div>
     }
   </div>
+  }
 
   <!-- Details Modal -->
   @if (isModalOpen) {

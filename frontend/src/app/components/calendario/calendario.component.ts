@@ -16,6 +16,7 @@ interface CalendarDay {
     isWeekend: boolean;
     isOtherMonth: boolean;
     isToday: boolean;
+    isPast: boolean;
     isAttending?: boolean;
     deadlines: any[];
     competitions: any[]; // List of all competitions on this day
@@ -60,6 +61,109 @@ export class CalendarioComponent implements AfterViewInit {
 
     changeYear(offset: number) {
         this.currentYear.update(y => y + offset);
+    }
+
+    // --- Vista: 'proximos' (agenda) vs 'completo' (rejilla 12 meses) ---
+    viewMode = signal<'proximos' | 'completo'>(this.loadViewMode());
+
+    private loadViewMode(): 'proximos' | 'completo' {
+        try {
+            return localStorage.getItem('calendarViewMode') === 'completo' ? 'completo' : 'proximos';
+        } catch {
+            return 'proximos';
+        }
+    }
+
+    toggleViewMode() {
+        const next = this.viewMode() === 'proximos' ? 'completo' : 'proximos';
+        this.viewMode.set(next);
+        try {
+            localStorage.setItem('calendarViewMode', next);
+        } catch { /* localStorage no disponible */ }
+        if (next === 'completo') {
+            setTimeout(() => this.scrollToCurrentMonth(), 100);
+        }
+    }
+
+    private parseLocalDate(dateStr: string): Date {
+        const parts = dateStr.substring(0, 10).split('-');
+        if (parts.length === 3) {
+            return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        }
+        return new Date(dateStr);
+    }
+
+    // Lista cronologica de eventos proximos, agrupada por mes (max 3 meses con eventos).
+    // Cruza el limite de anio de forma natural e incluye cierres de inscripcion y eventos personales.
+    upcomingMonths = computed(() => {
+        const comps = this.competitions();
+        const persEvents = this.personalEventsSignal();
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const items: any[] = [];
+
+        for (const c of comps) {
+            if (c.fechaEvento) {
+                const start = this.parseLocalDate(c.fechaEvento);
+                const end = c.fechaFinEvento ? this.parseLocalDate(c.fechaFinEvento) : start;
+                // El evento sigue siendo "proximo" mientras no haya terminado
+                if (end >= today) {
+                    items.push({ date: start, end, kind: 'event', comp: c, sortTime: start.getTime() });
+                }
+            }
+            if (c.fechaLimite) {
+                const dl = this.parseLocalDate(c.fechaLimite);
+                if (dl >= today) {
+                    items.push({ date: dl, kind: 'deadline', comp: c, sortTime: dl.getTime() });
+                }
+            }
+        }
+
+        for (const pe of persEvents) {
+            if (pe.start_date) {
+                const d = this.parseLocalDate(pe.start_date);
+                if (d >= today) {
+                    items.push({ date: d, kind: 'personal', pe, sortTime: d.getTime() });
+                }
+            }
+        }
+
+        items.sort((a, b) => a.sortTime - b.sortTime);
+
+        // Agrupar por anio-mes manteniendo el orden cronologico, maximo 3 grupos
+        const groups: any[] = [];
+        const map = new Map<string, any>();
+        for (const it of items) {
+            const y = it.date.getFullYear();
+            const m = it.date.getMonth();
+            const key = `${y}-${m}`;
+            let g = map.get(key);
+            if (!g) {
+                if (groups.length >= 3) continue; // ya tenemos 3 meses; lo posterior se ve en "Año completo"
+                g = { key, label: `${this.monthNames[m]} ${y}`, items: [] };
+                map.set(key, g);
+                groups.push(g);
+            }
+            g.items.push(it);
+        }
+        return groups;
+    });
+
+    openAgendaItem(item: any) {
+        if (item.kind === 'personal') {
+            this.openPersonalEventModal(undefined, item.pe);
+            return;
+        }
+        // Sintetizamos un CalendarDay minimo para reutilizar la logica del modal existente
+        const synthetic: any = {
+            date: new Date(item.date),
+            isOtherMonth: false,
+            competitions: item.kind === 'event' ? [item.comp] : [],
+            deadlines: item.kind === 'deadline' ? [item.comp] : [],
+            personalEvents: []
+        };
+        this.openModal(synthetic);
     }
 
     selectedCompetition: any = null;
@@ -200,6 +304,7 @@ export class CalendarioComponent implements AfterViewInit {
         const date = new Date(year, monthIndex, 1);
         const firstDayIndex = (date.getDay() + 6) % 7; // 0 = Mon, 6 = Sun
         const today = new Date();
+        const todayDateOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
         // Previous month padding
         for (let i = 0; i < firstDayIndex; i++) {
@@ -211,6 +316,7 @@ export class CalendarioComponent implements AfterViewInit {
                 isWeekend: false,
                 isOtherMonth: true,
                 isToday: false,
+                isPast: false,
                 isAttending: false,
                 deadlines: [],
                 competitions: [],
@@ -246,6 +352,8 @@ export class CalendarioComponent implements AfterViewInit {
                 date.getMonth() === today.getMonth() &&
                 date.getFullYear() === today.getFullYear();
 
+            const isPast = new Date(year, monthIndex, date.getDate()) < todayDateOnly;
+
             // Check if this day is a registration deadline for any event(s)
             const deadlines = competitions.filter((c: any) => c.fechaLimite === dateString);
 
@@ -260,6 +368,7 @@ export class CalendarioComponent implements AfterViewInit {
                 isWeekend: isWeekend,
                 isOtherMonth: false,
                 isToday: isToday,
+                isPast: isPast,
                 isAttending: isAttending,
                 deadlines: deadlines,
                 competitions: dailyCompetitions,
