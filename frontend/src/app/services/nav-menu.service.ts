@@ -10,6 +10,12 @@ import { TenantService } from './tenant.service';
  * Así, al añadir/quitar un enlace, aparece en ambos sitios automáticamente y no
  * vuelven a desincronizarse.
  *
+ * Estructura: cada SECCIÓN (Público, Miembros, Staff…) agrupa ITEMS. Un item es
+ * normalmente un enlace, pero si declara `children` se convierte en un GRUPO
+ * colapsable (divulgación progresiva) que anida varios enlaces bajo un mismo
+ * epígrafe semántico (ej. "Asistencia", "Comunidad"). Esto sustituye al antiguo
+ * marcador `header`.
+ *
  * Para añadir un enlace: edita NAV_SECTIONS. Nada más.
  */
 
@@ -26,8 +32,12 @@ export interface NavItem {
   feature?: string;
   /** Solo visible si este flag de settings del club está activo. */
   setting?: string;
-  /** Cabecera no clicable dentro de una sección (subtítulo). */
-  header?: boolean;
+  /**
+   * Si está presente, este item es un GRUPO colapsable (no un enlace): agrupa
+   * los enlaces de `children` bajo el epígrafe `label`. Un grupo se oculta
+   * automáticamente si todos sus hijos quedan filtrados.
+   */
+  children?: NavItem[];
 }
 
 export interface NavSection {
@@ -50,6 +60,9 @@ export const NAV_SECTIONS: NavSection[] = [
     ],
   },
   {
+    // "Explorar" se ha disuelto aquí: lo cotidiano queda arriba y el resto se
+    // reparte en grupos semánticos (Rendimiento, Bitácoras, Comunidad), en vez
+    // de un "cajón de sastre" separado.
     id: 'miembros', title: 'Miembros', icon: 'apps', role: 'member',
     items: [
       { label: 'Reservas', icon: 'event', route: '/reservas', feature: 'reservas-pistas' },
@@ -57,6 +70,24 @@ export const NAV_SECTIONS: NavSection[] = [
       { label: 'Clasificación', icon: 'emoji_events', route: '/ranking', setting: 'gamification_enabled' },
       { label: 'Vídeos', icon: 'movie', route: '/galeria-videos', feature: 'galeria-videos' },
       { label: 'Fotos', icon: 'photo_library', route: '/galeria-fotos' },
+      {
+        label: 'Rendimiento', icon: 'insights', children: [
+          { label: 'Salud Deportiva', icon: 'favorite', route: '/explorar/salud-deportiva', feature: 'salud-canina' },
+          { label: 'Liga Norte', icon: 'emoji_events', route: '/explorar/liga-norte', setting: 'liga_norte_enabled' },
+        ],
+      },
+      {
+        label: 'Bitácoras', icon: 'menu_book', children: [
+          { label: 'Canina (RSCE)', icon: 'analytics', route: '/bitacora-rsce', feature: 'modulo-canina' },
+          { label: 'Caza (RFEC)', icon: 'pets', route: '/bitacora-rfec', feature: 'modulo-caza' },
+        ],
+      },
+      {
+        label: 'Comunidad', icon: 'groups', children: [
+          { label: 'Tablón de Anuncios', icon: 'campaign', route: '/tablon-anuncios' },
+          { label: 'Recursos', icon: 'folder_shared', route: '/recursos' },
+        ],
+      },
     ],
   },
   {
@@ -64,11 +95,20 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { label: 'Eventos', icon: 'sports_score', route: '/gestionar-competiciones' },
       { label: 'Monitor Reservas', icon: 'visibility', route: '/info-reservas', feature: 'reservas-pistas' },
-      { label: 'Verificar Asistencia', icon: 'fact_check', route: '/admin/asistencia' },
-      { label: 'Historial Asistencia', icon: 'history', route: '/staff/historial-asistencia' },
+      {
+        label: 'Asistencia', icon: 'fact_check', children: [
+          { label: 'Verificar Asistencia', icon: 'fact_check', route: '/admin/asistencia' },
+          { label: 'Historial Asistencia', icon: 'history', route: '/staff/historial-asistencia' },
+        ],
+      },
       { label: 'Puntos Extra', icon: 'military_tech', route: '/admin/puntos-extra', setting: 'gamification_enabled' },
-      { label: 'Gestión Miembros', icon: 'people', route: '/gestionar-miembros' },
-      { label: 'Gestión Horarios', icon: 'calendar_month', route: '/gestionar-horarios', feature: 'reservas-pistas' },
+      {
+        // Tareas de baja frecuencia, fuera de la navegación diaria.
+        label: 'Administración', icon: 'tune', children: [
+          { label: 'Gestión Miembros', icon: 'people', route: '/gestionar-miembros' },
+          { label: 'Gestión Horarios', icon: 'calendar_month', route: '/gestionar-horarios', feature: 'reservas-pistas' },
+        ],
+      },
     ],
   },
   {
@@ -88,26 +128,18 @@ export const NAV_SECTIONS: NavSection[] = [
       { label: 'Gestión de Clubes', icon: 'domain', route: '/admin/clubs' },
       { label: 'Planes y Funciones', icon: 'card_membership', route: '/admin/suscripciones' },
       { label: 'Ver sugerencias', icon: 'report_problem', route: '/admin/sugerencias' },
-      { label: 'Revisar', icon: '', header: true },
-      { label: 'Revisar vídeos', icon: 'video_library', route: '/admin/videos', feature: 'galeria-videos' },
-      { label: 'Vídeos Borrados', icon: 'auto_delete', route: '/admin/videos-borrados', feature: 'galeria-videos' },
-      { label: 'Monitor ACWR', icon: 'monitor_heart', route: '/admin/salud-monitor' },
-      { label: 'Canina (RSCE)', icon: 'query_stats', route: '/admin/rsce-monitor' },
-      { label: 'Monitor Scraping', icon: 'sync', route: '/admin/scraper-monitor' },
-      { label: 'Liga Norte', icon: 'emoji_events', route: '/admin/liga-norte', setting: 'liga_norte_enabled' },
-      { label: 'Avatares IA', icon: 'auto_awesome', route: '/admin/avatares' },
-      { label: 'Monitor Onboarding', icon: 'checklist_rtl', route: '/admin/onboarding-monitor' },
-    ],
-  },
-  {
-    id: 'explorar', title: 'Explorar', icon: 'explore', role: 'member',
-    items: [
-      { label: 'Salud Deportiva', icon: 'favorite', route: '/explorar/salud-deportiva', feature: 'salud-canina' },
-      { label: 'Liga Norte', icon: 'emoji_events', route: '/explorar/liga-norte', setting: 'liga_norte_enabled' },
-      { label: 'Canina (RSCE)', icon: 'analytics', route: '/bitacora-rsce', feature: 'modulo-canina' },
-      { label: 'Caza (RFEC)', icon: 'pets', route: '/bitacora-rfec', feature: 'modulo-caza' },
-      { label: 'Tablón de Anuncios', icon: 'campaign', route: '/tablon-anuncios' },
-      { label: 'Recursos', icon: 'folder_shared', route: '/recursos' },
+      {
+        label: 'Revisar', icon: 'rule', children: [
+          { label: 'Revisar vídeos', icon: 'video_library', route: '/admin/videos', feature: 'galeria-videos' },
+          { label: 'Vídeos Borrados', icon: 'auto_delete', route: '/admin/videos-borrados', feature: 'galeria-videos' },
+          { label: 'Monitor ACWR', icon: 'monitor_heart', route: '/admin/salud-monitor' },
+          { label: 'Canina (RSCE)', icon: 'query_stats', route: '/admin/rsce-monitor' },
+          { label: 'Monitor Scraping', icon: 'sync', route: '/admin/scraper-monitor' },
+          { label: 'Liga Norte', icon: 'emoji_events', route: '/admin/liga-norte', setting: 'liga_norte_enabled' },
+          { label: 'Avatares IA', icon: 'auto_awesome', route: '/admin/avatares' },
+          { label: 'Monitor Onboarding', icon: 'checklist_rtl', route: '/admin/onboarding-monitor' },
+        ],
+      },
     ],
   },
 ];
@@ -119,7 +151,8 @@ export class NavMenuService {
 
   /**
    * Secciones visibles para el usuario actual, con sus items ya filtrados por
-   * rol, feature de plan y flags de módulos, y con :clubId resuelto.
+   * rol, feature de plan y flags de módulos, con los grupos vacíos eliminados y
+   * con :clubId resuelto.
    */
   readonly sections = computed<NavSection[]>(() => {
     const clubId = this.tenant.tenantInfo()?.id;
@@ -127,13 +160,25 @@ export class NavMenuService {
       .filter((s) => this.roleVisible(s.role))
       .map((s) => ({
         ...s,
-        items: s.items
-          .filter((i) => this.itemVisible(i))
-          .map((i) => ({ ...i, route: this.resolveRoute(i.route, clubId) })),
+        items: this.resolveItems(s.items, clubId),
       }))
       // No mostrar una sección que se ha quedado sin items reales.
-      .filter((s) => s.items.some((i) => !i.header));
+      .filter((s) => s.items.length > 0);
   });
+
+  /** Filtra y resuelve una lista de items, podando grupos que se quedan vacíos. */
+  private resolveItems(items: NavItem[], clubId?: number): NavItem[] {
+    const result: NavItem[] = [];
+    for (const i of items) {
+      if (i.children) {
+        const children = this.resolveItems(i.children, clubId);
+        if (children.length) result.push({ ...i, children });
+      } else if (this.itemVisible(i)) {
+        result.push({ ...i, route: this.resolveRoute(i.route, clubId) });
+      }
+    }
+    return result;
+  }
 
   private roleVisible(role: NavRole): boolean {
     switch (role) {
@@ -146,7 +191,6 @@ export class NavMenuService {
   }
 
   private itemVisible(i: NavItem): boolean {
-    if (i.header) return true;
     if (i.feature && !this.tenant.hasFeature(i.feature)) return false;
     if (i.setting && !this.settingOn(i.setting)) return false;
     return true;

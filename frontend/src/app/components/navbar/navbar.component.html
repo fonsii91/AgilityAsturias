@@ -53,8 +53,14 @@
             {{ section.title }} <span class="material-icons arrow">expand_more</span></a>
           <ul class="dropdown-menu-list">
             @for (item of section.items; track item.label) {
-              @if (item.header) {
+              @if (item.children) {
+              <!-- Grupo: epígrafe + enlaces anidados -->
               <li class="dropdown-section-label">{{ item.label }}</li>
+              @for (child of item.children; track child.label) {
+              <li><a [routerLink]="child.route" routerLinkActive="active-route"
+                    [routerLinkActiveOptions]="{ exact: !!child.exact }" (click)="closeMenu()"><span
+                    class="material-icons">{{ child.icon }}</span> {{ child.label }}</a></li>
+              }
               } @else {
               <li><a [routerLink]="item.route" routerLinkActive="active-route"
                     [routerLinkActiveOptions]="{ exact: !!item.exact }" (click)="closeMenu()"><span

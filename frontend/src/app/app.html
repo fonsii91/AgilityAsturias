@@ -31,9 +31,24 @@
           @for (section of mobileSections(); track section.id) {
             <li class="mobile-nav-divider">{{ section.title }}</li>
             @for (item of section.items; track item.label) {
-              @if (item.header) {
-              <li class="mobile-nav-divider"
-                style="padding-top: 0.5rem; color: rgba(255, 255, 255, 0.7); font-size: 0.75rem;">{{ item.label }}</li>
+              @if (item.children) {
+              <!-- Grupo colapsable (divulgación progresiva) -->
+              <li class="mobile-nav-group">
+                <details>
+                  <summary>
+                    <span class="material-icons">{{ item.icon }}</span>
+                    <span class="group-label">{{ item.label }}</span>
+                    <span class="material-icons group-arrow">expand_more</span>
+                  </summary>
+                  <ul class="mobile-subnav">
+                    @for (child of item.children; track child.label) {
+                    <li><a [routerLink]="child.route" routerLinkActive="active-route"
+                          [routerLinkActiveOptions]="{ exact: !!child.exact }" (click)="sidenav.close()"><span
+                          class="material-icons">{{ child.icon }}</span> {{ child.label }}</a></li>
+                    }
+                  </ul>
+                </details>
+              </li>
               } @else {
               <li><a [routerLink]="item.route" routerLinkActive="active-route"
                     [routerLinkActiveOptions]="{ exact: !!item.exact }" (click)="sidenav.close()"><span
