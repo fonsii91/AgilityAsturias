@@ -47,6 +47,7 @@ Conexiones externas y analítica.
 Reglas de interfaz orientadas al usuario final a pie de pista.
 *   **[[sistema-diseno]]**: Directrices UX/UI para Angular 18+, colores corporativos, ergonomía de una mano (Thumb Zone) y accesos outdoor.
 *   **[[estrategias-onboarding-ux]]**: Mitigación del efecto "Ciudad Fantasma" con tutoriales por rol y componentes inteligentes de estado vacío (Empty States).
+*   **[[datos-prueba-bienvenida]]**: Semilla de datos de ejemplo (perro, clases, socios, clasificación, reservas y bitácora) al crear un club, más la política de activación de módulos.
 
 ### 🏆 06. Gamificación y Reglas Deportivas
 Algoritmos y dinámicas recreativas para incentivar el uso de la aplicación.
