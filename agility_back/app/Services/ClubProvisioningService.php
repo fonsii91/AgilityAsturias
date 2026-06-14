@@ -18,6 +18,7 @@ use App\Models\Reservation;
 use App\Models\RfecTrack;
 use App\Models\RsceTrack;
 use App\Models\TimeSlot;
+use App\Models\Track;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -170,6 +171,16 @@ class ClubProvisioningService
         DB::transaction(function () use ($club, $manager) {
             $now = Carbon::now();
 
+            // Acumuladores de IDs sembrados: se guardan en settings['_demo_seed']
+            // para poder borrar EXACTAMENTE estos datos de ejemplo después, sin tocar
+            // datos reales (ver ClubController::clearDemoData). Los hijos (reservas,
+            // cargas, mangas, puntos) se borran por dog_id, así que basta con los IDs
+            // de perros + usuarios socio + horario + anuncio + eventos + temporada.
+            $demoDogIds = [];
+            $demoUserIds = [];
+            $demoCompetitionIds = [];
+            $demoAnnouncementIds = [];
+
             // --- 1. Perro de muestra, propiedad del gestor ---
             // Datos sanos para que el velocímetro de salud no penalice: sin lesiones
             // previas y ratio altura/peso >= 2.5 (umbrales normales de ACWR).
@@ -187,6 +198,7 @@ class ClubProvisioningService
                 'club_entry_year' => (int) $now->format('Y'),
                 'club_id' => $club->id,
             ]);
+            $demoDogIds[] = $dog->id;
             // La propiedad del perro se modela solo en el pivot dog_user. La licencia
             // RSCE y el grado van en el pivot: sin rsce_license el módulo Canina sale
             // bloqueado, y con rsce_grade '0' no se muestra el historial de mangas.
@@ -226,7 +238,7 @@ class ClubProvisioningService
             }
 
             // --- 3. Anuncio de bienvenida (fijado) ---
-            Announcement::create([
+            $welcomeAnnouncement = Announcement::create([
                 'user_id' => $manager->id,
                 'title' => '¡Bienvenido a ' . $club->name . '! 🐾',
                 'content' => "Este es el tablón de anuncios de tu club. Aquí podrás avisar a tus socios de novedades, eventos y cambios de horario.\n\nTodos los datos que ves ahora mismo (este anuncio, el perro \"Rex\", las clases del horario y los eventos del calendario) son ejemplos para que veas cómo funciona la plataforma. Puedes editarlos o borrarlos cuando quieras.",
@@ -234,6 +246,7 @@ class ClubProvisioningService
                 'category' => 'Importante',
                 'club_id' => $club->id,
             ]);
+            $demoAnnouncementIds[] = $welcomeAnnouncement->id;
 
             // --- 4. Dos eventos en el calendario (club-wide, tipo 'otros') ---
             // club_id no está en el $fillable de Competition: se asigna como atributo.
@@ -250,6 +263,7 @@ class ClubProvisioningService
                 ]);
                 $event->club_id = $club->id;
                 $event->save();
+                $demoCompetitionIds[] = $event->id;
             }
 
             // --- 5. Cargas de salud: 8 clases asistidas repartidas en 28 días ---
@@ -406,6 +420,8 @@ class ClubProvisioningService
                     'club_id' => $club->id,
                 ]);
                 $memberDog->users()->attach($memberUser->id, ['is_primary_owner' => true]);
+                $demoUserIds[] = $memberUser->id;
+                $demoDogIds[] = $memberDog->id;
 
                 $points = $m['attendances'] * 3;
                 DogSeasonPoint::create(['dog_id' => $memberDog->id, 'season_id' => $season->id, 'points' => $points]);
@@ -469,6 +485,85 @@ class ClubProvisioningService
                     $upcoming->save();
                 }
             }
+
+            // Registrar los IDs sembrados en settings['_demo_seed'] para el borrado
+            // en bloque posterior. No está en CLIENT_EDITABLE_SETTINGS_KEYS, así que
+            // las ediciones del gestor en Configurar club no lo pisan.
+            $settings = $club->settings ?? [];
+            $settings['_demo_seed'] = [
+                'dog_ids' => array_values($demoDogIds),
+                'user_ids' => array_values($demoUserIds),
+                'time_slot_ids' => array_map(fn ($s) => $s->id, $createdSlots),
+                'announcement_ids' => array_values($demoAnnouncementIds),
+                'competition_ids' => array_values($demoCompetitionIds),
+                'season_ids' => [$season->id],
+                'manager_id' => $manager->id,
+                'seeded_at' => $now->toDateTimeString(),
+            ];
+            $club->settings = $settings;
+            $club->save();
+        });
+    }
+
+    /**
+     * Borra EXACTAMENTE los datos de ejemplo sembrados (los IDs registrados en
+     * settings['_demo_seed']), sin tocar datos reales. Idempotente: si no hay
+     * marcador, no hace nada. Los hijos (reservas, cargas, mangas, puntos) se
+     * borran por dog_id.
+     */
+    public function clearDemoData(Club $club): void
+    {
+        $seed = $club->settings['_demo_seed'] ?? null;
+        if (!$seed) {
+            return;
+        }
+
+        DB::transaction(function () use ($club, $seed) {
+            $dogIds = $seed['dog_ids'] ?? [];
+
+            if ($dogIds) {
+                Reservation::whereIn('dog_id', $dogIds)->delete();
+                DogWorkload::whereIn('dog_id', $dogIds)->delete();
+                Track::whereIn('dog_id', $dogIds)->delete();
+                PointHistory::whereIn('dog_id', $dogIds)->delete();
+                DogSeasonPoint::whereIn('dog_id', $dogIds)->delete();
+                DB::table('dog_user')->whereIn('dog_id', $dogIds)->delete();
+                DB::table('dogs')->whereIn('id', $dogIds)->delete();
+            }
+
+            // Solo socios de ejemplo (role member); nunca el gestor ni admins.
+            if (!empty($seed['user_ids'])) {
+                User::whereIn('id', $seed['user_ids'])->where('role', 'member')->delete();
+            }
+            if (!empty($seed['time_slot_ids'])) {
+                TimeSlot::whereIn('id', $seed['time_slot_ids'])->delete();
+            }
+            if (!empty($seed['announcement_ids'])) {
+                Announcement::whereIn('id', $seed['announcement_ids'])->delete();
+            }
+            if (!empty($seed['competition_ids'])) {
+                Competition::whereIn('id', $seed['competition_ids'])->delete();
+            }
+            if (!empty($seed['season_ids'])) {
+                GamificationSeason::whereIn('id', $seed['season_ids'])->delete();
+            }
+
+            // Quitar la licencia RFEC de ejemplo del gestor solo si no la ha cambiado.
+            // rfec_license está encriptado (cast GracefulEncryption), así que hay que
+            // comparar/guardar vía modelo, no con un where sobre el texto plano.
+            if (!empty($seed['manager_id'])) {
+                $mgr = User::find($seed['manager_id']);
+                if ($mgr && $mgr->rfec_license === 'RFEC-EJEMPLO-0001') {
+                    $mgr->rfec_license = null;
+                    $mgr->save();
+                }
+            }
+
+            // Quitar el marcador.
+            $settings = $club->settings ?? [];
+            unset($settings['_demo_seed']);
+            $club->settings = $settings;
+            $club->save();
         });
     }
 

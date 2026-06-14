@@ -80,6 +80,11 @@ export class ClubAdminService {
         return this.http.delete(`${this.apiUrl}/admin/clubs/${id}`);
     }
 
+    /** Borra en bloque los datos de ejemplo sembrados al crear el club. */
+    clearDemoData(id: number): Observable<{ message: string; club: Club }> {
+        return this.http.post<{ message: string; club: Club }>(`${this.apiUrl}/admin/clubs/${id}/clear-demo`, {});
+    }
+
     createClubHandoff(id: number): Observable<ClubHandoff> {
         return this.http.post<ClubHandoff>(`${this.apiUrl}/admin/clubs/${id}/handoff`, {});
     }

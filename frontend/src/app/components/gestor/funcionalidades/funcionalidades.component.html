@@ -50,5 +50,19 @@
         </div>
       }
     </div>
+
+    @if (hasDemoData()) {
+      <div class="demo-banner">
+        <div class="demo-banner-icon"><span class="material-icons">science</span></div>
+        <div class="demo-banner-body">
+          <h3>Datos de ejemplo activos</h3>
+          <p>Tu club se creó con datos de prueba ("(ejemplo)") para que vieras cómo funciona todo. Cuando empieces con datos reales, puedes eliminarlos de golpe. Tus datos propios no se tocan.</p>
+        </div>
+        <button type="button" class="demo-clear-btn" [disabled]="clearingDemo()" (click)="clearDemo()">
+          <span class="material-icons">{{ clearingDemo() ? 'hourglass_empty' : 'delete_sweep' }}</span>
+          {{ clearingDemo() ? 'Eliminando...' : 'Eliminar datos de ejemplo' }}
+        </button>
+      </div>
+    }
   }
 </div>

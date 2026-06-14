@@ -206,6 +206,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'show']);
         Route::put('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']);
         Route::post('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']); // Some forms might send POST with _method
+        Route::post('/admin/clubs/{club}/clear-demo', [\App\Http\Controllers\ClubController::class, 'clearDemoData']);
     });
 
     Route::middleware(['role:admin,manager,staff,member'])->group(function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Models\Club;
+use App\Services\ClubProvisioningService;
 
 class ClubController extends Controller
 {
@@ -353,6 +354,21 @@ class ClubController extends Controller
             $club->settings = $settings;
             $club->save();
         }
+    }
+
+    public function clearDemoData(Request $request, Club $club, ClubProvisioningService $provisioner)
+    {
+        $user = $request->user();
+        if ($user->role === 'manager' && $user->club_id !== $club->id) {
+            return response()->json(['message' => 'Unauthorized. Managers can only clear their own club.'], 403);
+        }
+
+        $provisioner->clearDemoData($club);
+
+        return response()->json([
+            'message' => 'Datos de ejemplo eliminados.',
+            'club' => $club->fresh()->load('plan.features'),
+        ]);
     }
 
     public function destroy(Club $club)

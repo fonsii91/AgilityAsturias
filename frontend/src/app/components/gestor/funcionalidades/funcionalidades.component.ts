@@ -1,10 +1,12 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ClubAdminService, Club } from '../../../services/club-admin.service';
 import { TenantService } from '../../../services/tenant.service';
 import { ToastService } from '../../../services/toast.service';
+import { ConfirmDialog, ConfirmDialogData } from '../../shared/confirm-dialog/confirm-dialog';
 
 interface ModuleDef {
   key: string;
@@ -26,7 +28,7 @@ interface ModuleDef {
 @Component({
   selector: 'app-funcionalidades-club',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatIconModule],
+  imports: [CommonModule, RouterModule, MatIconModule, MatDialogModule],
   templateUrl: './funcionalidades.component.html',
   styleUrl: './funcionalidades.component.css',
 })
@@ -34,10 +36,15 @@ export class FuncionalidadesClubComponent implements OnInit {
   private clubService = inject(ClubAdminService);
   private tenant = inject(TenantService);
   private toast = inject(ToastService);
+  private dialog = inject(MatDialog);
 
   club = signal<Club | null>(null);
   isLoading = signal(true);
   savingKey = signal<string | null>(null);
+  clearingDemo = signal(false);
+
+  /** ¿El club todavía tiene datos de ejemplo sin limpiar? */
+  hasDemoData = computed(() => !!(this.club()?.settings as any)?.['_demo_seed']);
 
   readonly modules: ModuleDef[] = [
     {
@@ -111,6 +118,44 @@ export class FuncionalidadesClubComponent implements OnInit {
         this.savingKey.set(null);
         this.toast.error('No se pudo guardar el cambio.');
       },
+    });
+  }
+
+  clearDemo() {
+    const club = this.club();
+    if (!club || this.clearingDemo()) return;
+
+    const ref = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Eliminar datos de ejemplo',
+        message: 'Se borrarán los datos de prueba que se crearon al dar de alta el club (perro y socios de ejemplo, sus reservas, clasificación, bitácora, horario, anuncio y eventos de bienvenida). Tus datos reales no se tocan. Esta acción no se puede deshacer.',
+        confirmText: 'Eliminar datos de ejemplo',
+        cancelText: 'Cancelar',
+        isDestructive: true,
+      } as ConfirmDialogData,
+    });
+
+    ref.afterClosed().subscribe((ok) => {
+      if (!ok) return;
+      this.clearingDemo.set(true);
+      this.clubService.clearDemoData(club.id!).subscribe({
+        next: () => {
+          // Quitar el marcador en local para ocultar el botón y refrescar estado.
+          this.club.update((prev) => {
+            if (!prev) return prev;
+            const settings: any = { ...(prev.settings || {}) };
+            delete settings['_demo_seed'];
+            return { ...prev, settings };
+          });
+          this.clearingDemo.set(false);
+          this.toast.success('Datos de ejemplo eliminados.');
+          this.tenant.reload();
+        },
+        error: () => {
+          this.clearingDemo.set(false);
+          this.toast.error('No se pudieron eliminar los datos de ejemplo.');
+        },
+      });
     });
   }
 }
