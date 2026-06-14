@@ -207,6 +207,83 @@
 .step-text {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Paso bloqueado: visible pero atenuado, no cuenta para el progreso.
+   Sigue siendo navegable (lleva al empty-state de esa sección). */
+.step-item.blocked {
+  border-left-color: transparent;
+}
+.step-item.blocked:hover {
+  background-color: #f8fafc;
+  border-left-color: transparent;
+}
+.step-item.blocked .step-icon mat-icon {
+  color: #cbd5e1;
+}
+.step-item.blocked .step-title {
+  color: #94a3b8;
+}
+.step-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #94a3b8;
+  font-style: italic;
+}
+.step-hint mat-icon {
+  font-size: 15px;
+  width: 15px;
+  height: 15px;
+}
+
+/* Botón de omitir / marcar como hecho por paso */
+.step-skip-btn {
+  background: none;
+  border: none;
+  color: #cbd5e1;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  align-self: center;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.step-skip-btn:hover {
+  color: #10b981;
+  background-color: #ecfdf5;
+}
+.step-skip-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Pie del popover: saltar tutorial */
+.popover-footer {
+  padding: 10px 16px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: center;
+}
+.skip-tutorial-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.skip-tutorial-btn:hover {
+  color: #64748b;
+  background-color: #f1f5f9;
 }
 
 .step-title {

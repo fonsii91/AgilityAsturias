@@ -33,12 +33,10 @@
   }
 
   @if (!isLoading && videos.length === 0) {
-  <div class="empty-state">
-    <div class="empty-icon-wrapper">
-      <span class="material-icons">videocam_off</span>
-    </div>
-    <p>No hay vídeos publicados en este momento.</p>
-  </div>
+  <app-empty-state
+    icon="videocam_off"
+    message="No hay vídeos publicados en este momento.">
+  </app-empty-state>
   }
 
   @if (!isLoading && videos.length > 0) {

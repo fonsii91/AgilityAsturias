@@ -9,11 +9,12 @@ import { ToastService } from '../../services/toast.service';
 import { Dog } from '../../models/dog.model';
 import { environment } from '../../../environments/environment';
 import { OnboardingService } from '../../services/onboarding';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, EmptyStateComponent],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css'
 })

@@ -150,7 +150,7 @@ class ClubPhotoTest extends TestCase
         $this->assertEquals('evento_social', $response->json('data.0.category'));
     }
 
-    public function test_cualquier_miembro_puede_etiquetar_pero_no_editar_metadatos_ajenos()
+    public function test_cualquier_miembro_puede_etiquetar_y_editar_metadatos()
     {
         $this->actingAs($this->user)->postJson('/api/photos', $this->uploadPayload());
         $photo = ClubPhoto::withoutGlobalScopes()->first();
@@ -164,18 +164,18 @@ class ClubPhotoTest extends TestCase
         $this->assertCount(1, $photo->fresh()->dogs);
         $this->assertCount(1, $photo->fresh()->taggedUsers);
 
-        // Pero no puede cambiar el título de una foto que no es suya
+        // Y también puede corregir los metadatos de una foto que no es suya (colaborativo)
         $metaResponse = $this->actingAs($this->otherUser)->postJson("/api/photos/{$photo->id}", [
-            'title' => 'Título hackeado',
+            'title' => 'Título corregido',
+            'category' => 'evento_social',
+            'photo_type' => 'podio',
         ]);
-        $metaResponse->assertStatus(403);
+        $metaResponse->assertStatus(200);
 
-        // El autor sí puede
-        $authorResponse = $this->actingAs($this->user)->postJson("/api/photos/{$photo->id}", [
-            'title' => 'Mi título',
-        ]);
-        $authorResponse->assertStatus(200);
-        $this->assertEquals('Mi título', $photo->fresh()->title);
+        $fresh = $photo->fresh();
+        $this->assertEquals('Título corregido', $fresh->title);
+        $this->assertEquals('evento_social', $fresh->category);
+        $this->assertEquals('podio', $fresh->photo_type);
     }
 
     public function test_un_miembro_etiquetado_puede_quitarse_de_la_foto()

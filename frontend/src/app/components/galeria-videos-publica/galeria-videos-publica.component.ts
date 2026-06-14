@@ -6,11 +6,12 @@ import { ToastService } from '../../services/toast.service';
 import { Video } from '../../models/video.model';
 import { SmartVideoPlayerComponent } from '../galeria-videos/smart-video-player/smart-video-player.component';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-galeria-videos-publica',
   standalone: true,
-  imports: [CommonModule, SmartVideoPlayerComponent, InstruccionesComponent],
+  imports: [CommonModule, SmartVideoPlayerComponent, InstruccionesComponent, EmptyStateComponent],
   templateUrl: './galeria-videos-publica.component.html',
   styleUrl: './galeria-videos-publica.component.css'
 })

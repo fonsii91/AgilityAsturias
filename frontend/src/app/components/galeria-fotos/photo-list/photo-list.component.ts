@@ -2,7 +2,7 @@ import { Component, OnInit, inject, HostListener, signal, computed } from '@angu
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { PhotoService, PhotoFilters } from '../../../services/photo.service';
+import { PhotoService, PhotoFilters, PhotoUploadMetadata } from '../../../services/photo.service';
 import { DogService } from '../../../services/dog.service';
 import { CompetitionService } from '../../../services/competition.service';
 import { AuthService } from '../../../services/auth.service';
@@ -10,11 +10,13 @@ import { ToastService } from '../../../services/toast.service';
 import { Photo, PhotoStorageStats, PHOTO_CATEGORIES, PHOTO_TYPES, photoCategoryLabel, photoTypeLabel } from '../../../models/photo.model';
 import { environment } from '../../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
+import { EmptyStateComponent } from '../../ui/empty-state/empty-state';
+import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
 
 @Component({
     selector: 'app-photo-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, RouterLink],
+    imports: [CommonModule, FormsModule, RouterLink, EmptyStateComponent, InstruccionesComponent],
     templateUrl: './photo-list.component.html',
     styleUrl: './photo-list.component.css'
 })
@@ -47,9 +49,16 @@ export class PhotoListComponent implements OnInit {
     searchTerm = signal<string>('');
     private searchDebounce: any = null;
 
+    // Panel de filtros avanzados (Tipo/Perro/Miembro/Competición) plegable
+    isFiltersOpen = signal<boolean>(false);
+
     // Lightbox
     selectedPhoto = signal<Photo | null>(null);
     isEditingTags = signal<boolean>(false);
+    // Edición colaborativa de metadatos (cualquier miembro)
+    isEditingMeta = signal<boolean>(false);
+    isSavingMeta = signal<boolean>(false);
+    editMeta = { title: '', category: '', photo_type: '', competition_id: '', taken_at: '' };
     isDeleting = signal<boolean>(false);
     showSidebar = signal<boolean>(true);
     members = signal<{ id: number; name: string }[]>([]);
@@ -61,6 +70,19 @@ export class PhotoListComponent implements OnInit {
             .then(users => { this.members.set(users); })
             .catch(() => { this.members.set([]); });
     }
+
+    hasActiveFilters = computed<boolean>(() => !!(
+        this.filterCategory() || this.filterType() || this.filterDog() ||
+        this.filterMember() || this.filterCompetition() || this.searchTerm()
+    ));
+
+    // Mostrar la barra de filtros solo si hay fotos o algún filtro aplicado
+    showFilters = computed<boolean>(() => this.photos().length > 0 || this.hasActiveFilters());
+
+    // Filtros avanzados (los plegables): excluye solo la búsqueda, que queda siempre visible
+    hasAdvancedFilters = computed<boolean>(() => !!(
+        this.filterCategory() || this.filterType() || this.filterDog() || this.filterMember() || this.filterCompetition()
+    ));
 
     filters = computed<PhotoFilters>(() => {
         return {
@@ -104,8 +126,11 @@ export class PhotoListComponent implements OnInit {
         this.loadPhotos(true);
     }
 
-    selectCategory(category: string) {
-        this.filterCategory.set(this.filterCategory() === category ? '' : category);
+    onCategoryChange() {
+        // "Competición" solo aplica dentro de la categoría Competición: al salir, se limpia.
+        if (this.filterCategory() !== 'competicion' && this.filterCompetition()) {
+            this.filterCompetition.set('');
+        }
         this.onFilterChange();
     }
 
@@ -122,6 +147,24 @@ export class PhotoListComponent implements OnInit {
         return this.dogService.getAllDogs()() || [];
     });
 
+    private dogIsMine(dog: { users?: Array<{ id: number }> }, userId: number | null): boolean {
+        return !!userId && !!dog.users?.some(u => u.id === userId);
+    }
+
+    /** Perros del usuario actual, ordenados alfabéticamente (van primero y destacados). */
+    myDogs = computed(() => {
+        const uid = this.authService.currentUserSignal()?.id ?? null;
+        return this.dogs().filter(d => this.dogIsMine(d, uid))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    });
+
+    /** Resto de perros del club, ordenados alfabéticamente. */
+    otherDogs = computed(() => {
+        const uid = this.authService.currentUserSignal()?.id ?? null;
+        return this.dogs().filter(d => !this.dogIsMine(d, uid))
+            .sort((a, b) => a.name.localeCompare(b.name));
+    });
+
     formatStorage(bytes: number): string {
         if (!bytes) return '0 MB';
         const mb = bytes / (1024 * 1024);
@@ -134,6 +177,7 @@ export class PhotoListComponent implements OnInit {
     openPhoto(photo: Photo) {
         this.selectedPhoto.set(photo);
         this.isEditingTags.set(false);
+        this.isEditingMeta.set(false);
         this.showSidebar.set(true);
         document.body.style.overflow = 'hidden';
     }
@@ -145,6 +189,7 @@ export class PhotoListComponent implements OnInit {
     closePhoto() {
         this.selectedPhoto.set(null);
         this.isEditingTags.set(false);
+        this.isEditingMeta.set(false);
         document.body.style.overflow = '';
     }
 
@@ -161,6 +206,54 @@ export class PhotoListComponent implements OnInit {
         if (next) {
             this.selectedPhoto.set(next);
             this.isEditingTags.set(false);
+            this.isEditingMeta.set(false);
+        }
+    }
+
+    // ---- Edición colaborativa de metadatos ----
+
+    startEditMeta(photo: Photo) {
+        this.editMeta = {
+            title: photo.title || '',
+            category: photo.category || '',
+            photo_type: photo.photo_type || '',
+            competition_id: photo.competition_id ? String(photo.competition_id) : '',
+            taken_at: (photo.taken_at || '').slice(0, 10),
+        };
+        this.isEditingMeta.set(true);
+    }
+
+    async saveMeta(photo: Photo) {
+        if (this.isSavingMeta()) return;
+        if (!this.editMeta.category) {
+            this.toastService.error('La categoría es obligatoria.');
+            return;
+        }
+
+        const isComp = this.editMeta.category === 'competicion';
+        const payload: Partial<PhotoUploadMetadata> = {
+            title: this.editMeta.title || null,
+            category: this.editMeta.category,
+            photo_type: this.editMeta.photo_type || null,
+            taken_at: this.editMeta.taken_at,
+            competition_id: isComp ? (this.editMeta.competition_id ? Number(this.editMeta.competition_id) : null) : null,
+        };
+
+        this.isSavingMeta.set(true);
+        try {
+            const updated = await firstValueFrom(this.photoService.updatePhoto(photo.id, payload));
+            photo.title = updated.title;
+            photo.category = updated.category;
+            photo.photo_type = updated.photo_type;
+            photo.taken_at = updated.taken_at;
+            photo.competition_id = updated.competition_id;
+            photo.competition = updated.competition;
+            this.isEditingMeta.set(false);
+            this.toastService.success('Datos actualizados.');
+        } catch {
+            this.toastService.error('No se pudieron guardar los cambios.');
+        } finally {
+            this.isSavingMeta.set(false);
         }
     }
 

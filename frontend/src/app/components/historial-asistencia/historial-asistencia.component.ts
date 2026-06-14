@@ -25,6 +25,7 @@ import type { EChartsOption } from 'echarts';
 
 // Shared Components
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-historial-asistencia',
@@ -44,7 +45,8 @@ import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.co
     MatChipsModule,
     MatProgressSpinnerModule,
     NgxEchartsDirective,
-    InstruccionesComponent
+    InstruccionesComponent,
+    EmptyStateComponent
   ],
   templateUrl: './historial-asistencia.component.html',
   styleUrl: './historial-asistencia.component.css'

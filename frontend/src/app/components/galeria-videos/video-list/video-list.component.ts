@@ -15,11 +15,12 @@ import { ToastService } from '../../../services/toast.service';
 import { TenantService } from '../../../services/tenant.service';
 import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
 import { AnalyticsService } from '../../../services/analytics.service';
+import { EmptyStateComponent } from '../../ui/empty-state/empty-state';
 
 @Component({
     selector: 'app-video-list',
     standalone: true,
-    imports: [CommonModule, FormsModule, SmartVideoPlayerComponent, RouterLink, FichaPerroComponent, InstruccionesComponent],
+    imports: [CommonModule, FormsModule, SmartVideoPlayerComponent, RouterLink, FichaPerroComponent, InstruccionesComponent, EmptyStateComponent],
     templateUrl: './video-list.component.html',
     styleUrl: './video-list.component.css'
 })
@@ -67,6 +68,16 @@ export class VideoListComponent implements OnInit {
         this.loadVideos();
         this.dogService.loadAllDogs();
         this.compService.fetchCompetitions();
+    }
+
+    get hasActiveFilters(): boolean {
+        return !!(this.searchQuery || this.filterDateRange || this.filterDogId ||
+            this.filterCompetitionId || this.activeSort !== 'latest' || this.activeTab !== 'all');
+    }
+
+    // Mostrar la barra de filtros solo si hay vídeos o algún filtro aplicado
+    get showFilters(): boolean {
+        return this.videos.length > 0 || this.hasActiveFilters;
     }
 
     toggleFilters() {

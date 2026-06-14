@@ -7,6 +7,7 @@ import { VideoService } from '../../services/video.service';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-admin-deleted-videos',
@@ -19,7 +20,8 @@ import { MatButtonModule } from '@angular/material/button';
     MatProgressSpinnerModule,
     MatIconModule,
     MatButtonModule,
-    DatePipe
+    DatePipe,
+    EmptyStateComponent
   ],
   templateUrl: './admin-deleted-videos.component.html',
   styleUrls: ['./admin-deleted-videos.component.css']

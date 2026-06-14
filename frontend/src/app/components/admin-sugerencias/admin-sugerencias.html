@@ -17,10 +17,11 @@
   }
 
   @if (!isLoading() && filteredSuggestions().length === 0) {
-    <div class="empty-state">
-      <span class="material-icons">sentiment_satisfied_alt</span>
-      <p>No hay reportes {{ filter() === 'pending' ? 'pendientes' : filter() === 'resolved' ? 'resueltos' : filter() === 'unresolved' ? 'no resueltos' : filter() === 'landing_pages' ? 'de landing pages' : '' }} en este momento.</p>
-    </div>
+    <app-empty-state
+      icon="sentiment_satisfied_alt"
+      [message]="'No hay reportes ' + (filter() === 'pending' ? 'pendientes' : filter() === 'resolved' ? 'resueltos' : filter() === 'unresolved' ? 'no resueltos' : filter() === 'landing_pages' ? 'de landing pages' : '') + ' en este momento.'"
+      variant="no-results">
+    </app-empty-state>
   }
 
   @if (!isLoading() && filteredSuggestions().length > 0) {

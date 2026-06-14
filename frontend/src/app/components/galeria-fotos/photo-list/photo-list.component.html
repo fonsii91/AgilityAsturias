@@ -4,7 +4,7 @@
   <div class="gallery-header">
     <div class="header-titles">
       <h1><span class="material-icons">photo_library</span> Fotos del Club</h1>
-      @if (storageStats()) {
+      @if (storageStats() && storageStats()!.used_bytes > 0) {
       <div class="storage-meter" [class.storage-warning]="storageStats()!.percentage >= 90">
         <div class="storage-bar">
           <div class="storage-fill" [style.width.%]="storageStats()!.used_bytes > 0 ? (storageStats()!.percentage < 3 ? 3 : (storageStats()!.percentage > 100 ? 100 : storageStats()!.percentage)) : 0">
@@ -14,42 +14,131 @@
       </div>
       }
     </div>
-    <button class="btn-upload" routerLink="/galeria-fotos/subir">
-      <span class="material-icons">add_a_photo</span> Subir fotos
-    </button>
+    <div class="header-actions">
+      <button class="btn-upload" routerLink="/galeria-fotos/subir">
+        <span class="material-icons">add_a_photo</span> Subir fotos
+      </button>
+
+      <app-instrucciones titulo="Guía de las Fotos del Club">
+        <h4
+          style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <span class="material-icons-outlined" style="color: #64748b;">people</span> 1. Reglas para los Miembros
+        </h4>
+        <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Este es el álbum oficial del club: el
+          sitio para guardar y revivir los mejores momentos (entrenamientos, podios, cachorros, seminarios…). Estas son
+          las acciones que puedes hacer:</p>
+        <ul
+          style="padding-left: 0; margin-bottom: 2rem; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #1976d2; flex-shrink: 0; margin-top: 2px;">add_a_photo</span>
+            <div><strong>Subir fotos:</strong> Con el botón "Subir fotos" añades una o varias imágenes y eliges su
+              categoría (entrenamiento, competición, cachorros…) para que todo quede ordenado.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #8d6e63; flex-shrink: 0; margin-top: 2px;">sell</span>
+            <div><strong>Etiquetado entre todos:</strong> Al abrir una foto puedes pulsar "Etiquetar" para marcar qué
+              perros 🐾 y qué miembros 👤 salen en ella. Cuantas más etiquetas, más fácil encontrar luego las fotos de
+              tu perrete.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #1976d2; flex-shrink: 0; margin-top: 2px;">download</span>
+            <div><strong>Descargar:</strong> Dentro de cada foto tienes el botón de descarga para guardarla en tu
+              dispositivo con su calidad original.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #607d8b; flex-shrink: 0; margin-top: 2px;">person_remove</span>
+            <div><strong>Quitarte de una foto:</strong> Si apareces etiquetado y no quieres estarlo, usa "Quitarme de
+              esta foto" y desaparecerás de su etiquetado.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #d32f2f; flex-shrink: 0; margin-top: 2px;">delete</span>
+            <div><strong>Borrar:</strong> Solo puedes borrar las fotos que <strong>tú</strong> hayas subido. Es una
+              acción definitiva, así que piénsalo antes.</div>
+          </li>
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #f57c00; flex-shrink: 0; margin-top: 2px;">filter_alt</span>
+            <div><strong>Buscar y filtrar:</strong> Cuando haya fotos, podrás filtrar por categoría, tipo, perro,
+              miembro o competición, o buscar por texto para llegar enseguida a lo que buscas.</div>
+          </li>
+        </ul>
+
+        @if (authService.isStaff()) {
+        <h4
+          style="color: #0f172a; margin-top: 2rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+          <span class="material-icons-outlined" style="color: #64748b;">admin_panel_settings</span> 2. Opciones de Staff
+        </h4>
+        <p style="margin-bottom: 1rem; font-size: 0.95rem; text-align: left;">Como parte del equipo, dispones de
+          opciones de moderación sobre todo el álbum:</p>
+        <ul
+          style="padding-left: 0; margin-bottom: 0; list-style-type: none; display: flex; flex-direction: column; gap: 12px; text-align: left;">
+          <li style="display: flex; gap: 10px; align-items: flex-start;">
+            <span class="material-icons" style="color: #d32f2f; flex-shrink: 0; margin-top: 2px;">gavel</span>
+            <div><strong>Moderación total:</strong> Puedes borrar cualquier foto de la galería, no solo las tuyas, para
+              mantener el álbum limpio y apropiado.</div>
+          </li>
+        </ul>
+        }
+      </app-instrucciones>
+    </div>
   </div>
 
-  <!-- Filtros: categorías como chips -->
-  <div class="category-chips">
-    <button class="cat-chip" [class.active]="filterCategory() === ''" (click)="filterCategory.set(''); onFilterChange()">
-      Todas
-    </button>
-    @for (cat of categories; track cat.value) {
-    <button class="cat-chip" [class.active]="filterCategory() === cat.value" (click)="selectCategory(cat.value)">
-      <span class="material-icons">{{ cat.icon }}</span> {{ cat.label }}
-    </button>
-    }
-  </div>
-
-  <!-- Filtros secundarios -->
-  <div class="secondary-filters">
+  @if (showFilters()) {
+  <!-- Búsqueda + acceso a filtros avanzados -->
+  <div class="filters-bar">
     <div class="filter-field search-field">
       <span class="material-icons">search</span>
       <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()"
         placeholder="Buscar por título, perro o competición…" />
     </div>
 
+    <button type="button" class="btn-filters" [class.active]="isFiltersOpen() || hasAdvancedFilters()"
+      (click)="isFiltersOpen.set(!isFiltersOpen())">
+      <span class="material-icons">tune</span>
+      Filtros
+      @if (hasAdvancedFilters()) { <span class="filters-dot"></span> }
+    </button>
+  </div>
+
+  @if (isFiltersOpen()) {
+  <div class="advanced-filters">
+    <select class="filter-field" [(ngModel)]="filterDog" (ngModelChange)="onFilterChange()">
+      <option value="">Perro: todos</option>
+      @if (myDogs().length) {
+      <optgroup label="🐾 Mis perros">
+        @for (dog of myDogs(); track dog.id) {
+        <option [value]="dog.id">{{ dog.name }}</option>
+        }
+      </optgroup>
+      }
+      @if (otherDogs().length) {
+      <optgroup label="Otros perros del club">
+        @for (dog of otherDogs(); track dog.id) {
+        <option [value]="dog.id">{{ dog.name }}</option>
+        }
+      </optgroup>
+      }
+    </select>
+
+    <select class="filter-field" [(ngModel)]="filterCategory" (ngModelChange)="onCategoryChange()">
+      <option value="">Categoría: todas</option>
+      @for (cat of categories; track cat.value) {
+      <option [value]="cat.value">{{ cat.label }}</option>
+      }
+    </select>
+
+    @if (filterCategory() === 'competicion') {
+    <select class="filter-field" [(ngModel)]="filterCompetition" (ngModelChange)="onFilterChange()">
+      <option value="">Competición: todas</option>
+      @for (comp of competitions(); track comp.id) {
+      <option [value]="comp.id">{{ comp.nombre }}</option>
+      }
+    </select>
+    }
+
     <select class="filter-field" [(ngModel)]="filterType" (ngModelChange)="onFilterChange()">
       <option value="">Tipo: todos</option>
       @for (type of photoTypes; track type.value) {
       <option [value]="type.value">{{ type.label }}</option>
-      }
-    </select>
-
-    <select class="filter-field" [(ngModel)]="filterDog" (ngModelChange)="onFilterChange()">
-      <option value="">Perro: todos</option>
-      @for (dog of dogs(); track dog.id) {
-      <option [value]="dog.id">{{ dog.name }}</option>
       }
     </select>
 
@@ -59,25 +148,19 @@
       <option [value]="member.id">{{ member.name }}</option>
       }
     </select>
-
-    <select class="filter-field" [(ngModel)]="filterCompetition" (ngModelChange)="onFilterChange()">
-      <option value="">Competición: todas</option>
-      @for (comp of competitions(); track comp.id) {
-      <option [value]="comp.id">{{ comp.nombre }}</option>
-      }
-    </select>
   </div>
+  }
+  }
 
   <!-- Rejilla -->
   @if (photos().length === 0 && !isLoading()) {
-  <div class="empty-state">
-    <span class="material-icons">photo_camera</span>
-    <h3>Todavía no hay fotos{{ filterCategory() || filterType() || filterDog() || filterMember() || filterCompetition() || searchTerm() ? ' con estos filtros' : '' }}</h3>
-    <p>Sé el primero en compartir los momentos del club: entrenamientos, podios, cachorros…</p>
-    <button class="btn-upload" routerLink="/galeria-fotos/subir">
-      <span class="material-icons">add_a_photo</span> Subir las primeras fotos
-    </button>
-  </div>
+  <app-empty-state
+    icon="photo_camera"
+    [title]="'Todavía no hay fotos' + (filterCategory() || filterType() || filterDog() || filterMember() || filterCompetition() || searchTerm() ? ' con estos filtros' : '')"
+    message="Sé el primero en compartir los momentos del club: entrenamientos, podios, cachorros…"
+    ctaLabel="Subir las primeras fotos"
+    ctaRoute="/galeria-fotos/subir">
+  </app-empty-state>
   }
 
   <div class="photo-grid">
@@ -116,8 +199,9 @@
   <div class="lightbox-content" [class.sidebar-hidden]="!showSidebar()" (click)="$event.stopPropagation()">
 
     <button class="lightbox-close" (click)="closePhoto()"><span class="material-icons">close</span></button>
-    <button class="lightbox-info-toggle" (click)="toggleSidebar()" title="Información y etiquetas">
-      <span class="material-icons">{{ showSidebar() ? 'info' : 'info_outline' }}</span>
+    <button class="lightbox-info-toggle" (click)="toggleSidebar()"
+      [title]="showSidebar() ? 'Ampliar imagen' : 'Mostrar detalles'">
+      <span class="material-icons">{{ showSidebar() ? 'fullscreen' : 'fullscreen_exit' }}</span>
     </button>
     <button class="lightbox-nav nav-prev" (click)="navigatePhoto(-1)"><span
         class="material-icons">chevron_left</span></button>
@@ -131,6 +215,7 @@
     @if (showSidebar()) {
     <div class="lightbox-sidebar">
       <div class="sidebar-section">
+        @if (!isEditingMeta()) {
         @if (photo.title) { <h3>{{ photo.title }}</h3> }
         <div class="meta-line">
           <span class="material-icons">collections</span> {{ categoryLabel(photo.category) }}
@@ -147,6 +232,60 @@
         @if (photo.user) {
         <div class="meta-line subtle">
           <span class="material-icons">cloud_upload</span> Subida por {{ photo.user.name }}
+        </div>
+        }
+        <button class="btn-edit-meta" (click)="startEditMeta(photo)">
+          <span class="material-icons">edit</span> Editar datos
+        </button>
+        } @else {
+        <div class="meta-edit-form">
+          <label class="meta-field">
+            <span>Título</span>
+            <input type="text" [(ngModel)]="editMeta.title" placeholder="Título (opcional)" />
+          </label>
+
+          <label class="meta-field">
+            <span>Categoría</span>
+            <select [(ngModel)]="editMeta.category">
+              @for (cat of categories; track cat.value) {
+              <option [value]="cat.value">{{ cat.label }}</option>
+              }
+            </select>
+          </label>
+
+          @if (editMeta.category === 'competicion') {
+          <label class="meta-field">
+            <span>Competición</span>
+            <select [(ngModel)]="editMeta.competition_id">
+              <option value="">Sin especificar</option>
+              @for (comp of competitions(); track comp.id) {
+              <option [value]="comp.id">{{ comp.nombre }}</option>
+              }
+            </select>
+          </label>
+          }
+
+          <label class="meta-field">
+            <span>Tipo de foto</span>
+            <select [(ngModel)]="editMeta.photo_type">
+              <option value="">Sin especificar</option>
+              @for (type of photoTypes; track type.value) {
+              <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="meta-field">
+            <span>Fecha</span>
+            <input type="date" [(ngModel)]="editMeta.taken_at" />
+          </label>
+
+          <div class="meta-edit-actions">
+            <button class="btn-meta-cancel" (click)="isEditingMeta.set(false)" [disabled]="isSavingMeta()">Cancelar</button>
+            <button class="btn-meta-save" (click)="saveMeta(photo)" [disabled]="isSavingMeta()">
+              {{ isSavingMeta() ? 'Guardando…' : 'Guardar' }}
+            </button>
+          </div>
         </div>
         }
       </div>

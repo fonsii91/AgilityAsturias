@@ -10,11 +10,12 @@ import { AuthService } from '../../../services/auth.service';
 import { environment } from '../../../../environments/environment';
 import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
 import { HasFeatureDirective } from '../../../directives/has-feature.directive';
+import { EmptyStateComponent } from '../../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-recursos-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, MatButtonModule, MatIconModule, MatTooltipModule, InstruccionesComponent, HasFeatureDirective],
+  imports: [CommonModule, RouterModule, FormsModule, MatButtonModule, MatIconModule, MatTooltipModule, InstruccionesComponent, HasFeatureDirective, EmptyStateComponent],
   templateUrl: './recursos-list.component.html',
   styleUrls: ['./recursos-list.component.scss']
 })

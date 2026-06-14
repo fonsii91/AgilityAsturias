@@ -193,10 +193,11 @@
 
     </div>
   } @else {
-    <div class="empty-state-card text-center">
-      <mat-icon>bar_chart</mat-icon>
-      <p>No se pudieron cargar las estadísticas generales.</p>
-    </div>
+    <app-empty-state
+      icon="bar_chart"
+      message="No se pudieron cargar las estadísticas generales."
+      variant="no-results">
+    </app-empty-state>
   }
 </ng-template>
 
@@ -349,12 +350,10 @@
     }
   } @else {
     <!-- Empty State (No member selected) -->
-    <div class="empty-state-container">
-      <div class="empty-state-icon">
-        <mat-icon>person_search</mat-icon>
-      </div>
-      <h3>Detalle por Miembro</h3>
-      <p>Selecciona un miembro en el buscador superior para auditar su asistencia individual a clases y eventos.</p>
-    </div>
+    <app-empty-state
+      icon="person_search"
+      title="Detalle por Miembro"
+      message="Selecciona un miembro en el buscador superior para auditar su asistencia individual a clases y eventos.">
+    </app-empty-state>
   }
 </ng-template>

@@ -140,8 +140,8 @@ Los administradores del club disponen de una pestaña llamada **"Eventos de Flow
 * Muestra el estado del scraping, la fecha y la imagen capturada de Telegram.
 * Permite ver los binomios detectados y re-procesar o aprobar manualmente.
 
-### 🌟 Interfaz de Clasificación Pública (UX Premium)
-En la sección pública de **Explorar**, los socios y usuarios externos disponen de la pestaña **Clasificación Liga Norte** que destaca por sus ricos detalles visuales:
+### 🌟 Interfaz de Clasificación (UX Premium)
+En el menú de **Miembros → Competición → Liga Norte**, los socios disponen de la pantalla de **Clasificación Liga Norte** que destaca por sus ricos detalles visuales:
 * **Filtros por Altura/Clase**: Pestañas superiores estilizadas para alternar entre clases `20`, `30`, `40`, `50` y `60`.
 * **Diseño Mobile-First Colapsable**: En pantallas móviles, las tarjetas se presentan en formato supercompacto y colapsado (mostrando solo posición, perro, guía y puntos totales). Al tocar sobre una tarjeta, esta se expande con micro-animaciones revelando el desglose detallado de Agility, Jumping y excelentes.
 * **Destacado Local**: Los binomios pertenecientes a clubes locales se visualizan en color verde con degradados suaves hacia el blanco, destacándose instantáneamente sobre el resto de competidores.

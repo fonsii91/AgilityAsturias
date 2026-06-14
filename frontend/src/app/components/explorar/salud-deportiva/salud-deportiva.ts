@@ -15,6 +15,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { PendingReviewsDialogComponent } from './pending-reviews-dialog/pending-reviews-dialog.component';
 import { HistoryDialogComponent } from './history-dialog/history-dialog.component';
 import { InstruccionesComponent } from '../../shared/instrucciones/instrucciones.component';
+import { EmptyStateComponent } from '../../ui/empty-state/empty-state';
 import { AnalyticsService } from '../../../services/analytics.service';
 
 @Component({
@@ -29,7 +30,8 @@ import { AnalyticsService } from '../../../services/analytics.service';
     MatButtonModule, 
     MatIconModule, 
     MatRippleModule,
-    InstruccionesComponent
+    InstruccionesComponent,
+    EmptyStateComponent
   ],
   templateUrl: './salud-deportiva.html',
   styleUrls: ['./salud-deportiva.css']

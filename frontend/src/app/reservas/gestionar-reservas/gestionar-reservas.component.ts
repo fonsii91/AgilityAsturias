@@ -20,11 +20,12 @@ import { AcwrData } from '../../models/dog-workload.model';
 import { OnboardingService } from '../../services/onboarding';
 import { AnalyticsService } from '../../services/analytics.service';
 import { TenantService } from '../../services/tenant.service';
+import { EmptyStateComponent } from '../../components/ui/empty-state/empty-state';
 
 @Component({
     selector: 'app-gestionar-reservas',
     standalone: true,
-    imports: [CommonModule, FormsModule, MatIconModule, RouterModule, AthleticProfileCardComponent, FichaPerroComponent, InstruccionesComponent],
+    imports: [CommonModule, FormsModule, MatIconModule, RouterModule, AthleticProfileCardComponent, FichaPerroComponent, InstruccionesComponent, EmptyStateComponent],
     templateUrl: './gestionar-reservas.component.html',
     styleUrl: './gestionar-reservas.component.css'
 })

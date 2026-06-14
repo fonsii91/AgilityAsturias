@@ -79,23 +79,25 @@ Las pistas rurales suelen tener mala cobertura. La UI debe ser resiliente:
 
 ---
 
-## 7. Optimización de la Navegación y Arquitectura de la Información (Propuesta UX)
+## 7. Navegación y Arquitectura de la Información (Implementado)
 
-Para mitigar la fatiga visual y táctil del usuario a pie de pista bajo condiciones climáticas adversas, se propone la optimización de los menús cargados reduciendo el número de opciones visibles en el menú lateral mediante consolidación semántica y divulgación progresiva.
+Para mitigar la fatiga visual y táctil del usuario a pie de pista bajo condiciones climáticas adversas, la navegación se ha optimizado reduciendo el número de opciones visibles en el menú mediante **consolidación semántica** y **divulgación progresiva** (grupos colapsables). Los roles y el alcance de cada sección se definen en [[usuarios]]; el inventario de funciones que cuelga de cada apartado, en [[funcionalidades]]. El flujo de bienvenida que guía al usuario por esta navegación se detalla en [[estrategias-onboarding-ux]].
 
-### 7.1. Reestructuración del Menú Staff (De 7 a 5 elementos principales)
-*   **Consolidación de Asistencia:** Fusionar *Verificar Asistencia* e *Historial Asistencia* bajo un solo ítem llamado **"Control de Asistencia"**. La navegación entre pasar lista y ver el histórico se gestiona internamente mediante pestañas (*Tabs*).
-*   **Agrupación Administrativa:** Mover *Gestión Miembros* y *Gestión Horarios* a un subpanel de configuración o agruparlos bajo el ítem **"Ajustes del Club" / "Administración"** (tareas de baja frecuencia que no requieren estar en la navegación diaria).
-*   **Dashboard Operativo:** Diseñar un panel centralizado para el Staff con tarjetas táctiles de gran tamaño (mínimo 48x48px) en lugar de una lista plana de enlaces.
+> Las secciones 7.1 y 7.2 conservan el **razonamiento de diseño** que motivó la reestructuración; la sección 7.3 documenta lo realmente construido (*as-built*). Ante cualquier duda, manda 7.3.
 
-### 7.2. Reestructuración del Menú Explorar (De 6 a 3 elementos principales)
-*   **Integración Deportiva en "Mi Manada":** Mover *Salud Deportiva (ACWR)*, *Bitácora RSCE* y *Bitácora RFEC* directamente al perfil de cada perro. El usuario debe acceder a estas herramientas desde la ficha del perro correspondiente, no de forma aislada.
-*   **Consolidación de Recursos e Información:** Agrupar *Tablón de Anuncios* y *Recursos* bajo un nuevo bloque semántico llamado **"Comunidad"** o **"Club"**.
-*   **Redefinición Semántica:** Renombrar el apartado *"Explorar"* a *"Comunidad"* o *"Rendimiento"* según los elementos que finalmente albergue, evitando el patrón antipatrón de diseño de "cajón de sastre".
+### 7.1. Menú Staff (motivación: de 7 a ~4 elementos de primer nivel)
+*   **Consolidación de Asistencia:** agrupar *Verificar Asistencia* e *Historial Asistencia* para reducir ruido. *(Construido como grupo de menú; la fusión real en una sola pantalla con pestañas sigue pendiente — ver 7.3.)*
+*   **Agrupación Administrativa:** *Gestión Miembros* y *Gestión Horarios* son tareas de baja frecuencia que no deben ocupar la navegación diaria → se agrupan bajo **"Administración"**.
+*   **Dashboard Operativo:** idea de un panel de tarjetas táctiles grandes (mín. 48x48px) para el Staff en lugar de una lista plana de enlaces. *(Pendiente — ver 7.3.)*
 
-### 7.3. Implementación (estado actual)
+### 7.2. Disolución del Menú "Explorar" (antipatrón "cajón de sastre")
+*   **Integración Deportiva en la ficha del perro:** la intención de mover *Salud Deportiva (ACWR)*, *Bitácora RSCE* y *Bitácora RFEC* dentro del perfil de cada perro. *(Pendiente a nivel de componente; hoy siguen siendo rutas globales, solo reagrupadas — ver 7.3.)*
+*   **Consolidación de Recursos e Información:** agrupar *Tablón de Anuncios* y *Recursos* bajo un bloque semántico **"Comunidad"**.
+*   **Redefinición Semántica:** eliminar el apartado *"Explorar"* (cajón de sastre) repartiendo sus enlaces en grupos con significado propio.
 
-> Implementado en la rama `feat/navbar-reestructuracion`. El menú sigue teniendo una **fuente única** (`NAV_SECTIONS` en `nav-menu.service.ts`), que ahora rinde tanto en el navbar de escritorio como en el sidenav móvil.
+### 7.3. Estructura construida (*as-built*)
+
+> El menú tiene una **fuente única** (`NAV_SECTIONS` en `nav-menu.service.ts`), que rinde tanto en el navbar de escritorio como en el sidenav móvil. Para añadir o mover un enlace se edita solo ese array; ambos menús se mantienen sincronizados por construcción.
 
 **Cambio de modelo (habilitador):** `NavItem` admite un campo `children?: NavItem[]`. Un item con `children` deja de ser un enlace y pasa a ser un **grupo colapsable** bajo un epígrafe semántico. Los grupos se ocultan solos si todos sus hijos quedan filtrados por rol/feature/flag. Esto sustituye al antiguo marcador `header`.
 
@@ -105,7 +107,7 @@ Para mitigar la fatiga visual y táctil del usuario a pie de pista bajo condicio
     *   **Bitácoras** (RSCE + RFEC): registros oficiales por perro.
     *   **Comunidad** (Tablón de Anuncios + Recursos).
     *   *Vídeos y Fotos se mantienen sueltos por su alta frecuencia de uso (engagement diario), no se agrupan.*
-*   **Staff:** **Verificar Asistencia** (acción diaria) queda en primer nivel; el resto se agrupa por eje **acción vs. consulta**: grupo **Seguimiento** (Historial Asistencia + Monitor Reservas, solo lectura) y grupo **Administración** (Gestión Miembros + Gestión Horarios, baja frecuencia).
+*   **Staff:** las acciones diarias **Eventos** y **Verificar Asistencia** quedan en primer nivel; el resto se agrupa por eje **acción vs. consulta**: grupo **Seguimiento** (Historial Asistencia + Monitor Reservas, solo lectura) y grupo **Administración** (Gestión Miembros + Gestión Horarios, baja frecuencia).
 *   **Puntos Extra fuera del nav:** se otorga de forma contextual desde la propia Clasificación (botón "Dar Puntos" para Staff en `ranking.component`), co-localizando la acción con su dato.
 *   **Administrar:** el bloque de monitores y revisión se agrupa bajo **Revisar**.
 *   **Renderizado:** en escritorio los grupos aparecen como subsecciones etiquetadas dentro del desplegable; en móvil como `<details>` colapsables (divulgación progresiva real, accesibles por teclado).

@@ -5,11 +5,12 @@ import { LigaNorteService } from '../../services/liga-norte.service';
 import { ToastService } from '../../services/toast.service';
 import { TenantService } from '../../services/tenant.service';
 import { DogService } from '../../services/dog.service';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-clasificacion-liga-norte',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, EmptyStateComponent],
   templateUrl: './clasificacion-liga-norte.html',
   styleUrl: './clasificacion-liga-norte.css'
 })

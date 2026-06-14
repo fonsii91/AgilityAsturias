@@ -15,11 +15,11 @@
       </div>
     } @else {
       @if (historyList().length === 0) {
-        <div class="empty-state">
-          <span class="material-icons-outlined empty-icon">history</span>
-          <h3>Sin registros</h3>
-          <p>No se ha eliminado ningún video todavía.</p>
-        </div>
+        <app-empty-state
+          icon="history"
+          title="Sin registros"
+          message="No se ha eliminado ningún video todavía.">
+        </app-empty-state>
       } @else {
         <div class="table-container">
           <table mat-table [dataSource]="historyList()" class="mat-elevation-z0 hover-table">

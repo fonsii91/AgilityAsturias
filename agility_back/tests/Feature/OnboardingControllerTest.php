@@ -54,6 +54,44 @@ class OnboardingControllerTest extends TestCase
             ]);
     }
 
+    public function test_progress_response_includes_club_state_flags_false_when_empty()
+    {
+        $user = $this->createUser(['onboarding_progress' => null]);
+
+        $this->actingAs($user)
+            ->getJson('/api/user/onboarding')
+            ->assertOk()
+            ->assertJson([
+                'club_state' => [
+                    'has_bookable_classes' => false,
+                    'has_events' => false,
+                    'has_announcements' => false,
+                ],
+            ]);
+    }
+
+    public function test_club_state_reflects_existing_classes()
+    {
+        $user = $this->createUser(['onboarding_progress' => null]);
+
+        $slot = new \App\Models\TimeSlot([
+            'day' => 'lunes',
+            'name' => 'Clase de prueba',
+            'start_time' => '10:00',
+            'end_time' => '11:00',
+            'max_bookings' => 5,
+        ]);
+        $slot->club_id = $user->club_id;
+        $slot->save();
+
+        $this->actingAs($user)
+            ->getJson('/api/user/onboarding')
+            ->assertOk()
+            ->assertJson([
+                'club_state' => ['has_bookable_classes' => true],
+            ]);
+    }
+
     public function test_can_mark_a_step_as_completed_in_a_specific_tutorial()
     {
         $user = $this->createUser([

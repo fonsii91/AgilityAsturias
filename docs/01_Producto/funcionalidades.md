@@ -1,6 +1,6 @@
 # Funcionalidades de la Aplicación
 
-Este documento detalla todas las funcionalidades disponibles en la plataforma, clasificadas según el perfil de usuario que tiene acceso a ellas. Se excluyen de este documento las funcionalidades exclusivas del perfil de Administrador Global (gestión global, monitorización avanzada y configuración del sistema). Para más información sobre la definición y responsabilidades de cada rol de usuario, consulte [[usuarios]].
+Este documento detalla todas las funcionalidades disponibles en la plataforma, clasificadas según el perfil de usuario que tiene acceso a ellas. Se excluyen de este documento las funcionalidades exclusivas del perfil de Administrador Global (gestión global, monitorización avanzada y configuración del sistema). Para más información sobre la definición y responsabilidades de cada rol de usuario, consulte [[usuarios]]. La **estructura de menú** por la que se accede a estas funciones (secciones, grupos colapsables y fuente única `NAV_SECTIONS`) se documenta en [[sistema-diseno]] §7.
 
 ---
 

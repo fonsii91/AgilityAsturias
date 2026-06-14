@@ -3,11 +3,12 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { SuggestionService } from '../../services/suggestion.service';
 import { Suggestion } from '../../models/suggestion.model';
 import { ToastService } from '../../services/toast.service';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-admin-sugerencias',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule, DatePipe, EmptyStateComponent],
   templateUrl: './admin-sugerencias.html',
   styleUrls: ['./admin-sugerencias.css']
 })

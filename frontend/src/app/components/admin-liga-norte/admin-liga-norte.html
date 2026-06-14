@@ -43,13 +43,11 @@
       </div>
 
       @if (imports().length === 0) {
-        <div class="empty-state glass-card">
-          <span class="material-icons-outlined empty-icon">cloud_download</span>
-          <h3>No se han encontrado capturas</h3>
-          <p>
-            El scraper automático busca nuevas clasificaciones en el canal de Telegram @liganorte diariamente.
-          </p>
-        </div>
+        <app-empty-state
+          icon="cloud_download"
+          title="No se han encontrado capturas"
+          message="El scraper automático busca nuevas clasificaciones en el canal de Telegram @liganorte diariamente.">
+        </app-empty-state>
       } @else {
         <div class="imports-grid">
           @for (imp of imports(); track imp.id) {

@@ -99,6 +99,10 @@ export class SmartVideoPlayerComponent implements OnInit, OnDestroy {
   hasError = signal<boolean>(false);
   errorMessage = signal<string>('');
 
+  /** Cache-buster fijo por instancia: evita reutilizar una respuesta 404/403
+   *  cacheada del CDN sin convertir `localUrl` en un computed impuro. */
+  private readonly cacheBuster = Date.now();
+
   @Input() isHorizontal = false;
 
   get isVideoActive(): boolean {
@@ -127,7 +131,7 @@ export class SmartVideoPlayerComponent implements OnInit, OnDestroy {
     if (playbackUrl) {
       // Append cache-buster to prevent browser from reusing a cached 404/403 error response
       const separator = playbackUrl.includes('?') ? '&' : '?';
-      return `${playbackUrl}${separator}cb=${Date.now()}`;
+      return `${playbackUrl}${separator}cb=${this.cacheBuster}`;
     }
     if (localPath) {
       return `${environment.apiUrl.replace('/api', '')}/storage/${localPath}`;

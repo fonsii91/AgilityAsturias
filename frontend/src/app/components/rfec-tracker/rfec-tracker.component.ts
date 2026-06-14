@@ -11,6 +11,7 @@ import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
 import { RfecTrack } from '../../models/rfec-track.model';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 import { Competition } from '../../models/competition.model';
 import confetti from 'canvas-confetti';
 import { AuthService } from '../../services/auth.service';
@@ -19,7 +20,7 @@ import { AnalyticsService } from '../../services/analytics.service';
 @Component({
   selector: 'app-rfec-tracker',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, InstruccionesComponent],
+  imports: [CommonModule, FormsModule, RouterModule, InstruccionesComponent, EmptyStateComponent],
   templateUrl: './rfec-tracker.component.html',
   styleUrls: ['./rfec-tracker.component.scss']
 })

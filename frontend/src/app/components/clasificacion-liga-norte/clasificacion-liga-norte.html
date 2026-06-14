@@ -42,11 +42,12 @@
     </div>
 
     @if (filteredStandings().length === 0) {
-      <div class="empty-state glass-card">
-        <span class="material-icons-outlined empty-icon">leaderboard</span>
-        <h3>Clasificación no disponible</h3>
-        <p>No se han encontrado registros cargados en esta clase.</p>
-      </div>
+      <app-empty-state
+        icon="leaderboard"
+        title="Clasificación no disponible"
+        message="No se han encontrado registros cargados en esta clase."
+        variant="no-results">
+      </app-empty-state>
     } @else {
       <!-- Desktop Table View -->
       <div class="table-card glass-card desktop-only">

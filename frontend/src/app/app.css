@@ -57,8 +57,13 @@
     text-transform: uppercase;
     letter-spacing: 1px;
     padding: 1.5rem 1.5rem 0.5rem 1.5rem;
-    margin-top: auto;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* El primer divisor (p. ej. "MIEMBROS") va pegado arriba, sin línea superior */
+.mobile-nav-divider:first-child {
+    border-top: none;
+    padding-top: 1rem;
 }
 
 .mobile-nav a.active-route {

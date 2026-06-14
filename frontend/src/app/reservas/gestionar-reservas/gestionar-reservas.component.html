@@ -257,6 +257,20 @@
         }
       </div>
     </div>
+  } @empty {
+    @if (timeSlots().length === 0) {
+      <app-empty-state
+        icon="event_busy"
+        title="Aún no hay clases"
+        message="Tu club todavía no ha publicado horarios de clases para reservar. Cuando los publique, aparecerán aquí.">
+      </app-empty-state>
+    } @else {
+      <app-empty-state
+        icon="event_busy"
+        title="No hay clases esta semana"
+        message="No hay sesiones programadas en la semana seleccionada. Prueba a cambiar de semana arriba.">
+      </app-empty-state>
+    }
   }
 </div>
 
@@ -475,4 +489,4 @@
     </div>
   }
 
-
+

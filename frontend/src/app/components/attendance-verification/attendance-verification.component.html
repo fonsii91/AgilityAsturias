@@ -12,12 +12,11 @@
   }
 
   @if (!isLoading() && pendingSessions().length === 0 && pendingCompetitions().length === 0) {
-    <div
-      class="empty-state">
-      <div class="icon-check">✨</div>
-      <h3>¡Todo al día!</h3>
-      <p>No hay entrenamientos ni competiciones pendientes de revisión.</p>
-    </div>
+    <app-empty-state
+      icon="task_alt"
+      title="¡Todo al día!"
+      message="No hay entrenamientos ni competiciones pendientes de revisión.">
+    </app-empty-state>
   }
 
   @if (!isLoading() && pendingSessions().length > 0) {

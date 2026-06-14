@@ -146,10 +146,10 @@
     <p class="section-desc">Tus compañeros peludos vinculados a esta cuenta.</p>
     <div class="dogs-grid">
       @if (dogs().length === 0) {
-      <div class="empty-state">
-        <span class="material-icons-outlined empty-icon">sentiment_dissatisfied</span>
-        <p>Aún no has añadido ningún perro.</p>
-      </div>
+      <app-empty-state
+        icon="sentiment_dissatisfied"
+        message="Aún no has añadido ningún perro.">
+      </app-empty-state>
       }
       @for (dog of dogs(); track dog) {
       <div class="glass-card dog-card" [routerLink]="['/gestionar-perros', dog.id, 'resumen']" title="Gestionar a {{dog.name}}">

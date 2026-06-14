@@ -5,12 +5,42 @@ import { AuthService } from './auth.service';
 import { ToastService } from './toast.service';
 import { TenantService } from './tenant.service';
 
+/**
+ * Naturaleza de cada paso (ver docs/05_Diseno_y_UX/estrategias-onboarding-ux.md):
+ *  - 'personal'    : acción sobre datos propios, siempre realizable (añadir mi perro).
+ *  - 'explorar'    : solo visitar una pantalla, siempre realizable (ver el ranking).
+ *  - 'setup-club'  : configuración de club (logo, horario…), scope club [Fase 2].
+ *  - 'dependiente' : requiere datos creados por el club (apuntarse a una clase/evento).
+ *                    Si la precondición `requires` no se cumple, el paso NO bloquea el
+ *                    100%: se muestra atenuado y se excluye del denominador.
+ */
+export type StepKind = 'personal' | 'explorar' | 'setup-club' | 'dependiente';
+
+export type ClubStateFlag = 'has_bookable_classes' | 'has_events' | 'has_announcements';
+
+export interface ClubState {
+  has_bookable_classes?: boolean;
+  has_events?: boolean;
+  has_announcements?: boolean;
+}
+
 export interface OnboardingStep {
   id: string;
   title: string;
   description: string;
   icon: string;
   route: string;
+  kind?: StepKind;
+  /** Solo para kind 'dependiente': flag de club_state que debe ser true para poder realizarlo. */
+  requires?: ClubStateFlag;
+  /**
+   * El paso solo existe si el plan del club incluye esta feature (TenantService.hasFeature).
+   * Mismo criterio que el navbar (NAV_SECTIONS): si el módulo no está en el plan, el
+   * paso se ELIMINA del tutorial (no se muestra ni cuenta), no es un simple "sin datos".
+   */
+  feature?: string;
+  /** El paso solo existe si este flag de settings del club está activado por el gestor. */
+  setting?: string;
 }
 
 export const GESTOR_TUTORIAL: OnboardingStep[] = [
@@ -30,12 +60,12 @@ export const STAFF_TUTORIAL: OnboardingStep[] = [
 ];
 
 export const MIEMBRO_TUTORIAL: OnboardingStep[] = [
-  { id: 'miembro_perros', title: 'Añade o edita a tu Compañero', description: 'Crea o modifica el perfil de tu perro.', icon: 'pets', route: '/gestionar-perros' },
-  { id: 'miembro_clase', title: 'Apúntate a una clase', description: 'Reserva una plaza en una clase desde reservas.', icon: 'event_available', route: '/reservas' },
-  { id: 'miembro_evento', title: 'Apúntate a un evento', description: 'Inscríbete en un evento o competición desde el calendario.', icon: 'emoji_events', route: '/calendario' },
-  { id: 'miembro_anuncios', title: 'Revisa el tablón', description: 'Lee las noticias o informaciones publicadas para los miembros.', icon: 'campaign', route: '/tablon-anuncios' },
-  { id: 'miembro_clasificacion', title: 'Revisa la clasificación', description: 'Visita el ranking del club y pulsa en Instrucciones para descubrir cómo funciona. Encontrarás este botón de Instrucciones en todas las secciones de la aplicación donde tendrás explicado como funciona esa sección', icon: 'leaderboard', route: '/ranking' },
-  { id: 'miembro_perfil', title: 'Cuando quieras, completa los perfiles', description: 'Cuando completes tu perfil y el de tus perros irás desbloqueando nuevas funcionalidades.', icon: 'person', route: '/perfil' },
+  { id: 'miembro_perros', title: 'Añade o edita a tu Compañero', description: 'Crea o modifica el perfil de tu perro.', icon: 'pets', route: '/gestionar-perros', kind: 'personal' },
+  { id: 'miembro_clase', title: 'Apúntate a una clase', description: 'Reserva una plaza en una clase desde reservas.', icon: 'event_available', route: '/reservas', kind: 'dependiente', requires: 'has_bookable_classes', feature: 'reservas-pistas' },
+  { id: 'miembro_evento', title: 'Apúntate a un evento', description: 'Inscríbete en un evento o competición desde el calendario.', icon: 'emoji_events', route: '/calendario', kind: 'dependiente', requires: 'has_events' },
+  { id: 'miembro_anuncios', title: 'Revisa el tablón', description: 'Lee las noticias o informaciones publicadas para los miembros.', icon: 'campaign', route: '/tablon-anuncios', kind: 'explorar' },
+  { id: 'miembro_clasificacion', title: 'Revisa la clasificación', description: 'Visita el ranking del club y pulsa en Instrucciones para descubrir cómo funciona. Encontrarás este botón de Instrucciones en todas las secciones de la aplicación donde tendrás explicado como funciona esa sección', icon: 'leaderboard', route: '/ranking', kind: 'explorar', setting: 'gamification_enabled' },
+  { id: 'miembro_perfil', title: 'Cuando quieras, completa los perfiles', description: 'Cuando completes tu perfil y el de tus perros irás desbloqueando nuevas funcionalidades.', icon: 'person', route: '/perfil', kind: 'personal' },
 ];
 
 @Injectable({
@@ -49,6 +79,8 @@ export class OnboardingService {
   private apiUrl = environment.apiUrl;
 
   progress = signal<any>({});
+  /** Estado del club (¿hay clases?, ¿hay eventos?), llega junto al progreso. */
+  clubState = signal<ClubState>({});
 
   activeTutorialType = computed<'gestor' | 'staff' | 'miembro' | null>(() => {
     const user = this.authService.currentUserSignal();
@@ -78,15 +110,45 @@ export class OnboardingService {
 
   activeSteps = computed<OnboardingStep[]>(() => {
     const type = this.activeTutorialType();
-    if (type === 'gestor') return GESTOR_TUTORIAL;
-    if (type === 'staff') return STAFF_TUTORIAL;
-    if (type === 'miembro') return MIEMBRO_TUTORIAL;
-    return [];
+    let steps: OnboardingStep[] = [];
+    if (type === 'gestor') steps = GESTOR_TUTORIAL;
+    else if (type === 'staff') steps = STAFF_TUTORIAL;
+    else if (type === 'miembro') steps = MIEMBRO_TUTORIAL;
+    // Mismo filtrado que el navbar: si el módulo no está en el plan (feature) o el
+    // gestor lo desactivó (setting), el paso no aplica y se quita del tutorial.
+    return steps.filter(step => this.isStepAvailable(step));
   });
+
+  /** ¿El módulo al que pertenece el paso está disponible en este club? */
+  private isStepAvailable(step: OnboardingStep): boolean {
+    if (step.feature && !this.tenantService.hasFeature(step.feature)) return false;
+    if (step.setting && !this.settingOn(step.setting)) return false;
+    return true;
+  }
+
+  private settingOn(key: string): boolean {
+    const v: any = this.tenantService.tenantInfo()?.settings?.[key];
+    return v === true || v === 1 || v === '1';
+  }
+
+  /**
+   * Un paso 'dependiente' está bloqueado solo si SABEMOS que el club aún no tiene
+   * el dato que necesita. Mientras el club_state no haya cargado (undefined), no se
+   * bloquea (optimista). Los pasos bloqueados se muestran pero no cuentan.
+   */
+  isStepBlocked(step: OnboardingStep): boolean {
+    if (step.kind !== 'dependiente' || !step.requires) return false;
+    return this.clubState()[step.requires] === false;
+  }
+
+  /** Pasos que sí cuentan para el progreso/100% (excluye los bloqueados). */
+  countableSteps = computed<OnboardingStep[]>(() =>
+    this.activeSteps().filter(step => !this.isStepBlocked(step))
+  );
 
   activeTutorialProgress = computed<number>(() => {
     const type = this.activeTutorialType();
-    const steps = this.activeSteps();
+    const steps = this.countableSteps();
     if (!type || steps.length === 0) return 0;
 
     const p = this.progress();
@@ -122,9 +184,10 @@ export class OnboardingService {
     if (this.tenantService.tenantInfo()?.subscribed === false) {
       return;
     }
-    this.http.get<{ onboarding_progress: any }>(`${this.apiUrl}/user/onboarding`).subscribe({
+    this.http.get<{ onboarding_progress: any; club_state?: ClubState }>(`${this.apiUrl}/user/onboarding`).subscribe({
       next: (res) => {
         this.progress.set(res.onboarding_progress || {});
+        this.clubState.set(res.club_state || {});
         this.checkAutoFinish();
       },
       error: (err) => {
@@ -163,7 +226,10 @@ export class OnboardingService {
 
   private checkAutoFinish() {
     const type = this.activeTutorialType();
-    const steps = this.activeSteps();
+    // Solo se evalúan los pasos realizables: un paso 'dependiente' bloqueado
+    // (p.ej. apuntarse a una clase cuando el club aún no tiene clases) no debe
+    // impedir cerrar el tutorial al 100%.
+    const steps = this.countableSteps();
     if (!type || steps.length === 0) return;
 
     const p = this.progress();
@@ -177,6 +243,22 @@ export class OnboardingService {
         this.showCongratulations();
       }
     }
+  }
+
+  /**
+   * Omitir un paso = marcarlo como completado. En el tutorial de Miembro esto
+   * cuenta para la métrica del reto de activación de referidos (decisión de
+   * producto: mejor un salto consciente que un paso que bloquea el 100%).
+   */
+  skipStep(step: OnboardingStep) {
+    this.markStepCompleted(step.id);
+  }
+
+  /** Saltar el tutorial activo: lo marca como finalizado y oculta el widget. */
+  skipTutorial() {
+    const type = this.activeTutorialType();
+    if (!type) return;
+    this.finishTutorial(type);
   }
 
   private showCongratulations() {

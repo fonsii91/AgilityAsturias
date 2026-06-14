@@ -157,15 +157,13 @@ class PhotoController extends Controller
             $photo->taggedUsers()->sync($request->user_ids ?? []);
         }
 
-        // El resto de metadatos solo los edita el autor o el staff.
+        // Edición colaborativa: cualquier socio del club puede corregir los metadatos
+        // (categoría, competición, tipo/podio, título, fecha), igual que el etiquetado.
+        // El aislamiento por club lo garantiza el TenantScope; el borrado sigue restringido.
         $metadataFields = collect(['category', 'competition_id', 'photo_type', 'title', 'taken_at'])
             ->filter(fn ($field) => $request->has($field));
 
         if ($metadataFields->isNotEmpty()) {
-            if (!$this->canManage($request, $photo)) {
-                return response()->json(['message' => 'No tienes permiso para editar esta foto.'], 403);
-            }
-
             $photo->fill($request->only($metadataFields->all()));
 
             if ($photo->category !== 'competicion') {

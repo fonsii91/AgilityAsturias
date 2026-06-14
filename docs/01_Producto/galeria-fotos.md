@@ -91,6 +91,7 @@ Detalles del flujo:
 - **Subida con concurrencia limitada** (3–4 ficheros en paralelo) y barra de progreso global + estado por miniatura (pendiente / subiendo / ✅ / ❌ con reintento individual). Un fallo en una foto **no aborta el lote**.
 - **Límites:** máx. 30 fotos por lote y 20 MB por foto original (antes de comprimir). Si el club supera su cuota a mitad de lote, se detiene la subida e informa de cuáles entraron.
 - **Etiquetado colaborativo posterior:** cualquier socio puede etiquetar perros/miembros en cualquier foto desde la vista de detalle (mismo espíritu comunitario que la validación colaborativa de [[analisis-videos-insights]]). El autor de la foto, el staff y el etiquetado pueden retirar etiquetas.
+- **Edición colaborativa de metadatos:** desde la vista de detalle, **cualquier socio del club** puede corregir los datos de una foto (título, categoría, competición, tipo/podio y fecha) con el botón *Editar*, no solo el autor o el staff. El aislamiento por club lo garantiza el `TenantScope`. El **borrado**, en cambio, sigue restringido al autor o al staff.
 
 ---
 

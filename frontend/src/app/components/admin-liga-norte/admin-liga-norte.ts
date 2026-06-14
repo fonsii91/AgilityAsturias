@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { LigaNorteService } from '../../services/liga-norte.service';
 import { DogService } from '../../services/dog.service';
 import { ToastService } from '../../services/toast.service';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
   selector: 'app-admin-liga-norte',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, EmptyStateComponent],
   templateUrl: './admin-liga-norte.html',
   styleUrl: './admin-liga-norte.css'
 })

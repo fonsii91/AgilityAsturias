@@ -104,10 +104,11 @@
   }
 
   @if (!isLoading() && resources().length === 0) {
-  <div class="empty-state">
-    <span class="material-icons empty-icon">folder_open</span>
-    <p>No hay recursos disponibles en esta categoría.</p>
-  </div>
+  <app-empty-state
+    icon="folder_open"
+    message="No hay recursos disponibles en esta categoría."
+    variant="no-results">
+  </app-empty-state>
   }
 
   @if (!isLoading() && resources().length > 0) {

@@ -1,4 +1,4 @@
-<div class="onboarding-container" *ngIf="onboardingService.activeTutorialType()">
+<div class="onboarding-container" *ngIf="fase1RoleAllowed() && onboardingService.activeTutorialType()">
   
   <!-- Popover / Checklist -->
   <div class="onboarding-popover" *ngIf="isExpanded()" @popover>
@@ -16,21 +16,36 @@
     </div>
 
     <div class="popover-content">
-      <div class="step-item" 
+      <div class="step-item"
            *ngFor="let step of onboardingService.activeSteps()"
            [class.completed]="onboardingService.isStepCompleted(step.id)"
+           [class.blocked]="onboardingService.isStepBlocked(step) && !onboardingService.isStepCompleted(step.id)"
            (click)="navigate(step)">
-        
+
         <div class="step-icon">
           <mat-icon *ngIf="!onboardingService.isStepCompleted(step.id)">{{ step.icon }}</mat-icon>
           <mat-icon *ngIf="onboardingService.isStepCompleted(step.id)" class="check-icon">check_circle</mat-icon>
         </div>
-        
+
         <div class="step-text">
           <span class="step-title">{{ step.title }}</span>
-          <span class="step-desc">{{ step.description }}</span>
+          <span class="step-desc" *ngIf="!onboardingService.isStepBlocked(step) || onboardingService.isStepCompleted(step.id)">{{ step.description }}</span>
+          <span class="step-desc step-hint" *ngIf="onboardingService.isStepBlocked(step) && !onboardingService.isStepCompleted(step.id)">
+            <mat-icon>hourglass_empty</mat-icon> Disponible cuando tu club lo prepare. No bloquea tu progreso.
+          </span>
         </div>
+
+        <button class="step-skip-btn"
+                *ngIf="!onboardingService.isStepCompleted(step.id)"
+                (click)="skipStep(step, $event)"
+                title="Marcar como hecho / omitir">
+          <mat-icon>done</mat-icon>
+        </button>
       </div>
+    </div>
+
+    <div class="popover-footer">
+      <button class="skip-tutorial-btn" (click)="skipTutorial()">Saltar tutorial</button>
     </div>
   </div>
 

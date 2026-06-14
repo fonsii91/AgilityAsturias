@@ -7,11 +7,12 @@ import { AuthService, User } from '../../services/auth.service';
 import { DogService } from '../../services/dog.service';
 import { Dog } from '../../models/dog.model';
 import { OnboardingService } from '../../services/onboarding';
+import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 @Component({
     selector: 'app-attendance-verification',
     standalone: true,
-    imports: [CommonModule, FormsModule],
+    imports: [CommonModule, FormsModule, EmptyStateComponent],
     templateUrl: './attendance-verification.component.html',
     styleUrls: ['./attendance-verification.component.css']
 })
