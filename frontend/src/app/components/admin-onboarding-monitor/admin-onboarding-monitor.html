@@ -1,7 +1,7 @@
 <div class="monitor-container">
   <div class="header-section">
     <h2><span class="material-icons-outlined" style="color: var(--primary-color);">checklist_rtl</span> Monitor de Onboarding</h2>
-    <p>Supervisa qué miembros han completado el tutorial de introducción a la aplicación.</p>
+    <p>Supervisa el Reto de Activación: el progreso de cada miembro en el tutorial de bienvenida y cuánto falta para el objetivo del club (7 miembros = 700%).</p>
   </div>
 
   @if (isLoading()) {
@@ -9,7 +9,33 @@
       <div class="spinner"></div>
       <p>Cargando datos de los miembros...</p>
     </div>
-  } @else {
+  } @else if (data(); as d) {
+
+    <!-- Resumen del reto -->
+    <div class="card glass-card challenge-summary" [class.achieved]="d.achieved">
+      <div class="summary-top">
+        <div class="summary-numbers">
+          <span class="summary-total">{{ d.total }}%</span>
+          <span class="summary-target">/ {{ d.target }}%</span>
+        </div>
+        <div class="summary-meta">
+          <span class="finished-count">{{ d.finished_count }} de 7 miembros completos</span>
+          @if (d.achieved) {
+            <span class="achieved-tag"><span class="material-icons">check_circle</span> Reto conseguido</span>
+          } @else {
+            <span class="remaining">Faltan {{ d.target - d.total }}%</span>
+          }
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill"
+             [style.width.%]="progressPct()"
+             [style.background-color]="d.achieved ? '#10b981' : 'var(--primary-color)'">
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de miembros -->
     <div class="card glass-card">
       <div class="table-responsive">
         <table class="users-table">
@@ -17,66 +43,69 @@
             <tr>
               <th>Usuario</th>
               <th>Rol</th>
-              <th>Progreso ({{ expectedSteps.length }} pasos)</th>
-              <th>Estado Tutorial</th>
+              <th>Progreso del tutorial</th>
+              <th>Estado</th>
             </tr>
           </thead>
           <tbody>
-            @for (user of users(); track user.id) {
+            @for (member of d.members; track member.id) {
               <tr>
                 <td>
                   <div class="user-info">
                     <div class="avatar">
-                      @if (user.photo_url) {
-                        <img [src]="user.photo_url" [alt]="user.name">
+                      @if (member.photo_url) {
+                        <img [src]="member.photo_url" [alt]="member.name" referrerpolicy="no-referrer">
                       } @else {
                         <span class="material-icons-outlined">person</span>
                       }
                     </div>
                     <div class="user-details">
-                      <span class="name">{{ user.name }}</span>
-                      <span class="email">{{ user.email }}</span>
+                      <span class="name">{{ member.name }}</span>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <span class="role-badge" [ngClass]="user.role">{{ user.role }}</span>
+                  <span class="role-badge" [ngClass]="member.role">{{ roleLabel(member.role) }}</span>
                 </td>
                 <td>
                   <div class="progress-bar-wrapper">
                     <div class="progress-info">
-                      <span class="progress-text">{{ user.stepsCompleted }} / {{ user.totalSteps }} completados</span>
-                      <span class="progress-percentage">{{ (user.stepsCompleted / user.totalSteps) * 100 | number:'1.0-0' }}%</span>
+                      <span class="progress-percentage">{{ member.percent }}%</span>
                     </div>
                     <div class="progress-bar-bg">
-                      <div class="progress-bar-fill" 
-                           [style.width.%]="(user.stepsCompleted / user.totalSteps) * 100"
-                           [style.background-color]="getProgressBarColor(user.stepsCompleted, user.totalSteps)">
+                      <div class="progress-bar-fill"
+                           [style.width.%]="member.percent"
+                           [style.background-color]="barColor(member.percent, member.finished)">
                       </div>
                     </div>
                   </div>
                 </td>
                 <td>
-                  @if (user.tutorialCompleted) {
+                  @if (member.finished) {
                     <span class="status-badge success">
                       <span class="material-icons">check_circle</span> Completado
                     </span>
                   } @else {
                     <span class="status-badge pending">
-                      <span class="material-icons">hourglass_empty</span> Pendiente
+                      <span class="material-icons">hourglass_empty</span> En curso
                     </span>
                   }
                 </td>
               </tr>
             }
-            @if (users().length === 0) {
+            @if (d.members.length === 0) {
               <tr>
-                <td colspan="4" class="text-center empty-message">No se han encontrado usuarios.</td>
+                <td colspan="4" class="text-center empty-message">No se han encontrado miembros.</td>
               </tr>
             }
           </tbody>
         </table>
       </div>
+    </div>
+  } @else {
+    <div class="loading-state">
+      <span class="material-icons-outlined">error_outline</span>
+      <p>No se pudo cargar el progreso de onboarding.</p>
     </div>
   }
 </div>

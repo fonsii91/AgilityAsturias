@@ -7,12 +7,14 @@ import { PersonalEventService } from '../../services/personal-event.service';
 import { PersonalEvent } from '../../models/personal-event.model';
 import { FormsModule } from '@angular/forms';
 import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
+import { ChallengeModalComponent } from '../shared/challenge-modal/challenge-modal';
 import { OnboardingService } from '../../services/onboarding';
 interface CalendarDay {
     date: Date;
     isCompetition: boolean;
     isExhibicion: boolean;
     isOtherEvent: boolean;
+    isChallenge: boolean;
     isWeekend: boolean;
     isOtherMonth: boolean;
     isToday: boolean;
@@ -27,12 +29,14 @@ interface CalendarDay {
 @Component({
     selector: 'app-calendario',
     standalone: true,
-    imports: [CommonModule, FormsModule, InstruccionesComponent],
+    imports: [CommonModule, FormsModule, InstruccionesComponent, ChallengeModalComponent],
     templateUrl: './calendario.component.html',
     styleUrls: ['./calendario.component.css']
 })
 export class CalendarioComponent implements AfterViewInit {
     currentYear = signal(new Date().getFullYear());
+    /** Modal del Reto de Activación (se abre al pulsar el evento tipo 'reto'). */
+    isChallengeOpen = signal(false);
     monthNames = [
         'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
         'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -239,6 +243,11 @@ export class CalendarioComponent implements AfterViewInit {
 
         if (totalItems === 1 && this.selectedPersonalEvents.length === 0) {
             if (this.selectedCompetitions.length === 1) {
+                // El evento del Reto abre su propio modal de progreso, no el detalle.
+                if (this.selectedCompetitions[0]?.tipo === 'reto') {
+                    this.openChallenge();
+                    return;
+                }
                 // Auto-expand only if it's a competition
                 this.selectedCompetition = this.selectedCompetitions[0];
                 this.activeModalTab = 'info';
@@ -266,9 +275,25 @@ export class CalendarioComponent implements AfterViewInit {
     }
 
     selectCompetitionFromList(comp: any) {
+        if (comp?.tipo === 'reto') {
+            this.openChallenge();
+            return;
+        }
         this.selectedCompetition = comp;
         this.activeModalTab = 'info';
         this.resetAttendanceState();
+    }
+
+    /** Cierra el modal de día (si lo hubiera) y abre el modal del Reto de Activación. */
+    openChallenge() {
+        this.isModalOpen = false;
+        this.isChallengeOpen.set(true);
+        document.body.style.overflow = 'hidden';
+    }
+
+    closeChallenge() {
+        this.isChallengeOpen.set(false);
+        document.body.style.overflow = 'auto';
     }
 
     resetAttendanceState() {
@@ -313,6 +338,7 @@ export class CalendarioComponent implements AfterViewInit {
                 isCompetition: false,
                 isExhibicion: false,
                 isOtherEvent: false,
+                isChallenge: false,
                 isWeekend: false,
                 isOtherMonth: true,
                 isToday: false,
@@ -346,6 +372,7 @@ export class CalendarioComponent implements AfterViewInit {
             const isCompetition = dailyCompetitions.some((c: any) => !c.tipo || c.tipo === 'competicion');
             const isExhibicion = dailyCompetitions.some((c: any) => c.tipo === 'exhibicion');
             const isOtherEvent = dailyCompetitions.some((c: any) => c.tipo === 'otros');
+            const isChallenge = dailyCompetitions.some((c: any) => c.tipo === 'reto');
             const isAttending = dailyCompetitions.some((c: any) => c.isAttending);
 
             const isToday = date.getDate() === today.getDate() &&
@@ -365,6 +392,7 @@ export class CalendarioComponent implements AfterViewInit {
                 isCompetition: isCompetition,
                 isExhibicion: isExhibicion,
                 isOtherEvent: isOtherEvent,
+                isChallenge: isChallenge,
                 isWeekend: isWeekend,
                 isOtherMonth: false,
                 isToday: isToday,

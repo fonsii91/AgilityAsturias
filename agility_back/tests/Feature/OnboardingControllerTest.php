@@ -92,6 +92,52 @@ class OnboardingControllerTest extends TestCase
             ]);
     }
 
+    public function test_challenge_counts_finished_as_100_and_partial_by_steps()
+    {
+        // Miembro que terminó el tutorial -> cuenta como 100%.
+        $finished = $this->createUser(['onboarding_progress' => ['miembro_finished' => true]]);
+        $clubId = $finished->club_id;
+
+        // Otro miembro del mismo club con 3 de 6 pasos -> 50%.
+        User::factory()->create([
+            'club_id' => $clubId,
+            'role' => 'member',
+            'onboarding_progress' => ['miembro' => [
+                'miembro_perros' => true, 'miembro_anuncios' => true, 'miembro_perfil' => true,
+            ]],
+        ]);
+
+        $this->actingAs($finished)
+            ->getJson('/api/user/onboarding/challenge')
+            ->assertOk()
+            ->assertJson([
+                'target' => 700,
+                'finished_count' => 1,
+                'total' => 150, // 100 (terminado) + 50 (3/6)
+                'achieved' => false,
+            ]);
+    }
+
+    public function test_challenge_exposes_deadline_from_reto_event()
+    {
+        $user = $this->createUser(['onboarding_progress' => null]);
+
+        $event = new \App\Models\Competition([
+            'nombre' => 'Límite para conseguir la recompensa por completar el tutorial',
+            'fecha_evento' => '2026-07-01',
+            'tipo' => 'reto',
+            'lugar' => 'Test',
+        ]);
+        $event->club_id = $user->club_id;
+        $event->save();
+
+        $res = $this->actingAs($user)
+            ->getJson('/api/user/onboarding/challenge')
+            ->assertOk();
+
+        $this->assertNotNull($res->json('deadline'));
+    }
+
     public function test_can_mark_a_step_as_completed_in_a_specific_tutorial()
     {
         $user = $this->createUser([

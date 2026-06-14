@@ -248,17 +248,19 @@ class ClubProvisioningService
             ]);
             $demoAnnouncementIds[] = $welcomeAnnouncement->id;
 
-            // --- 4. Dos eventos en el calendario (club-wide, tipo 'otros') ---
+            // --- 4. Dos eventos en el calendario (club-wide) ---
             // club_id no está en el $fillable de Competition: se asigna como atributo.
+            // El evento del reto usa tipo 'reto' para que el calendario abra el modal
+            // de progreso del Reto de Activación en vez del detalle de evento normal.
             $events = [
-                ['nombre' => 'Día de creación de la web del club', 'fecha_evento' => $now->toDateString()],
-                ['nombre' => 'Límite para conseguir la recompensa por completar el tutorial', 'fecha_evento' => $now->copy()->addDays(14)->toDateString()],
+                ['nombre' => 'Día de creación de la web del club', 'fecha_evento' => $now->toDateString(), 'tipo' => 'otros'],
+                ['nombre' => 'Límite para conseguir la recompensa por completar el tutorial', 'fecha_evento' => $now->copy()->addDays(14)->toDateString(), 'tipo' => 'reto'],
             ];
             foreach ($events as $e) {
                 $event = new Competition([
                     'nombre' => $e['nombre'],
                     'fecha_evento' => $e['fecha_evento'],
-                    'tipo' => 'otros',
+                    'tipo' => $e['tipo'],
                     'lugar' => $club->name,
                 ]);
                 $event->club_id = $club->id;

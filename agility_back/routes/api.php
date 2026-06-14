@@ -212,6 +212,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware(['role:admin,manager,staff,member'])->group(function () {
         // Onboarding
         Route::get('/user/onboarding', [\App\Http\Controllers\OnboardingController::class, 'getProgress']);
+        Route::get('/user/onboarding/challenge', [\App\Http\Controllers\OnboardingController::class, 'challenge']);
         Route::post('/user/onboarding/step', [\App\Http\Controllers\OnboardingController::class, 'updateStep']);
         Route::post('/user/onboarding/tutorial-finish', [\App\Http\Controllers\OnboardingController::class, 'finishTutorial']);
 

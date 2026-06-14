@@ -1,7 +1,6 @@
-import { Component, Input, signal, Output, EventEmitter, inject } from '@angular/core';
+import { Component, Input, signal, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { OnboardingService } from '../../../services/onboarding';
 
 @Component({
   selector: 'app-instrucciones',
@@ -11,7 +10,6 @@ import { OnboardingService } from '../../../services/onboarding';
   styleUrl: './instrucciones.component.css'
 })
 export class InstruccionesComponent {
-  onboardingService = inject(OnboardingService);
   @Input() titulo: string = 'Instrucciones';
   @Output() opened = new EventEmitter<void>();
   isHelpModalOpen = signal(false);
@@ -19,7 +17,6 @@ export class InstruccionesComponent {
   openHelpModal() {
     this.isHelpModalOpen.set(true);
     this.opened.emit();
-    this.onboardingService.markStepCompleted('miembro_instrucciones');
   }
 
   closeHelpModal(event?: Event) {

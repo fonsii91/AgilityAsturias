@@ -16,12 +16,14 @@ import { TenantService } from './tenant.service';
  */
 export type StepKind = 'personal' | 'explorar' | 'setup-club' | 'dependiente';
 
-export type ClubStateFlag = 'has_bookable_classes' | 'has_events' | 'has_announcements';
+export type ClubStateFlag = 'has_bookable_classes' | 'has_events' | 'has_announcements' | 'has_gallery' | 'has_team';
 
 export interface ClubState {
   has_bookable_classes?: boolean;
   has_events?: boolean;
   has_announcements?: boolean;
+  has_gallery?: boolean;
+  has_team?: boolean;
 }
 
 export interface OnboardingStep {
@@ -34,6 +36,13 @@ export interface OnboardingStep {
   /** Solo para kind 'dependiente': flag de club_state que debe ser true para poder realizarlo. */
   requires?: ClubStateFlag;
   /**
+   * Pasos de Staff/Gestor: si el club YA tiene este dato (lo creara quien lo creara),
+   * el paso cuenta como completado automáticamente. Resuelve el "ya lo hizo otro del
+   * staff" y hace que la cascada del gestor sea de baja fricción (los pasos de club
+   * ya configurado se auto-marcan). Ver OnboardingController@getProgress.
+   */
+  satisfiedBy?: ClubStateFlag;
+  /**
    * El paso solo existe si el plan del club incluye esta feature (TenantService.hasFeature).
    * Mismo criterio que el navbar (NAV_SECTIONS): si el módulo no está en el plan, el
    * paso se ELIMINA del tutorial (no se muestra ni cuenta), no es un simple "sin datos".
@@ -43,20 +52,40 @@ export interface OnboardingStep {
   setting?: string;
 }
 
+/** Un miembro del club en el Reto de Activación. */
+export interface ChallengeMember {
+  id: number;
+  name: string;
+  photo_url?: string | null;
+  role: string;
+  finished: boolean;
+  percent: number;
+}
+
+/** Estado del Reto de Activación del club (ver OnboardingController@challenge). */
+export interface ChallengeData {
+  deadline: string | null;
+  target: number;
+  total: number;
+  achieved: boolean;
+  finished_count: number;
+  members: ChallengeMember[];
+}
+
 export const GESTOR_TUTORIAL: OnboardingStep[] = [
-  { id: 'gestor_logo', title: 'Personaliza tu Club', description: 'Desde configurar club sube el logotipo, el eslogan, las imagenes principales y define los colores.', icon: 'palette', route: 'DYNAMIC_CLUB_CONFIG' },
-  { id: 'gestor_horario', title: 'Configura el Horario Base', description: 'Desde Gestión de horarios, establece las franjas horarias y crea al menos una clase.', icon: 'schedule', route: '/gestionar-horarios' },
-  { id: 'gestor_equipo', title: 'Añade a tu Equipo', description: 'Desde Gestión de Miembros, genera enlaces de invitación.', icon: 'group_add', route: '/gestionar-miembros' },
-  { id: 'gestor_galeria', title: 'Inaugura la Galería', description: 'Sube una foto a la galería pública o elimina las por defecto.', icon: 'photo_library', route: '/galeria' }
+  { id: 'gestor_logo', title: 'Personaliza tu Club', description: 'Desde configurar club sube el logotipo, el eslogan, las imagenes principales y define los colores.', icon: 'palette', route: 'DYNAMIC_CLUB_CONFIG', kind: 'setup-club' },
+  { id: 'gestor_horario', title: 'Configura el Horario Base', description: 'Desde Gestión de horarios, establece las franjas horarias y crea al menos una clase.', icon: 'schedule', route: '/gestionar-horarios', kind: 'setup-club', feature: 'reservas-pistas', satisfiedBy: 'has_bookable_classes' },
+  { id: 'gestor_equipo', title: 'Añade a tu Equipo', description: 'Desde Gestión de Miembros, genera enlaces de invitación.', icon: 'group_add', route: '/gestionar-miembros', kind: 'setup-club', satisfiedBy: 'has_team' },
+  { id: 'gestor_galeria', title: 'Inaugura la Galería', description: 'Sube una foto a la galería pública o elimina las por defecto.', icon: 'photo_library', route: '/galeria', kind: 'setup-club', satisfiedBy: 'has_gallery' }
 ];
 
 export const STAFF_TUTORIAL: OnboardingStep[] = [
-  { id: 'staff_perros', title: 'Añade a tu perro', description: 'Desde "Mi Manada" crea el perfil de tu perro para gestionarlo.', icon: 'pets', route: '/gestionar-perros' },
-  { id: 'staff_clase', title: 'Modifica el horario base', description: 'Ajusta la hora, el nombre o las plazas de una clase y comprueba los cambios.', icon: 'edit_calendar', route: '/gestionar-horarios' },
-  { id: 'staff_evento', title: 'Crea tu primer evento', description: 'Crea una competición o evento de prueba en el calendario.', icon: 'emoji_events', route: '/gestionar-competiciones' },
-  { id: 'staff_anuncio', title: 'Publica un anuncio', description: 'Escribe un saludo de bienvenida en el tablón para todos los socios.', icon: 'campaign', route: '/tablon-anuncios' },
-  { id: 'staff_asistencia', title: 'Visita la clasificación', description: 'Visita la clasificación del club y lee las instrucciones para ver cómo funciona el sistema.', icon: 'leaderboard', route: '/ranking' },
-  { id: 'staff_puntos', title: 'Dar puntos extra', description: 'Suma puntos de bonificación manuales a la clasificación general.', icon: 'stars', route: '/admin/puntos-extra' }
+  { id: 'staff_perros', title: 'Añade a tu perro', description: 'Desde "Mi Manada" crea el perfil de tu perro para gestionarlo.', icon: 'pets', route: '/gestionar-perros', kind: 'personal' },
+  { id: 'staff_clase', title: 'Configura el horario', description: 'Crea o ajusta una clase del horario del club. Si ya hay clases creadas, este paso está hecho.', icon: 'edit_calendar', route: '/gestionar-horarios', kind: 'setup-club', feature: 'reservas-pistas', satisfiedBy: 'has_bookable_classes' },
+  { id: 'staff_evento', title: 'Programa un evento', description: 'Crea una competición o evento en el calendario. Si ya hay eventos creados, este paso está hecho.', icon: 'emoji_events', route: '/gestionar-competiciones', kind: 'setup-club', satisfiedBy: 'has_events' },
+  { id: 'staff_anuncio', title: 'Publica un anuncio', description: 'Escribe un aviso en el tablón para los socios. Si ya hay anuncios publicados, este paso está hecho.', icon: 'campaign', route: '/tablon-anuncios', kind: 'setup-club', satisfiedBy: 'has_announcements' },
+  { id: 'staff_asistencia', title: 'Visita la clasificación', description: 'Visita la clasificación del club y lee las instrucciones para ver cómo funciona el sistema.', icon: 'leaderboard', route: '/ranking', kind: 'explorar', setting: 'gamification_enabled' },
+  { id: 'staff_puntos', title: 'Dar puntos extra', description: 'Desde la Clasificación, usa "Dar puntos" para sumar bonificaciones manuales a un perro.', icon: 'stars', route: '/ranking', kind: 'explorar', setting: 'gamification_enabled' }
 ];
 
 export const MIEMBRO_TUTORIAL: OnboardingStep[] = [
@@ -151,22 +180,27 @@ export class OnboardingService {
     const steps = this.countableSteps();
     if (!type || steps.length === 0) return 0;
 
-    const p = this.progress();
-    const tutorialProgress = p[type] || {};
-    let completedCount = 0;
-
-    steps.forEach(step => {
-      if (tutorialProgress[step.id]) completedCount++;
-    });
+    const completedCount = steps.filter(step => this.isStepDone(step)).length;
 
     return Math.round((completedCount / steps.length) * 100);
   });
 
-  isStepCompleted(stepId: string): boolean {
+  /**
+   * Un paso está hecho si el usuario lo completó O si el club ya cumple su
+   * `satisfiedBy` (p.ej. ya existen clases/eventos/anuncios creados por otro).
+   */
+  private isStepDone(step: OnboardingStep): boolean {
     const type = this.activeTutorialType();
     if (!type) return false;
     const p = this.progress();
-    return !!(p[type] && p[type][stepId]);
+    if (p[type] && p[type][step.id]) return true;
+    if (step.satisfiedBy && this.clubState()[step.satisfiedBy]) return true;
+    return false;
+  }
+
+  isStepCompleted(stepId: string): boolean {
+    const step = this.activeSteps().find(s => s.id === stepId);
+    return step ? this.isStepDone(step) : false;
   }
 
   constructor() {
@@ -178,6 +212,11 @@ export class OnboardingService {
         this.progress.set({});
       }
     });
+  }
+
+  /** Estado del Reto de Activación del club (progreso de onboarding de los miembros). */
+  getChallenge() {
+    return this.http.get<ChallengeData>(`${this.apiUrl}/user/onboarding/challenge`);
   }
 
   fetchProgress() {
@@ -215,13 +254,31 @@ export class OnboardingService {
       completed: true
     }).subscribe({
       next: (res) => {
-        this.progress.set(res.onboarding_progress || {});
+        // Fusionar (no reemplazar): si una acción marca dos pasos a la vez, la
+        // respuesta de uno puede no incluir aún el otro. La unión conserva ambos.
+        this.progress.set(this.mergeProgress(this.progress(), res.onboarding_progress || {}));
         this.checkAutoFinish();
       },
       error: (err) => {
         // Silently ignore errors
       }
     });
+  }
+
+  /**
+   * Une el progreso local (optimista) con el del servidor: un paso o flag marcado
+   * en cualquiera de los dos se conserva (los pasos solo pasan de no-hecho a hecho).
+   */
+  private mergeProgress(local: any, server: any): any {
+    const out: any = { ...(server || {}) };
+    for (const [k, lv] of Object.entries(local || {})) {
+      if (lv && typeof lv === 'object' && !Array.isArray(lv)) {
+        out[k] = { ...(lv as object), ...(out[k] || {}) };
+      } else if (!out[k]) {
+        out[k] = lv;
+      }
+    }
+    return out;
   }
 
   private checkAutoFinish() {
@@ -233,15 +290,12 @@ export class OnboardingService {
     if (!type || steps.length === 0) return;
 
     const p = this.progress();
-    const tutorialProgress = p[type] || {};
-
-    const allCompleted = steps.every(step => tutorialProgress[step.id]);
+    const allCompleted = steps.every(step => this.isStepDone(step));
 
     if (allCompleted && !p[type + '_finished']) {
-      this.finishTutorial(type);
-      if (type === 'miembro') {
-        this.showCongratulations();
-      }
+      // Solo celebramos al cerrar el tutorial de Miembro (final de la cascada).
+      // En Gestor/Staff el cierre es silencioso (encadena al siguiente tutorial).
+      this.finishTutorial(type, type === 'miembro');
     }
   }
 
@@ -342,12 +396,17 @@ export class OnboardingService {
     }
   }
 
-  finishTutorial(type: string) {
+  finishTutorial(type: string, celebrate = false) {
     this.http.post<{ onboarding_progress: any }>(`${this.apiUrl}/user/onboarding/tutorial-finish`, {
       tutorial: type
     }).subscribe({
       next: (res) => {
-        this.progress.set(res.onboarding_progress || {});
+        this.progress.set(this.mergeProgress(this.progress(), res.onboarding_progress || {}));
+        if (celebrate) this.showCongratulations();
+        // Encadena la cascada: si el siguiente tutorial ya está satisfecho por el
+        // estado del club (Gestor/Staff de un club configurado), se auto-finaliza
+        // también y avanzamos hasta el primer tutorial que requiera acción real.
+        this.checkAutoFinish();
       },
       error: (err) => {
         // Silently ignore errors

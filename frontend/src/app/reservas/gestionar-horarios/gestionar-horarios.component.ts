@@ -212,7 +212,6 @@ export class GestionarHorariosComponent {
         };
         await this.timeSlotService.updateTimeSlot(this.editingSlot.id, slotData);
         this.toastService.success('Horario actualizado.');
-        this.onboardingService.markStepCompleted('staff_clase');
       } else {
         if (this.slotForm.isUnique) {
           if (!this.slotForm.date) {
@@ -248,7 +247,11 @@ export class GestionarHorariosComponent {
         this.toastService.success('Clase(s) guardada(s) correctamente.');
       }
       this.timeSlotService.fetchTimeSlots(); // Refresh
+      // Marca el paso tanto al CREAR como al EDITAR (antes staff_clase solo se
+      // marcaba al editar, así que crear la primera clase no lo completaba).
+      // El backend serializa los dos marcados concurrentes con lock.
       this.onboardingService.markStepCompleted('gestor_horario');
+      this.onboardingService.markStepCompleted('staff_clase');
       this.closeModal();
     } catch (error) {
       console.error(error);

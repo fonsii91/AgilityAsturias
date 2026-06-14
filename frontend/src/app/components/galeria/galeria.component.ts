@@ -9,11 +9,12 @@ import { AddPhotoDialog, AddPhotoDialogData } from './add-photo-dialog/add-photo
 import { ConfirmDialog, ConfirmDialogData } from '../shared/confirm-dialog/confirm-dialog';
 import { OnboardingService } from '../../services/onboarding';
 import { EmptyStateComponent } from '../ui/empty-state/empty-state';
+import { InstruccionesComponent } from '../shared/instrucciones/instrucciones.component';
 
 @Component({
     selector: 'app-galeria',
     standalone: true,
-    imports: [MatDialogModule, EmptyStateComponent],
+    imports: [MatDialogModule, EmptyStateComponent, InstruccionesComponent],
     templateUrl: './galeria.component.html',
     styleUrl: './galeria.component.css',
     animations: [

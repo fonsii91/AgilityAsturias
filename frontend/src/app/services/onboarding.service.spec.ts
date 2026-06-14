@@ -150,6 +150,40 @@ describe('OnboardingService', () => {
     expect(service.activeTutorialProgress()).toBe(100);
   });
 
+  it('keeps both steps when one action marks two at once with stale/out-of-order responses', () => {
+    authServiceMock.currentUserSignal.set({ role: 'staff' });
+    service.progress.set({});
+
+    // Añadir un perro marca staff_perros Y miembro_perros (dos POST concurrentes).
+    service.markStepCompleted('staff_perros');
+    service.markStepCompleted('miembro_perros');
+
+    const reqs = httpMock.match(r => r.url.includes('/user/onboarding/step'));
+    expect(reqs.length).toBe(2);
+
+    // Cada respuesta trae SOLO su propio paso (simula la carrera). La fusión debe
+    // conservar ambos en vez de que el último pise al otro.
+    reqs[0].flush({ onboarding_progress: { staff: { staff_perros: true } } });
+    reqs[1].flush({ onboarding_progress: { miembro: { miembro_perros: true } } });
+
+    expect(service.progress().staff.staff_perros).toBe(true);
+    expect(service.progress().miembro.miembro_perros).toBe(true);
+  });
+
+  it('auto-completes Staff steps when the club already has the data (satisfiedBy)', () => {
+    authServiceMock.currentUserSignal.set({ role: 'staff' });
+    // Club ya configurado por cualquiera: hay clases, eventos y anuncios.
+    service.clubState.set({ has_bookable_classes: true, has_events: true, has_announcements: true });
+    service.progress.set({});
+
+    // Los pasos de "crear" se dan por hechos sin que ESTE staff los repita.
+    expect(service.isStepCompleted('staff_clase')).toBe(true);
+    expect(service.isStepCompleted('staff_evento')).toBe(true);
+    expect(service.isStepCompleted('staff_anuncio')).toBe(true);
+    // Un paso personal NO se auto-completa por estado del club.
+    expect(service.isStepCompleted('staff_perros')).toBe(false);
+  });
+
   it('should call finishTutorial and show congratulations when member completes all steps', () => {
     vi.spyOn(document.body, 'appendChild').mockImplementation(() => null as any);
     vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => { cb(0); return 0; });

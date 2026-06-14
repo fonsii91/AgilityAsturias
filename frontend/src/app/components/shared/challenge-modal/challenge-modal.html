@@ -1,0 +1,86 @@
+<div class="challenge-overlay" (click)="onClose()">
+  <div class="challenge-card" (click)="$event.stopPropagation()">
+    <button class="challenge-close" (click)="onClose()" aria-label="Cerrar">
+      <mat-icon>close</mat-icon>
+    </button>
+
+    @if (isLoading()) {
+      <div class="challenge-loading">
+        <div class="spinner"></div>
+        <p>Cargando el reto…</p>
+      </div>
+    } @else if (data(); as d) {
+      <div class="challenge-header">
+        <mat-icon class="trophy">emoji_events</mat-icon>
+        <h2>Reto de Activación</h2>
+        <p class="subtitle">
+          Cuando <strong>7 miembros</strong> completen el tutorial de bienvenida, el club consigue la recompensa.
+        </p>
+      </div>
+
+      <!-- Progreso global hacia el objetivo (700%) -->
+      <div class="challenge-progress" [class.achieved]="d.achieved">
+        <div class="progress-numbers">
+          <span class="total">{{ d.total }}%</span>
+          <span class="target">/ {{ d.target }}%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="progressPct()"></div>
+        </div>
+        @if (d.achieved) {
+          <p class="status done"><mat-icon>check_circle</mat-icon> ¡Reto conseguido! El club ha desbloqueado la recompensa.</p>
+        } @else {
+          <p class="status">
+            Faltan <strong>{{ d.target - d.total }}%</strong> — equivale a {{ remainingMembers() }} miembro(s) más al 100%.
+          </p>
+        }
+      </div>
+
+      <!-- Fecha límite -->
+      @if (daysLeft() !== null) {
+        <div class="challenge-deadline"
+             [class.urgent]="daysLeft()! <= 3 && daysLeft()! >= 0"
+             [class.expired]="daysLeft()! < 0">
+          <mat-icon>schedule</mat-icon>
+          @if (daysLeft()! > 1) { <span>Quedan {{ daysLeft() }} días</span> }
+          @else if (daysLeft() === 1) { <span>Queda 1 día</span> }
+          @else if (daysLeft() === 0) { <span>¡Último día!</span> }
+          @else { <span>Plazo finalizado</span> }
+        </div>
+      }
+
+      <!-- Progreso por miembro -->
+      <div class="challenge-members">
+        <h3>Progreso por miembro <span class="count">({{ d.finished_count }} completados)</span></h3>
+        @for (m of d.members; track m.id) {
+          <div class="member-row" [class.complete]="m.finished">
+            <div class="member-avatar">
+              @if (m.photo_url) {
+                <img [src]="m.photo_url" [alt]="m.name" referrerpolicy="no-referrer">
+              } @else {
+                <span class="material-icons">person</span>
+              }
+            </div>
+            <div class="member-info">
+              <div class="member-top">
+                <span class="member-name">{{ m.name }} <span class="member-role">{{ roleLabel(m.role) }}</span></span>
+                <span class="member-pct">{{ m.percent }}%</span>
+              </div>
+              <div class="member-track">
+                <div class="member-fill" [style.width.%]="m.percent"></div>
+              </div>
+            </div>
+            @if (m.finished) { <mat-icon class="member-check">check_circle</mat-icon> }
+          </div>
+        } @empty {
+          <p class="no-members">Aún no hay miembros en el club.</p>
+        }
+      </div>
+    } @else {
+      <div class="challenge-loading">
+        <mat-icon>error_outline</mat-icon>
+        <p>No se pudo cargar el reto.</p>
+      </div>
+    }
+  </div>
+</div>

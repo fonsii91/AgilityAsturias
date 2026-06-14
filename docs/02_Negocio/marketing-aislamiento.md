@@ -1,0 +1,3 @@
+ aqui ira todo lo relacionado con el marketing de la app
+
+ - Despliegues Separados (Aislamiento): Cuando compilas (ng build --configuration=agilityasturias), Angular empaqueta solo los datos de Agility Asturias. Esto permite que despliegues la app de cada club en su propio subdominio/servidor y conectada a su propia base de datos aislada. Esta seguridad y aislamiento es un gran punto de venta para los clubes.

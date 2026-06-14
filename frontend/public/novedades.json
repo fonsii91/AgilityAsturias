@@ -5,7 +5,15 @@
     "features": [
       "¡Menú de navegación renovado y más ordenado! Hemos reorganizado el menú para que encuentres todo más rápido y con menos opciones a la vista. Ahora las secciones relacionadas van agrupadas por temas: por ejemplo, 'Competición' reúne la Clasificación y la Liga Norte, 'Bitácoras' agrupa tus registros deportivos y 'Comunidad' junta el Tablón de Anuncios y los Recursos.",
       "¡Más cómodo en el móvil! Estos grupos del menú se despliegan y se pliegan con un solo toque, para que puedas navegar fácilmente con una sola mano a pie de pista. Además, la sección 'Público' (Bienvenida, Galería, Contacto…) aparece recogida para los socios, manteniendo el menú limpio.",
-      "¡Acceso más directo para el equipo del club! Las tareas del día a día, como Verificar Asistencia, quedan a un solo toque, mientras que las de consulta y configuración se agrupan aparte para no recargar la navegación diaria."
+      "¡Acceso más directo para el equipo del club! Las tareas del día a día, como Verificar Asistencia, quedan a un solo toque, mientras que las de consulta y configuración se agrupan aparte para no recargar la navegación diaria.",
+      "¡Nueva forma de pasar las fotos! En el visor de la galería ya puedes ir de una foto a otra simplemente deslizando con el dedo en el móvil (funciona también con el móvil girado) o arrastrando con el ratón en el ordenador, además de con las flechas de siempre.",
+      "¡Fotos mejor encuadradas y a vuestro gusto! Ahora las fotos se ven con un encuadre uniforme y elegante, sin franjas ni tamaños raros. Y lo mejor: entre todos podéis elegir qué parte de cada foto queda centrada. Con el botón 'Ajustar encuadre' tocas el punto importante (por ejemplo, la cara de tu perro) y ese encuadre queda guardado para todo el club.",
+      "¡Botones del visor más a mano! Ajustar el encuadre y descargar la foto están ahora arriba, junto a los de ampliar y cerrar, así que puedes usarlos también con la foto a pantalla completa."
+    ],
+    "bugfixes": [
+      "¡Etiquetas al instante! Al etiquetar un perro o a un miembro en una foto, la etiqueta aparece de inmediato, sin tener que volver a tocar la pantalla.",
+      "¡Aviso de borrado más claro y seguro! Al borrar una foto ahora aparece una ventana de confirmación integrada y cuidada, en lugar del aviso del navegador, para evitar borrados accidentales.",
+      "¡Visor a pantalla completa también en horizontal! Con el móvil girado, el visor de fotos ocupa ahora toda la pantalla en vez de mostrarse como una ventana pequeña, y se llega sin problema a todos los detalles deslizando."
     ]
   },
   {

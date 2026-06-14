@@ -1,5 +1,5 @@
 <div class="gallery-container">
-  <h2>Galería</h2>
+  <h2>Galería Pública</h2>
   <!-- Input de fichero a nivel superior para poder dispararlo también desde el estado vacío -->
   <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
   <!-- Upload Button for Staff -->
@@ -11,6 +11,17 @@
         }
         {{ isUploading() ? 'Subiendo...' : 'Añadir nueva foto' }}
       </button>
+
+      <app-instrucciones titulo="Gestión de la Galería Pública">
+        <div class="staff-instructions">
+          <p style="margin-bottom: 1rem;"><strong>Estas fotos son públicas: las puede ver cualquiera, aunque no esté registrado en la aplicación, y sirven como escaparate del club en internet.</strong></p>
+          <ul style="padding-left: 1.1rem; display: flex; flex-direction: column; gap: 12px; margin: 0;">
+            <li><strong>Añadir una foto:</strong> pulsa el botón verde <em>«Añadir nueva foto»</em>, elige una imagen de tu dispositivo y escribe una breve descripción; se publicará al instante.</li>
+            <li><strong>Borrar una foto:</strong> pasa el cursor por encima de la foto y pulsa el botón rojo con una <span class="material-icons" style="font-size: 16px; vertical-align: bottom; color: #e74c3c;">close</span> que aparece en su esquina superior derecha.</li>
+            <li><strong>Ver una foto en grande:</strong> pulsa cualquier imagen para abrirla a pantalla completa; usa las flechas laterales para pasar de una a otra.</li>
+          </ul>
+        </div>
+      </app-instrucciones>
     </div>
   }
 

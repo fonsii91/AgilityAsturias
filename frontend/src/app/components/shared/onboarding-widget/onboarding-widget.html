@@ -1,4 +1,4 @@
-<div class="onboarding-container" *ngIf="fase1RoleAllowed() && onboardingService.activeTutorialType()">
+<div class="onboarding-container" *ngIf="onboardingService.activeTutorialType()">
   
   <!-- Popover / Checklist -->
   <div class="onboarding-popover" *ngIf="isExpanded()" @popover>

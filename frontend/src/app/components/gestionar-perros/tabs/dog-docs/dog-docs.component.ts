@@ -6,7 +6,6 @@ import { ToastService } from '../../../../services/toast.service';
 import { DogService } from '../../../../services/dog.service';
 import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../services/auth.service';
-import { OnboardingService } from '../../../../services/onboarding';
 
 @Component({
   selector: 'app-dog-docs',
@@ -182,7 +181,6 @@ export class DogDocsComponent {
   dogService = inject(DogService);
   toast = inject(ToastService);
   authService = inject(AuthService);
-  onboardingService = inject(OnboardingService);
   
   dog = this.dogState.getDog();
   clubTheme = environment.clubConfig.colors;
@@ -280,8 +278,7 @@ export class DogDocsComponent {
       this.dogState.setDog(updated);
       this.initialData = { ...this.formData };
       this.hasChanges.set(false);
-      
-      this.onboardingService.markStepCompleted('miembro_documento');
+
       this.toast.success('Documentos actualizados');
     } catch(e) {
       this.toast.error('Error al guardar documentos');

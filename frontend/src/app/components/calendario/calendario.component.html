@@ -208,6 +208,7 @@
         @for (day of month.days; track day) {
         <div class="day" [class.other-month]="day.isOtherMonth" [class.weekend]="day.isWeekend"
           [class.competition]="day.isCompetition" [class.exhibicion]="day.isExhibicion" [class.other-event]="day.isOtherEvent" [class.today]="day.isToday"
+          [class.challenge]="day.isChallenge"
           [class.past]="day.isPast" [class.attending]="day.isAttending" [class.personal-event]="day.personalEvents.length > 0"
           (click)="handleDayClick(day)">
           @if (!day.isOtherMonth) {
@@ -217,6 +218,12 @@
           @if (day.isAttending && !day.isOtherMonth) {
           <div class="attending-badge" title="Asistiré">
             <span class="material-icons-outlined" style="font-size: 11px; font-weight: 900;">check</span>
+          </div>
+          }
+          <!-- Reto de Activación Indicator -->
+          @if (day.isChallenge && !day.isOtherMonth) {
+          <div class="challenge-badge" title="Reto de Activación">
+            <span class="material-icons-outlined" style="font-size: 12px;">emoji_events</span>
           </div>
           }
           <!-- Deadline Indicator with Tooltip -->
@@ -693,9 +700,14 @@
         </div>
 
         <div class="modern-pe-body">
-          <h2 style="margin: 0 0 20px 0; font-size: 1.35rem; font-weight: 500; color: #202124;">
+          <h2 style="margin: 0 0 12px 0; font-size: 1.35rem; font-weight: 500; color: #202124;">
             {{ isEditingPersonalEvent ? 'Editar Evento' : 'Nuevo Evento Personal' }}
           </h2>
+
+          <div style="display: flex; align-items: center; gap: 8px; margin: 0 0 20px 0; padding: 8px 12px; background: #f1f5f9; border-radius: 8px; color: #475569; font-size: 0.85rem;">
+            <span class="material-icons-outlined" style="font-size: 18px;">lock</span>
+            <span>Evento privado: solo tú lo ves. El resto de miembros del club no pueden verlo.</span>
+          </div>
 
           <div class="form-group-modern" style="margin-left: 40px; margin-bottom: 30px;">
             <input type="text" [(ngModel)]="personalEventForm.title" class="input-title" placeholder="Añade un título" autofocus>
@@ -749,6 +761,11 @@
     <img [src]="selectedCompetition.cartel" alt="Cartel Ampliado">
   </div>
 </div>
+}
+
+<!-- Modal del Reto de Activación -->
+@if (isChallengeOpen()) {
+  <app-challenge-modal (close)="closeChallenge()"></app-challenge-modal>
 }
 
 

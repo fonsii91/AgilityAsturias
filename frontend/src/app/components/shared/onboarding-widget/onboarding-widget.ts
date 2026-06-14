@@ -1,11 +1,10 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OnboardingService, OnboardingStep } from '../../../services/onboarding';
 import { TenantService } from '../../../services/tenant.service';
-import { AuthService } from '../../../services/auth.service';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 
 @Component({
@@ -27,15 +26,7 @@ export class OnboardingWidgetComponent {
   onboardingService = inject(OnboardingService);
   router = inject(Router);
   tenantService = inject(TenantService);
-  authService = inject(AuthService);
   isExpanded = signal(false);
-
-  /**
-   * Fase 1: el onboarding solo se reactiva para socios (rol exacto 'member').
-   * Staff y Gestor se reactivarán en la Fase 2, cuando sus tutoriales estén
-   * blindados (scope de club, sin pasos redundantes/destructivos).
-   */
-  fase1RoleAllowed = computed(() => this.authService.currentUserSignal()?.role === 'member');
 
   toggle() {
     this.isExpanded.update(v => !v);
