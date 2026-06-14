@@ -556,7 +556,7 @@ La integración y automatización con **FlowAgility.com** ha sido completamente 
 * **Métricas detalladas y Dorsales (`2026_05_20_162224_add_detailed_metrics_to_tracks_and_competition_dog.php`)**:
   - Añadida columna `dorsal` (`string`) en `competition_dog` para la asistencia.
   - Añadidas columnas para análisis de rendimiento (`time`, `faults`, `refusals`, `time_penalty`, `total_penalty`, `is_clean`, `course_length`, `standard_time`) en las tablas `rsce_tracks` y `rfec_tracks`.
-* **Monitoreo de Scraping (`2026_05_20_183210_add_scrape_status_to_competitions.php`)**:
+* **Monitoreo de Scraping** (repartido en dos migraciones reales: `2026_05_20_182540_add_results_scraped_to_competitions_table.php` y `2026_05_20_183702_add_scrape_monitoring_to_competitions_table.php`):
   - Añadidas columnas en la tabla `competitions` para controlar la ejecución automática e individual:
     - `results_scraped` (`boolean`): Evita scrapeos duplicados.
     - `scrape_status` (`enum: ['pending', 'success', 'failed']`): Estado del último intento.
@@ -571,7 +571,7 @@ Se ha implementado el script usando **Playwright Headless Chrome** con el siguie
 * **Filtro de Clubs**: Solo expande y procesa los binomios pertenecientes a clubes locales para minimizar tiempos de red.
 
 ## 3. Integración Laravel & Comando Artisan (`app/Console/Commands/ScrapeFlowAgility.php`)
-Comando ejecutable vía `php artisan flowagility:scrape` que gestiona todo el proceso:
+Comando ejecutable vía `php artisan flowagility:scrape` que gestiona todo el proceso. Acepta además flags: `--force` (re-scrapea competiciones ya marcadas como completadas) y `--competition_id=` (scrapea una competición concreta). Gestiona:
 * **Deduplicación de URLs en Memoria**: Agrupa todas las competiciones por su enlace de FlowAgility para que, en caso de que varios clubes tengan añadida la misma competición, el scraper **navegue una única vez** a la página del evento.
 * **Exclusión de Eventos en Curso**: Calcula las fechas límite de los eventos. Las competiciones en curso o futuras (fecha actual $\le$ fecha fin del evento) son omitidas del proceso automático para evitar guardar resultados parciales o incorrectos.
 * **Enriquecimiento del Trabajo del Perro (ACWR)**:
@@ -581,9 +581,10 @@ Comando ejecutable vía `php artisan flowagility:scrape` que gestiona todo el pr
 * **Mapeo de Nombres de Evento y Jueces**: El campo `location` (Competición) y `judge_name` (Juez) se rellenan automáticamente usando la información de la base de datos local de la competición, garantizando que el historial del perro esté completamente detallado.
 
 ## 4. Panel de Monitoreo del Administrador Global (Frontend y API)
-* **Endpoints API creados (`RsceTrackController` / `routes/api.php`)**:
-  - `GET /api/admin/scraper/status`: Obtiene todas las competiciones finalizadas junto con su estado y error de scraping.
-  - `POST /api/admin/scraper/run`: Ejecuta manualmente el comando Artisan para una competición finalizada individual, transmitiendo los logs en vivo del terminal a la API.
+* **Endpoints API creados (`CompetitionController` / `routes/api.php`)**:
+  - `GET /api/admin/scraper/status` (`adminScraperStatus`): Obtiene todas las competiciones finalizadas junto con su estado y error de scraping.
+  - `POST /api/admin/scraper/run` (`adminScraperRun`): Ejecuta manualmente el comando Artisan para una competición finalizada individual, transmitiendo los logs en vivo del terminal a la API.
+  - `POST /api/admin/scraper/run-calendar` (`adminScraperRunCalendar`): Encola en segundo plano el comando **`flowagility:scrape-calendar`** (scraper del *calendario* de competiciones, distinto del de resultados `flowagility:scrape`).
 * **Panel de Control Angular (`AdminScraperMonitorComponent`)**:
   - Interfaz de administración premium con tablas de estados, badges de colores semánticos (`Completado`, `Fallido`, `Pendiente`), indicador de fecha de scrapeo y visor de logs de error en modal.
   - Botón para lanzar el scraping individual y visualizador del buffer del terminal (`stdout`/`stderr`) en tiempo real.

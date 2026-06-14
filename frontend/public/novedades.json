@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.1.56",
+    "date": "2026-06-14",
+    "features": [
+      "¡Menú de navegación renovado y más ordenado! Hemos reorganizado el menú para que encuentres todo más rápido y con menos opciones a la vista. Ahora las secciones relacionadas van agrupadas por temas: por ejemplo, 'Competición' reúne la Clasificación y la Liga Norte, 'Bitácoras' agrupa tus registros deportivos y 'Comunidad' junta el Tablón de Anuncios y los Recursos.",
+      "¡Más cómodo en el móvil! Estos grupos del menú se despliegan y se pliegan con un solo toque, para que puedas navegar fácilmente con una sola mano a pie de pista. Además, la sección 'Público' (Bienvenida, Galería, Contacto…) aparece recogida para los socios, manteniendo el menú limpio.",
+      "¡Acceso más directo para el equipo del club! Las tareas del día a día, como Verificar Asistencia, quedan a un solo toque, mientras que las de consulta y configuración se agrupan aparte para no recargar la navegación diaria."
+    ]
+  },
+  {
     "version": "1.1.55",
     "date": "2026-06-13",
     "features": [
