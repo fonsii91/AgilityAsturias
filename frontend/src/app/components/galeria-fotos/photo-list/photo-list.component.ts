@@ -60,6 +60,7 @@ export class PhotoListComponent implements OnInit {
     isSavingMeta = signal<boolean>(false);
     editMeta = { title: '', category: '', photo_type: '', competition_id: '', taken_at: '' };
     isDeleting = signal<boolean>(false);
+    pendingDelete = signal<Photo | null>(null);
     showSidebar = signal<boolean>(true);
     members = signal<{ id: number; name: string }[]>([]);
 
@@ -210,6 +211,8 @@ export class PhotoListComponent implements OnInit {
 
     @HostListener('document:keydown.escape')
     onEscape() {
+        // El modal de confirmación tiene prioridad sobre el cierre del visor.
+        if (this.pendingDelete()) { this.cancelDelete(); return; }
         if (this.selectedPhoto()) this.closePhoto();
     }
 
@@ -422,15 +425,25 @@ export class PhotoListComponent implements OnInit {
         return !!user && !!photo.tagged_users?.some(u => u.id === user.id);
     }
 
-    async deletePhoto(photo: Photo) {
+    askDeletePhoto(photo: Photo) {
+        this.pendingDelete.set(photo);
+    }
+
+    cancelDelete() {
         if (this.isDeleting()) return;
-        if (!confirm('¿Seguro que quieres borrar esta foto? Esta acción no se puede deshacer.')) return;
+        this.pendingDelete.set(null);
+    }
+
+    async confirmDelete() {
+        const photo = this.pendingDelete();
+        if (!photo || this.isDeleting()) return;
 
         this.isDeleting.set(true);
         try {
             await firstValueFrom(this.photoService.deletePhoto(photo.id));
             this.photos.update(prev => prev.filter(p => p.id !== photo.id));
             this.total.update(t => t - 1);
+            this.pendingDelete.set(null);
             this.closePhoto();
             this.toastService.success('Foto eliminada.');
         } catch {

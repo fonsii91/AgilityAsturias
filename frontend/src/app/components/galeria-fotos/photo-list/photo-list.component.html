@@ -208,11 +208,30 @@
     [style.opacity]="swipeOpacity()"
     [style.transition]="isSwiping() ? 'none' : 'transform 0.2s ease, opacity 0.2s ease'">
 
-    <button class="lightbox-close" (click)="closePhoto()"><span class="material-icons">close</span></button>
-    <button class="lightbox-info-toggle" (click)="toggleSidebar()"
-      [title]="showSidebar() ? 'Ampliar imagen' : 'Mostrar detalles'">
-      <span class="material-icons">{{ showSidebar() ? 'fullscreen' : 'fullscreen_exit' }}</span>
-    </button>
+    <div class="lightbox-toolbar">
+      @if (!isEditingFocal()) {
+      <button class="lightbox-tool" title="Ajustar encuadre" aria-label="Ajustar encuadre"
+        (click)="startEditFocal(photo)">
+        <span class="material-icons">crop</span>
+      </button>
+      } @else {
+      <button class="lightbox-tool tool-active" title="Listo" aria-label="Terminar de ajustar el encuadre"
+        (click)="stopEditFocal()">
+        <span class="material-icons">done</span>
+      </button>
+      }
+      <button class="lightbox-tool" title="Descargar foto" aria-label="Descargar foto" (click)="downloadPhoto(photo)">
+        <span class="material-icons">download</span>
+      </button>
+      <button class="lightbox-tool tool-fullscreen" (click)="toggleSidebar()"
+        [title]="showSidebar() ? 'Ampliar imagen' : 'Mostrar detalles'"
+        [attr.aria-label]="showSidebar() ? 'Ampliar imagen' : 'Mostrar detalles'">
+        <span class="material-icons">{{ showSidebar() ? 'fullscreen' : 'fullscreen_exit' }}</span>
+      </button>
+      <button class="lightbox-tool" title="Cerrar" aria-label="Cerrar" (click)="closePhoto()">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
     <button class="lightbox-nav nav-prev" (click)="navigatePhoto(-1)"><span
         class="material-icons">chevron_left</span></button>
     <button class="lightbox-nav nav-next" (click)="navigatePhoto(1)"><span
@@ -260,9 +279,23 @@
           <span class="material-icons">cloud_upload</span> Subida por {{ photo.user.name }}
         </div>
         }
-        <button class="btn-edit-meta" (click)="startEditMeta(photo)">
-          <span class="material-icons">edit</span> Editar datos
-        </button>
+        <div class="meta-actions">
+          <button class="btn-edit-meta" (click)="startEditMeta(photo)">
+            <span class="material-icons">edit</span> Editar datos
+          </button>
+          @if (isTaggedSelf(photo)) {
+          <button class="btn-icon" title="Quitarme de esta foto" aria-label="Quitarme de esta foto"
+            (click)="untagSelf(photo)">
+            <span class="material-icons">person_remove</span>
+          </button>
+          }
+          @if (canManage(photo)) {
+          <button class="btn-icon btn-icon-danger" title="Borrar foto" aria-label="Borrar foto"
+            (click)="askDeletePhoto(photo)">
+            <span class="material-icons">delete</span>
+          </button>
+          }
+        </div>
         } @else {
         <div class="meta-edit-form">
           <label class="meta-field">
@@ -358,38 +391,25 @@
         </div>
         }
       </div>
-
-      <div class="sidebar-actions">
-        @if (!isEditingFocal()) {
-        <button class="btn-icon" title="Ajustar encuadre" aria-label="Ajustar encuadre"
-          (click)="startEditFocal(photo)">
-          <span class="material-icons">crop</span>
-        </button>
-        } @else {
-        <button class="btn-icon btn-icon-primary" title="Listo" aria-label="Terminar de ajustar el encuadre"
-          (click)="stopEditFocal()">
-          <span class="material-icons">done</span>
-        </button>
-        }
-        <button class="btn-icon btn-icon-primary" title="Descargar foto" aria-label="Descargar foto"
-          (click)="downloadPhoto(photo)">
-          <span class="material-icons">download</span>
-        </button>
-        @if (isTaggedSelf(photo)) {
-        <button class="btn-icon" title="Quitarme de esta foto" aria-label="Quitarme de esta foto"
-          (click)="untagSelf(photo)">
-          <span class="material-icons">person_remove</span>
-        </button>
-        }
-        @if (canManage(photo)) {
-        <button class="btn-icon btn-icon-danger" [title]="isDeleting() ? 'Borrando…' : 'Borrar foto'"
-          aria-label="Borrar foto" [disabled]="isDeleting()" (click)="deletePhoto(photo)">
-          <span class="material-icons">{{ isDeleting() ? 'hourglass_empty' : 'delete' }}</span>
-        </button>
-        }
-      </div>
     </div>
     }
+  </div>
+</div>
+}
+
+<!-- ============ Modal de confirmación de borrado ============ -->
+@if (pendingDelete()) {
+<div class="confirm-backdrop" (click)="cancelDelete()">
+  <div class="confirm-dialog" (click)="$event.stopPropagation()">
+    <div class="confirm-icon"><span class="material-icons">delete</span></div>
+    <h3>Borrar foto</h3>
+    <p>¿Seguro que quieres borrar esta foto? Esta acción no se puede deshacer.</p>
+    <div class="confirm-actions">
+      <button class="btn-confirm-cancel" (click)="cancelDelete()" [disabled]="isDeleting()">Cancelar</button>
+      <button class="btn-confirm-delete" (click)="confirmDelete()" [disabled]="isDeleting()">
+        <span class="material-icons">delete</span> {{ isDeleting() ? 'Borrando…' : 'Borrar' }}
+      </button>
+    </div>
   </div>
 </div>
 }
