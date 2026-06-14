@@ -161,7 +161,11 @@ class ClubController extends Controller
         // El plan y sus features se incluyen para que el formulario de gestión
         // pueda reflejar qué módulos permite activar el plan contratado
         // (PLAN_GATED_MODULES).
-        return response()->json($club->load('plan.features'));
+        $club->load('plan.features');
+        // Flag autoritativo del backend para mostrar/ocultar el borrado de datos
+        // de ejemplo (no exponemos la estructura interna _demo_seed al frontend).
+        $club->setAttribute('has_demo_data', isset($club->settings['_demo_seed']));
+        return response()->json($club);
     }
 
     public function store(Request $request)
@@ -365,9 +369,13 @@ class ClubController extends Controller
 
         $provisioner->clearDemoData($club);
 
+        $fresh = $club->fresh()->load('plan.features');
+        // Tras el borrado, el marcador ya no existe: estado autoritativo del backend.
+        $fresh->setAttribute('has_demo_data', isset($fresh->settings['_demo_seed']));
+
         return response()->json([
             'message' => 'Datos de ejemplo eliminados.',
-            'club' => $club->fresh()->load('plan.features'),
+            'club' => $fresh,
         ]);
     }
 

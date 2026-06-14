@@ -43,8 +43,9 @@ export class FuncionalidadesClubComponent implements OnInit {
   savingKey = signal<string | null>(null);
   clearingDemo = signal(false);
 
-  /** ¿El club todavía tiene datos de ejemplo sin limpiar? */
-  hasDemoData = computed(() => !!(this.club()?.settings as any)?.['_demo_seed']);
+  /** ¿El club todavía tiene datos de ejemplo sin limpiar? Flag autoritativo del
+      backend (has_demo_data); una vez borrados no vuelve a aparecer. */
+  hasDemoData = computed(() => !!(this.club() as any)?.has_demo_data);
 
   readonly modules: ModuleDef[] = [
     {
@@ -139,14 +140,10 @@ export class FuncionalidadesClubComponent implements OnInit {
       if (!ok) return;
       this.clearingDemo.set(true);
       this.clubService.clearDemoData(club.id!).subscribe({
-        next: () => {
-          // Quitar el marcador en local para ocultar el botón y refrescar estado.
-          this.club.update((prev) => {
-            if (!prev) return prev;
-            const settings: any = { ...(prev.settings || {}) };
-            delete settings['_demo_seed'];
-            return { ...prev, settings };
-          });
+        next: (res) => {
+          // Estado autoritativo del backend (has_demo_data = false) -> el botón
+          // desaparece y no vuelve a salir.
+          this.club.set(res.club);
           this.clearingDemo.set(false);
           this.toast.success('Datos de ejemplo eliminados.');
           this.tenant.reload();
