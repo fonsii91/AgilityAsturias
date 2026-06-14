@@ -89,8 +89,12 @@
           <li class="mobile-nav-divider">Gestor</li>
           <li><a routerLink="/admin/clubs/edit/{{ tenantService.tenantInfo()?.id }}" routerLinkActive="active-route"
               (click)="sidenav.close()"><span class="material-icons">settings</span> Configurar Club</a></li>
+          <li><a routerLink="/configuracion/modulos" routerLinkActive="active-route" (click)="sidenav.close()"><span
+                class="material-icons">widgets</span> Funcionalidades</a></li>
           <li><a routerLink="/gestor/landing-page" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">design_services</span> P. Bienvenida</a></li>
+          <li><a routerLink="/configuracion/facturacion" routerLinkActive="active-route" (click)="sidenav.close()"><span
+                class="material-icons">credit_card</span> Facturación</a></li>
           @if (provisionFondosEnabled()) {
           <li><a routerLink="/admin/finanzas" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">payments</span> Provisión Fondos</a></li>
@@ -104,6 +108,8 @@
                 class="material-icons">admin_panel_settings</span> Roles</a></li>
           <li><a routerLink="/admin/clubs" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">domain</span> Gestión de Clubes</a></li>
+          <li><a routerLink="/admin/suscripciones" routerLinkActive="active-route" (click)="sidenav.close()"><span
+                class="material-icons">card_membership</span> Planes y Funciones</a></li>
           <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">report_problem</span> Ver sugerencias</a></li>
           <li class="mobile-nav-divider"
@@ -122,6 +128,10 @@
           <li><a routerLink="/admin/liga-norte" routerLinkActive="active-route" (click)="sidenav.close()"><span
                 class="material-icons">emoji_events</span> Liga Norte</a></li>
           }
+          <li><a routerLink="/admin/avatares" routerLinkActive="active-route" (click)="sidenav.close()"><span
+                class="material-icons">auto_awesome</span> Avatares IA</a></li>
+          <li><a routerLink="/admin/onboarding-monitor" routerLinkActive="active-route" (click)="sidenav.close()"><span
+                class="material-icons">checklist_rtl</span> Monitor Onboarding</a></li>
           }
 
           <!-- Explorar and Area Pública for logged-in users -->
