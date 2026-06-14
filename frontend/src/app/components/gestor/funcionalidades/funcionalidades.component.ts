@@ -50,7 +50,7 @@ export class FuncionalidadesClubComponent implements OnInit {
       key: 'provision_fondos_enabled', feature: 'provision-fondos',
       title: 'Provisión de Fondos', icon: 'account_balance_wallet',
       description: 'Lleva las cuentas de tus socios: ingresos, gastos y saldo. Actívalo cuando vayas a gestionar el dinero del club.',
-      manageLink: '/finanzas', manageLabel: 'Ir a finanzas',
+      manageLink: '/admin/finanzas', manageLabel: 'Gestionar fondos del club',
     },
     {
       key: 'sponsors_enabled', feature: 'patrocinadores',
