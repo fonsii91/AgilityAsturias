@@ -534,6 +534,18 @@
     }
 }
 
+/* Protecciones del gesto en cualquier dispositivo táctil, también en landscape
+   (donde el ancho supera el breakpoint móvil pero sigue siendo un móvil). */
+@media (pointer: coarse) {
+    .lightbox-backdrop {
+        overscroll-behavior: contain;
+    }
+
+    .lightbox-content {
+        touch-action: pan-y;
+    }
+}
+
 /* ============ Punto focal (encuadre colaborativo) ============ */
 /* Mientras se ajusta el encuadre ocultamos la navegación para no estorbar. */
 .lightbox-content.focal-editing .lightbox-nav,
@@ -820,75 +832,61 @@
     color: var(--text-main);
 }
 
+/* Barra de acciones compacta: botones de solo icono. */
 .sidebar-actions {
     margin-top: auto;
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 0.5rem;
     padding-top: 0.75rem;
     border-top: 1px solid #e2e8f0;
 }
 
-.btn-sidebar {
-    display: flex;
+.btn-icon {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    width: 100%;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border: none;
     border-radius: 10px;
-    padding: 10px;
-    font-size: 0.9rem;
-    font-weight: 700;
     cursor: pointer;
-    border: 2px solid transparent;
+    background: #f1f5f9;
+    color: var(--text-secondary);
     transition: all 0.2s;
 }
 
-.btn-sidebar .material-icons {
-    font-size: 18px;
-}
-
-.btn-untag,
-.btn-focal {
-    background: #f1f5f9;
-    border-color: transparent;
-    color: var(--text-secondary);
-}
-
-.btn-untag:hover,
-.btn-focal:hover {
+.btn-icon:hover {
     background: #e2e8f0;
 }
 
-.btn-focal-done {
+.btn-icon .material-icons {
+    font-size: 20px;
+}
+
+.btn-icon-primary {
     background: var(--primary-blue);
     color: #fff;
 }
 
-.btn-focal-done:hover {
+.btn-icon-primary:hover {
+    box-shadow: 0 4px 12px rgba(0, 115, 207, 0.25);
     filter: brightness(0.95);
 }
 
-.btn-delete {
+/* Borrar: separado del resto (zona "peligrosa") y con color de aviso. */
+.btn-icon-danger {
+    margin-left: auto;
     background: rgba(220, 38, 38, 0.1);
     color: #dc2626;
 }
 
-.btn-delete:hover {
+.btn-icon-danger:hover {
     background: rgba(220, 38, 38, 0.18);
 }
 
-.btn-delete:disabled {
+.btn-icon:disabled {
     opacity: 0.6;
     cursor: wait;
-}
-
-.btn-download {
-    background: var(--primary-blue);
-    color: #fff;
-}
-
-.btn-download:hover {
-    box-shadow: 0 4px 12px rgba(0, 115, 207, 0.25);
-    filter: brightness(0.95);
 }

@@ -356,25 +356,30 @@
 
       <div class="sidebar-actions">
         @if (!isEditingFocal()) {
-        <button class="btn-sidebar btn-focal" (click)="startEditFocal(photo)">
-          <span class="material-icons">crop</span> Ajustar encuadre
+        <button class="btn-icon" title="Ajustar encuadre" aria-label="Ajustar encuadre"
+          (click)="startEditFocal(photo)">
+          <span class="material-icons">crop</span>
         </button>
         } @else {
-        <button class="btn-sidebar btn-focal-done" (click)="stopEditFocal()">
-          <span class="material-icons">done</span> Listo
+        <button class="btn-icon btn-icon-primary" title="Listo" aria-label="Terminar de ajustar el encuadre"
+          (click)="stopEditFocal()">
+          <span class="material-icons">done</span>
         </button>
         }
-        <button class="btn-sidebar btn-download" (click)="downloadPhoto(photo)">
-          <span class="material-icons">download</span> Descargar foto
+        <button class="btn-icon btn-icon-primary" title="Descargar foto" aria-label="Descargar foto"
+          (click)="downloadPhoto(photo)">
+          <span class="material-icons">download</span>
         </button>
         @if (isTaggedSelf(photo)) {
-        <button class="btn-sidebar btn-untag" (click)="untagSelf(photo)">
-          <span class="material-icons">person_remove</span> Quitarme de esta foto
+        <button class="btn-icon" title="Quitarme de esta foto" aria-label="Quitarme de esta foto"
+          (click)="untagSelf(photo)">
+          <span class="material-icons">person_remove</span>
         </button>
         }
         @if (canManage(photo)) {
-        <button class="btn-sidebar btn-delete" [disabled]="isDeleting()" (click)="deletePhoto(photo)">
-          <span class="material-icons">delete</span> {{ isDeleting() ? 'Borrando…' : 'Borrar foto' }}
+        <button class="btn-icon btn-icon-danger" [title]="isDeleting() ? 'Borrando…' : 'Borrar foto'"
+          aria-label="Borrar foto" [disabled]="isDeleting()" (click)="deletePhoto(photo)">
+          <span class="material-icons">{{ isDeleting() ? 'hourglass_empty' : 'delete' }}</span>
         </button>
         }
       </div>

@@ -232,8 +232,14 @@ export class PhotoListComponent implements OnInit {
 
     // ---- Gesto de deslizar horizontal (pasa la tarjeta entera, solo móvil) ----
 
+    /**
+     * El gesto se activa en cualquier dispositivo táctil, independientemente de
+     * la orientación: por ancho un móvil en horizontal supera los 820px, así que
+     * nos apoyamos sobre todo en el puntero "grueso" (táctil).
+     */
     private isMobileViewport(): boolean {
-        return typeof window !== 'undefined' && window.innerWidth <= 820;
+        if (typeof window === 'undefined') return false;
+        return window.matchMedia?.('(pointer: coarse)')?.matches || window.innerWidth <= 820;
     }
 
     /** Opacidad de la tarjeta durante el arrastre: se atenúa al alejarse. */
