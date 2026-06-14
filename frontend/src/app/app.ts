@@ -1,7 +1,6 @@
 import { Component, signal, inject, OnInit, OnDestroy, Injector, effect, computed } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { HasFeatureDirective } from './directives/has-feature.directive';
 
 import { ToastComponent } from './components/toast/toast.component';
 import { MatSidenavModule } from '@angular/material/sidenav';
@@ -17,6 +16,7 @@ import { DogService } from './services/dog.service';
 import { environment } from '../environments/environment';
 import { TenantService } from './services/tenant.service';
 import { AnalyticsService } from './services/analytics.service';
+import { NavMenuService } from './services/nav-menu.service';
 
 import { CommonModule, DatePipe } from '@angular/common';
 import { ClubagilityComponent } from './clubagility/clubagility.component';
@@ -26,7 +26,7 @@ import { UploadProgressPanelComponent } from './components/shared/upload-progres
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent, HasFeatureDirective, CookieBannerComponent, UploadProgressPanelComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent, ToastComponent, MatSidenavModule, CommonModule, DatePipe, ClubagilityComponent, OnboardingWidgetComponent, CookieBannerComponent, UploadProgressPanelComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -35,6 +35,16 @@ export class App implements OnInit, OnDestroy {
   authService = inject(AuthService);
   tenantService = inject(TenantService);
   analyticsService = inject(AnalyticsService);
+  private navMenu = inject(NavMenuService);
+
+  /** Mismas secciones que el navbar (fuente única), con "Público" al final
+      para el sidenav móvil. */
+  mobileSections = computed(() => {
+    const all = this.navMenu.sections();
+    const pub = all.filter((s) => s.id === 'publico');
+    const rest = all.filter((s) => s.id !== 'publico');
+    return [...rest, ...pub];
+  });
   gamificationEnabled = computed(() => {
     const val = this.tenantService.tenantInfo()?.settings?.['gamification_enabled'];
     return val !== false && val !== 'false';

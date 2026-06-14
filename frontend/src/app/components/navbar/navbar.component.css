@@ -138,6 +138,18 @@ nav.desktop-nav .dropdown-menu-list {
     display: block;
 }
 
+/* Subtítulo/cabecera de grupo dentro de un desplegable (item con header:true). */
+.dropdown-section-label {
+    padding: 8px 20px 4px;
+    margin-top: 4px;
+    border-top: 1px solid #e2e8f0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 nav.desktop-nav .dropdown-menu-list li a {
     display: flex;
     align-items: center;

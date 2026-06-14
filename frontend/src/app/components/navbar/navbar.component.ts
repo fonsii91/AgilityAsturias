@@ -8,12 +8,12 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SugerenciaDialog } from '../sugerencias/sugerencia-dialog/sugerencia-dialog';
 import { environment } from '../../../environments/environment';
-import { HasFeatureDirective } from '../../directives/has-feature.directive';
+import { NavMenuService } from '../../services/nav-menu.service';
 
 @Component({
     selector: 'app-navbar',
     standalone: true,
-    imports: [RouterLink, RouterLinkActive, CommonModule, MatToolbarModule, MatDialogModule, HasFeatureDirective],
+    imports: [RouterLink, RouterLinkActive, CommonModule, MatToolbarModule, MatDialogModule],
     templateUrl: './navbar.component.html',
     styleUrl: './navbar.component.css'
 })
@@ -25,6 +25,7 @@ export class NavbarComponent {
     router = inject(Router);
     dialog = inject(MatDialog);
     tenantService = inject(TenantService);
+    navMenu = inject(NavMenuService);
     clubConfig = environment.clubConfig;
     
     clubName = computed(() => this.tenantService.tenantInfo()?.name || this.clubConfig.name);

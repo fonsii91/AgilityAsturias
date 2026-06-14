@@ -10,39 +10,30 @@
 
     <nav class="desktop-nav" style="margin-left: 2rem;">
       <ul>
-        @if (!authService.isMember()) {
-        <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span
-              class="material-icons">home</span> Bienvenida</a></li>
-        <li><a routerLink="/galeria" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
-            Galería</a></li>
-        <li *hasFeature="'galeria-videos'"><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
-              class="material-icons">videocam</span> Videoteca</a></li>
-        @if (sponsorsEnabled()) {
-        <li><a routerLink="/patrocinadores" routerLinkActive="active-route"><span
-              class="material-icons">handshake</span> Patrocinadores</a></li>
-        }
-        <li><a routerLink="/contacto" routerLinkActive="active-route"><span
-              class="material-icons">contact_support</span> Contacto</a></li>
-        }
-        @if (authService.isMember()) {
-        <li class="nav-dropdown">
-          <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">public</span> Público <span
-              class="material-icons arrow">expand_more</span></a>
-          <ul class="dropdown-menu-list">
-            <li><a routerLink="/" routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}"><span
-                  class="material-icons">home</span> Bienvenida</a></li>
-            <li><a routerLink="/galeria" routerLinkActive="active-route"><span
-                  class="material-icons">photo_library</span> Galería</a></li>
-            <li *hasFeature="'galeria-videos'"><a routerLink="/videos-publicos" routerLinkActive="active-route"><span
-                  class="material-icons">videocam</span> Videoteca</a></li>
-            @if (sponsorsEnabled()) {
-            <li><a routerLink="/patrocinadores" routerLinkActive="active-route"><span
-                  class="material-icons">handshake</span> Patrocinadores</a></li>
+        @for (section of navMenu.sections(); track section.id) {
+          @if (section.id === 'publico') {
+            @if (!authService.isMember()) {
+              <!-- Visitante: enlaces públicos en plano -->
+              @for (item of section.items; track item.label) {
+              <li><a [routerLink]="item.route" routerLinkActive="active-route"
+                    [routerLinkActiveOptions]="{ exact: !!item.exact }"><span class="material-icons">{{ item.icon }}</span>
+                  {{ item.label }}</a></li>
+              }
+            } @else {
+              <!-- Miembro: lo público agrupado en un desplegable -->
+              <li class="nav-dropdown">
+                <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">{{ section.icon }}</span>
+                  {{ section.title }} <span class="material-icons arrow">expand_more</span></a>
+                <ul class="dropdown-menu-list">
+                  @for (item of section.items; track item.label) {
+                  <li><a [routerLink]="item.route" routerLinkActive="active-route"
+                        [routerLinkActiveOptions]="{ exact: !!item.exact }"><span class="material-icons">{{ item.icon }}</span>
+                      {{ item.label }}</a></li>
+                  }
+                </ul>
+              </li>
             }
-            <li><a routerLink="/contacto" routerLinkActive="active-route"><span
-                  class="material-icons">contact_support</span> Contacto</a></li>
-          </ul>
-        </li>
+          }
         }
       </ul>
     </nav>
@@ -53,137 +44,26 @@
 
   <nav class="desktop-nav">
     <ul>
-      <!-- Miembros Dropdown for Logged In Members -->
-      @if (authService.isMember()) {
-      <li class="nav-dropdown">
-        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">apps</span> Miembros <span
-            class="material-icons arrow">expand_more</span></a>
-        <ul class="dropdown-menu-list">
-          <li *hasFeature="'reservas-pistas'"><a routerLink="/reservas" routerLinkActive="active-route"><span class="material-icons">event</span>
-              Reservas</a></li>
-          <li><a routerLink="/calendario" routerLinkActive="active-route"><span
-                class="material-icons">calendar_month</span> Calendario</a></li>
-          @if (gamificationEnabled()) {
-            <li><a routerLink="/ranking" routerLinkActive="active-route"><span class="material-icons">emoji_events</span>
-                Clasificación</a></li>
-          }
-
-          <li *hasFeature="'galeria-videos'"><a routerLink="/galeria-videos" routerLinkActive="active-route"><span class="material-icons">movie</span>
-              Vídeos</a></li>
-          <li><a routerLink="/galeria-fotos" routerLinkActive="active-route"><span class="material-icons">photo_library</span>
-              Fotos</a></li>
-        </ul>
-      </li>
-      }
-
-      <!-- Staff Dropdown for Staff Users -->
-      @if (authService.isStaff()) {
-      <li class="nav-dropdown">
-        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">badge</span> Staff <span
-            class="material-icons arrow">expand_more</span></a>
-        <ul class="dropdown-menu-list">
-          <li><a routerLink="/gestionar-competiciones" routerLinkActive="active-route"><span
-                class="material-icons">sports_score</span> Eventos</a></li>
-          <li *hasFeature="'reservas-pistas'"><a routerLink="/info-reservas" routerLinkActive="active-route"><span
-                class="material-icons">visibility</span> Monitor Reservas</a></li>
-          <li><a routerLink="/admin/asistencia" routerLinkActive="active-route"><span
-                class="material-icons">fact_check</span> Verificar Asistencia</a></li>
-          <li><a routerLink="/staff/historial-asistencia" routerLinkActive="active-route"><span
-                class="material-icons">history</span> Historial Asistencia</a></li>
-          @if (gamificationEnabled()) {
-            <li><a routerLink="/admin/puntos-extra" routerLinkActive="active-route" (click)="closeMenu()"><span
-                  class="material-icons">military_tech</span> Puntos Extra</a></li>
-          }
-          <li><a routerLink="/gestionar-miembros" routerLinkActive="active-route"><span
-                class="material-icons">people</span> Gestión Miembros</a></li>
-          <li *hasFeature="'reservas-pistas'"><a routerLink="/gestionar-horarios" routerLinkActive="active-route"><span
-                class="material-icons">calendar_month</span> Gestión Horarios</a></li>
-        </ul>
-      </li>
-      }
-
-      <!-- Gestor Dropdown for Manager Users -->
-      @if (authService.isManager()) {
-      <li class="nav-dropdown">
-        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">business</span> Gestor <span
-            class="material-icons arrow">expand_more</span></a>
-        <ul class="dropdown-menu-list">
-          <li><a (click)="goToMyClub()" style="cursor: pointer;"><span class="material-icons">settings</span> Configurar
-              Club</a></li>
-          <li><a routerLink="/configuracion/modulos" routerLinkActive="active-route"><span
-                class="material-icons">widgets</span> Funcionalidades</a></li>
-          <li><a routerLink="/gestor/landing-page" routerLinkActive="active-route"><span
-                class="material-icons">design_services</span> P. Bienvenida</a></li>
-          <li><a routerLink="/configuracion/facturacion" routerLinkActive="active-route"><span
-                class="material-icons">credit_card</span> Facturación</a></li>
-          @if (provisionFondosEnabled()) {
-            <li><a routerLink="/admin/finanzas" routerLinkActive="active-route"><span class="material-icons">payments</span>
-                Provisión Fondos</a></li>
-          }
-        </ul>
-      </li>
-      }
-
-      <!-- Administrar Dropdown for Admin Users -->
-      @if (authService.isAdmin()) {
-      <li class="nav-dropdown">
-        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">admin_panel_settings</span>
-          Administrar <span class="material-icons arrow">expand_more</span></a>
-        <ul class="dropdown-menu-list">
-          <li><a routerLink="/admin/usuarios" routerLinkActive="active-route"><span
-                class="material-icons">admin_panel_settings</span> Roles</a></li>
-          <li><a routerLink="/admin/clubs" routerLinkActive="active-route"><span class="material-icons">domain</span>
-              Gestión de Clubes</a></li>
-          <li><a routerLink="/admin/suscripciones" routerLinkActive="active-route"><span class="material-icons">card_membership</span>
-              Planes y Funciones</a></li>
-          <li><a routerLink="/admin/sugerencias" routerLinkActive="active-route"><span
-                class="material-icons">report_problem</span> Ver sugerencias</a></li>
-          <li class="dropdown-divider"></li>
-          <li
-            style="padding: 4px 20px; font-size: 0.75rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">
-            Revisar</li>
-          <li *hasFeature="'galeria-videos'"><a routerLink="/admin/videos" routerLinkActive="active-route"><span
-                class="material-icons">video_library</span> Revisar vídeos</a></li>
-          <li><a routerLink="/admin/salud-monitor" routerLinkActive="active-route"><span
-                class="material-icons">monitor_heart</span> Monitor ACWR</a></li>
-          <li><a routerLink="/admin/rsce-monitor" routerLinkActive="active-route"><span
-                class="material-icons">query_stats</span> Canina (RSCE)</a></li>
-          <li><a routerLink="/admin/scraper-monitor" routerLinkActive="active-route"><span
-                class="material-icons">sync</span> Monitor Scraping</a></li>
-          @if (ligaNorteEnabled()) {
-          <li><a routerLink="/admin/liga-norte" routerLinkActive="active-route"><span
-                class="material-icons">emoji_events</span> Liga Norte</a></li>
-          }
-          <li><a routerLink="/admin/avatares" routerLinkActive="active-route"><span
-                class="material-icons">auto_awesome</span> Avatares IA</a></li>
-          <li><a routerLink="/admin/onboarding-monitor" routerLinkActive="active-route"><span
-                class="material-icons">checklist_rtl</span> Monitor Onboarding</a></li>
-        </ul>
-      </li>
-      }
-
-      <!-- Explorar Dropdown for Logged In Users -->
-      @if (authService.isMember()) {
-      <li class="nav-dropdown">
-        <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">explore</span> Explorar <span
-            class="material-icons arrow">expand_more</span></a>
-        <ul class="dropdown-menu-list">
-          <li *hasFeature="'salud-canina'"><a routerLink="/explorar/salud-deportiva" routerLinkActive="active-route"><span
-                class="material-icons">favorite</span> Salud Deportiva</a></li>
-          @if (ligaNorteEnabled()) {
-          <li><a routerLink="/explorar/liga-norte" routerLinkActive="active-route"><span
-                class="material-icons">emoji_events</span> Liga Norte</a></li>
-          }
-          <li *hasFeature="'modulo-canina'"><a routerLink="/bitacora-rsce" routerLinkActive="active-route"><span
-                class="material-icons">analytics</span> Canina (RSCE)</a></li>
-          <li *hasFeature="'modulo-caza'"><a routerLink="/bitacora-rfec" routerLinkActive="active-route"><span class="material-icons">pets</span>
-              Caza (RFEC)</a></li>
-          <li><a routerLink="/tablon-anuncios" routerLinkActive="active-route"><span
-                class="material-icons">campaign</span> Tablón de Anuncios</a></li>
-          <li><a routerLink="/recursos" routerLinkActive="active-route"><span
-                class="material-icons">folder_shared</span> Recursos</a></li>
-        </ul>
-      </li>
+      <!-- Secciones por rol (Miembros, Staff, Gestor, Administrar, Explorar)
+           generadas desde NAV_SECTIONS (NavMenuService) — fuente única. -->
+      @for (section of navMenu.sections(); track section.id) {
+        @if (section.id !== 'publico') {
+        <li class="nav-dropdown">
+          <a class="dropdown-toggle" style="cursor: pointer;"><span class="material-icons">{{ section.icon }}</span>
+            {{ section.title }} <span class="material-icons arrow">expand_more</span></a>
+          <ul class="dropdown-menu-list">
+            @for (item of section.items; track item.label) {
+              @if (item.header) {
+              <li class="dropdown-section-label">{{ item.label }}</li>
+              } @else {
+              <li><a [routerLink]="item.route" routerLinkActive="active-route"
+                    [routerLinkActiveOptions]="{ exact: !!item.exact }" (click)="closeMenu()"><span
+                    class="material-icons">{{ item.icon }}</span> {{ item.label }}</a></li>
+              }
+            }
+          </ul>
+        </li>
+        }
       }
     </ul>
   </nav>
