@@ -27,7 +27,7 @@ Concepto de la aplicación, mapa de características y funcionalidades.
 ### 💼 02. Negocio
 Modelos de monetización, suscripciones SaaS y estrategias comerciales.
 *   **[[planes-suscripcion-saas]]**: Modelos de precios y características incluidas (Planes Básico, Pro y Élite).
-*   **[[marketing-aislamiento]]**: Nota de valor sobre despliegue aislado y seguridad multi-tenant.
+*   **[[marketing]]**: Estrategia de marketing de referidos, programa de invitaciones y desafíos de activación.
 *   **[[normativa-rfec]]**: Reglas, clases, grados autonómicos y criterios de ascenso de la Real Federación Española de Caza (RFEC).
 
 ### 🏗️ 03. Arquitectura y Sistemas
