@@ -81,25 +81,26 @@ sección **Funcionalidades del club**):
 
 ---
 
-## ❓ Decisión abierta: limpieza de los datos de prueba
+## 🧹 Limpieza de los datos de prueba (borrado en bloque)
 
-¿Conviene un botón de **"Eliminar datos de ejemplo" de golpe**, o que el gestor los
-vaya borrando uno a uno?
+Implementado un **borrado en bloque seguro**: la semilla registra los **IDs exactos**
+de lo que crea en `settings['_demo_seed']`, y el borrado elimina justo esos
+registros (los hijos —reservas, cargas, mangas, puntos— por `dog_id`), sin tocar
+datos reales.
 
-**Recomendación:** ofrecer un **borrado en bloque** (un botón en *Funcionalidades* o
-*Configurar club*: "Eliminar todos los datos de ejemplo"), por:
-- Todos los registros están **marcados `(ejemplo)`** → identificarlos es trivial.
-- Borrar a mano 5 socios + 6 perros + reservas + mangas + temporada es **tedioso y
-  propenso a dejar restos** (p.ej. la temporada de ranking, que no es obvia).
-- Da **control y limpieza inmediata** cuando el club arranca de verdad.
+- **Backend**: `ClubProvisioningService::clearDemoData()` (idempotente; si no hay
+  marcador, no hace nada). Endpoint `POST /admin/clubs/{club}/clear-demo` (gestor
+  sobre su propio club). También limpia la licencia RFEC de ejemplo del gestor (solo
+  si no la ha cambiado) y quita el marcador `_demo_seed`.
+- **Frontend**: en **Funcionalidades del club** aparece un banner *"Datos de ejemplo
+  activos"* con el botón **"Eliminar datos de ejemplo"** (con diálogo de
+  confirmación), visible solo mientras quede `_demo_seed`.
 
-Matices:
-- Mantener también el borrado individual (por si quieren conservar parte, p.ej. el
-  horario de clases como plantilla).
-- Confirmación clara e **idempotente** (que no borre datos reales: filtrar por la
-  marca de ejemplo / por los IDs sembrados, nunca "borrar todo lo del club").
-- Opcional: ofrecerlo proactivamente cuando se detecte que el club ya tiene datos
-  reales (p.ej. un socio real registrado) — "Parece que ya tienes datos propios,
-  ¿quieres limpiar los de ejemplo?".
+Se conserva el **borrado individual** de cada registro por si el gestor quiere quedarse
+con parte (p.ej. el horario de clases como plantilla).
 
-> Estado: **pendiente de implementar** el borrado en bloque.
+Posible mejora futura: ofrecer el borrado **proactivamente** al detectar el primer
+dato real (p.ej. un socio real registrado) — "Parece que ya tienes datos propios,
+¿quieres limpiar los de ejemplo?".
+
+> Estado: **implementado**.
