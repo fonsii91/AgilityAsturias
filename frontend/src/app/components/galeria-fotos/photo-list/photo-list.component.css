@@ -536,6 +536,32 @@
     }
 }
 
+/* Móvil/tablet en horizontal: el ancho supera el breakpoint portrait y caería
+   en los estilos de escritorio (modal flotante con márgenes). Lo forzamos a
+   pantalla completa, manteniendo la disposición imagen + datos en fila. */
+@media (pointer: coarse) and (orientation: landscape) {
+    .lightbox-backdrop {
+        padding: 0;
+    }
+
+    .lightbox-content {
+        width: 100%;
+        max-width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
+        border-radius: 0;
+    }
+
+    .lightbox-image-wrapper img {
+        max-height: 100%;
+    }
+
+    .lightbox-sidebar {
+        max-height: 100dvh;
+    }
+}
+
 /* Protecciones del gesto en cualquier dispositivo táctil, también en landscape
    (donde el ancho supera el breakpoint móvil pero sigue siendo un móvil). */
 @media (pointer: coarse) {
