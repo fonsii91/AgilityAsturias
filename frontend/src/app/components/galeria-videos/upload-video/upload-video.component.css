@@ -260,11 +260,41 @@
     transition: width 0.3s ease;
 }
 
+/* Hint de campos pendientes antes de subir */
+.submit-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0.85rem 1rem;
+    background: rgba(0, 115, 207, 0.06);
+    border: 1px solid rgba(0, 115, 207, 0.2);
+    border-radius: 10px;
+    color: var(--primary-blue);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.submit-hint .material-icons {
+    font-size: 20px;
+    flex-shrink: 0;
+}
+
+/* Botón en estado "faltan datos": pulsable, pero atenuado para indicar que aún no está listo */
+.form-actions .btn-primary.is-incomplete {
+    opacity: 0.55;
+}
+
 /* Form Actions */
 .form-actions {
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
+}
+
+/* Si va precedido del hint, reduce el doble margen superior */
+.submit-hint + .form-actions {
+    margin-top: 0.75rem;
 }
 
 .form-actions .btn-primary {

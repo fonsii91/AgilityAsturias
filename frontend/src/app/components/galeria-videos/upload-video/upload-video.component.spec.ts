@@ -89,10 +89,20 @@ describe('UploadVideoComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should show error if form is invalid on submit', async () => {
+    it('should warn that a video must be selected when none is chosen', async () => {
         component.uploadForm.controls['dog_id'].setValue('');
+        component.selectedFile = null;
         await component.onSubmit();
-        expect(toastServiceMock.error).toHaveBeenCalledWith('Por favor completa todos los campos requeridos y selecciona un vídeo.');
+        expect(toastServiceMock.error).toHaveBeenCalledWith('Selecciona o arrastra un vídeo para continuar.');
+    });
+
+    it('should warn that the dog is missing when a video is selected but no dog', async () => {
+        component.selectedFile = new File(['content'], 'test.mp4', { type: 'video/mp4' });
+        component.uploadForm.controls['dog_id'].setValue('');
+        component.uploadForm.controls['date'].setValue('2023-01-01');
+        await component.onSubmit();
+        expect(toastServiceMock.error).toHaveBeenCalledWith('Falta seleccionar el perro.');
+        expect(uploadServiceMock.addToQueue).not.toHaveBeenCalled();
     });
 
     it('should upload video if form is valid and file is selected', async () => {

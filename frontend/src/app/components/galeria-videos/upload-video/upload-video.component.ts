@@ -341,9 +341,31 @@ export class UploadVideoComponent implements OnInit {
         return new File([compressedBlob], `compressed_${file.name.replace(/\.[^/.]+$/, "")}.mp4`, { type: 'video/mp4' });
     }
 
+    /** Devuelve un texto explicando qué falta para poder subir, o null si todo está listo. */
+    get missingHint(): string | null {
+        if (!this.selectedFile) return 'Selecciona o arrastra un vídeo para continuar.';
+        if (this.uploadForm.get('dog_id')?.invalid) return 'Falta seleccionar el perro.';
+        if (this.uploadForm.get('date')?.invalid) return 'Falta indicar la fecha de grabación.';
+        return null;
+    }
+
+    /** Marca los campos en rojo y hace scroll al primero que falte. */
+    private revealMissingFields() {
+        this.uploadForm.markAllAsTouched();
+        this.cdr.detectChanges();
+        const firstInvalid = document.querySelector('.is-invalid, .drag-drop-zone');
+        if (this.selectedFile) {
+            // Si ya hay vídeo, el problema está en un campo del formulario.
+            document.querySelector('.is-invalid')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            firstInvalid?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
     async onSubmit() {
         if (this.uploadForm.invalid || !this.selectedFile) {
-            this.toastService.error('Por favor completa todos los campos requeridos y selecciona un vídeo.');
+            this.toastService.error(this.missingHint || 'Por favor completa todos los campos requeridos y selecciona un vídeo.');
+            this.revealMissingFields();
             return;
         }
 

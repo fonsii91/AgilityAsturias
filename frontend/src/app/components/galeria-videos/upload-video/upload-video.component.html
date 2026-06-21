@@ -164,12 +164,18 @@
     }
 
     @if (!isUploading && !isCompressing) {
+    @if (missingHint) {
+    <div class="submit-hint">
+      <span class="material-icons">info</span>
+      <span>{{ missingHint }}</span>
+    </div>
+    }
     <div class="form-actions">
       <button type="button" class="btn-cancel" (click)="cancel()">
         <span class="material-icons">arrow_back</span>
         Cancelar
       </button>
-      <button type="submit" [disabled]="uploadForm.invalid || !selectedFile" class="btn-primary">
+      <button type="submit" class="btn-primary" [class.is-incomplete]="missingHint">
         Subir Vídeo <span class="material-icons">send</span>
       </button>
     </div>

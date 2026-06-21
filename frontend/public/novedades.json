@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.57",
+    "date": "2026-06-21",
+    "bugfixes": [
+      "¡Subir vídeos, por fin sin atascos! Varios de vosotros nos contabais que, al elegir un vídeo, el botón de subir se quedaba apagado y no había manera de continuar. El motivo era que faltaba un dato obligatorio (normalmente, elegir el perro), pero la pantalla no lo dejaba claro. Ahora el botón siempre se puede pulsar y, si falta algo, te lo decimos con un mensaje bien visible (por ejemplo, 'Falta seleccionar el perro') y te llevamos directamente al campo que tienes que rellenar."
+    ]
+  },
+  {
     "version": "1.1.56",
     "date": "2026-06-14",
     "features": [
