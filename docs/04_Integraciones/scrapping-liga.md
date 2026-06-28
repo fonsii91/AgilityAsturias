@@ -1,5 +1,5 @@
 ---
-name: scrapping_liga
+name: scrapping-liga
 description: Documentación sobre el sistema de scraping de la clasificación de la Liga Norte desde Telegram con Gemini Vision AI y vinculación difusa de binomios
 ---
 

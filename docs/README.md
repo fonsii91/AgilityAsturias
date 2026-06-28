@@ -39,6 +39,7 @@ Bases técnicas, seguridad, infraestructura y ciclo de vida de los datos.
 Conexiones externas y analítica.
 *   **[[suscripciones-stripe]]**: Gestión del ciclo de vida y facturación de clubes mediante Stripe y Laravel Cashier.
 *   **[[integracion-flowagility]]**: Web scraping con Playwright para Phoenix LiveView e importación de competiciones y marcas.
+*   **[[scrapping-liga]]**: Scraping de las clasificaciones de la Liga Norte desde Telegram con Gemini Vision AI y mapeo difuso (fuzzy matching) de binomios.
 *   **[[estrategia-analytics]]**: Plan de implantación de Google Analytics 4 (GA4) y cumplimiento estricto del GDPR (Consent Mode v2).
 *   **[[gestion-videos]]**: Nueva especificación y flujo para la gestión de vídeos en la plataforma.
 *   **[[antigua-gestion-videos]]**: Legacy de gestión de vídeos (subida local temporal y CRON diario a la API de YouTube).

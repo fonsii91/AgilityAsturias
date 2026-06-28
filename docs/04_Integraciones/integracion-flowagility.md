@@ -1,5 +1,5 @@
 ---
-name: conexion_flowagility
+name: integracion-flowagility
 description: Documentación sobre la web de flowagility.com para realizar web scrapping
 ---
 
@@ -11,11 +11,14 @@ Este documento detalla el plan y análisis técnico para realizar la extracción
 
 ## 🔑 Credenciales de Acceso
 
-Para realizar la autenticación y poder acceder a los datos de la zona privada de eventos en la plataforma, utilizaremos las siguientes credenciales:
+Para realizar la autenticación y poder acceder a los datos de la zona privada de eventos en la plataforma, se utilizan credenciales de FlowAgility.
 
 > [!IMPORTANT]
-> **Usuario:** `torrija999@gmail.com`  
-> **Contraseña:** `torrijaia`
+> **Las credenciales NO se almacenan en esta documentación.** Se configuran como variables de entorno en el backend (`.env`):
+> ```env
+> FLOWAGILITY_EMAIL=tu_email
+> FLOWAGILITY_PASSWORD=tu_password
+> ```
 
 ---
 
@@ -77,7 +80,7 @@ sequenceDiagram
     App->>DB: Consultar competiciones activas y clubs registrados
     DB-->>App: Listado de URLs y nombres de clubs
     App->>Scrap: Invocar Scraper con URLs y lista de clubs (JSON)
-    Scrap->>FA: Navegar a login y autenticar (torrija999@gmail.com)
+    Scrap->>FA: Navegar a login y autenticar (credenciales de .env)
     FA-->>Scrap: Sesión activa (Cookies/Tokens)
     
     loop Para cada competición
@@ -103,24 +106,24 @@ sequenceDiagram
 Analizando la estructura de la base de datos de **AgilityAsturias**, realizaremos las siguientes interacciones:
 
 1. **Competiciones de Origen:**
-   - Buscaremos en la tabla `competitions` (representada por el modelo [Competition](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/Competition.php)) aquellos registros cuyo campo `enlace` (Enlace de Inscripción) pertenezca a FlowAgility.
+   - Buscaremos en la tabla `competitions` (representada por el modelo [Competition](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/Competition.php)) aquellos registros cuyo campo `enlace` (Enlace de Inscripción) pertenezca a FlowAgility.
    - Ejemplo de conversión de enlace:
      - URL Inscripción: `https://www.flowagility.com/zone/events/info/b6a5b896-93bb-4b12-9344-cfb41c52fe65`
      - URL Scraping: `https://www.flowagility.com/zone/event/b6a5b896-93bb-4b12-9344-cfb41c52fe65/group_runs`
      - *Regla de conversión:* Reemplazar `events/info` por `event` y añadir `/group_runs` al final.
 
 2. **Whitelist de Clubs:**
-   - Para no expandir ni procesar innecesariamente a todos los competidores de la prueba, consultaremos los clubs registrados en nuestra aplicación desde el modelo [Club](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/Club.php) (ej. `Agility Asturias`, etc.). La whitelist respeta el aislamiento por tenant definido en [[arquitectura-multi-tenant]].
+   - Para no expandir ni procesar innecesariamente a todos los competidores de la prueba, consultaremos los clubs registrados en nuestra aplicación desde el modelo [Club](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/Club.php) (ej. `Agility Asturias`, etc.). La whitelist respeta el aislamiento por tenant definido en [[arquitectura-multi-tenant]].
    - Solo si el nombre o el slug del club del competidor coincide con nuestra lista, procederemos a desplegar sus detalles.
 
 3. **Asociación del Binomio (Guía y Perro):**
-   - Buscaremos el perro en la tabla `dogs` (modelo [Dog](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/Dog.php)) mediante su nombre (campo `name`) y validando el nombre del guía/dueño (tabla `users` mediante la relación de pertenencia de [Dog](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/Dog.php) con [User](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/User.php) a través de la tabla `dog_user`).
+   - Buscaremos el perro en la tabla `dogs` (modelo [Dog](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/Dog.php)) mediante su nombre (campo `name`) y validando el nombre del guía/dueño (tabla `users` mediante la relación de pertenencia de [Dog](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/Dog.php) con [User](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/User.php) a través de la tabla `dog_user`).
 
 4. **Persistencia de Resultados y Tracks:**
    - Registraremos la asistencia general y clasificación final en la tabla pivote `competition_dog` (guardando el `position` final).
    - Dependiendo del tipo de federación de la competición (`competitions.federacion` que es un enum `['RSCE', 'RFEC', 'Otro']`), guardaremos los resultados de las mangas:
-     - Si es **RSCE**: Insertaremos en la tabla `rsce_tracks` (modelo [RsceTrack](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/RsceTrack.php)).
-     - Si es **RFEC**: Insertaremos en la tabla `rfec_tracks` (modelo [RfecTrack](file:///c:/Users/Fonsi/Desktop/AgilityAsturias/agility_back/app/Models/RfecTrack.php)).
+     - Si es **RSCE**: Insertaremos en la tabla `rsce_tracks` (modelo [RsceTrack](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/RsceTrack.php)).
+     - Si es **RFEC**: Insertaremos en la tabla `rfec_tracks` (modelo [RfecTrack](file:///c:/Users/Usuario/Desktop/AgilityAsturiass/agility_back/app/Models/RfecTrack.php)).
 
 ---
 
@@ -250,8 +253,9 @@ const fs = require('fs');
 
     console.log("Iniciando sesión en FlowAgility...");
     await page.goto('https://www.flowagility.com/zone/login'); 
-    await page.fill('input#user_email', 'torrija999@gmail.com');
-    await page.fill('input#user_password', 'torrijaia');
+    // Credenciales inyectadas vía variables de entorno (process.env), nunca hardcodeadas
+    await page.fill('input#user_email', process.env.FLOWAGILITY_EMAIL);
+    await page.fill('input#user_password', process.env.FLOWAGILITY_PASSWORD);
     await page.click('button#signin');
     await page.waitForNavigation();
     
