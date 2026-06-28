@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.58",
+    "date": "2026-06-28",
+    "bugfixes": [
+      "¡Iniciar sesión, sin botón bloqueado! Algunos de vosotros nos contabais que, al entrar desde el móvil, escribíais (o dejabais que el navegador rellenara) vuestro correo y contraseña, pero el botón 'Iniciar Sesión' se quedaba apagado y no había forma de entrar. Ya está resuelto: el botón siempre se puede pulsar y la app reconoce correctamente los datos que rellena el navegador o el gestor de contraseñas. Además, si faltara algún dato, te lo indicamos con un mensaje claro en lugar de dejar el botón apagado sin explicación."
+    ]
+  },
+  {
     "version": "1.1.57",
     "date": "2026-06-21",
     "bugfixes": [
