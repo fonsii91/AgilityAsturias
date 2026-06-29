@@ -2,7 +2,9 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterModule } from '@angular/router';
+import { ConfirmDialog, ConfirmDialogData } from '../../components/shared/confirm-dialog/confirm-dialog';
 import { TimeSlotService } from '../../services/time-slot.service';
 import { ToastService } from '../../services/toast.service';
 import { TimeSlot } from '../../models/time-slot.model';
@@ -17,7 +19,7 @@ import { EmptyStateComponent } from '../../components/ui/empty-state/empty-state
 @Component({
   selector: 'app-gestionar-horarios',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, RouterModule, EmptyStateComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, MatDialogModule, RouterModule, EmptyStateComponent],
   templateUrl: './gestionar-horarios.component.html',
   styleUrl: './gestionar-horarios.component.css'
 })
@@ -29,6 +31,7 @@ export class GestionarHorariosComponent {
   tenantService = inject(TenantService);
   clubAdminService = inject(ClubAdminService);
   authService = inject(AuthService);
+  dialog = inject(MatDialog);
 
   timeSlots = this.timeSlotService.getTimeSlots();
 
@@ -174,8 +177,19 @@ export class GestionarHorariosComponent {
     this.closeModal();
   }
 
-  async deleteSlot(id: number) {
-    if (confirm('¿Estás seguro de eliminar este horario? Se perderán las reservas asociadas.')) {
+  deleteSlot(id: number) {
+    const dialogRef = this.dialog.open(ConfirmDialog, {
+      data: {
+        title: 'Eliminar horario',
+        message: '¿Estás seguro de eliminar este horario? Se perderán las reservas asociadas.',
+        confirmText: 'Eliminar',
+        cancelText: 'Cancelar',
+        isDestructive: true
+      } as ConfirmDialogData
+    });
+
+    dialogRef.afterClosed().subscribe(async (confirmed) => {
+      if (!confirmed) return;
       try {
         await this.timeSlotService.deleteTimeSlot(id);
         this.timeSlotService.fetchTimeSlots(); // Refresh
@@ -184,7 +198,7 @@ export class GestionarHorariosComponent {
         console.error(error);
         this.toastService.error('Error al eliminar.');
       }
-    }
+    });
   }
 
   async saveSlot() {

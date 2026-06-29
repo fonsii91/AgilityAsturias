@@ -1,5 +1,12 @@
 [
   {
+    "version": "1.1.59",
+    "date": "2026-06-29",
+    "bugfixes": [
+      "¡Borrar horarios, por fin sin bloqueos! Algunos responsables nos contabais que, al intentar eliminar una clase desde 'Gestión de Horarios', el aviso de confirmación no llegaba a aparecer y la clase no se borraba. Ya está solucionado: ahora aparece una ventana de confirmación integrada y cuidada (en lugar del aviso del navegador, que en algunos móviles no se mostraba), para que puedas eliminar horarios con normalidad y sin borrados accidentales."
+    ]
+  },
+  {
     "version": "1.1.58",
     "date": "2026-06-28",
     "bugfixes": [

@@ -9,11 +9,14 @@ import { ToastService } from '../../services/toast.service';
 import { ActivatedRoute } from '@angular/router';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { MatDialog } from '@angular/material/dialog';
+import { of } from 'rxjs';
 
 describe('GestionarHorariosComponent Logic', () => {
   let component: GestionarHorariosComponent;
   let mockTimeSlotService: any;
   let mockToastService: any;
+  let mockDialog: any;
 
   beforeEach(async () => {
     TestBed.resetTestingModule();
@@ -34,10 +37,15 @@ describe('GestionarHorariosComponent Logic', () => {
       error: vi.fn()
     };
 
+    mockDialog = {
+      open: vi.fn().mockReturnValue({ afterClosed: () => of(true) })
+    };
+
     await TestBed.configureTestingModule({
       providers: [
         { provide: TimeSlotService, useValue: mockTimeSlotService },
         { provide: ToastService, useValue: mockToastService },
+        { provide: MatDialog, useValue: mockDialog },
         { provide: ActivatedRoute, useValue: { snapshot: {} } }
       ]
     }).compileComponents();
@@ -103,22 +111,24 @@ describe('GestionarHorariosComponent Logic', () => {
   });
 
   it('should delete slot when confirmed', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true);
-    
-    await component.deleteSlot(1);
-    
-    expect(confirmSpy).toHaveBeenCalled();
+    mockDialog.open.mockReturnValue({ afterClosed: () => of(true) });
+
+    component.deleteSlot(1);
+    await new Promise((resolve) => setTimeout(resolve)); // flush async subscribe callback
+
+    expect(mockDialog.open).toHaveBeenCalled();
     expect(mockTimeSlotService.deleteTimeSlot).toHaveBeenCalledWith(1);
     expect(mockTimeSlotService.fetchTimeSlots).toHaveBeenCalled();
     expect(mockToastService.success).toHaveBeenCalledWith('Horario eliminado.');
   });
 
   it('should not delete slot when cancelled', async () => {
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false);
-    
-    await component.deleteSlot(1);
-    
-    expect(confirmSpy).toHaveBeenCalled();
+    mockDialog.open.mockReturnValue({ afterClosed: () => of(false) });
+
+    component.deleteSlot(1);
+    await new Promise((resolve) => setTimeout(resolve)); // flush async subscribe callback
+
+    expect(mockDialog.open).toHaveBeenCalled();
     expect(mockTimeSlotService.deleteTimeSlot).not.toHaveBeenCalled();
   });
 
