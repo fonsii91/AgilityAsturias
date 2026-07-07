@@ -9,61 +9,86 @@ function parseFlowAgilityDateRange(dateStr, referenceDate = new Date()) {
   if (!dateStr) return null;
   const currentYear = referenceDate.getFullYear();
   const currentMonth = referenceDate.getMonth() + 1;
-  
-  const cleanStr = dateStr.trim().replace(/\s+/g, ' ');
-  let startMonth, startDay, endMonth, endDay;
-  
-  if (!cleanStr.includes('-')) {
-    const parts = cleanStr.split(' ');
-    if (parts.length < 2) return null;
-    const m = MONTHS[parts[0].toLowerCase()];
-    if (!m) return null;
-    startMonth = m;
-    startDay = parseInt(parts[1], 10);
-    endMonth = startMonth;
-    endDay = startDay;
-  } else {
-    const rangeParts = cleanStr.split('-').map(p => p.trim());
-    const leftParts = rangeParts[0].split(' ');
-    if (leftParts.length < 2) return null;
-    const sm = MONTHS[leftParts[0].toLowerCase()];
-    if (!sm) return null;
-    startMonth = sm;
-    startDay = parseInt(leftParts[1], 10);
-    
-    const rightParts = rangeParts[1].split(' ');
-    if (rightParts.length === 1) {
-      endMonth = startMonth;
-      endDay = parseInt(rightParts[0], 10);
-    } else if (rightParts.length === 2) {
-      const em = MONTHS[rightParts[0].toLowerCase()];
-      if (!em) return null;
-      endMonth = em;
-      endDay = parseInt(rightParts[1], 10);
-    } else {
-      return null;
+
+  const cleanStr = dateStr.trim().replace(/[–—]/g, '-').replace(/\s+/g, ' ');
+
+  // Parses one side of the range: "Sep 19", "Jul 31, 2026", "14" or "Aug 2, 2027".
+  // FlowAgility omits the year when the range stays within one year, but renders
+  // full dates ("Jul 31, 2026 - Aug 2, 2027") when start and end years differ.
+  const parseSide = (str) => {
+    const tokens = str.replace(/,/g, ' ').trim().split(/\s+/);
+    const side = { month: null, day: null, year: null };
+    for (const token of tokens) {
+      if (/^\d{4}$/.test(token)) side.year = parseInt(token, 10);
+      else if (/^\d{1,2}$/.test(token)) side.day = parseInt(token, 10);
+      else if (MONTHS[token.toLowerCase()]) side.month = MONTHS[token.toLowerCase()];
     }
+    return side;
+  };
+
+  let start, end;
+  if (!cleanStr.includes('-')) {
+    start = parseSide(cleanStr);
+    end = { ...start };
+  } else {
+    const rangeParts = cleanStr.split('-');
+    start = parseSide(rangeParts[0]);
+    end = parseSide(rangeParts.slice(1).join(' '));
+    if (end.month === null) end.month = start.month;
   }
-  
-  if (!startMonth || isNaN(startDay) || !endMonth || isNaN(endDay)) {
+
+  if (!start.month || !start.day || isNaN(start.day) || !end.month || !end.day || isNaN(end.day)) {
     return null;
   }
-  
-  let startYear = currentYear;
-  if (startMonth < currentMonth) {
-    startYear = currentYear + 1;
+
+  // Years: use the explicit ones when present, otherwise infer (listed events are upcoming)
+  if (start.year === null) {
+    start.year = start.month < currentMonth ? currentYear + 1 : currentYear;
   }
-  
-  let endYear = startYear;
-  if (endMonth < startMonth) {
-    endYear = startYear + 1;
+  if (end.year === null) {
+    end.year = end.month < start.month ? start.year + 1 : start.year;
   }
-  
+
+  // Sanity clamp: agility events span days, not months. An end date more than ~2 months
+  // after the start (or before it) is an organizer typo (e.g. end year set to 2027 on a
+  // 2026 event); retry with the start year before giving up.
+  const DAY_MS = 24 * 3600 * 1000;
+  const toUTC = (s, year) => Date.UTC(year, s.month - 1, s.day);
+  const span = toUTC(end, end.year) - toUTC(start, start.year);
+  if (span < 0 || span > 62 * DAY_MS) {
+    const sameYearSpan = toUTC(end, start.year) - toUTC(start, start.year);
+    if (sameYearSpan >= 0 && sameYearSpan <= 62 * DAY_MS) {
+      end.year = start.year;
+    } else if (span < 0) {
+      end = { ...start };
+    }
+  }
+
   const pad = (n) => n.toString().padStart(2, '0');
   return {
-    start: `${startYear}-${pad(startMonth)}-${pad(startDay)}`,
-    end: `${endYear}-${pad(endMonth)}-${pad(endDay)}`
+    start: `${start.year}-${pad(start.month)}-${pad(start.day)}`,
+    end: `${end.year}-${pad(end.month)}-${pad(end.day)}`
   };
+}
+
+// Same sanity clamp for the structured "Start Date"/"End Date" fields of the event
+// page, which carry organizer typos verbatim (e.g. "Aug 2, 2027" on a 2026 event).
+function clampEventEndDate(startStr, endStr) {
+  if (!startStr || !endStr) return endStr;
+  const start = new Date(startStr + 'T00:00:00Z');
+  const end = new Date(endStr + 'T00:00:00Z');
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return endStr;
+  const DAY_MS = 24 * 3600 * 1000;
+  const span = end.getTime() - start.getTime();
+  if (span >= 0 && span <= 62 * DAY_MS) return endStr;
+  const sameYear = new Date(end.getTime());
+  sameYear.setUTCFullYear(start.getUTCFullYear());
+  const sameYearSpan = sameYear.getTime() - start.getTime();
+  if (sameYearSpan >= 0 && sameYearSpan <= 62 * DAY_MS) {
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${sameYear.getUTCFullYear()}-${pad(sameYear.getUTCMonth() + 1)}-${pad(sameYear.getUTCDate())}`;
+  }
+  return span < 0 ? startStr : endStr;
 }
 
 // Convert "Jul 17, 2026, 14:00" to "2026-07-17" or similar
@@ -311,6 +336,8 @@ function extractJudgesFromText(bodyText) {
         fecha_fin_evento = parsedRange.end;
       }
     }
+
+    fecha_fin_evento = clampEventEndDate(fecha_evento, fecha_fin_evento);
     
     // Construct location string
     let lugar = rawData.city || '';

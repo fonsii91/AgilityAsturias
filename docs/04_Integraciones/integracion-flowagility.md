@@ -546,7 +546,11 @@ class ScrapeFlowAgility extends Command
    FlowAgility podría implementar medidas anti-bot (Cloudflare, recaptcha).
    - *Solución:* Playwright permite configurar agentes de usuario realistas (`User-Agent`), deshabilitar flags de automatización (usando `stealth` plugins) e introducir retardos aleatorios entre interacciones para imitar el comportamiento humano.
 
-3. **Mapeo de Nombres (Guías y Perros):**
+3. **Formatos de Fecha del Calendario:**
+   Las tarjetas del listado `/zone/events` muestran normalmente las fechas sin año (`Jul 31 - Aug 2`), pero **cuando el rango cruza de año, FlowAgility renderiza las fechas completas** (`Jul 31, 2026 - Aug 2, 2027`). Esto ocurre también cuando el organizador comete una errata en el año de fin (caso real: "La de El Norte", julio 2026, con fecha fin 2027).
+   - *Solución (implementada 2026-07-07):* `parseFlowAgilityDateRange` (en `flowagility_calendar_scraper.cjs` y `flowagility_single_event_scraper.cjs`) acepta años explícitos y guiones tipográficos (– —), y aplica un *clamp* de cordura: si la fecha fin queda a más de ~2 meses del inicio (o antes de él), se reintenta con el año de la fecha de inicio. Antes de este arreglo, esos eventos devolvían `fecha_evento = null` y `flowagility:scrape-calendar` los descartaba silenciosamente, por lo que nunca aparecían en el autocompletado de "Nuevo Evento".
+
+4. **Mapeo de Nombres (Guías y Perros):**
    Las erratas o diferencias tipográficas en los nombres (p. ej. `María Gómez` en nuestra app y `Maria Gomez` en FlowAgility, o un perro registrado como `Thor` y en FlowAgility como `Thor de AgilityAsturias`) pueden impedir la correcta asociación.
    - *Solución:* Implementar comparación con tolerancia (insensible a mayúsculas/minúsculas y acentos) o utilizar funciones de similitud de cadenas (como la distancia Levenshtein) para sugerir emparejamientos en un panel de administración en caso de dudas.
 
