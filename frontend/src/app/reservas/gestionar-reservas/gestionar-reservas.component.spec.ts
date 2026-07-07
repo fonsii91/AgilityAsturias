@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
+import { provideRouter } from '@angular/router';
 import { GestionarReservasComponent } from './gestionar-reservas.component';
 import { AuthService } from '../../services/auth.service';
 import { ReservationService } from '../../services/reservation.service';
@@ -60,6 +61,8 @@ describe('GestionarReservasComponent (Exceptions)', () => {
 
         TestBed.configureTestingModule({
             providers: [
+                // El componente lee ?tab= de la URL (pestaña Clases / Entrenamiento Libre)
+                provideRouter([]),
                 { provide: AuthService, useValue: mockAuthService },
                 { provide: ReservationService, useValue: mockReservationService },
                 { provide: DogService, useValue: mockDogService },
@@ -145,6 +148,8 @@ describe('GestionarReservasComponent (Módulo Reserva de Pistas)', () => {
         const emptySignal = signal<any[]>([]);
         TestBed.configureTestingModule({
             providers: [
+                // El componente lee ?tab= de la URL (pestaña Clases / Entrenamiento Libre)
+                provideRouter([]),
                 { provide: AuthService, useValue: { currentUserSignal: signal({ id: 1, role: 'member' }), getMinimalUsers: vi.fn().mockResolvedValue([]) } },
                 { provide: ReservationService, useValue: { getReservations: () => emptySignal, getAvailability: () => emptySignal, getExceptions: () => emptySignal } },
                 { provide: DogService, useValue: { getDogs: () => emptySignal, getAllDogs: () => emptySignal, loadUserDogs: vi.fn(), loadAllDogs: vi.fn() } },

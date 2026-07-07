@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmDialog, ConfirmDialogData } from '../../components/shared/confirm-dialog/confirm-dialog';
-import { TrackReservationService, TrackAvailability, TrackSlotAvailability } from '../../services/track-reservation.service';
+import { TrackReservationService, TrackAvailability, TrackSlotAvailability, MyTrackReservation } from '../../services/track-reservation.service';
 import { ToastService } from '../../services/toast.service';
 import { surfaceLabel } from '../../models/training-track.model';
 
@@ -35,8 +35,11 @@ export class ReservaPistasComponent implements OnInit {
   days: DayOption[] = [];
   selectedDate = signal<string>('');
   tracks = signal<TrackAvailability[]>([]);
+  myReservations = signal<MyTrackReservation[]>([]);
   isLoading = signal(false);
   isSubmitting = signal(false);
+  /** Hoy las horas ya pasadas se ocultan por defecto para acortar la parrilla. */
+  showPastHours = signal(false);
 
   private static readonly DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -44,6 +47,7 @@ export class ReservaPistasComponent implements OnInit {
     this.days = this.buildNextDays(7);
     this.selectedDate.set(this.days[0].date);
     this.loadAvailability();
+    this.loadMyReservations();
   }
 
   private buildNextDays(count: number): DayOption[] {
@@ -66,7 +70,27 @@ export class ReservaPistasComponent implements OnInit {
   selectDate(date: string) {
     if (this.selectedDate() === date) return;
     this.selectedDate.set(date);
+    this.showPastHours.set(false);
     this.loadAvailability();
+  }
+
+  /** Franjas a pintar: hoy se recortan las pasadas salvo que el socio las despliegue. */
+  visibleSlots(track: TrackAvailability): TrackSlotAvailability[] {
+    if (this.showPastHours()) return track.slots;
+    return track.slots.filter(s => !this.isPast(s));
+  }
+
+  /** Nº de franjas pasadas ocultas (las horas son las mismas en todas las pistas). */
+  hiddenPastCount(): number {
+    const first = this.tracks()[0];
+    if (!first || this.showPastHours()) return 0;
+    return first.slots.filter(s => this.isPast(s)).length;
+  }
+
+  /** Primera franja libre y aún reservable de la pista: atajo para no escanear la parrilla. */
+  firstFreeTime(track: TrackAvailability): string | null {
+    const slot = track.slots.find(s => s.status === 'free' && !this.isPast(s));
+    return slot ? slot.start_time : null;
   }
 
   async loadAvailability() {
@@ -80,6 +104,34 @@ export class ReservaPistasComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  /**
+   * Próximas reservas del socio: resumen fijo sobre el selector de días para
+   * que no tenga que navegar día a día buscando cuándo tenía pista.
+   */
+  async loadMyReservations() {
+    try {
+      this.myReservations.set(await this.trackReservationService.getMyReservations());
+    } catch (error) {
+      // No bloquea la pantalla: la parrilla de disponibilidad sigue funcionando.
+      console.error(error);
+    }
+  }
+
+  /** "2026-07-09" → "Jueves 09/07" (o "Hoy 07/07" si es el día actual). */
+  reservationDateLabel(dateStr: string): string {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const d = new Date(year, month - 1, day);
+    const today = new Date();
+    const isToday = d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
+    const name = isToday ? 'Hoy' : ReservaPistasComponent.DAY_NAMES[d.getDay()];
+    return `${name} ${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}`;
+  }
+
+  /** Recorta "18:00:00" a "18:00" (el backend devuelve segundos). */
+  shortTime(time: string): string {
+    return time.slice(0, 5);
   }
 
   /** Una franja de hoy cuya hora de inicio ya pasó no es reservable. */
@@ -135,17 +187,33 @@ export class ReservaPistasComponent implements OnInit {
       } finally {
         this.isSubmitting.set(false);
         this.loadAvailability();
+        this.loadMyReservations();
       }
     });
   }
 
   private cancelReservation(track: TrackAvailability, slot: TrackSlotAvailability) {
     if (!slot.reservation_id) return;
+    this.confirmAndCancel(
+      slot.reservation_id,
+      `¿Quieres cancelar tu reserva de la pista "${track.name}" el ${this.formattedDate()} de ${slot.start_time} a ${slot.end_time}?`
+    );
+  }
 
+  /** Cancelación desde el resumen "Tus próximas reservas". */
+  cancelFromList(res: MyTrackReservation) {
+    const trackName = res.training_track?.name ?? 'la pista';
+    this.confirmAndCancel(
+      res.id,
+      `¿Quieres cancelar tu reserva de "${trackName}" el ${this.reservationDateLabel(res.date)} de ${this.shortTime(res.start_time)} a ${this.shortTime(res.end_time)}?`
+    );
+  }
+
+  private confirmAndCancel(reservationId: number, message: string) {
     const dialogRef = this.dialog.open(ConfirmDialog, {
       data: {
         title: 'Cancelar reserva de pista',
-        message: `¿Quieres cancelar tu reserva de la pista "${track.name}" el ${this.formattedDate()} de ${slot.start_time} a ${slot.end_time}?`,
+        message,
         confirmText: 'Cancelar reserva',
         cancelText: 'Volver',
         isDestructive: true
@@ -156,7 +224,7 @@ export class ReservaPistasComponent implements OnInit {
       if (!confirmed) return;
       this.isSubmitting.set(true);
       try {
-        await this.trackReservationService.cancel(slot.reservation_id!);
+        await this.trackReservationService.cancel(reservationId);
         this.toastService.success('Reserva de pista cancelada.');
       } catch (error) {
         console.error(error);
@@ -164,6 +232,7 @@ export class ReservaPistasComponent implements OnInit {
       } finally {
         this.isSubmitting.set(false);
         this.loadAvailability();
+        this.loadMyReservations();
       }
     });
   }

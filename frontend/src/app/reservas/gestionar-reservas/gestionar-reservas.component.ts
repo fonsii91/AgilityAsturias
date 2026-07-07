@@ -11,7 +11,7 @@ import { TimeSlot } from '../../models/time-slot.model';
 
 import { ToastService } from '../../services/toast.service';
 
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AthleticProfileCardComponent } from '../../components/ui/athletic-profile-card/athletic-profile-card.component';
 import { FichaPerroComponent } from '../../components/ficha-perro/ficha-perro.component';
 import { InstruccionesComponent } from '../../components/shared/instrucciones/instrucciones.component';
@@ -40,6 +40,8 @@ export class GestionarReservasComponent {
     onboardingService = inject(OnboardingService);
     analyticsService = inject(AnalyticsService);
     tenantService = inject(TenantService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
 
     cancellationNoticeHours = computed(() => {
         return this.tenantService.tenantInfo()?.settings?.['cancellation_notice_hours'] ?? 24;
@@ -52,6 +54,22 @@ export class GestionarReservasComponent {
     });
 
     activeTab = signal<'clases' | 'pistas'>('clases');
+
+    /**
+     * Cambia de pestaña reflejándolo en la URL (?tab=pistas) para que el enlace
+     * sea compartible, sobreviva al refresco y las notificaciones de pista
+     * puedan enlazar directamente a esta vista.
+     */
+    setTab(tab: 'clases' | 'pistas') {
+        if (this.activeTab() === tab) return;
+        this.activeTab.set(tab);
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { tab: tab === 'pistas' ? 'pistas' : null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+        });
+    }
 
     // Bonos de clases (opt-in del gestor): el socio ve su saldo de clases
     // disponibles; reservar consume una y cancelar la devuelve.
@@ -152,6 +170,12 @@ export class GestionarReservasComponent {
 
     constructor() {
         this.analyticsService.logModuleAccess('reservas');
+
+        // Pestaña inicial desde la URL (?tab=pistas). Suscrito para que el
+        // botón "atrás" del navegador también cambie de pestaña.
+        this.route.queryParamMap.subscribe(params => {
+            this.activeTab.set(params.get('tab') === 'pistas' ? 'pistas' : 'clases');
+        });
         effect(() => {
             const user = this.authService.currentUserSignal();
             if (user) {

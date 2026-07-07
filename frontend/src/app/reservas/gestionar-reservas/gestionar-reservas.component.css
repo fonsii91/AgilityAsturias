@@ -92,17 +92,17 @@ h2 {
     gap: 8px;
     background: transparent;
     border: none;
-    padding: 10px 28px;
+    padding: 12px 32px;
     border-radius: 40px;
     cursor: pointer;
     font-weight: 700;
     color: var(--text-secondary);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    font-size: 0.95rem;
+    font-size: 1rem;
 }
 
 .tab-selector button .material-icons {
-    font-size: 18px;
+    font-size: 20px;
 }
 
 .tab-selector button.active {
@@ -116,35 +116,35 @@ h2 {
     color: var(--primary-color, #0056b3);
 }
 
-/* Week Selector */
+/* Week Selector: filtro secundario — deliberadamente más ligero que el
+   selector de pestañas (Clases / Entrenamiento Libre) para que no compitan
+   visualmente como dos controles del mismo nivel. */
 .week-selector {
     display: flex;
     justify-content: center;
-    background: #fff;
-    padding: 6px;
-    border-radius: 50px;
+    gap: 6px;
+    background: transparent;
+    padding: 0;
     width: fit-content;
     margin: 0 auto 3rem auto;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-    border: 1px solid #f0f0f0;
 }
 
 .week-selector button {
     background: transparent;
-    border: none;
-    padding: 10px 32px;
+    border: 1px solid transparent;
+    padding: 8px 24px;
     border-radius: 40px;
     cursor: pointer;
     font-weight: 600;
-    color: var(--text-secondary);
+    color: #64748b;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
 }
 
 .week-selector button.active {
-    background: var(--primary-color, #0056b3);
-    color: white;
-    box-shadow: 0 4px 12px rgba(0, 115, 207, 0.3);
+    background: color-mix(in srgb, var(--primary-color, #0056b3) 10%, white);
+    border-color: color-mix(in srgb, var(--primary-color, #0056b3) 30%, white);
+    color: var(--primary-color, #0056b3);
 }
 
 .week-selector button:hover:not(.active) {

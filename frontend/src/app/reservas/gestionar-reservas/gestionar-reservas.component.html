@@ -2,9 +2,13 @@
   <div class="header-main">
     <div>
       <h2>Gestionar Reservas</h2>
-      <p class="subtitle">Selecciona una clase para reservar tu plaza de Agility.</p>
+      @if (activeTab() === 'pistas' && trackBookingEnabled()) {
+        <p class="subtitle">Reserva una pista una hora para entrenar por tu cuenta.</p>
+      } @else {
+        <p class="subtitle">Selecciona una clase para reservar tu plaza de Agility.</p>
+      }
     </div>
-    <!-- ADMIN/STAFF ONLY: Edit Schedule & Help Buttons -->
+    <!-- Guía (ambas pestañas) y Editar Horario (solo Clases) -->
     <div style="display: flex; gap: 10px; align-items: center;">
       <app-instrucciones titulo="Guía de Reservas">
         <h4 style="color: #0f172a; margin-top: 0; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Reglas para los Socios</h4>
@@ -26,6 +30,28 @@
             <span><strong>Comunidad:</strong> Al desplegar "Ver asistentes", podrás ver a tus compañeros. Haciendo clic en el nombre de cualquier perro podrás ver su Ficha Pública.</span>
           </li>
         </ul>
+
+        @if (trackBookingEnabled()) {
+          <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Entrenamiento Libre (Reserva de Pistas)</h4>
+          <ul style="padding-left: 0; list-style: none; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 16px;">
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span class="material-icons" style="color: #10b981; flex-shrink: 0; margin-top: 2px;">self_improvement</span>
+              <span><strong>Cómo funciona:</strong> Reserva una pista durante una hora exacta para entrenar por tu cuenta, sin monitor. Puedes reservar con hasta 7 días de antelación.</span>
+            </li>
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span class="material-icons" style="color: #f59e0b; flex-shrink: 0; margin-top: 2px;">school</span>
+              <span><strong>Las clases mandan:</strong> Si el club programa una clase sobre tu franja, tu reserva se cancela automáticamente y recibirás una notificación para que elijas otra hora.</span>
+            </li>
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span class="material-icons" style="color: #3b82f6; flex-shrink: 0; margin-top: 2px;">event_busy</span>
+              <span><strong>Disponibilidad:</strong> No puedes reservar franjas ya ocupadas por una clase u otro socio, ni horas de hoy que ya hayan pasado. La disponibilidad es independiente por pista.</span>
+            </li>
+            <li style="display: flex; gap: 10px; align-items: flex-start;">
+              <span class="material-icons" style="color: #ef4444; flex-shrink: 0; margin-top: 2px;">cancel</span>
+              <span><strong>Cancelar:</strong> Pulsa tu franja en la parrilla o la X en "Tus próximas reservas". La hora queda libre al instante para otros socios.</span>
+            </li>
+          </ul>
+        }
 
         @if (authService.isStaff()) {
           <h4 style="color: #0f172a; margin-top: 1.5rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Exclusivo para Staff y Administración</h4>
@@ -71,7 +97,7 @@
         }
       </app-instrucciones>
 
-      @if (authService.isStaff()) {
+      @if (authService.isStaff() && activeTab() === 'clases') {
         <button
           class="btn-edit-schedule" routerLink="/gestionar-horarios">
           <span class="material-icons" style="font-size: 18px; vertical-align: text-bottom; margin-right: 4px;">settings</span> Editar Horario
@@ -83,13 +109,13 @@
   <!-- Pestañas Clases / Reserva de Pistas (solo con el módulo de entrenamientos libres activo) -->
   @if (trackBookingEnabled()) {
   <div class="tab-selector">
-    <button [class.active]="activeTab() === 'clases'" (click)="activeTab.set('clases')">
+    <button [class.active]="activeTab() === 'clases'" (click)="setTab('clases')">
       <span class="material-icons">school</span>
       Clases
     </button>
-    <button [class.active]="activeTab() === 'pistas'" (click)="activeTab.set('pistas')">
-      <span class="material-icons">flag</span>
-      Reserva de Pistas
+    <button [class.active]="activeTab() === 'pistas'" (click)="setTab('pistas')">
+      <span class="material-icons">self_improvement</span>
+      Entrenamiento Libre
     </button>
   </div>
   }

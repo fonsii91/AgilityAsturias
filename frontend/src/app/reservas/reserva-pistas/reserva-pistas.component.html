@@ -8,6 +8,32 @@
     </div>
   </div>
 
+  <!-- Próximas reservas del socio: visibles sin tener que navegar día a día -->
+  @if (myReservations().length > 0) {
+  <div class="my-reservations">
+    <span class="my-reservations-title">
+      <span class="material-icons">event_available</span>
+      Tus próximas reservas
+    </span>
+    <div class="my-reservations-list">
+      @for (res of myReservations(); track res.id) {
+      <div class="my-reservation-chip">
+        <span class="material-icons">flag</span>
+        <span class="my-reservation-info">
+          <strong>{{ reservationDateLabel(res.date) }}</strong>
+          {{ shortTime(res.start_time) }} - {{ shortTime(res.end_time) }}
+          @if (res.training_track) { · {{ res.training_track.name }} }
+        </span>
+        <button class="my-reservation-cancel" (click)="cancelFromList(res)" title="Cancelar esta reserva"
+          [disabled]="isSubmitting()" aria-label="Cancelar reserva">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
   <!-- Selector de día (próximos 7 días) -->
   <div class="day-selector">
     @for (day of days; track day.date) {
@@ -18,12 +44,35 @@
     }
   </div>
 
+  <!-- Leyenda: antes de la parrilla para que se aprenda el código de colores
+       sin tener que hacer scroll hasta el final -->
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot free"></span> Libre</span>
+    <span class="legend-item"><span class="legend-dot mine"></span> Tu reserva</span>
+    <span class="legend-item"><span class="legend-dot class-busy"></span> Clase</span>
+    <span class="legend-item"><span class="legend-dot booked"></span> Ocupada</span>
+  </div>
+
   @if (isLoading()) {
   <div class="loading-state">
     <span class="material-icons spinning">progress_activity</span>
     Cargando disponibilidad...
   </div>
   } @else {
+
+  <!-- Hoy: las horas ya pasadas se ocultan para acortar la parrilla -->
+  @if (hiddenPastCount() > 0) {
+  <button class="past-toggle" (click)="showPastHours.set(true)">
+    <span class="material-icons">history</span>
+    Mostrar {{ hiddenPastCount() }} hora{{ hiddenPastCount() === 1 ? '' : 's' }} anterior{{ hiddenPastCount() === 1 ? '' : 'es' }}
+  </button>
+  }
+  @if (showPastHours()) {
+  <button class="past-toggle" (click)="showPastHours.set(false)">
+    <span class="material-icons">visibility_off</span>
+    Ocultar horas pasadas
+  </button>
+  }
 
   <div class="tracks-list">
     @for (track of tracks(); track track.id) {
@@ -40,10 +89,22 @@
           <span class="track-title">{{ track.name }}</span>
           <span class="track-surface">{{ surfaceLabel(track.surface) }}</span>
         </div>
+        @if (firstFreeTime(track); as first) {
+        <span class="first-free-chip">
+          <span class="material-icons">bolt</span>
+          Primera libre: {{ first }}
+        </span>
+        } @else {
+        <span class="first-free-chip none">Sin huecos este día</span>
+        }
       </div>
 
+      @if (visibleSlots(track).length === 0) {
+      <p class="no-slots-note">No quedan franjas hoy en esta pista. Prueba otro día del selector.</p>
+      }
+
       <div class="hours-grid">
-        @for (slot of track.slots; track slot.start_time) {
+        @for (slot of visibleSlots(track); track slot.start_time) {
         <button class="hour-chip"
           [class.free]="slot.status === 'free' && !isPast(slot)"
           [class.past]="slot.status === 'free' && isPast(slot)"
@@ -72,12 +133,5 @@
     }
   </div>
 
-  <!-- Leyenda -->
-  <div class="legend">
-    <span class="legend-item"><span class="legend-dot free"></span> Libre</span>
-    <span class="legend-item"><span class="legend-dot mine"></span> Tu reserva</span>
-    <span class="legend-item"><span class="legend-dot class-busy"></span> Clase</span>
-    <span class="legend-item"><span class="legend-dot booked"></span> Ocupada</span>
-  </div>
   }
 </div>

@@ -35,6 +35,77 @@
     line-height: 1.4;
 }
 
+/* Próximas reservas del socio */
+.my-reservations {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.my-reservations-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-main, #0f172a);
+}
+
+.my-reservations-title .material-icons {
+    font-size: 18px;
+    color: var(--primary-color, #0073CF);
+}
+
+.my-reservations-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.my-reservation-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px 8px 14px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--primary-color, #0073CF) 8%, white);
+    border: 1px solid color-mix(in srgb, var(--primary-color, #0073CF) 25%, white);
+    font-size: 0.88rem;
+    color: var(--text-main, #0f172a);
+}
+
+.my-reservation-chip > .material-icons {
+    font-size: 16px;
+    color: var(--primary-color, #0073CF);
+}
+
+.my-reservation-info strong {
+    margin-right: 4px;
+}
+
+.my-reservation-cancel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.my-reservation-cancel:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+.my-reservation-cancel .material-icons {
+    font-size: 16px;
+}
+
 /* Selector de día */
 .day-selector {
     display: flex;
@@ -84,6 +155,66 @@
 .day-chip.active .day-chip-name,
 .day-chip.active .day-chip-date {
     color: white;
+}
+
+/* Toggle de horas pasadas (solo hoy) */
+.past-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: center;
+    padding: 6px 16px;
+    border-radius: 40px;
+    border: 1px dashed #cbd5e1;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.past-toggle:hover {
+    border-color: #94a3b8;
+    background: #f8fafc;
+}
+
+.past-toggle .material-icons {
+    font-size: 16px;
+}
+
+/* Chip "Primera libre" en la cabecera de cada pista */
+.first-free-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    padding: 5px 12px;
+    border-radius: 40px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #047857;
+    font-size: 0.8rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.first-free-chip .material-icons {
+    font-size: 15px;
+}
+
+.first-free-chip.none {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+    color: #94a3b8;
+}
+
+.no-slots-note {
+    margin: 0;
+    padding: 0.75rem 0;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    text-align: center;
 }
 
 /* Estado de carga */
