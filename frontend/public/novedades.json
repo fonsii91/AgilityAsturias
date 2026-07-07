@@ -1,5 +1,19 @@
 [
   {
+    "version": "1.1.61",
+    "date": "2026-07-08",
+    "features": [
+      "¡Reservar pista es ahora mucho más cómodo! En la pestaña de Entrenamiento Libre verás arriba 'Tus próximas reservas', con todas tus pistas reservadas a la vista y la opción de cancelarlas con un toque, sin tener que ir buscándolas día a día. Además, cada pista te muestra directamente su 'Primera libre' del día, y las horas de hoy que ya han pasado se recogen automáticamente para que la parrilla sea más corta (puedes desplegarlas si las quieres ver).",
+      "¡Guía de reservas ampliada! El botón de ayuda de Reservas ahora también explica cómo funciona el entrenamiento libre: cuántos días de antelación tienes, qué pasa si el club programa una clase sobre tu franja y cómo cancelar. Y al cambiar entre las pestañas de Clases y Entrenamiento Libre, la dirección de la página lo recuerda: si recargas o compartes el enlace, vuelves justo a la pestaña en la que estabas.",
+      "¡Pantalla de 'Funcionalidades del club' renovada para los responsables! Los módulos opcionales aparecen ahora en una lista limpia y agrupada por temas (Competición, Comunidad, Dinero, Reservas…), con un contador de cuántos tienes activos, la descripción de cada uno a un toque y los módulos que no incluye tu plan apartados al final, con un enlace directo para mejorar tu suscripción si te interesan.",
+      "¡Las bitácoras deportivas ahora son opcionales! El responsable del club puede activar o desactivar las bitácoras Canina (RSCE) y de Caza (RFEC) desde 'Funcionalidades del club'. Si en tu club nadie compite en alguna de esas modalidades, puedes ocultarla y dejar el menú de tus socios más limpio. Para los clubes que ya las usaban, todo sigue igual: permanecen activadas."
+    ],
+    "bugfixes": [
+      "¡Vuelta del pago sin sustos! Al completar el pago de la suscripción del club, la aplicación ahora te devuelve correctamente a la página de Facturación y tu suscripción aparece activa al instante; antes, en algunos casos, podía verse un aviso de suscripción pendiente durante unos momentos justo después de pagar.",
+      "La página de Facturación luce ahora los colores de tu club, como el resto de la aplicación."
+    ]
+  },
+  {
     "version": "1.1.60",
     "date": "2026-07-07",
     "features": [
