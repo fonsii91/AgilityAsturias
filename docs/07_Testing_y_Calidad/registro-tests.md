@@ -701,4 +701,70 @@ Este documento mantiene un historial de las pruebas automatizadas implementadas 
 - **Descripción:** Se testearon las dos vistas principales de la funcionalidad: la vista pública (`PatrocinadoresComponent`), comprobando el estado vacío y el renderizado en cuadrícula al haber datos disponibles; y la consola de gestión (`CrudPatrocinadoresComponent`), probando la visibilidad condicional del formulario de edición, la inyección del formulario reactivo, la preparación del envío para añadir registros y el modal de diálogo para borrado seguro de entidades.
 
 ### End-to-End (Playwright)
-- No requerido (La funcionalidad CRUD y la vista pública están validadas de forma completa mediante tests unitarios y Feature tests).
+- No requerido (La funcionalidad CRUD y la vista pública están validadas de forma completa mediante tests unitarios y Feature tests).
+---
+
+## 34. Gestión de Reservas e Instalaciones (Gestor) - Pistas de Entrenamiento
+**Fecha:** 07/07/2026
+**Capas Cubiertas:** Frontend y Backend
+
+### Backend (PHPUnit)
+- **Archivos Modificados/Creados:**
+  - `agility_back/tests/Feature/TrainingTrackTest.php`
+  - `agility_back/database/factories/TrainingTrackFactory.php`
+  - `agility_back/app/Models/TrainingTrack.php`
+  - `agility_back/app/Http/Controllers/TrainingTrackController.php`
+- **Descripción:** Se testeó el CRUD de pistas de entrenamiento (ver [[pistas-entrenamiento]]): creación automática de la pista principal al crear un club (hook `created`), validación del terreno obligatorio contra la lista de superficies válidas, permisos (el gestor crea/edita/borra, el staff solo lista, los miembros no acceden al endpoint), aislamiento multi-tenant (404 al operar sobre pistas de otro club y listados acotados), la regla de negocio que impide borrar la última pista del club (HTTP 422), la reasignación automática de horarios a la pista principal al borrar una pista (las clases y sus reservas se conservan) y la integración con horarios (asignación de pista por defecto, asignación explícita y rechazo de pistas de otro club).
+
+### Frontend (Vitest + Angular)
+- **Archivos Modificados/Creados:**
+  - `frontend/src/app/reservas/gestionar-pistas/gestionar-pistas.component.spec.ts`
+- **Descripción:** Se validó la consola de gestión de pistas (`GestionarPistasComponent`): carga inicial de datos, apertura del modal en modo creación (valores por defecto) y edición (datos de la pista), validación de nombre obligatorio, llamadas al servicio en alta y edición, borrado con diálogo de confirmación y el bloqueo en cliente del borrado cuando solo queda una pista (aviso sin llegar a abrir el diálogo).
+
+### End-to-End (Playwright)
+- No requerido (El CRUD, las reglas de negocio y la integración con horarios están cubiertos por Feature tests de backend y tests unitarios de frontend).
+
+---
+
+## 35. Gestión de Reservas e Instalaciones (Socio) - Reserva Individual de Pistas (Entrenamientos Libres)
+**Fecha:** 07/07/2026
+**Capas Cubiertas:** Frontend y Backend
+
+### Backend (PHPUnit)
+- **Archivos Modificados/Creados:**
+  - `agility_back/tests/Feature/TrackReservationTest.php`
+  - `agility_back/database/factories/TrackReservationFactory.php`
+  - `agility_back/app/Models/TrackReservation.php`
+  - `agility_back/app/Http/Controllers/TrackReservationController.php`
+  - `agility_back/app/Http/Middleware/CheckTrackBookingEnabled.php`
+- **Descripción:** Se testeó el módulo opt-in de reserva individual de pistas (ver [[pistas-entrenamiento]]): bloqueo total de los endpoints cuando el gestor no ha activado el módulo (middleware `track_booking.enabled`, HTTP 403), reserva de franjas libres de una hora, rechazo de franjas ocupadas por clase (incluidos solapes parciales) o por otro socio, disponibilidad calculada por pista y no global (la misma franja es reservable en otra pista), estados por franja del endpoint de disponibilidad (free/class/booked/mine), la prioridad de las clases (crear una clase encima elimina las reservas individuales solapadas de esa pista y envía `TrackReservationCancelledNotification` solo a los afectados), permisos de cancelación (el socio las suyas, el staff cualquiera), validaciones de franja (pasada, no en punto, fuera de horario) y la liberación de la pista cuando la clase está anulada por una excepción.
+
+### Frontend (Vitest + Angular)
+- **Archivos Modificados/Creados:**
+  - `frontend/src/app/reservas/reserva-pistas/reserva-pistas.component.spec.ts`
+- **Descripción:** Se validó la pestaña "Reserva de Pistas" (`ReservaPistasComponent`): construcción del selector de 7 días empezando por "Hoy", carga y recarga de disponibilidad al cambiar de día, flujo de reserva de franja libre con diálogo de confirmación, bloqueo de clic en franjas ocupadas por clase u otro socio, cancelación de la reserva propia y el marcado de franjas de hoy ya pasadas como no reservables.
+
+### End-to-End (Playwright)
+- No requerido (Las reglas de negocio están cubiertas por Feature tests de backend y la lógica de interfaz por tests unitarios de frontend).
+
+---
+
+## 36. Provisión de Fondos - Bonos de Clases
+**Fecha:** 07/07/2026
+**Capas Cubiertas:** Backend (lógica de negocio completa) y Frontend (integración de UI)
+
+### Backend (PHPUnit)
+- **Archivos Modificados/Creados:**
+  - `agility_back/tests/Feature/ClassBonusTest.php`
+  - `agility_back/app/Services/ClassBonusService.php`
+  - `agility_back/app/Http/Controllers/ClassBonusController.php`
+  - `agility_back/app/Http/Middleware/CheckClassBonusesEnabled.php`
+- **Descripción:** Se testearon los bonos de clases (ver [[provision-fondos]]): gestión por el staff (añadir clases, acumulación, corrección negativa con suelo en 0, bloqueo HTTP 403 con la funcionalidad desactivada y para socios), consumo al reservar (una clase por perro/plaza, descuento atómico), bloqueo de la inscripción sin saldo (también cuando apunta el staff en nombre del socio), exención de las reservas del staff para sí mismo, no-consumo con la funcionalidad desactivada y las devoluciones en las cuatro vías de cancelación (el socio cancela, el staff desapunta en bloque, anulación de la clase por excepción y borrado del horario). Se verificó además la protección contra dobles devoluciones (flag `bonus_consumed`) y que una reserva hecha con la funcionalidad desactivada no devuelve bono al cancelarse con ella activa.
+
+### Frontend (Vitest + Angular)
+- **Archivos Modificados/Creados:**
+  - Integración en componentes existentes (`finanzas-gestor`, `gestionar-reservas`, `gestionar-horarios`, `funcionalidades`); las suites existentes de estos componentes siguen en verde.
+- **Descripción:** La lógica de negocio vive íntegramente en el backend (cubierta por los 16 Feature tests); el frontend añade la tarjeta de bono en Administrar Finanzas, el checkbox en Reglas de Reservas, la tarjeta del módulo en Funcionalidades y el distintivo de saldo del socio en Reservas, todos condicionados al setting `class_bonuses_enabled` y verificados mediante la build y las suites existentes.
+
+### End-to-End (Playwright)
+- No requerido (Las reglas de consumo/devolución están cubiertas exhaustivamente por Feature tests de backend).

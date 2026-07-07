@@ -1,0 +1,301 @@
+.track-booking-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Banner introductorio */
+.intro-banner {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: color-mix(in srgb, var(--primary-color, #0073CF) 6%, white);
+    border: 1px solid color-mix(in srgb, var(--primary-color, #0073CF) 20%, white);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+}
+
+.intro-banner .material-icons {
+    color: var(--primary-color, #0073CF);
+    font-size: 28px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.intro-banner strong {
+    color: var(--text-main, #0f172a);
+    font-size: 1rem;
+}
+
+.intro-banner p {
+    margin: 4px 0 0;
+    color: #475569;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Selector de día */
+.day-selector {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.day-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 76px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    flex-shrink: 0;
+}
+
+.day-chip-name {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-main, #0f172a);
+}
+
+.day-chip-date {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.day-chip:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.day-chip.active {
+    background: var(--primary-color, #0073CF);
+    border-color: var(--primary-color, #0073CF);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color, #0073CF) 25%, transparent);
+}
+
+.day-chip.active .day-chip-name,
+.day-chip.active .day-chip-date {
+    color: white;
+}
+
+/* Estado de carga */
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 3rem 1rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Tarjeta por pista */
+.tracks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.track-availability-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.track-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.track-thumb {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 1px solid #e2e8f0;
+}
+
+.track-thumb.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    color: #94a3b8;
+}
+
+.track-header-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.track-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-main, #0f172a);
+}
+
+.track-surface {
+    font-size: 0.8rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Parrilla de horas */
+.hours-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+    gap: 8px;
+}
+
+.hour-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 6px;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.hour-chip .hour-label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--text-main, #0f172a);
+}
+
+.hour-chip .hour-status .material-icons {
+    font-size: 16px;
+    color: #94a3b8;
+}
+
+.hour-chip.free {
+    border-color: #a7f3d0;
+    background: #ecfdf5;
+}
+
+.hour-chip.free .hour-status .material-icons {
+    color: #10b981;
+}
+
+.hour-chip.free:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px -4px rgba(16, 185, 129, 0.35);
+    border-color: #10b981;
+}
+
+.hour-chip.past {
+    background: #f8fafc;
+    border-color: #f1f5f9;
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.hour-chip.class-busy {
+    background: #fffbeb;
+    border-color: #fde68a;
+    cursor: not-allowed;
+}
+
+.hour-chip.class-busy .hour-status .material-icons {
+    color: #f59e0b;
+}
+
+.hour-chip.booked {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    cursor: not-allowed;
+}
+
+.hour-chip.mine {
+    background: var(--primary-color, #0073CF);
+    border-color: var(--primary-color, #0073CF);
+}
+
+.hour-chip.mine .hour-label,
+.hour-chip.mine .hour-status .material-icons {
+    color: white;
+}
+
+.hour-chip.mine:hover {
+    filter: brightness(0.92);
+}
+
+/* Leyenda */
+.legend {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    display: inline-block;
+    border: 1px solid #e2e8f0;
+}
+
+.legend-dot.free {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+}
+
+.legend-dot.mine {
+    background: var(--primary-color, #0073CF);
+    border-color: var(--primary-color, #0073CF);
+}
+
+.legend-dot.class-busy {
+    background: #fffbeb;
+    border-color: #fde68a;
+}
+
+.legend-dot.booked {
+    background: #f1f5f9;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

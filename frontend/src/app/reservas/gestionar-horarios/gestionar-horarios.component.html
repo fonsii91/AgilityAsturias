@@ -18,6 +18,13 @@
     </div>
     <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
       @if (authService.isManager()) {
+      <a routerLink="/gestionar-pistas" class="btn-secondary"
+        style="display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #e2e8f0; background: white; color: #475569; border-radius: 10px; padding: 10px 20px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); width: 180px; white-space: nowrap; text-decoration: none;"
+        title="Pistas de Entrenamiento" onmouseover="this.style.background='#f8fafc'"
+        onmouseout="this.style.background='white'">
+        <span class="material-icons btn-icon-small">flag</span>
+        Pistas
+      </a>
       <button class="btn-secondary" (click)="openSettingsModal()"
         style="display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #e2e8f0; background: white; color: #475569; border-radius: 10px; padding: 10px 20px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05); width: 180px; white-space: nowrap;"
         title="Reglas de Cancelación" onmouseover="this.style.background='#f8fafc'"
@@ -96,6 +103,12 @@
                     <span class="capacity-badge" style="background: rgba(239, 68, 68, 0.08); color: #ef4444; border-color: rgba(239, 68, 68, 0.15); font-weight: 600;">
                       <span class="material-icons icon-tiny" style="color: #ef4444;">event</span>
                       Única: {{ slot.date | date:'dd/MM/yyyy' }}
+                    </span>
+                    }
+                    @if (slot.training_track && trainingTracks().length > 1) {
+                    <span class="capacity-badge">
+                      <span class="material-icons icon-tiny">flag</span>
+                      {{ slot.training_track.name }}
                     </span>
                     }
                   </div>
@@ -237,6 +250,20 @@
             </div>
           </div>
 
+          @if (trainingTracks().length > 1) {
+          <div class="form-group" style="grid-column: 1 / -1;">
+            <label>Pista de entrenamiento</label>
+            <div class="select-wrapper">
+              <select [(ngModel)]="slotForm.trackId" class="modern-input">
+                @for (track of trainingTracks(); track track.id) {
+                <option [ngValue]="track.id">{{ track.name }}</option>
+                }
+              </select>
+              <span class="material-icons select-icon">expand_more</span>
+            </div>
+          </div>
+          }
+
           <div class="form-group" style="grid-column: 1 / -1;">
             <label>Color de la clase (Sutil)</label>
             <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px;">
@@ -299,6 +326,18 @@
         <p style="font-size: 0.85rem; color: #64748b; margin-top: 8px;">
           Los miembros no podrán cancelar ni reservar una plaza si faltan menos de este tiempo estipulado para que
           comience la clase.
+        </p>
+      </div>
+
+      <div class="form-group" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #f1f5f9;">
+        <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-weight: 600; color: var(--text-main, #0f172a); font-size: 0.95rem;">
+          <input type="checkbox" [(ngModel)]="classBonusesEnabled" style="cursor: pointer; margin-top: 3px; width: 16px; height: 16px;" />
+          Bonos de clases
+        </label>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 8px;">
+          Con los bonos activados, cada inscripción a una clase consume una clase del bono del socio (y se devuelve al
+          cancelar). Los socios sin clases disponibles no podrán reservar. Los bonos se recargan desde
+          <strong>Administrar Finanzas</strong>.
         </p>
       </div>
       <div class="form-actions-row" style="margin-top: 2rem;">

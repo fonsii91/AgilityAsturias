@@ -76,6 +76,12 @@ class ClubProvisioningService
                 'provision_fondos_enabled' => false,
                 'sponsors_enabled' => false,
                 'liga_norte_enabled' => false,
+                // Reserva individual de pistas (entrenamientos libres): opt-in,
+                // el gestor lo activa desde Funcionalidades cuando quiera abrirlo.
+                'track_booking_enabled' => false,
+                // Bonos de clases: opt-in, las reservas solo consumen bono si
+                // el gestor activa la funcionalidad.
+                'class_bonuses_enabled' => false,
                 'contact' => [
                     'phone' => $lead->phone ?? '',
                     'email' => $lead->email ?? '',
@@ -215,6 +221,14 @@ class ClubProvisioningService
             $manager->save();
 
             // --- 2. Horario base: 3 clases recurrentes (date null = semanal) ---
+            // Se asignan a la pista principal del club (creada automáticamente
+            // por el hook created de Club). Se busca sin scopes porque el
+            // aprovisionamiento corre fuera del contexto de tenant.
+            $mainTrack = \App\Models\TrainingTrack::withoutGlobalScopes()
+                ->where('club_id', $club->id)
+                ->orderBy('id')
+                ->first();
+
             $classes = [
                 ['day' => 'Lunes',     'name' => 'Iniciación',   'start_time' => '18:00', 'end_time' => '19:30', 'color' => '#0ea5e9'],
                 ['day' => 'Miércoles', 'name' => 'Intermedio',   'start_time' => '18:00', 'end_time' => '19:30', 'color' => '#f59e0b'],
@@ -231,6 +245,7 @@ class ClubProvisioningService
                     'max_bookings' => 6,
                     'color' => $c['color'],
                     'date' => null,
+                    'training_track_id' => $mainTrack?->id,
                 ]);
                 $slot->club_id = $club->id;
                 $slot->save();

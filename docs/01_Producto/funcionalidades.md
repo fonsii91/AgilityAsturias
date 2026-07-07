@@ -43,7 +43,8 @@ Herramienta avanzada para la prevención de lesiones y monitorización del rendi
 
 ### Reservas y Calendario
 * **Calendario Global:** Visualizar la disponibilidad de la pista, instalaciones y eventos del club en un formato de calendario.
-* **Mis Reservas:** Realizar, visualizar y gestionar las reservas propias. Permite reservar franjas horarias concretas (si hay disponibilidad) y cancelar las reservas ya realizadas.
+* **Mis Reservas:** Realizar, visualizar y gestionar las reservas propias. Permite reservar franjas horarias concretas (si hay disponibilidad) y cancelar las reservas ya realizadas. Si el club tiene activados los **bonos de clases**, cada inscripción consume una clase del bono del socio (se devuelve al cancelar) y sin clases disponibles no se puede reservar; el socio ve su saldo en la propia pantalla de Reservas (ver [[provision-fondos]]).
+* **Reserva de Pistas (Entrenamientos Libres):** Si el club tiene activado el módulo, pestaña dentro de Reservas para reservar una pista concreta durante una hora y entrenar por cuenta propia, sin monitor. Solo se ofrecen franjas en las que la pista no esté ocupada por una clase u otra reserva; las clases tienen prioridad (ver [[pistas-entrenamiento]]).
 * **Eventos Personales:** Añadir recordatorios y eventos propios al calendario para organizar la asistencia y los entrenamientos.
 
 ### Galería de Vídeos y Recursos Multimedia
@@ -87,9 +88,10 @@ Dinámicas recreativas y colaborativas diseñadas para incentivar la participaci
 Los miembros con el rol de "Staff" (monitores, entrenadores, directiva) tienen acceso a todas las funcionalidades de un Miembro regular, sumado a permisos especiales para la administración y gestión diaria del club.
 
 ### Gestión de Reservas e Instalaciones
-* **Gestión de Horarios (Time Slots):** Configurar y gestionar las franjas horarias generales en las que la pista o las instalaciones están disponibles para reservar.
+* **Gestión de Horarios (Time Slots):** Configurar y gestionar las franjas horarias generales en las que la pista o las instalaciones están disponibles para reservar. Cada clase del horario lleva asignada la pista de entrenamiento donde se imparte (ver [[pistas-entrenamiento]]).
 * **Excepciones de Horario:** Crear excepciones para bloquear días o tramos horarios concretos por festivos, mantenimientos o cierre.
 * **Info de Reservas Global:** Vista para monitorizar y consultar todas las reservas realizadas por los miembros en un día u horario determinado.
+* **Pistas de Entrenamiento (solo Responsable del Club):** CRUD de las pistas del club (nombre, foto y tipo de terreno). Siempre debe existir al menos una pista; la pista principal se crea automáticamente con el club (ver [[pistas-entrenamiento]]).
 
 ### Gestión de Eventos y Competiciones
 * **CRUD de Competiciones:** Crear nuevas competiciones en el sistema, modificar sus datos (fecha, lugar, grado) y eliminarlas si se cancelan o introducen por error.
@@ -123,4 +125,4 @@ El Responsable del Club (Gestor) posee todos los permisos del Staff y del Socio,
 * **Gestión de la Provisión de Fondos:** Acceso al panel financiero de auditoría para todos los socios del tenant. Permite registrar nuevos ingresos (Bizum, transferencia, efectivo, etc.), registrar gastos imputados (cuotas, inscripciones, licencias, etc.), subir los documentos/justificantes de las transacciones y anular movimientos erróneos (ver especificaciones en [[provision-fondos]]).
 
 ### Administración del Club (Configuración)
-* **Gestión del Club:** Acceso al panel de configuración e identidad visual del club. Permite modificar logotipos, imágenes hero/salto, información de contacto/redes, inyectar colores dinámicos del tema de Angular Material, y habilitar/deshabilitar selectivamente los módulos de Gamificación, Provisión de Fondos y Patrocinadores (ver especificaciones en [[gestionar-club]]). Si este último está activo, incluye acceso directo al CRUD de gestión de patrocinadores.
+* **Gestión del Club:** Acceso al panel de configuración e identidad visual del club. Permite modificar logotipos, imágenes hero/salto, información de contacto/redes, inyectar colores dinámicos del tema de Angular Material, y habilitar/deshabilitar selectivamente los módulos de Gamificación, Provisión de Fondos, Patrocinadores, Reserva de Pistas / entrenamientos libres y Bonos de Clases (ver especificaciones en [[gestionar-club]], [[pistas-entrenamiento]] y [[provision-fondos]]). Si este último está activo, incluye acceso directo al CRUD de gestión de patrocinadores.

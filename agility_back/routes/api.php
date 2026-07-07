@@ -124,6 +124,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/time-slots/{id}', [TimeSlotController::class, 'update']);
         Route::post('/time-slots/{id}/delete', [TimeSlotController::class, 'destroy']);
 
+        // Pistas de entrenamiento (lectura: staff necesita la lista al asignar horarios)
+        Route::get('/training-tracks', [\App\Http\Controllers\TrainingTrackController::class, 'index']);
+
+        // Bonos de clases (staff añade clases al contador del socio; opt-in del gestor)
+        Route::middleware(['class_bonuses.enabled'])->group(function () {
+            Route::post('/class-bonuses/{id}/add', [\App\Http\Controllers\ClassBonusController::class, 'add']);
+        });
+
         // Time Slot Exceptions
         Route::post('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'store']);
         Route::post('/time-slot-exceptions/delete', [\App\Http\Controllers\TimeSlotExceptionController::class, 'destroy']);
@@ -203,6 +211,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::post('/admin/seasons/{id}/reopen', [\App\Http\Controllers\SeasonController::class, 'reopen']);
         });
 
+        // Pistas de entrenamiento (CRUD del gestor del club)
+        Route::post('/training-tracks', [\App\Http\Controllers\TrainingTrackController::class, 'store']);
+        Route::post('/training-tracks/{id}', [\App\Http\Controllers\TrainingTrackController::class, 'update']);
+        Route::post('/training-tracks/{id}/delete', [\App\Http\Controllers\TrainingTrackController::class, 'destroy']);
+
         Route::get('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'show']);
         Route::put('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']);
         Route::post('/admin/clubs/{club}', [\App\Http\Controllers\ClubController::class, 'update']); // Some forms might send POST with _method
@@ -269,6 +282,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         Route::get('/availability', [ReservationController::class, 'availability']); // ???
         Route::get('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'index']);
+
+        // Reserva individual de pistas (entrenamientos libres, módulo opt-in)
+        Route::middleware(['track_booking.enabled'])->group(function () {
+            Route::get('/track-bookings/availability', [\App\Http\Controllers\TrackReservationController::class, 'availability']);
+            Route::get('/track-bookings/my', [\App\Http\Controllers\TrackReservationController::class, 'myReservations']);
+            Route::post('/track-bookings', [\App\Http\Controllers\TrackReservationController::class, 'store']);
+            Route::post('/track-bookings/{id}/delete', [\App\Http\Controllers\TrackReservationController::class, 'destroy']);
+        });
 
         Route::get('/reservations/my', [ReservationController::class, 'myReservations']); // Necesitaríamos este endpoint
         Route::post('/reservations', [ReservationController::class, 'store']); // ???

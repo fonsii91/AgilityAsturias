@@ -21,11 +21,12 @@ import { OnboardingService } from '../../services/onboarding';
 import { AnalyticsService } from '../../services/analytics.service';
 import { TenantService } from '../../services/tenant.service';
 import { EmptyStateComponent } from '../../components/ui/empty-state/empty-state';
+import { ReservaPistasComponent } from '../reserva-pistas/reserva-pistas.component';
 
 @Component({
     selector: 'app-gestionar-reservas',
     standalone: true,
-    imports: [CommonModule, FormsModule, MatIconModule, RouterModule, AthleticProfileCardComponent, FichaPerroComponent, InstruccionesComponent, EmptyStateComponent],
+    imports: [CommonModule, FormsModule, MatIconModule, RouterModule, AthleticProfileCardComponent, FichaPerroComponent, InstruccionesComponent, EmptyStateComponent, ReservaPistasComponent],
     templateUrl: './gestionar-reservas.component.html',
     styleUrl: './gestionar-reservas.component.css'
 })
@@ -43,6 +44,34 @@ export class GestionarReservasComponent {
     cancellationNoticeHours = computed(() => {
         return this.tenantService.tenantInfo()?.settings?.['cancellation_notice_hours'] ?? 24;
     });
+
+    // Módulo de reserva individual de pistas (entrenamientos libres): la
+    // pestaña "Reserva de Pistas" solo existe cuando el gestor lo activa.
+    trackBookingEnabled = computed(() => {
+        return this.tenantService.tenantInfo()?.settings?.['track_booking_enabled'] === true;
+    });
+
+    activeTab = signal<'clases' | 'pistas'>('clases');
+
+    // Bonos de clases (opt-in del gestor): el socio ve su saldo de clases
+    // disponibles; reservar consume una y cancelar la devuelve.
+    classBonusesEnabled = computed(() => {
+        return this.tenantService.tenantInfo()?.settings?.['class_bonuses_enabled'] === true;
+    });
+
+    showBonusChip = computed(() => {
+        return this.classBonusesEnabled() && this.authService.currentUserSignal()?.role === 'member';
+    });
+
+    myBonusBalance = computed(() => {
+        return this.authService.currentUserSignal()?.class_bonus_balance ?? 0;
+    });
+
+    /** El saldo del bono cambia en el backend al reservar/cancelar: se refresca el usuario. */
+    private refreshBonusBalance() {
+        if (!this.classBonusesEnabled()) return;
+        this.authService.refreshUserState().subscribe({ error: () => { } });
+    }
 
     // Modal state
     isModalOpen = false;
@@ -94,6 +123,17 @@ export class GestionarReservasComponent {
 
     // Dynamic definition of slots
     timeSlots = this.timeSlotService.getTimeSlots();
+
+    // Solo se muestra la pista en las tarjetas cuando el club usa varias:
+    // con una única pista el dato no aporta y mete ruido visual.
+    hasMultipleTracks = computed(() => {
+        const trackIds = new Set(
+            this.timeSlots()
+                .map(s => s.training_track_id)
+                .filter((id): id is number => id != null)
+        );
+        return trackIds.size > 1;
+    });
 
     onUserChange(userId: number | null) {
         this.selectedUserId.set(userId);
@@ -509,6 +549,7 @@ export class GestionarReservasComponent {
             });
             this.closeModal();
             this.toastService.success('¡Reserva confirmada con éxito!');
+            this.refreshBonusBalance();
             this.onboardingService.markStepCompleted('miembro_clase');
         } catch (error: any) {
             console.error('Error al reservar:', error);
@@ -626,6 +667,7 @@ export class GestionarReservasComponent {
                 }
             }
             this.toastService.success('Reserva cancelada correctamente.');
+            this.refreshBonusBalance();
             this.closeCancelModal();
         } catch (error) {
             console.error(error);

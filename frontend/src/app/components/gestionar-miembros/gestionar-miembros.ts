@@ -1,6 +1,8 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { AuthService, UserProfile } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { environment } from '../../../environments/environment';
@@ -30,6 +32,51 @@ export class GestionarMiembrosComponent implements OnInit {
   userToDelete = signal<UserProfile | null>(null);
   isDeleting = signal<boolean>(false);
   deleteConfirmationText = signal<string>('');
+
+  private http = inject(HttpClient);
+
+  // Bonos de clases (opt-in del gestor): el staff recarga bonos desde aquí
+  classBonusesEnabled = computed(() => {
+    return this.tenantService.tenantInfo()?.settings?.['class_bonuses_enabled'] === true;
+  });
+  bonusUser = signal<UserProfile | null>(null);
+  bonusClassesToAdd: number | null = null;
+  isSavingBonus = signal(false);
+
+  openBonusModal(user: UserProfile) {
+    this.bonusUser.set(user);
+    this.bonusClassesToAdd = null;
+  }
+
+  closeBonusModal() {
+    this.bonusUser.set(null);
+  }
+
+  async saveBonus() {
+    const user = this.bonusUser();
+    const classes = Math.trunc(Number(this.bonusClassesToAdd));
+    if (!user || this.isSavingBonus()) return;
+    if (!classes || isNaN(classes)) {
+      this.toastService.error('Indica cuántas clases quieres añadir al bono.');
+      return;
+    }
+
+    this.isSavingBonus.set(true);
+    try {
+      const res = await firstValueFrom(this.http.post<{ id: number; class_bonus_balance: number }>(
+        `${environment.apiUrl}/class-bonuses/${user.id}/add`,
+        { classes }
+      ));
+      this.users.update(list => list.map(u => u.id === res.id ? { ...u, class_bonus_balance: res.class_bonus_balance } : u));
+      this.toastService.success(`Bono de ${user.displayName}: ${res.class_bonus_balance} clases disponibles.`);
+      this.closeBonusModal();
+    } catch (error: any) {
+      console.error('Error updating bonus', error);
+      this.toastService.error(error?.error?.message || 'No se pudo actualizar el bono.');
+    } finally {
+      this.isSavingBonus.set(false);
+    }
+  }
 
   // Filter out admins to prevent modification by regular staff, but SHOW staff
   displayUsers = computed(() => {

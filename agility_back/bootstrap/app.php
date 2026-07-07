@@ -21,6 +21,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'gamification.enabled' => \App\Http\Middleware\CheckGamificationEnabled::class,
             'provision_fondos.enabled' => \App\Http\Middleware\CheckProvisionFondosEnabled::class,
             'liga_norte.enabled' => \App\Http\Middleware\CheckLigaNorteEnabled::class,
+            'track_booking.enabled' => \App\Http\Middleware\CheckTrackBookingEnabled::class,
+            'class_bonuses.enabled' => \App\Http\Middleware\CheckClassBonusesEnabled::class,
             'subscription.active' => \App\Http\Middleware\CheckSubscriptionActive::class,
         ]);
     })

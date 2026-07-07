@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FundTransactionService, FundTransaction } from '../../services/fund-transaction.service';
 import { MatCardModule } from '@angular/material/card';
@@ -6,6 +6,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastService } from '../../services/toast.service';
+import { TenantService } from '../../services/tenant.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-finanzas-socio',
@@ -45,6 +47,26 @@ import { ToastService } from '../../services/toast.service';
             </p>
           </mat-card-content>
         </mat-card>
+
+        <!-- Bono de Clases (solo con la funcionalidad activa) -->
+        @if (classBonusesEnabled()) {
+          <mat-card class="bonus-card" [class.empty-bonus]="bonusBalance() === 0">
+            <mat-card-content class="balance-content">
+              <span class="balance-label" style="display: inline-flex; align-items: center; gap: 6px;">
+                <mat-icon style="font-size: 18px; width: 18px; height: 18px;">confirmation_number</mat-icon>
+                Tu Bono de Clases
+              </span>
+              <h2 class="balance-amount">{{ bonusBalance() }} clase{{ bonusBalance() === 1 ? '' : 's' }}</h2>
+              <p class="balance-sub">
+                @if (bonusBalance() > 0) {
+                  Cada vez que reserves plaza en una clase se consumirá una (se devuelve si cancelas). Tus clases no caducan.
+                } @else {
+                  No te quedan clases en el bono. Contacta con el club para recargarlo y poder reservar.
+                }
+              </p>
+            </mat-card-content>
+          </mat-card>
+        }
 
         <h3 class="section-title">Historial de Movimientos</h3>
 
@@ -153,6 +175,19 @@ import { ToastService } from '../../services/toast.service';
     }
     .balance-card.negative {
       background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
+    }
+    .bonus-card {
+      border-radius: 1.25rem;
+      border: none;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+    .bonus-card.empty-bonus {
+      background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
     }
     .balance-content {
       padding: 2rem !important;
@@ -329,13 +364,29 @@ import { ToastService } from '../../services/toast.service';
 export class FinanzasSocioComponent implements OnInit {
   private fundService = inject(FundTransactionService);
   private toast = inject(ToastService);
+  private tenantService = inject(TenantService);
+  private authService = inject(AuthService);
 
   transactions = signal<FundTransaction[]>([]);
   balance = signal<number>(0);
   isLoading = signal<boolean>(true);
 
+  // Bono de clases (opt-in del gestor): el socio consulta aquí cuántas
+  // clases le quedan, junto a su saldo de fondos.
+  classBonusesEnabled = computed(() => {
+    return this.tenantService.tenantInfo()?.settings?.['class_bonuses_enabled'] === true;
+  });
+
+  bonusBalance = computed(() => {
+    return this.authService.currentUserSignal()?.class_bonus_balance ?? 0;
+  });
+
   ngOnInit(): void {
     this.loadData();
+    // Refresca el usuario para que el bono refleje recargas recientes del staff
+    if (this.classBonusesEnabled()) {
+      this.authService.refreshUserState().subscribe({ error: () => { } });
+    }
   }
 
   loadData() {

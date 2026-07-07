@@ -20,6 +20,7 @@ export interface User {
     rfec_category?: string;
     rfec_expiration_date?: string;
     birth_year?: number;
+    class_bonus_balance?: number;
     // Compatibility fields
     uid?: number; // alias for id
     displayName?: string; // alias for name

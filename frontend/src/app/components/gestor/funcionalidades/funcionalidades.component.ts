@@ -10,7 +10,8 @@ import { ConfirmDialog, ConfirmDialogData } from '../../shared/confirm-dialog/co
 
 interface ModuleDef {
   key: string;
-  feature: string;
+  /** Feature del plan que desbloquea el módulo; sin ella el módulo está disponible en todos los planes. */
+  feature?: string;
   title: string;
   description: string;
   icon: string;
@@ -71,6 +72,18 @@ export class FuncionalidadesClubComponent implements OnInit {
       title: 'Liga Norte', icon: 'leaderboard',
       description: 'Clasificación y contenidos de la Liga Norte (competición regional). Solo relevante si tu club participa en ella.',
     },
+    {
+      key: 'track_booking_enabled',
+      title: 'Reserva de Pistas', icon: 'flag',
+      description: 'Entrenamientos libres: tus socios podrán reservar una pista una hora para entrenar por su cuenta, en las franjas que no ocupen las clases. Aparece como una pestaña dentro de Reservas.',
+      manageLink: '/reservas', manageLabel: 'Ir a Reservas',
+    },
+    {
+      key: 'class_bonuses_enabled',
+      title: 'Bonos de Clases', icon: 'confirmation_number',
+      description: 'Cada socio tiene un contador de clases disponibles: apuntarse a una clase consume una y cancelar la devuelve. Sin clases en el bono no se puede reservar. Los bonos se recargan desde Administrar Finanzas.',
+      manageLink: '/admin/finanzas', manageLabel: 'Gestionar bonos',
+    },
   ];
 
   ngOnInit() {
@@ -90,8 +103,10 @@ export class FuncionalidadesClubComponent implements OnInit {
     return ((this.club()?.plan as any)?.features || []).map((f: any) => f.slug);
   }
 
-  /** Bloqueado si el club tiene plan y el plan no incluye la feature del módulo. */
+  /** Bloqueado si el club tiene plan y el plan no incluye la feature del módulo.
+      Los módulos sin feature asociada están disponibles en todos los planes. */
   isLocked(m: ModuleDef): boolean {
+    if (!m.feature) return false;
     const club = this.club();
     if (!club?.plan) return false;
     return !this.planFeatures().includes(m.feature);

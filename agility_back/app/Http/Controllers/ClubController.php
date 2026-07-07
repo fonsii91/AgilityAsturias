@@ -23,6 +23,8 @@ class ClubController extends Controller
         'provision_fondos_enabled',
         'liga_norte_enabled',
         'sponsors_enabled',
+        'track_booking_enabled',
+        'class_bonuses_enabled',
         'customizationRequest',
         'landing_page_requested',
         'cancellation_notice_hours',

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
+use App\Services\ClassBonusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -217,15 +218,32 @@ class ReservationController extends Controller
             ], 422);
         }
 
+        // BONOS DE CLASES (opt-in del gestor): cada plaza consume una clase del
+        // bono del socio titular. Sin saldo suficiente, la inscripción se
+        // bloquea (también cuando apunta el staff: puede añadir bono primero).
+        $bonusService = app(ClassBonusService::class);
+        $targetUser = \App\Models\User::find($validated['user_id']);
+        $bonusResult = $bonusService->consumeForBooking($targetUser, count($validated['dog_ids']));
+
+        if ($bonusResult === ClassBonusService::RESULT_INSUFFICIENT) {
+            $message = $user->id == $validated['user_id']
+                ? 'No tienes clases disponibles en tu bono. Contacta con el club para recargarlo.'
+                : 'El socio no tiene clases disponibles en su bono (' . ($targetUser->class_bonus_balance ?? 0) . ' restantes para ' . count($validated['dog_ids']) . ' plazas). Añádele bono desde Provisión de Fondos.';
+
+            return response()->json(['message' => $message], 422);
+        }
+
         $createdReservations = [];
         foreach ($validated['dog_ids'] as $dogId) {
-            $reservation = Reservation::create([
+            $reservation = new Reservation([
                 'slot_id' => $validated['slot_id'],
                 'user_id' => $validated['user_id'],
                 'dog_id' => $dogId,
                 'date' => $validated['date'],
                 'status' => 'active',
             ]);
+            $reservation->bonus_consumed = ($bonusResult === ClassBonusService::RESULT_CONSUMED);
+            $reservation->save();
             $reservation->load(['user', 'timeSlot', 'dog']);
             $createdReservations[] = $reservation;
         }
@@ -269,7 +287,13 @@ class ReservationController extends Controller
             'status' => 'in:active,cancelled,completed'
         ]);
 
+        $wasActive = $reservation->status === 'active';
         $reservation->update($validated);
+
+        // Cancelación vía update: devolver la clase consumida del bono
+        if ($wasActive && ($validated['status'] ?? null) === 'cancelled') {
+            app(ClassBonusService::class)->refund([$reservation]);
+        }
 
         return response()->json($reservation->load(['user', 'timeSlot', 'dog']));
     }
@@ -308,6 +332,9 @@ class ReservationController extends Controller
         }
 
         $reservation->update(['status' => 'cancelled', 'updated_at' => now()]);
+
+        // La clase consumida vuelve al bono del socio (cancele él o el staff)
+        app(ClassBonusService::class)->refund([$reservation]);
 
         return response()->noContent();
     }
@@ -380,6 +407,9 @@ class ReservationController extends Controller
                 }
             }
         }
+
+        // Las clases consumidas vuelven al bono antes de cancelar en bloque
+        app(ClassBonusService::class)->refund($reservationsToDelete);
 
         Reservation::whereIn('id', $reservationsToDelete->pluck('id'))->update(['status' => 'cancelled', 'updated_at' => now()]);
 

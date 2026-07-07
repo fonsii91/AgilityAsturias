@@ -66,6 +66,7 @@ class User extends Authenticatable implements FilamentUser
             'rfec_license' => \App\Casts\GracefulEncryption::class,
             'rfec_expiration_date' => \App\Casts\GracefulEncryption::class,
             'onboarding_progress' => 'array',
+            'class_bonus_balance' => 'integer',
         ];
     }
     /**

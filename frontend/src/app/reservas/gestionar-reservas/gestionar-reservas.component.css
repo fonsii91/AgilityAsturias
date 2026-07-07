@@ -73,6 +73,49 @@ h2 {
     border-color: #94a3b8;
 }
 
+/* Pestañas Clases / Reserva de Pistas (módulo de entrenamientos libres) */
+.tab-selector {
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    padding: 6px;
+    border-radius: 50px;
+    width: fit-content;
+    margin: 0 auto 2rem auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+}
+
+.tab-selector button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: none;
+    padding: 10px 28px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-weight: 700;
+    color: var(--text-secondary);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    font-size: 0.95rem;
+}
+
+.tab-selector button .material-icons {
+    font-size: 18px;
+}
+
+.tab-selector button.active {
+    background: var(--primary-color, #0056b3);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 115, 207, 0.3);
+}
+
+.tab-selector button:hover:not(.active) {
+    background: #f8fafc;
+    color: var(--primary-color, #0056b3);
+}
+
 /* Week Selector */
 .week-selector {
     display: flex;

@@ -60,6 +60,11 @@ class TimeSlotExceptionController extends Controller
                 );
             }
 
+            // Las clases consumidas del bono vuelven al socio: la clase la
+            // anula el club, no el socio.
+            $activeReservations = $reservations->where('status', 'active');
+            app(\App\Services\ClassBonusService::class)->refund($activeReservations);
+
             // Eliminar las reservas de esta clase
             \App\Models\Reservation::where('slot_id', $validated['slot_id'])
                 ->whereDate('date', $validated['date'])

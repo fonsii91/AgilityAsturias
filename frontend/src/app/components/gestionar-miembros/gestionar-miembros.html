@@ -167,6 +167,14 @@
                             <option value="admin" [selected]="user.role === 'admin'">Administrador</option>
                           }
                         </select>
+                        @if (classBonusesEnabled() && user.role === 'member') {
+                          <button (click)="openBonusModal(user)"
+                            [title]="'Bono de clases: ' + (user.class_bonus_balance ?? 0) + ' disponibles. Pulsa para añadir clases.'"
+                            style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 10px; border-radius: 8px; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; cursor: pointer; font-weight: 700; font-size: 0.85rem;">
+                            <span class="material-icons" style="font-size: 16px;">confirmation_number</span>
+                            {{ user.class_bonus_balance ?? 0 }}
+                          </button>
+                        }
                         <button class="btn-icon reset-pwd-btn" (click)="generateResetLink(user)"
                           title="Generar Enlace de Recuperación">
                           <span class="material-icons">key</span>
@@ -200,6 +208,39 @@
           <div class="zoom-modal-content" (click)="$event.stopPropagation()">
             <button class="close-zoom-btn" (click)="closeImageZoom()">&times;</button>
             <img [src]="zoomedImageURL" alt="Zoomed Profile Foto">
+          </div>
+        </div>
+      }
+
+      <!-- Bono de Clases Modal -->
+      @if (bonusUser()) {
+        <div class="modal-overlay delete-modal-overlay" (click)="closeBonusModal()">
+          <div class="modal-content delete-modal-content" (click)="$event.stopPropagation()">
+            <div class="modal-icon-wrapper" style="background: #ecfdf5; color: #047857;">
+              <span class="material-icons">confirmation_number</span>
+            </div>
+            <h3>Bono de Clases</h3>
+            <p>
+              <strong>{{ bonusUser()?.displayName }}</strong> tiene
+              <strong>{{ bonusUser()?.class_bonus_balance ?? 0 }}</strong>
+              clase{{ (bonusUser()?.class_bonus_balance ?? 0) === 1 ? '' : 's' }} disponibles en su bono.
+            </p>
+            <div class="delete-confirmation-group">
+              <label>Clases a añadir (un número negativo corrige el saldo):</label>
+              <input type="number" step="1" [(ngModel)]="bonusClassesToAdd" class="form-input confirmation-input"
+                placeholder="Ej: 10" style="text-align: center;">
+            </div>
+            <div class="modal-actions">
+              <button class="btn-cancel" (click)="closeBonusModal()" [disabled]="isSavingBonus()">Cancelar</button>
+              <button class="btn-danger" style="background: #047857;" (click)="saveBonus()" [disabled]="isSavingBonus()">
+                @if (isSavingBonus()) {
+                  <span class="spinner-small"></span>
+                } @else {
+                  <span class="material-icons btn-icon">add</span>
+                }
+                {{ isSavingBonus() ? 'Guardando...' : 'Añadir al bono' }}
+              </button>
+            </div>
           </div>
         </div>
       }

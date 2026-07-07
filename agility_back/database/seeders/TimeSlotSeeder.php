@@ -29,8 +29,12 @@ class TimeSlotSeeder extends Seeder
             $slots[] = ['id' => $idCounter++, 'day' => $day, 'start_time' => '19:30', 'end_time' => '21:00', 'max_bookings' => 6];
         }
 
+        // Pista principal del club activo (creada por el hook created de Club):
+        // ningún horario debe quedar sin pista asociada.
+        $trackId = \App\Models\TrainingTrack::orderBy('id')->value('id');
+
         foreach ($slots as $slot) {
-            \App\Models\TimeSlot::create($slot);
+            \App\Models\TimeSlot::create($slot + ['training_track_id' => $trackId]);
         }
     }
 }

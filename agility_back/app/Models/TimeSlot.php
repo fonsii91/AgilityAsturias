@@ -21,7 +21,13 @@ class TimeSlot extends Model
         'max_bookings',
         'color',
         'date',
+        'training_track_id',
     ];
+
+    public function trainingTrack()
+    {
+        return $this->belongsTo(TrainingTrack::class);
+    }
 
     public function reservations()
     {

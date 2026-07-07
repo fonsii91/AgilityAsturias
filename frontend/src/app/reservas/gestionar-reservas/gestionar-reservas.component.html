@@ -80,6 +80,42 @@
     </div>
   </div>
 
+  <!-- Pestañas Clases / Reserva de Pistas (solo con el módulo de entrenamientos libres activo) -->
+  @if (trackBookingEnabled()) {
+  <div class="tab-selector">
+    <button [class.active]="activeTab() === 'clases'" (click)="activeTab.set('clases')">
+      <span class="material-icons">school</span>
+      Clases
+    </button>
+    <button [class.active]="activeTab() === 'pistas'" (click)="activeTab.set('pistas')">
+      <span class="material-icons">flag</span>
+      Reserva de Pistas
+    </button>
+  </div>
+  }
+
+  @if (activeTab() === 'pistas' && trackBookingEnabled()) {
+  <app-reserva-pistas />
+  } @else {
+
+  <!-- Saldo del bono de clases del socio (solo con la funcionalidad activa) -->
+  @if (showBonusChip()) {
+  <div style="display: flex; justify-content: center; margin-bottom: 1.25rem;">
+    <span
+      [style.background]="myBonusBalance() > 0 ? '#ecfdf5' : '#fef2f2'"
+      [style.border-color]="myBonusBalance() > 0 ? '#a7f3d0' : '#fecaca'"
+      [style.color]="myBonusBalance() > 0 ? '#047857' : '#b91c1c'"
+      style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; border-radius: 40px; border: 1px solid; font-weight: 700; font-size: 0.95rem;">
+      <span class="material-icons" style="font-size: 18px;">confirmation_number</span>
+      @if (myBonusBalance() > 0) {
+        Bono: {{ myBonusBalance() }} clase{{ myBonusBalance() === 1 ? '' : 's' }} disponible{{ myBonusBalance() === 1 ? '' : 's' }}
+      } @else {
+        Bono agotado: contacta con el club para recargarlo
+      }
+    </span>
+  </div>
+  }
+
   <div class="week-selector">
     <button [class.active]="selectedWeek() === 'current'" (click)="toggleWeek('current')">
       Semana Actual
@@ -118,6 +154,12 @@
                   <span class="material-icons time-icon">schedule</span>
                   <span class="time-range">{{ slot.start_time | slice:0:5 }} - {{ slot.end_time | slice:0:5 }}</span>
                 </div>
+                @if (hasMultipleTracks() && slot.training_track) {
+                <div class="time-badge" style="margin: 0;">
+                  <span class="material-icons time-icon">flag</span>
+                  <span>{{ slot.training_track.name }}</span>
+                </div>
+                }
               </div>
               <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                 @if (!slot.isCancelled) {
@@ -272,6 +314,8 @@
       </app-empty-state>
     }
   }
+
+  }
 </div>
 
 <!-- Booking Modal -->
@@ -281,6 +325,15 @@
       <h3><span class="material-icons" style="vertical-align: text-bottom; margin-right: 8px;">event_available</span> Confirmar Reserva</h3>
       <div class="dog-selection" style="padding-top: 1.5rem;">
         <p class="confirm-message" style="margin-top: 0; margin-bottom: 1.5rem;">¿Estás seguro de que quieres reservar plaza el <strong>{{ selectedSlotForBooking()?.day }} {{ selectedSlotForBooking()?.date | date:'dd/MM' }}</strong> a las <strong>{{ selectedSlotForBooking()?.start_time | slice:0:5 }}</strong>?</p>
+        @if (showBonusChip()) {
+        <p style="display: flex; align-items: flex-start; gap: 8px; margin: -0.5rem 0 1.5rem; padding: 10px 14px; border-radius: 10px; font-size: 0.9rem;"
+          [style.background]="myBonusBalance() > 0 ? '#ecfdf5' : '#fef2f2'"
+          [style.color]="myBonusBalance() > 0 ? '#047857' : '#b91c1c'">
+          <span class="material-icons" style="font-size: 18px; margin-top: 1px;">confirmation_number</span>
+          <span>Se consumirá <strong>1 clase de tu bono por cada perro</strong> que apuntes (se devuelve si cancelas).
+            Ahora mismo tienes <strong>{{ myBonusBalance() }} clase{{ myBonusBalance() === 1 ? '' : 's' }}</strong>.</span>
+        </p>
+        }
       @if (authService.isStaff()) {
         <div class="admin-user-selector" style="margin-bottom: 1.5rem; padding: 1rem; background: #f0f4f8; border-radius: 8px; border-left: 4px solid #1976d2;">
           <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: #1976d2;">

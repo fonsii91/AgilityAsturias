@@ -18,9 +18,10 @@ Concepto de la aplicación, mapa de características y funcionalidades.
 *   **[[funcionalidades]]**: Índice de funciones disponibles para Socios, Staff e Invitados/Inactivos.
 *   **[[presencia-publica]]**: Detalle de la cara pública de la web (Bienvenida, Galería, Videoteca y Contacto).
 *   **[[usuarios]]**: Roles de usuario (Visitante / Invitado / Inactivo, Socio, Staff, Responsable del Club y Administrador Global) y alcance de permisos.
-*   **[[provision-fondos]]**: Especificación de la provisión de fondos de socios (saldo, ingresos, gastos y roles de acceso).
+*   **[[provision-fondos]]**: Especificación de la provisión de fondos de socios (saldo, ingresos, gastos y roles de acceso) y de los bonos de clases (contador de clases por socio con consumo/devolución automático al reservar).
 *   **[[historial-asistencia]]**: Análisis y consulta del histórico y estadísticas de asistencia de miembros (clases y eventos) para el perfil Staff.
 *   **[[gestionar-club]]**: Panel de configuración de identidad visual, marca, contacto y activación de módulos por club.
+*   **[[pistas-entrenamiento]]**: Gestión de las pistas de entrenamiento del club (nombre, foto y terreno), pista principal por defecto, asignación de pista a los horarios de clase y módulo opcional de reserva individual de pistas (entrenamientos libres).
 *   **[[galeria-fotos]]**: Galería de fotos interna del club con subida en lote, compresión, etiquetado de perros/miembros y almacenamiento en Mega S4 por cuota de plan.
 *   **[[lineas-futuras-roadmap]]**: Futuras líneas de desarrollo (Notificaciones Push, Mapas de pistas, etc.).
 

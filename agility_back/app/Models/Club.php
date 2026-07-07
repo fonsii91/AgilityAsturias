@@ -80,6 +80,18 @@ class Club extends Model
 
     protected static function booted()
     {
+        // Todo club nace con su pista de entrenamiento principal: la regla de
+        // negocio exige al menos una pista por club para poder asociar los
+        // horarios de clase. club_id explícito porque la creación puede correr
+        // fuera del contexto de tenant (webhook de Stripe, panel de admin).
+        static::created(function ($club) {
+            \App\Models\TrainingTrack::create([
+                'club_id' => $club->id,
+                'name' => \App\Models\TrainingTrack::DEFAULT_NAME,
+                'surface' => 'otro',
+            ]);
+        });
+
         static::deleting(function ($club) {
             // Delete all videos of the club via Eloquent to trigger file cleanups (Bunny.net & Local)
             \App\Models\Video::withoutGlobalScopes()
@@ -104,6 +116,13 @@ class Club extends Model
 
             // Delete all users of the club via Eloquent to trigger their delete events (which also cleans up their videos)
             \App\Models\User::withoutGlobalScopes()
+                ->where('club_id', $club->id)
+                ->get()
+                ->each
+                ->delete();
+
+            // Delete all training tracks via Eloquent to trigger photo file cleanup
+            \App\Models\TrainingTrack::withoutGlobalScopes()
                 ->where('club_id', $club->id)
                 ->get()
                 ->each

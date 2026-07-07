@@ -6,6 +6,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { RouterModule } from '@angular/router';
 import { ConfirmDialog, ConfirmDialogData } from '../../components/shared/confirm-dialog/confirm-dialog';
 import { TimeSlotService } from '../../services/time-slot.service';
+import { TrainingTrackService } from '../../services/training-track.service';
 import { ToastService } from '../../services/toast.service';
 import { TimeSlot } from '../../models/time-slot.model';
 import { environment } from '../../../environments/environment';
@@ -33,7 +34,14 @@ export class GestionarHorariosComponent {
   authService = inject(AuthService);
   dialog = inject(MatDialog);
 
+  trainingTrackService = inject(TrainingTrackService);
+
   timeSlots = this.timeSlotService.getTimeSlots();
+  trainingTracks = this.trainingTrackService.getTracks();
+
+  constructor() {
+    this.trainingTrackService.fetchTracks();
+  }
 
   activeFilter = signal('Todos');
   availableDays = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -77,6 +85,7 @@ export class GestionarHorariosComponent {
   isSettingsModalOpen = false;
   isSubmittingSettings = signal(false);
   cancellationNoticeHours: number = 24;
+  classBonusesEnabled: boolean = false;
   availableColors = [
     { value: '', label: 'Por defecto', bg: '#f1f5f9', border: '#cbd5e1' },
     { value: 'blue', label: 'Azul', bg: '#eff6ff', border: '#bfdbfe' },
@@ -102,7 +111,8 @@ export class GestionarHorariosComponent {
     maxBookings: 5,
     isUnique: false,
     date: '',
-    color: ''
+    color: '',
+    trackId: null as number | null
   };
 
   openModal() {
@@ -116,7 +126,9 @@ export class GestionarHorariosComponent {
       maxBookings: 5,
       isUnique: false,
       date: '',
-      color: ''
+      color: '',
+      // Por defecto, la pista principal del club (la más antigua)
+      trackId: this.trainingTracks()[0]?.id ?? null
     };
   }
 
@@ -127,6 +139,7 @@ export class GestionarHorariosComponent {
 
   openSettingsModal() {
     this.cancellationNoticeHours = this.tenantService.tenantInfo()?.settings?.['cancellation_notice_hours'] ?? 24;
+    this.classBonusesEnabled = this.tenantService.tenantInfo()?.settings?.['class_bonuses_enabled'] === true;
     this.isSettingsModalOpen = true;
   }
 
@@ -141,7 +154,11 @@ export class GestionarHorariosComponent {
 
     this.isSubmittingSettings.set(true);
     try {
-      const updatedSettings = { ...info.settings, cancellation_notice_hours: Number(this.cancellationNoticeHours) };
+      const updatedSettings = {
+        ...info.settings,
+        cancellation_notice_hours: Number(this.cancellationNoticeHours),
+        class_bonuses_enabled: this.classBonusesEnabled === true
+      };
       await firstValueFrom(this.clubAdminService.updateClub(info.id, {
         name: info.name,
         slug: info.slug,
@@ -169,7 +186,8 @@ export class GestionarHorariosComponent {
       maxBookings: slot.max_bookings,
       isUnique: !!slot.date,
       date: slot.date || '',
-      color: slot.color || ''
+      color: slot.color || '',
+      trackId: slot.training_track_id ?? this.trainingTracks()[0]?.id ?? null
     };
   }
 
@@ -222,7 +240,8 @@ export class GestionarHorariosComponent {
           end_time: this.slotForm.endTime,
           max_bookings: this.slotForm.maxBookings,
           color: this.slotForm.color || null,
-          date: dateValue
+          date: dateValue,
+          training_track_id: this.slotForm.trackId
         };
         await this.timeSlotService.updateTimeSlot(this.editingSlot.id, slotData);
         this.toastService.success('Horario actualizado.');
@@ -240,7 +259,8 @@ export class GestionarHorariosComponent {
             end_time: this.slotForm.endTime,
             max_bookings: this.slotForm.maxBookings,
             color: this.slotForm.color || null,
-            date: this.slotForm.date
+            date: this.slotForm.date,
+            training_track_id: this.slotForm.trackId
           };
           await this.timeSlotService.addTimeSlot(slotData as any);
         } else {
@@ -253,7 +273,8 @@ export class GestionarHorariosComponent {
               end_time: this.slotForm.endTime,
               max_bookings: this.slotForm.maxBookings,
               color: this.slotForm.color || null,
-              date: null
+              date: null,
+              training_track_id: this.slotForm.trackId
             };
             await this.timeSlotService.addTimeSlot(slotData as any);
           }

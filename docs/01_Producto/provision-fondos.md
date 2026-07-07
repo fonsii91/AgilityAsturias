@@ -97,3 +97,43 @@ El panel de administración del gestor (`/admin/finanzas`) emplea una estructura
     *   **Justificante Drag-and-Drop:** Zona interactiva de carga de archivos (PDF o imágenes, máx. 5MB) que reacciona con micro-animaciones y cambios de color según el estado del archivo (`drag-over`, `has-file`).
     *   **Prevención de Errores (Double-submit):** El botón de guardar se deshabilita instantáneamente al iniciar el guardado para evitar registros duplicados.
 
+
+---
+
+## 🎟️ 6. Bonos de Clases
+
+Además de los movimientos de dinero, la sección de Provisión de Fondos gestiona los **bonos de clases** de los socios: un **contador de clases disponibles por miembro, sin caducidad**.
+
+### Activación (opt-in del gestor)
+
+Funcionalidad activable/desactivable por el Responsable del Club (setting `class_bonuses_enabled`, desactivada por defecto) desde dos sitios equivalentes:
+
+- **Funcionalidades del club** → tarjeta "Bonos de Clases".
+- **Gestión de Horarios → Ajustes (Reglas de Reservas)** → checkbox "Bonos de clases".
+
+### Gestión (staff)
+
+- En **Administrar Finanzas** (gestor), al seleccionar un socio aparece (solo con la funcionalidad activa) la tarjeta de su bono con el saldo actual y un campo para **añadir clases directamente** (los valores negativos corrigen errores; el saldo nunca baja de 0).
+- En **Gestión de Miembros** (accesible al staff), cada socio muestra un distintivo verde con su saldo de bono; pulsándolo se abre el modal para añadir clases. Así el staff recarga bonos sin necesitar acceso a las finanzas del club.
+- Endpoint: `POST /api/class-bonuses/{userId}/add` con `{ classes }` (roles admin/manager/staff, tras el middleware `class_bonuses.enabled`).
+- El dashboard financiero (`users_with_balances`) incluye el campo `class_bonus` de cada socio.
+
+### Consumo y devolución automáticos
+
+Con la funcionalidad **activada**:
+
+- **Apuntarse a una clase consume una clase del bono** en el momento de la inscripción (una por perro/plaza; el descuento es atómico para evitar carreras).
+- **Sin clases disponibles no se puede apuntar**: se bloquea la inscripción del socio (y también la del staff en su nombre, con un mensaje que le indica recargar el bono primero).
+- La clase consumida **se devuelve al bono** en todas las vías de cancelación: el socio cancela, el staff le desapunta (individual o en bloque), el staff anula la clase por excepción/festivo, o se borra el horario completo.
+- Cada reserva guarda la marca `bonus_consumed`: solo se devuelve lo que realmente se consumió (sin dobles devoluciones y sin devoluciones de reservas hechas con la funcionalidad desactivada).
+- Las reservas de usuarios staff/gestor para sí mismos no consumen bono.
+
+Con la funcionalidad **desactivada**, las clases funcionan como siempre, sin consumir bonos (los saldos se conservan).
+
+### Vista del Socio
+
+El socio ve cuántas clases le quedan en tres puntos:
+
+- **Reservas**: distintivo en la cabecera ("Bono: X clases disponibles", o aviso de bono agotado), que se refresca tras reservar o cancelar.
+- **Modal de confirmación de reserva**: recordatorio de que se consumirá 1 clase por perro y del saldo actual, justo antes de confirmar.
+- **Mis gastos (/finanzas)**: tarjeta "Tu Bono de Clases" junto al saldo de fondos (azul con saldo, ámbar si está agotado), con el dato refrescado al entrar.

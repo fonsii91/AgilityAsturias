@@ -1,5 +1,14 @@
 [
   {
+    "version": "1.1.60",
+    "date": "2026-07-07",
+    "features": [
+      "¡Ya puedes gestionar tus pistas de entrenamiento! Si tu club entrena en varias zonas, ahora puedes darlas de alta desde 'Gestión de Horarios', cada una con su nombre, su foto y su tipo de terreno (tierra, césped, césped artificial u otro). Todos los clubes empiezan con una pista creada por defecto, así que no tienes que configurar nada si solo usáis una. Y cuando creas o editas una clase del horario, puedes indicar en qué pista se imparte (el selector solo aparece si tienes más de una, para no complicar las cosas).",
+      "¡Reserva de pistas para entrenamientos libres! Una nueva opción, activable por el responsable del club, que permite a los socios reservar una pista durante una hora para entrenar por su cuenta, sin monitor. Aparece como una pestaña dentro de 'Reservas': el socio elige el día y ve, pista por pista, qué horas están libres. El sistema bloquea automáticamente las franjas que ya ocupa una clase o que otro socio ha reservado, para que nunca haya solapamientos.",
+      "¡Bonos de clases! Otra novedad activable por el responsable del club: cada socio dispone de un bono con el número de clases que tiene disponibles. Al apuntarse a una clase se descuenta una automáticamente, y si cancela, se le devuelve. Si un socio se queda sin clases, no podrá reservar hasta que le recarguéis el bono. El equipo del club puede añadir clases a cada socio desde 'Gestión de Miembros' o desde 'Administrar Finanzas', y cada socio consulta cuántas le quedan en su pantalla de Reservas y en 'Mis gastos'."
+    ]
+  },
+  {
     "version": "1.1.59",
     "date": "2026-06-29",
     "bugfixes": [

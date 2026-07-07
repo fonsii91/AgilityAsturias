@@ -213,6 +213,12 @@ export const routes: Routes = [
                 title: titleResolver, data: { pageTitle: 'Gestión de Horarios' }
             },
             {
+                path: 'gestionar-pistas',
+                loadComponent: () => import('./reservas/gestionar-pistas/gestionar-pistas.component').then(m => m.GestionarPistasComponent),
+                canActivate: [managerGuard, featureGuard('reservas-pistas')],
+                title: titleResolver, data: { pageTitle: 'Pistas de Entrenamiento' }
+            },
+            {
                 path: 'gestionar-competiciones',
                 loadComponent: () => import('./components/crud-competicion/crud-competicion.component').then(m => m.CrudCompeticionComponent),
                 canActivate: [staffGuard],

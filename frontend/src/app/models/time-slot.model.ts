@@ -1,3 +1,5 @@
+import { TrainingTrack } from './training-track.model';
+
 export interface TimeSlot {
     id: number;
     day: string;
@@ -6,6 +8,8 @@ export interface TimeSlot {
     end_time: string;
     max_bookings: number;
     color?: string | null;
+    training_track_id?: number | null;
+    training_track?: TrainingTrack | null;
     // Front-end only properties (optional)
     currentBookings?: number;
     isBookedByCurrentUser?: boolean;

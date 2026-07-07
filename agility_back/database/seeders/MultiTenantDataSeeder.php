@@ -37,9 +37,11 @@ class MultiTenantDataSeeder extends Seeder
             
             echo "-> Llenando " . $club->name . "\n";
             
-            // 1. TimeSlots para reservas
+            // 1. TimeSlots para reservas (asignados a la pista principal del club)
             $slots = TimeSlot::factory()->count(2)->create([
-                'club_id' => $club->id
+                'club_id' => $club->id,
+                'training_track_id' => \App\Models\TrainingTrack::withoutGlobalScopes()
+                    ->where('club_id', $club->id)->orderBy('id')->value('id'),
             ]);
 
             // 2. Usuarios

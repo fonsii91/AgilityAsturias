@@ -1,0 +1,83 @@
+<div class="track-booking-container">
+  <div class="intro-banner">
+    <span class="material-icons">self_improvement</span>
+    <div>
+      <strong>Entrenamientos libres</strong>
+      <p>Reserva una pista durante una hora para entrenar por tu cuenta, sin monitor. Solo puedes reservar franjas en
+        las que la pista no esté ocupada por una clase u otra reserva.</p>
+    </div>
+  </div>
+
+  <!-- Selector de día (próximos 7 días) -->
+  <div class="day-selector">
+    @for (day of days; track day.date) {
+    <button class="day-chip" [class.active]="selectedDate() === day.date" (click)="selectDate(day.date)">
+      <span class="day-chip-name">{{ day.dayName }}</span>
+      <span class="day-chip-date">{{ day.dayNumber }}</span>
+    </button>
+    }
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <span class="material-icons spinning">progress_activity</span>
+    Cargando disponibilidad...
+  </div>
+  } @else {
+
+  <div class="tracks-list">
+    @for (track of tracks(); track track.id) {
+    <div class="track-availability-card">
+      <div class="track-header">
+        @if (track.photo_url) {
+        <img class="track-thumb" [src]="track.photo_url" [alt]="track.name" />
+        } @else {
+        <div class="track-thumb placeholder">
+          <span class="material-icons">flag</span>
+        </div>
+        }
+        <div class="track-header-info">
+          <span class="track-title">{{ track.name }}</span>
+          <span class="track-surface">{{ surfaceLabel(track.surface) }}</span>
+        </div>
+      </div>
+
+      <div class="hours-grid">
+        @for (slot of track.slots; track slot.start_time) {
+        <button class="hour-chip"
+          [class.free]="slot.status === 'free' && !isPast(slot)"
+          [class.past]="slot.status === 'free' && isPast(slot)"
+          [class.class-busy]="slot.status === 'class'"
+          [class.booked]="slot.status === 'booked'"
+          [class.mine]="slot.status === 'mine'"
+          [disabled]="slot.status === 'booked' || slot.status === 'class' || (slot.status === 'free' && isPast(slot))"
+          [title]="slotTitle(slot)"
+          (click)="onSlotClick(track, slot)">
+          <span class="hour-label">{{ slot.start_time }}</span>
+          <span class="hour-status">
+            @switch (slot.status) {
+              @case ('class') { <span class="material-icons">school</span> }
+              @case ('booked') { <span class="material-icons">person</span> }
+              @case ('mine') { <span class="material-icons">check_circle</span> }
+              @default {
+                @if (isPast(slot)) { <span class="material-icons">history</span> }
+                @else { <span class="material-icons">add</span> }
+              }
+            }
+          </span>
+        </button>
+        }
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Leyenda -->
+  <div class="legend">
+    <span class="legend-item"><span class="legend-dot free"></span> Libre</span>
+    <span class="legend-item"><span class="legend-dot mine"></span> Tu reserva</span>
+    <span class="legend-item"><span class="legend-dot class-busy"></span> Clase</span>
+    <span class="legend-item"><span class="legend-dot booked"></span> Ocupada</span>
+  </div>
+  }
+</div>

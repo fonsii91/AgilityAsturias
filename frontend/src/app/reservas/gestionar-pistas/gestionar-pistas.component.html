@@ -1,0 +1,152 @@
+<div class="management-container" [style.--club-primary]="clubConfig.colors.primary"
+  [style.--club-accent]="clubConfig.colors.accent" [style.--club-warn]="clubConfig.colors.warn">
+  <div style="margin-bottom: 1rem;">
+    <a routerLink="/gestionar-horarios"
+      style="display: inline-flex; align-items: center; gap: 6px; color: #64748b; text-decoration: none; font-size: 0.95rem; font-weight: 600; transition: color 0.2s; cursor: pointer;"
+      onmouseover="this.style.color='var(--primary-color)'" onmouseout="this.style.color='#64748b'">
+      <span class="material-icons" style="font-size: 18px;">arrow_back</span>
+      Volver a Gestión de Horarios
+    </a>
+  </div>
+
+  <div class="header-main"
+    style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h2 style="margin-top: 0;"><span class="material-icons"
+          style="vertical-align: middle; margin-right: 8px;">flag</span> Pistas de Entrenamiento</h2>
+      <p class="subtitle" style="margin-top: 4px;">Gestiona las pistas de tu club. Cada clase del horario se imparte en
+        una de estas pistas.</p>
+    </div>
+    <button class="btn-primary-action" (click)="openModal()"
+      style="display: flex; align-items: center; justify-content: center; width: 180px; white-space: nowrap;">
+      <span class="material-icons btn-icon-small">add</span>
+      Añadir Pista
+    </button>
+  </div>
+
+  <div class="management-body">
+    <div class="list-header">
+      <h4 class="section-title card-title">
+        <span class="material-icons indicator-icon">view_list</span>
+        Pistas del Club
+      </h4>
+      <span class="count-badge">{{ tracks().length }} pista{{ tracks().length === 1 ? '' : 's' }}</span>
+    </div>
+
+    <div class="tracks-grid">
+      @for (track of tracks(); track track.id) {
+      <div class="track-card">
+        <div class="track-photo">
+          @if (track.photo_url) {
+          <img [src]="track.photo_url" [alt]="track.name" />
+          } @else {
+          <div class="track-photo-placeholder">
+            <span class="material-icons">{{ surfaceIcon(track.surface) }}</span>
+          </div>
+          }
+        </div>
+        <div class="track-body">
+          <div class="track-info">
+            <span class="track-name">{{ track.name }}</span>
+            <span class="capacity-badge">
+              <span class="material-icons icon-tiny">{{ surfaceIcon(track.surface) }}</span>
+              {{ surfaceLabel(track.surface) }}
+            </span>
+          </div>
+          <div class="track-actions">
+            <button class="btn-icon-action edit" (click)="openModal(track)" title="Editar">
+              <span class="material-icons">edit</span>
+            </button>
+            <button class="btn-icon-action delete" (click)="deleteTrack(track)"
+              [disabled]="tracks().length <= 1"
+              [title]="tracks().length <= 1 ? 'Debe existir al menos una pista en el club' : 'Eliminar'">
+              <span class="material-icons">delete_outline</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    @if (tracks().length === 1) {
+    <p class="single-track-hint">
+      <span class="material-icons" style="font-size: 16px; vertical-align: text-bottom;">info</span>
+      Esta es la pista principal de tu club. Añade más pistas si entrenáis en varias zonas y podrás asignarlas a cada
+      clase del horario.
+    </p>
+    }
+  </div>
+</div>
+
+<!-- Modal Crear/Editar -->
+@if (isModalOpen) {
+<div class="modal-backdrop" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header header-light">
+      <h3>
+        <span class="material-icons header-icon">flag</span>
+        {{ editingTrack ? 'Editar Pista' : 'Nueva Pista' }}
+      </h3>
+      <button class="btn-icon close-btn" (click)="closeModal()" title="Cerrar">
+        <span class="material-icons">close</span>
+      </button>
+    </div>
+    <div class="management-body" style="background: white; padding: 2rem;">
+      <div class="form-grid" style="grid-template-columns: 1fr;">
+        <div class="form-group">
+          <label>Nombre de la pista</label>
+          <div class="input-with-icon">
+            <span class="material-icons input-icon">label</span>
+            <input type="text" [(ngModel)]="trackForm.name" class="modern-input with-icon"
+              placeholder="Ej. Pista cubierta, Pista exterior..." maxlength="255" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Terreno</label>
+          <div class="surface-selector">
+            @for (option of surfaceOptions; track option.value) {
+            <button type="button" class="surface-btn" [class.selected]="trackForm.surface === option.value"
+              (click)="trackForm.surface = option.value">
+              <span class="material-icons">{{ surfaceIcon(option.value) }}</span>
+              {{ option.label }}
+            </button>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Foto (Opcional)</label>
+          @if (photoPreview) {
+          <div class="photo-preview">
+            <img [src]="photoPreview" alt="Foto de la pista" />
+            <button type="button" class="btn-icon-action delete photo-remove-btn" (click)="clearPhoto()"
+              title="Quitar foto">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          } @else {
+          <label class="photo-dropzone">
+            <span class="material-icons">add_photo_alternate</span>
+            <span>Subir una foto de la pista (se optimiza automáticamente)</span>
+            <input type="file" accept="image/*" (change)="onPhotoSelected($event)" hidden />
+          </label>
+          }
+        </div>
+      </div>
+
+      <div class="form-actions-row">
+        <button class="btn-text" (click)="closeModal()">
+          <span class="material-icons btn-icon-small">cancel</span>
+          Cancelar
+        </button>
+        <button class="btn-primary-action" [class.btn-edit]="editingTrack" (click)="saveTrack()"
+          [disabled]="isSubmitting">
+          <span class="material-icons btn-icon-small">{{ editingTrack ? 'save' : 'add' }}</span>
+          {{ isSubmitting ? 'Guardando...' : (editingTrack ? 'Guardar Cambios' : 'Añadir Pista') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+}

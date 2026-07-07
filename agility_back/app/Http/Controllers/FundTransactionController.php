@@ -141,7 +141,7 @@ class FundTransactionController extends Controller
         $allTransactions = FundTransaction::with(['creator:id,name'])->get();
 
         // Obtener los socios del club (HasClub lo filtra automáticamente)
-        $users = User::select('id', 'name', 'email')->orderBy('name')->get();
+        $users = User::select('id', 'name', 'email', 'class_bonus_balance')->orderBy('name')->get();
 
         $userBalances = [];
         foreach ($users as $u) {
@@ -191,7 +191,8 @@ class FundTransactionController extends Controller
                 'id' => $data['user']->id,
                 'name' => $data['user']->name,
                 'email' => $data['user']->email,
-                'balance' => (float)number_format($data['balance'], 2, '.', '')
+                'balance' => (float)number_format($data['balance'], 2, '.', ''),
+                'class_bonus' => (int) $data['user']->class_bonus_balance,
             ];
         }
 

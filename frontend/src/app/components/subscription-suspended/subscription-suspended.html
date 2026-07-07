@@ -1,47 +1,44 @@
 <div class="suspended-container">
-  <div class="glass-card fade-in">
-    <div class="card-glow"></div>
-    <div class="card-content">
-      
-      <!-- Logotipo o Icono -->
-      <div class="logo-area">
-        <img *ngIf="clubLogo()" [src]="clubLogo()" class="club-logo" alt="Logo de {{ clubName() }}">
-        <div *ngIf="!clubLogo()" class="lock-icon-container">
-          <span class="material-icons lock-icon">lock</span>
-        </div>
+  <div class="suspended-card fade-in">
+
+    <!-- Logotipo o Icono -->
+    <div class="logo-area">
+      <img *ngIf="clubLogo()" [src]="clubLogo()" class="club-logo" alt="Logo de {{ clubName() }}">
+      <div *ngIf="!clubLogo()" class="lock-icon-container">
+        <span class="material-icons lock-icon">lock</span>
       </div>
-
-      <!-- Texto Explicativo -->
-      <h1 class="suspended-title">Acceso Suspendido</h1>
-      <h2 class="club-subtitle">{{ clubName() }}</h2>
-      
-      <div class="divider"></div>
-
-      <p class="description">
-        La suscripción de este club a la plataforma **ClubAgility** se encuentra inactiva.
-      </p>
-
-      <div class="roles-box">
-        <div class="role-instruction">
-          <span class="material-icons role-icon">admin_panel_settings</span>
-          <div class="role-text">
-            <strong>¿Eres administrador?</strong> Inicia sesión con tu cuenta de gestor y accede al panel de Facturación para reactivar el servicio al instante.
-          </div>
-        </div>
-        <div class="role-instruction">
-          <span class="material-icons role-icon">people</span>
-          <div class="role-text">
-            <strong>¿Eres socio o entrenador?</strong> Ponte en contacto con la directiva de tu club para avisarles de la suspensión y solicitar su reactivación.
-          </div>
-        </div>
-      </div>
-
-      <!-- Botón de Salida -->
-      <button class="primary-btn logout-btn btn-glow" (click)="logout()">
-        <span class="material-icons">logout</span>
-        Volver a Iniciar Sesión
-      </button>
-
     </div>
+
+    <!-- Texto Explicativo -->
+    <h1 class="suspended-title">Acceso Suspendido</h1>
+    <h2 class="club-subtitle">{{ clubName() }}</h2>
+
+    <div class="divider"></div>
+
+    <p class="description">
+      La suscripción de este club a la plataforma <strong>ClubAgility</strong> se encuentra inactiva.
+    </p>
+
+    <div class="roles-box">
+      <div class="role-instruction">
+        <span class="material-icons role-icon">admin_panel_settings</span>
+        <div class="role-text">
+          <strong>¿Eres administrador?</strong> Inicia sesión con tu cuenta de gestor y accede al panel de Facturación para reactivar el servicio al instante.
+        </div>
+      </div>
+      <div class="role-instruction">
+        <span class="material-icons role-icon">people</span>
+        <div class="role-text">
+          <strong>¿Eres socio o entrenador?</strong> Ponte en contacto con la directiva de tu club para avisarles de la suspensión y solicitar su reactivación.
+        </div>
+      </div>
+    </div>
+
+    <!-- Botón de Salida -->
+    <button class="logout-btn" (click)="logout()">
+      <span class="material-icons">logout</span>
+      Volver a Iniciar Sesión
+    </button>
+
   </div>
 </div>

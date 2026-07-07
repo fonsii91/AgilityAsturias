@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ToastService } from '../../services/toast.service';
+import { TenantService } from '../../services/tenant.service';
 import { EmptyStateComponent } from '../ui/empty-state/empty-state';
 
 export interface UserWithBalance {
@@ -20,6 +21,7 @@ export interface UserWithBalance {
   name: string;
   email: string;
   balance: number;
+  class_bonus?: number;
 }
 
 @Component({
@@ -144,6 +146,35 @@ export interface UserWithBalance {
                     </p>
                   </mat-card-content>
                 </mat-card>
+
+                <!-- Bono de Clases (funcionalidad opt-in del gestor) -->
+                @if (classBonusesEnabled()) {
+                  <mat-card class="bonus-card" style="margin-bottom: 1.5rem;">
+                    <mat-card-content style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                      <div>
+                        <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; font-weight: 600; color: #64748b;">
+                          <mat-icon style="font-size: 18px; width: 18px; height: 18px;">confirmation_number</mat-icon>
+                          Bono de clases de {{ selectedUser()?.name }}
+                        </span>
+                        <h3 style="margin: 4px 0; font-size: 1.6rem; font-weight: 800; color: #0f172a;">
+                          {{ selectedUser()?.class_bonus ?? 0 }} clase{{ (selectedUser()?.class_bonus ?? 0) === 1 ? '' : 's' }}
+                        </h3>
+                        <p style="margin: 0; font-size: 0.85rem; color: #64748b;">
+                          Cada inscripción a una clase consume una; al cancelar se devuelve. Sin caducidad.
+                        </p>
+                      </div>
+                      <div style="display: flex; align-items: center; gap: 10px;">
+                        <mat-form-field appearance="outline" style="width: 140px; margin-bottom: -1.25em;">
+                          <mat-label>Clases a añadir</mat-label>
+                          <input matInput type="number" step="1" [(ngModel)]="bonusClassesToAdd" [ngModelOptions]="{standalone: true}" placeholder="Ej: 10">
+                        </mat-form-field>
+                        <button mat-flat-button color="primary" (click)="addBonusClasses()" [disabled]="isSavingBonus()">
+                          <mat-icon>add</mat-icon> {{ isSavingBonus() ? 'Guardando...' : 'Añadir' }}
+                        </button>
+                      </div>
+                    </mat-card-content>
+                  </mat-card>
+                }
 
                 <!-- Historial de Movimientos -->
                 <div class="tx-section-header">
@@ -1993,6 +2024,14 @@ export class FinanzasGestorComponent implements OnInit {
   private fb = inject(FormBuilder);
   private toast = inject(ToastService);
   private http = inject(HttpClient);
+  private tenantService = inject(TenantService);
+
+  // Bonos de clases: la tarjeta de bono solo aparece con la funcionalidad activa
+  classBonusesEnabled = computed(() => {
+    return this.tenantService.tenantInfo()?.settings?.['class_bonuses_enabled'] === true;
+  });
+  bonusClassesToAdd: number | null = null;
+  isSavingBonus = signal(false);
 
   usersList = signal<UserWithBalance[]>([]);
   filteredUsers = signal<UserWithBalance[]>([]);
@@ -2169,6 +2208,37 @@ export class FinanzasGestorComponent implements OnInit {
     this.transactions.set([]);
     this.balance.set(0);
     this.loadDashboardData();
+  }
+
+  /** Añade clases al bono del socio seleccionado (valores negativos corrigen; el backend no baja de 0). */
+  addBonusClasses() {
+    const userId = this.selectedUserId();
+    const classes = Math.trunc(Number(this.bonusClassesToAdd));
+
+    if (!userId || this.isSavingBonus()) return;
+    if (!classes || isNaN(classes)) {
+      this.toast.error('Indica cuántas clases quieres añadir al bono.');
+      return;
+    }
+
+    this.isSavingBonus.set(true);
+    this.http.post<{ id: number; class_bonus_balance: number }>(
+      `${environment.apiUrl}/class-bonuses/${userId}/add`,
+      { classes }
+    ).subscribe({
+      next: (res) => {
+        // Actualiza el detalle y la lista lateral sin recargar todo el dashboard
+        this.selectedUser.update(u => u ? { ...u, class_bonus: res.class_bonus_balance } : u);
+        this.usersList.update(list => list.map(u => u.id === res.id ? { ...u, class_bonus: res.class_bonus_balance } : u));
+        this.bonusClassesToAdd = null;
+        this.isSavingBonus.set(false);
+        this.toast.success(`Bono actualizado: ${res.class_bonus_balance} clases disponibles.`);
+      },
+      error: (err) => {
+        this.isSavingBonus.set(false);
+        this.toast.error(err?.error?.message || 'No se pudo actualizar el bono.');
+      }
+    });
   }
 
   loadTransactions() {

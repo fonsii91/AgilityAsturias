@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TenantService } from '../../services/tenant.service';
-import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -14,7 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 })
 export class SubscriptionSuspendedComponent implements OnInit {
   tenantService = inject(TenantService);
-  private router = inject(Router);
+  private authService = inject(AuthService);
 
   clubName = signal<string>('Club Agility');
   clubLogo = signal<string | null>(null);
@@ -28,8 +28,6 @@ export class SubscriptionSuspendedComponent implements OnInit {
   }
 
   logout() {
-    // In Angular, we can clear storage and navigate to login
-    localStorage.removeItem('auth_token');
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }
