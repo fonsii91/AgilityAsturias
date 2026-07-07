@@ -138,11 +138,19 @@ describe('ReservaPistasComponent Logic', () => {
   });
 
   it('should mark past slots of today as not reservable', () => {
-    component.ngOnInit();
-    const today = component.days[0].date;
-    component.selectedDate.set(today);
+    // Hora fijada a mediodía: con el reloj real el test se volvía flaky
+    // (ejecutado a las 23:59, la franja de las 23:59 ya cuenta como pasada).
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 0, 15, 12, 0, 0));
+    try {
+      component.ngOnInit();
+      const today = component.days[0].date;
+      component.selectedDate.set(today);
 
-    expect(component.isPast({ start_time: '00:00', end_time: '01:00', status: 'free' })).toBe(true);
-    expect(component.isPast({ start_time: '23:59', end_time: '24:00', status: 'free' })).toBe(false);
+      expect(component.isPast({ start_time: '00:00', end_time: '01:00', status: 'free' })).toBe(true);
+      expect(component.isPast({ start_time: '23:59', end_time: '24:00', status: 'free' })).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

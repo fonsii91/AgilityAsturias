@@ -22,7 +22,7 @@ describe('HistorialAsistenciaComponent', () => {
     } as any;
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     attendanceHistoryServiceMock = {
       loading: vi.fn().mockReturnValue(false),
       generalStats: vi.fn().mockReturnValue({
@@ -88,6 +88,7 @@ describe('HistorialAsistenciaComponent', () => {
         provideAnimations()
       ]
     });
+    await TestBed.compileComponents();
   });
 
   it('should create the component', () => {

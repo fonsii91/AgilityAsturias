@@ -1,20 +1,11 @@
-import '@angular/compiler';
-import 'zone.js';
-import 'zone.js/testing';
-import { TestBed, getTestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
-import { afterEach, beforeEach, vi } from 'vitest';
+import { vi } from 'vitest';
 
-getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
+// canvas-confetti pinta en un <canvas> real vía requestAnimationFrame; en el
+// DOM de test (jsdom) getContext() devuelve null y revienta fuera de los tests.
+vi.mock('canvas-confetti', () => ({ default: Object.assign(vi.fn(), { reset: vi.fn() }) }));
 
-beforeEach(() => {
-  TestBed.resetTestingModule();
-});
-
-afterEach(() => {
-  TestBed.resetTestingModule();
-});
-
+// El builder @angular/build:unit-test ya inicializa el TestBed y zone.js;
+// aquí solo van los polyfills que faltan en el DOM de test.
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
