@@ -62,6 +62,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Rutas de Facturación y Suscripción (exentas de bloqueo por suscripción inactiva)
     Route::post('/billing/checkout', [\App\Http\Controllers\BillingController::class, 'checkout']);
+    Route::post('/billing/sync-checkout', [\App\Http\Controllers\BillingController::class, 'syncCheckoutSession']);
     Route::post('/billing/portal', [\App\Http\Controllers\BillingController::class, 'portal']);
     Route::get('/billing/status', [\App\Http\Controllers\BillingController::class, 'status']);
     Route::get('/billing/invoices', [\App\Http\Controllers\BillingController::class, 'invoices']);

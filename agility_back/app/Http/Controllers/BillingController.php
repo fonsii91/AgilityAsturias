@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Club;
 use App\Models\Plan;
+use App\Services\StripeSubscriptionSyncService;
+use App\Support\FrontendUrl;
 use Illuminate\Support\Facades\Log;
+use Laravel\Cashier\Cashier;
 
 class BillingController extends Controller
 {
@@ -55,12 +58,16 @@ class BillingController extends Controller
                 }
             }
 
-            // Generar el Checkout Session de Stripe
-            // En producción, usa https y los dominios configurados
-            $host = $request->getHost();
-            $scheme = $request->secure() ? 'https' : 'http';
-            $successUrl = "{$scheme}://{$host}/configuracion/facturacion?success=true&session_id={CHECKOUT_SESSION_ID}";
-            $cancelUrl = "{$scheme}://{$host}/configuracion/facturacion?cancel=true";
+            // Generar el Checkout Session de Stripe.
+            // Stripe debe redirigir al FRONTEND, no al backend: el host de la
+            // petición ($request->getHost()) es el del backend (agility_back.test
+            // en local), que no tiene la ruta Angular /configuracion/facturacion
+            // y devuelve 404. Usamos el Origin de la petición para respetar el
+            // subdominio del tenant (mismo criterio que el reset de contraseña).
+            $returnHost = FrontendUrl::returnHost($request->header('origin'));
+
+            $successUrl = "{$returnHost}/configuracion/facturacion?success=true&session_id={CHECKOUT_SESSION_ID}";
+            $cancelUrl = "{$returnHost}/configuracion/facturacion?cancel=true";
 
             $checkoutSession = $subscription->checkout([
                 'success_url' => $successUrl,
@@ -74,6 +81,61 @@ class BillingController extends Controller
                 'message' => 'Error al conectar con Stripe Checkout.',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Sincroniza la suscripción tras volver del Stripe Checkout (success_url).
+     *
+     * El registro local de la suscripción lo crea normalmente el webhook, pero:
+     *  - en local Stripe no puede alcanzar agility_back.test, así que nunca llega;
+     *  - en producción el usuario suele aterrizar en la página de éxito antes de
+     *    que Stripe entregue el webhook, y vería el aviso de "suscripción
+     *    requerida" durante unos segundos.
+     * Este endpoint verifica la sesión de Checkout contra Stripe y registra la
+     * suscripción al momento. Es idempotente: si el webhook llegó primero, no hace nada.
+     */
+    public function syncCheckoutSession(Request $request, StripeSubscriptionSyncService $subscriptionSync)
+    {
+        $user = $request->user();
+        if ($user->role !== 'manager' && $user->role !== 'admin') {
+            return response()->json(['message' => 'No autorizado para gestionar facturación.'], 403);
+        }
+
+        $club = null;
+        if (app()->bound('active_club_id')) {
+            $club = Club::find(app('active_club_id'));
+        } else {
+            $club = $user->club;
+        }
+
+        if (!$club) {
+            return response()->json(['message' => 'No se detectó ningún club activo.'], 404);
+        }
+
+        $validated = $request->validate([
+            'session_id' => 'required|string',
+        ]);
+
+        try {
+            $session = Cashier::stripe()->checkout->sessions->retrieve($validated['session_id']);
+
+            // La sesión debe pertenecer al cliente de Stripe de ESTE club: el
+            // session_id viene de la URL y no debe permitir activar un club ajeno.
+            if (!$club->hasStripeId() || $session->customer !== $club->stripe_id) {
+                return response()->json(['message' => 'La sesión de pago no corresponde a este club.'], 403);
+            }
+
+            if ($session->payment_status !== 'paid') {
+                return response()->json(['message' => 'El pago de la sesión aún no está confirmado.'], 409);
+            }
+
+            $subscriptionSync->syncSubscription($club, $session->subscription);
+
+            return $this->status($request);
+        } catch (\Exception $e) {
+            Log::error('Error sincronizando la sesión de Checkout de Stripe: ' . $e->getMessage());
+            return response()->json(['message' => 'No se pudo verificar la sesión de pago con Stripe.'], 500);
         }
     }
 
@@ -99,9 +161,10 @@ class BillingController extends Controller
         }
 
         try {
-            $host = $request->getHost();
-            $scheme = $request->secure() ? 'https' : 'http';
-            $returnUrl = "{$scheme}://{$host}/configuracion/facturacion";
+            // Igual que en checkout(): la vuelta del portal debe ir al frontend,
+            // no al host del backend.
+            $returnHost = FrontendUrl::returnHost($request->header('origin'));
+            $returnUrl = "{$returnHost}/configuracion/facturacion";
 
             $portalUrl = $club->billingPortalUrl($returnUrl);
 

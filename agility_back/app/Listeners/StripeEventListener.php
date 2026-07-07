@@ -4,12 +4,11 @@ namespace App\Listeners;
 
 use App\Models\Club;
 use App\Models\ClubLead;
-use App\Models\Plan;
 use App\Models\User;
 use App\Services\ClubProvisioningService;
+use App\Services\StripeSubscriptionSyncService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Laravel\Cashier\Cashier;
 use Laravel\Cashier\Events\WebhookReceived;
 
 /**
@@ -21,8 +20,10 @@ use Laravel\Cashier\Events\WebhookReceived;
  */
 class StripeEventListener
 {
-    public function __construct(private ClubProvisioningService $provisioner)
-    {
+    public function __construct(
+        private ClubProvisioningService $provisioner,
+        private StripeSubscriptionSyncService $subscriptionSync,
+    ) {
     }
 
     public function handle(WebhookReceived $event): void
@@ -77,57 +78,10 @@ class StripeEventListener
             return;
         }
 
-        $this->syncSubscription($club, $session['subscription'] ?? null);
-    }
-
-    /**
-     * Crea el registro local de la suscripción. El webhook customer.subscription.created
-     * suele llegar antes de que el club exista, y Cashier lo descarta al no encontrar
-     * el billable; sin esto el club quedaría bloqueado por CheckSubscriptionActive.
-     */
-    private function syncSubscription(Club $club, ?string $stripeSubscriptionId): void
-    {
-        if (!$stripeSubscriptionId) {
-            return;
-        }
-
-        try {
-            $stripeSubscription = Cashier::stripe()->subscriptions->retrieve($stripeSubscriptionId);
-
-            if ($club->subscriptions()->where('stripe_id', $stripeSubscription->id)->exists()) {
-                return;
-            }
-
-            $firstItem = $stripeSubscription->items->data[0] ?? null;
-
-            $subscription = $club->subscriptions()->create([
-                'type' => 'default',
-                'stripe_id' => $stripeSubscription->id,
-                'stripe_status' => $stripeSubscription->status,
-                'stripe_price' => $firstItem ? $firstItem->price->id : null,
-                'quantity' => $firstItem ? ($firstItem->quantity ?? 1) : 1,
-                'trial_ends_at' => $stripeSubscription->trial_end
-                    ? \Carbon\Carbon::createFromTimestamp($stripeSubscription->trial_end)
-                    : null,
-                'ends_at' => null,
-            ]);
-
-            foreach ($stripeSubscription->items->data as $item) {
-                $subscription->items()->create([
-                    'stripe_id' => $item->id,
-                    'stripe_product' => $item->price->product,
-                    'stripe_price' => $item->price->id,
-                    'quantity' => $item->quantity ?? 1,
-                ]);
-            }
-
-            // El plan de pago de Stripe manda sobre las funciones del club
-            $this->applyPlanFromPrice($club, $firstItem ? $firstItem->price->id : null);
-        } catch (\Exception $e) {
-            // No es fatal: Cashier creará la suscripción local con el siguiente
-            // customer.subscription.updated del ciclo de vida.
-            Log::error("No se pudo sincronizar la suscripción {$stripeSubscriptionId} del club {$club->id}: " . $e->getMessage());
-        }
+        // Crea el registro local de la suscripción. El webhook customer.subscription.created
+        // suele llegar antes de que el club exista, y Cashier lo descarta al no encontrar
+        // el billable; sin esto el club quedaría bloqueado por CheckSubscriptionActive.
+        $this->subscriptionSync->syncSubscription($club, $session['subscription'] ?? null);
     }
 
     /**
@@ -149,45 +103,7 @@ class StripeEventListener
             return;
         }
 
-        $this->applyPlanFromPrice($club, $priceId);
-    }
-
-    /**
-     * Mapea un Price ID de Stripe a un Plan local (vía config('services.stripe.prices'))
-     * y actualiza el plan_id del club si cambia. No hace nada si el precio no se reconoce.
-     */
-    private function applyPlanFromPrice(Club $club, ?string $priceId): void
-    {
-        if (!$priceId) {
-            return;
-        }
-
-        // Plan fijado por el admin: no se sincroniza desde Stripe (el club disfruta de
-        // las funciones del plan asignado aunque pague un precio distinto).
-        if ($club->plan_locked) {
-            Log::info("Club {$club->id} con plan fijado (plan_locked); se omite la sincronización del plan desde Stripe.");
-            return;
-        }
-
-        $slug = array_search($priceId, config('services.stripe.prices', []), true);
-        if ($slug === false) {
-            Log::warning("Precio de Stripe '{$priceId}' sin plan asociado en config; plan_id del club {$club->id} sin cambios.");
-            return;
-        }
-
-        $plan = Plan::where('slug', $slug)->first();
-        if (!$plan || $club->plan_id === $plan->id) {
-            return;
-        }
-
-        $previous = $club->plan_id;
-        $club->update(['plan_id' => $plan->id]);
-
-        // Una bajada de plan retira automáticamente los módulos que el nuevo
-        // plan no incluye.
-        $club->syncModuleSettingsWithPlan();
-
-        Log::info("Plan del club {$club->id} sincronizado desde Stripe: {$previous} -> {$plan->id} ({$slug}).");
+        $this->subscriptionSync->applyPlanFromPrice($club, $priceId);
     }
 
     private function notifyAdminOfConflict(ClubLead $lead): void

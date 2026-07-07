@@ -83,7 +83,29 @@ export class FacturacionComponent implements OnInit {
         this.cancelMsg.set(true);
       }
     });
-    this.loadBillingData();
+
+    // Al volver del Checkout de Stripe, el webhook puede no haber llegado aún
+    // (en local nunca llega): confirmamos la sesión contra Stripe ANTES de
+    // pintar el estado, o el gestor vería "suscripción requerida" tras pagar.
+    const sessionId = this.route.snapshot.queryParams['session_id'];
+    if (this.route.snapshot.queryParams['success'] && sessionId) {
+      this.confirmCheckout(sessionId);
+    } else {
+      this.loadBillingData();
+    }
+  }
+
+  /** Verifica la sesión de Checkout con el backend y recarga el estado de facturación. */
+  private async confirmCheckout(sessionId: string) {
+    this.isLoading.set(true);
+    try {
+      await this.http.post(`${this.apiUrl}/sync-checkout`, { session_id: sessionId }).toPromise();
+    } catch (error) {
+      console.error('Error confirmando la sesión de pago', error);
+      // No bloqueamos la página: el estado real se pinta igualmente al recargar.
+    } finally {
+      this.loadBillingData();
+    }
   }
 
   async loadBillingData() {
