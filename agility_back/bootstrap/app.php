@@ -23,6 +23,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'liga_norte.enabled' => \App\Http\Middleware\CheckLigaNorteEnabled::class,
             'track_booking.enabled' => \App\Http\Middleware\CheckTrackBookingEnabled::class,
             'class_bonuses.enabled' => \App\Http\Middleware\CheckClassBonusesEnabled::class,
+            'rsce_tracker.enabled' => \App\Http\Middleware\CheckRsceTrackerEnabled::class,
+            'rfec_tracker.enabled' => \App\Http\Middleware\CheckRfecTrackerEnabled::class,
             'subscription.active' => \App\Http\Middleware\CheckSubscriptionActive::class,
         ]);
     })

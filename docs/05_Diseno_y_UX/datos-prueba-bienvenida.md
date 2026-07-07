@@ -58,6 +58,11 @@ sección **Funcionalidades del club**):
 
 - **Gamificación → ON** (si el plan la incluye): es el núcleo de engagement y la
   semilla la deja viva (clasificación poblada).
+- **Bitácoras RSCE y RFEC → ON** (si el plan incluye `modulo-canina` / `modulo-caza`):
+  son diarios personales de competición y la semilla crea mangas de ejemplo que las
+  dejan desbloqueadas. El gestor puede apagarlas desde **Funcionalidades del club**
+  (`rsce_tracker_enabled` / `rfec_tracker_enabled`); en clubes anteriores a estas
+  claves la ausencia cuenta como activado.
 - **Provisión de Fondos, Patrocinadores, Liga Norte → OFF** por defecto, aunque el
   plan los incluya. Manejan dinero / cara pública / nicho; en vacío dan mala
   imagen. El gestor los activa cuando esté listo desde **Funcionalidades del club**.

@@ -12,6 +12,11 @@ interface ModuleDef {
   key: string;
   /** Feature del plan que desbloquea el módulo; sin ella el módulo está disponible en todos los planes. */
   feature?: string;
+  /** Si la clave no existe aún en settings del club, el módulo cuenta como activado
+      (módulos anteriores a su switch, que los clubes existentes ya usaban). */
+  defaultOn?: boolean;
+  /** Grupo semántico bajo el que se muestra (misma taxonomía que el menú de navegación). */
+  group: string;
   title: string;
   description: string;
   icon: string;
@@ -19,12 +24,18 @@ interface ModuleDef {
   manageLabel?: string;
 }
 
+interface ModuleGroup {
+  name: string;
+  modules: ModuleDef[];
+}
+
 /**
  * "Funcionalidades del club": activación de los módulos opcionales del club,
- * separada de la configuración visual (Configurar club). Cada módulo es una
- * tarjeta con su descripción, estado y el gating del plan contratado. Reutiliza
- * el endpoint de actualización del club (whitelist de settings + gating del
- * backend en ClubController::update).
+ * separada de la configuración visual (Configurar club). Los módulos se muestran
+ * como una lista de filas compactas agrupadas por área (misma taxonomía que el
+ * menú, para reforzar un único modelo mental), con los módulos fuera del plan
+ * apartados al final como zona de upsell. Reutiliza el endpoint de actualización
+ * del club (whitelist de settings + gating del backend en ClubController::update).
  */
 @Component({
   selector: 'app-funcionalidades-club',
@@ -48,43 +59,88 @@ export class FuncionalidadesClubComponent implements OnInit {
       backend (has_demo_data); una vez borrados no vuelve a aparecer. */
   hasDemoData = computed(() => !!(this.club() as any)?.has_demo_data);
 
+  /** Orden de los grupos en pantalla (los módulos se declaran abajo con su `group`). */
+  private readonly groupOrder = ['Competición', 'Comunidad y motivación', 'Dinero y cara pública', 'Reservas y clases'];
+
   readonly modules: ModuleDef[] = [
     {
-      key: 'gamification_enabled', feature: 'gamificacion',
-      title: 'Gamificación', icon: 'emoji_events',
-      description: 'Clasificación de perros, álbum de cromos y Tablón de Cazarrecompensas. Da vida al club y motiva la asistencia a clase.',
-      manageLink: '/ranking', manageLabel: 'Ver clasificación',
-    },
-    {
-      key: 'provision_fondos_enabled', feature: 'provision-fondos',
-      title: 'Provisión de Fondos', icon: 'account_balance_wallet',
-      description: 'Lleva las cuentas de tus socios: ingresos, gastos y saldo. Actívalo cuando vayas a gestionar el dinero del club.',
-      manageLink: '/admin/finanzas', manageLabel: 'Gestionar fondos del club',
-    },
-    {
-      key: 'sponsors_enabled', feature: 'patrocinadores',
-      title: 'Patrocinadores', icon: 'handshake',
-      description: 'Muestra a tus marcas colaboradoras en la cara pública del club. Actívalo cuando tengas patrocinadores que enseñar.',
-      manageLink: '/admin/patrocinadores', manageLabel: 'Gestionar patrocinadores',
-    },
-    {
-      key: 'liga_norte_enabled', feature: 'liga-norte',
-      title: 'Liga Norte', icon: 'leaderboard',
-      description: 'Clasificación y contenidos de la Liga Norte (competición regional). Solo relevante si tu club participa en ella.',
-    },
-    {
-      key: 'track_booking_enabled',
+      key: 'track_booking_enabled', group: 'Reservas y clases',
       title: 'Reserva de Pistas', icon: 'flag',
       description: 'Entrenamientos libres: tus socios podrán reservar una pista una hora para entrenar por su cuenta, en las franjas que no ocupen las clases. Aparece como una pestaña dentro de Reservas.',
       manageLink: '/reservas', manageLabel: 'Ir a Reservas',
     },
     {
-      key: 'class_bonuses_enabled',
+      // El enlace va a Gestión de Miembros (recarga por socio, sin depender de
+      // otros módulos); Administrar Finanzas mantiene su tarjeta de bono como
+      // sitio secundario, pero requiere Provisión de Fondos activa.
+      key: 'class_bonuses_enabled', group: 'Reservas y clases',
       title: 'Bonos de Clases', icon: 'confirmation_number',
-      description: 'Cada socio tiene un contador de clases disponibles: apuntarse a una clase consume una y cancelar la devuelve. Sin clases en el bono no se puede reservar. Los bonos se recargan desde Administrar Finanzas.',
-      manageLink: '/admin/finanzas', manageLabel: 'Gestionar bonos',
+      description: 'Cada socio tiene un contador de clases disponibles: apuntarse a una clase consume una y cancelar la devuelve. Sin clases en el bono no se puede reservar. Los bonos se recargan desde Gestión de Miembros (y también desde Administrar Finanzas si llevas la Provisión de Fondos).',
+      manageLink: '/gestionar-miembros', manageLabel: 'Recargar bonos',
+    },
+    {
+      key: 'liga_norte_enabled', feature: 'liga-norte', group: 'Competición',
+      title: 'Liga Norte', icon: 'leaderboard',
+      description: 'Clasificación y contenidos de la Liga Norte (competición regional). Solo relevante si tu club participa en ella.',
+    },
+    {
+      key: 'rsce_tracker_enabled', feature: 'modulo-canina', defaultOn: true, group: 'Competición',
+      title: 'Bitácora Canina (RSCE)', icon: 'analytics',
+      description: 'Diario personal de competición RSCE: cada socio registra sus mangas, grados y progreso hacia el ascenso. Desactívalo si en tu club nadie compite en Canina.',
+      manageLink: '/bitacora-rsce', manageLabel: 'Ver bitácora',
+    },
+    {
+      key: 'rfec_tracker_enabled', feature: 'modulo-caza', defaultOn: true, group: 'Competición',
+      title: 'Bitácora de Caza (RFEC)', icon: 'pets',
+      description: 'Diario personal de competición RFEC: resultados por manga, clases y grados autonómicos. Desactívalo si en tu club nadie compite en Caza.',
+      manageLink: '/bitacora-rfec', manageLabel: 'Ver bitácora',
+    },
+    {
+      key: 'gamification_enabled', feature: 'gamificacion', group: 'Comunidad y motivación',
+      title: 'Gamificación', icon: 'emoji_events',
+      description: 'Clasificación de perros, álbum de cromos y Tablón de Cazarrecompensas. Da vida al club y motiva la asistencia a clase.',
+      manageLink: '/ranking', manageLabel: 'Ver clasificación',
+    },
+    {
+      key: 'provision_fondos_enabled', feature: 'provision-fondos', group: 'Dinero y cara pública',
+      title: 'Provisión de Fondos', icon: 'account_balance_wallet',
+      description: 'Lleva las cuentas de tus socios: ingresos, gastos y saldo. Actívalo cuando vayas a gestionar el dinero del club.',
+      manageLink: '/admin/finanzas', manageLabel: 'Gestionar fondos del club',
+    },
+    {
+      key: 'sponsors_enabled', feature: 'patrocinadores', group: 'Dinero y cara pública',
+      title: 'Patrocinadores', icon: 'handshake',
+      description: 'Muestra a tus marcas colaboradoras en la cara pública del club. Actívalo cuando tengas patrocinadores que enseñar.',
+      manageLink: '/admin/patrocinadores', manageLabel: 'Gestionar patrocinadores',
     },
   ];
+
+  /** Fila con la descripción expandida (divulgación progresiva: 1 línea por defecto). */
+  expandedKey = signal<string | null>(null);
+
+  /** Grupos con sus módulos disponibles en el plan, omitiendo grupos vacíos. */
+  groups = computed<ModuleGroup[]>(() => {
+    this.club();
+    return this.groupOrder
+      .map((name) => ({ name, modules: this.modules.filter((m) => m.group === name && !this.isLocked(m)) }))
+      .filter((g) => g.modules.length > 0);
+  });
+
+  /** Módulos fuera del plan contratado, apartados como zona de upsell. */
+  lockedModules = computed<ModuleDef[]>(() => {
+    this.club();
+    return this.modules.filter((m) => this.isLocked(m));
+  });
+
+  activeCount = computed(() => {
+    this.club();
+    return this.modules.filter((m) => !this.isLocked(m) && this.isEnabled(m)).length;
+  });
+
+  availableCount = computed(() => {
+    this.club();
+    return this.modules.filter((m) => !this.isLocked(m)).length;
+  });
 
   ngOnInit() {
     const id = this.tenant.tenantInfo()?.id;
@@ -95,8 +151,14 @@ export class FuncionalidadesClubComponent implements OnInit {
     });
   }
 
-  isEnabled(key: string): boolean {
-    return !!(this.club()?.settings as any)?.[key];
+  isEnabled(m: ModuleDef): boolean {
+    const v = (this.club()?.settings as any)?.[m.key];
+    if (v === undefined || v === null) return !!m.defaultOn;
+    return v === true || v === 1 || v === '1';
+  }
+
+  toggleExpanded(m: ModuleDef) {
+    this.expandedKey.update((k) => (k === m.key ? null : m.key));
   }
 
   private planFeatures(): string[] {
@@ -116,7 +178,7 @@ export class FuncionalidadesClubComponent implements OnInit {
     const club = this.club();
     if (!club || this.isLocked(m) || this.savingKey()) return;
 
-    const newVal = !this.isEnabled(m.key);
+    const newVal = !this.isEnabled(m);
     const settings: any = { ...(club.settings || {}) };
     settings[m.key] = newVal;
 

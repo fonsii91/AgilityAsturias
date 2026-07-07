@@ -67,8 +67,8 @@ Herramienta avanzada para la prevención de lesiones y monitorización del rendi
 * **Visualización de Competiciones:** Ver las próximas competiciones y eventos oficiales en los que el club va a participar.
 * **Asistencia a Competiciones:** Confirmar la inscripción o asistencia a una competición determinada ("apuntarse") o cancelar dicha inscripción ("desapuntarse"). Ver la lista de otros miembros que también van a asistir.
 * **Ranking Comunitario:** Consultar la clasificación de la liga interna o ranking del club para ver la posición de los perros en las diferentes categorías (ver mecánica de gamificación en [[gamificacion-ranking-perros]]).
-* **Bitácora RSCE:** Herramienta para realizar un seguimiento personal de las pistas RSCE realizadas, guardar resultados, registrar puntos y llevar un control del grado de competición.
-* **Bitácora RFEC:** Herramienta paralela para el seguimiento de clasificaciones, resultados y progresión en la normativa de la Real Federación Española de Caza (RFEC) (ver [[normativa-rfec]]).
+* **Bitácora RSCE:** Herramienta para realizar un seguimiento personal de las pistas RSCE realizadas, guardar resultados, registrar puntos y llevar un control del grado de competición. Es un módulo activable/desactivable por el gestor desde **Funcionalidades del club** (`settings.rsce_tracker_enabled`, ver [[gestionar-club]]).
+* **Bitácora RFEC:** Herramienta paralela para el seguimiento de clasificaciones, resultados y progresión en la normativa de la Real Federación Española de Caza (RFEC) (ver [[normativa-rfec]]). También es un módulo activable/desactivable por el gestor (`settings.rfec_tracker_enabled`, ver [[gestionar-club]]).
 
 ### Finanzas y Provisión de Fondos
 * **Consulta de Provisión de Fondos:** Visualizar el saldo acumulado (neto) personal y acceder al historial completo de movimientos (ingresos y gastos), incluyendo métodos de pago y visualización/descarga de justificantes (ver especificaciones en [[provision-fondos]]).

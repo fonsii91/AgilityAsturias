@@ -25,6 +25,8 @@ class ClubController extends Controller
         'sponsors_enabled',
         'track_booking_enabled',
         'class_bonuses_enabled',
+        'rsce_tracker_enabled',
+        'rfec_tracker_enabled',
         'customizationRequest',
         'landing_page_requested',
         'cancellation_notice_hours',

@@ -113,8 +113,8 @@ Funcionalidad activable/desactivable por el Responsable del Club (setting `class
 
 ### Gestión (staff)
 
-- En **Administrar Finanzas** (gestor), al seleccionar un socio aparece (solo con la funcionalidad activa) la tarjeta de su bono con el saldo actual y un campo para **añadir clases directamente** (los valores negativos corrigen errores; el saldo nunca baja de 0).
-- En **Gestión de Miembros** (accesible al staff), cada socio muestra un distintivo verde con su saldo de bono; pulsándolo se abre el modal para añadir clases. Así el staff recarga bonos sin necesitar acceso a las finanzas del club.
+- **Gestión de Miembros** es el sitio canónico de recarga (accesible al staff): cada socio muestra un distintivo verde con su saldo de bono; pulsándolo se abre el modal para añadir clases. No depende de ningún otro módulo — el enlace "Recargar bonos" de la tarjeta del módulo en Funcionalidades apunta aquí, precisamente porque los bonos pueden estar activos con la Provisión de Fondos apagada (`/admin/finanzas` está tras `provisionFondosGuard`).
+- En **Administrar Finanzas** (gestor), como sitio secundario y solo si la Provisión de Fondos está activa, al seleccionar un socio aparece la tarjeta de su bono con el saldo actual y un campo para **añadir clases directamente** (los valores negativos corrigen errores; el saldo nunca baja de 0). Útil cuando se cobra el bono y se registra el ingreso en la misma pantalla.
 - Endpoint: `POST /api/class-bonuses/{userId}/add` con `{ classes }` (roles admin/manager/staff, tras el middleware `class_bonuses.enabled`).
 - El dashboard financiero (`users_with_balances`) incluye el campo `class_bonus` de cada socio.
 

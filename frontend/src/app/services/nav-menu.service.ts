@@ -32,6 +32,10 @@ export interface NavItem {
   feature?: string;
   /** Solo visible si este flag de settings del club está activo. */
   setting?: string;
+  /** Si `setting` no existe aún en los settings del club, se considera activo.
+      Para módulos anteriores a su switch (los clubes existentes no tienen la
+      clave guardada y no deben perder el enlace). */
+  settingDefaultOn?: boolean;
   /**
    * Si está presente, este item es un GRUPO colapsable (no un enlace): agrupa
    * los enlaces de `children` bajo el epígrafe `label`. Un grupo se oculta
@@ -80,8 +84,8 @@ export const NAV_SECTIONS: NavSection[] = [
       },
       {
         label: 'Bitácoras', icon: 'menu_book', children: [
-          { label: 'Canina (RSCE)', icon: 'analytics', route: '/bitacora-rsce', feature: 'modulo-canina' },
-          { label: 'Caza (RFEC)', icon: 'pets', route: '/bitacora-rfec', feature: 'modulo-caza' },
+          { label: 'Canina (RSCE)', icon: 'analytics', route: '/bitacora-rsce', feature: 'modulo-canina', setting: 'rsce_tracker_enabled', settingDefaultOn: true },
+          { label: 'Caza (RFEC)', icon: 'pets', route: '/bitacora-rfec', feature: 'modulo-caza', setting: 'rfec_tracker_enabled', settingDefaultOn: true },
         ],
       },
       {
@@ -196,12 +200,13 @@ export class NavMenuService {
 
   private itemVisible(i: NavItem): boolean {
     if (i.feature && !this.tenant.hasFeature(i.feature)) return false;
-    if (i.setting && !this.settingOn(i.setting)) return false;
+    if (i.setting && !this.settingOn(i.setting, i.settingDefaultOn)) return false;
     return true;
   }
 
-  private settingOn(key: string): boolean {
+  private settingOn(key: string, defaultOn = false): boolean {
     const v: any = this.tenant.tenantInfo()?.settings?.[key];
+    if (v === undefined || v === null) return defaultOn;
     return v === true || v === 1 || v === '1';
   }
 

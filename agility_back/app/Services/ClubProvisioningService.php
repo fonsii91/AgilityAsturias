@@ -73,6 +73,11 @@ class ClubProvisioningService
                 'customizationRequest' => '',
                 'landing_page_requested' => false,
                 'gamification_enabled' => $planHasFeature('gamificacion'),
+                // Bitácoras RSCE/RFEC: ON si el plan las incluye. Son diarios
+                // personales de competición y la semilla de bienvenida crea
+                // mangas de ejemplo que las dejan desbloqueadas.
+                'rsce_tracker_enabled' => $planHasFeature('modulo-canina'),
+                'rfec_tracker_enabled' => $planHasFeature('modulo-caza'),
                 'provision_fondos_enabled' => false,
                 'sponsors_enabled' => false,
                 'liga_norte_enabled' => false,

@@ -269,17 +269,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/announcements', [AnnouncementController::class, 'index']);
         Route::post('/announcements/{id}/read', [AnnouncementController::class, 'markAsRead']);
 
-        // RSCE Tracks
-        Route::get('/rsce-tracks', [RsceTrackController::class, 'index']);
-        Route::post('/rsce-tracks', [RsceTrackController::class, 'store']);
-        Route::post('/rsce-tracks/{rsceTrack}', [RsceTrackController::class, 'update']);
-        Route::post('/rsce-tracks/{rsceTrack}/delete', [RsceTrackController::class, 'destroy']);
+        // RSCE Tracks (bloqueadas si el gestor desactiva la bitácora en Funcionalidades)
+        Route::middleware(['rsce_tracker.enabled'])->group(function () {
+            Route::get('/rsce-tracks', [RsceTrackController::class, 'index']);
+            Route::post('/rsce-tracks', [RsceTrackController::class, 'store']);
+            Route::post('/rsce-tracks/{rsceTrack}', [RsceTrackController::class, 'update']);
+            Route::post('/rsce-tracks/{rsceTrack}/delete', [RsceTrackController::class, 'destroy']);
+        });
 
-        // RFEC Tracks
-        Route::get('/rfec-tracks', [RfecTrackController::class, 'index']);
-        Route::post('/rfec-tracks', [RfecTrackController::class, 'store']);
-        Route::post('/rfec-tracks/{rfecTrack}', [RfecTrackController::class, 'update']);
-        Route::post('/rfec-tracks/{rfecTrack}/delete', [RfecTrackController::class, 'destroy']);
+        // RFEC Tracks (idem con la bitácora de Caza)
+        Route::middleware(['rfec_tracker.enabled'])->group(function () {
+            Route::get('/rfec-tracks', [RfecTrackController::class, 'index']);
+            Route::post('/rfec-tracks', [RfecTrackController::class, 'store']);
+            Route::post('/rfec-tracks/{rfecTrack}', [RfecTrackController::class, 'update']);
+            Route::post('/rfec-tracks/{rfecTrack}/delete', [RfecTrackController::class, 'destroy']);
+        });
 
         Route::get('/availability', [ReservationController::class, 'availability']); // ???
         Route::get('/time-slot-exceptions', [\App\Http\Controllers\TimeSlotExceptionController::class, 'index']);

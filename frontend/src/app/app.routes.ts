@@ -21,6 +21,7 @@ import { featureGuard } from './guards/feature.guard';
 import { gamificationGuard } from './guards/gamification.guard';
 import { provisionFondosGuard } from './guards/provision-fondos.guard';
 import { ligaNorteGuard } from './guards/liga-norte.guard';
+import { moduleSettingGuard } from './guards/module-setting.guard';
 import { subscriptionActiveGuard } from './guards/subscription-active.guard';
 
 export const routes: Routes = [
@@ -396,13 +397,13 @@ export const routes: Routes = [
             {
                 path: 'bitacora-rsce',
                 loadComponent: () => import('./components/rsce-tracker/rsce-tracker.component').then(m => m.RsceTrackerComponent),
-                canActivate: [memberGuard, featureGuard('modulo-canina')],
+                canActivate: [memberGuard, featureGuard('modulo-canina'), moduleSettingGuard('rsce_tracker_enabled', 'La bitácora Canina (RSCE) está desactivada para este club.')],
                 title: titleResolver, data: { pageTitle: 'Seguimiento RSCE' }
             },
             {
                 path: 'bitacora-rfec',
                 loadComponent: () => import('./components/rfec-tracker/rfec-tracker.component').then(m => m.RfecTrackerComponent),
-                canActivate: [memberGuard, featureGuard('modulo-caza')],
+                canActivate: [memberGuard, featureGuard('modulo-caza'), moduleSettingGuard('rfec_tracker_enabled', 'La bitácora de Caza (RFEC) está desactivada para este club.')],
                 title: titleResolver, data: { pageTitle: 'Seguimiento RFEC' }
             }
         ]

@@ -1,7 +1,12 @@
 <div class="func-container">
   <div class="func-header">
-    <h2><span class="material-icons">widgets</span> Funcionalidades del club</h2>
-    <p>Activa los módulos opcionales cuando estés listo para usarlos. Los que no incluye tu plan aparecen bloqueados.</p>
+    <div class="func-title-row">
+      <h2><span class="material-icons">widgets</span> Funcionalidades del club</h2>
+      @if (!isLoading()) {
+        <span class="func-counter">{{ activeCount() }} de {{ availableCount() }} activos</span>
+      }
+    </div>
+    <p>Activa cada módulo cuando estés listo para usarlo. Toca una fila para ver el detalle.</p>
   </div>
 
   @if (isLoading()) {
@@ -9,48 +14,6 @@
       <div class="spinner"></div> Cargando módulos...
     </div>
   } @else {
-    <div class="modules-grid">
-      @for (m of modules; track m.key) {
-        <div class="module-card" [class.enabled]="isEnabled(m.key)" [class.locked]="isLocked(m)">
-          <div class="module-icon">
-            <span class="material-icons">{{ m.icon }}</span>
-          </div>
-
-          <div class="module-body">
-            <div class="module-title-row">
-              <h3>{{ m.title }}</h3>
-              @if (isLocked(m)) {
-                <span class="status-pill locked"><span class="material-icons">lock</span> No incluido</span>
-              } @else if (isEnabled(m.key)) {
-                <span class="status-pill on">Activo</span>
-              } @else {
-                <span class="status-pill off">Inactivo</span>
-              }
-            </div>
-            <p class="module-desc">{{ m.description }}</p>
-
-            @if (isLocked(m)) {
-              <p class="plan-hint"><span class="material-icons">lock</span> Tu plan actual no incluye este módulo. Mejora tu plan para activarlo.</p>
-            } @else {
-              <div class="module-actions">
-                <label class="switch">
-                  <input type="checkbox" [checked]="isEnabled(m.key)" [disabled]="savingKey() !== null" (change)="toggle(m)">
-                  <span class="slider"></span>
-                </label>
-                <span class="switch-label">{{ isEnabled(m.key) ? 'Activado' : 'Activar' }}</span>
-
-                @if (m.manageLink && isEnabled(m.key)) {
-                  <a class="manage-link" [routerLink]="m.manageLink">
-                    <span class="material-icons">arrow_forward</span> {{ m.manageLabel }}
-                  </a>
-                }
-              </div>
-            }
-          </div>
-        </div>
-      }
-    </div>
-
     @if (hasDemoData()) {
       <div class="demo-banner">
         <div class="demo-banner-icon"><span class="material-icons">science</span></div>
@@ -63,6 +26,62 @@
           {{ clearingDemo() ? 'Eliminando...' : 'Eliminar datos de ejemplo' }}
         </button>
       </div>
+    }
+
+    @for (g of groups(); track g.name) {
+      <p class="group-label">{{ g.name }}</p>
+      <div class="group-card">
+        @for (m of g.modules; track m.key) {
+          <div class="module-row" [class.enabled]="isEnabled(m)" (click)="toggleExpanded(m)">
+            <div class="module-icon">
+              <span class="material-icons">{{ m.icon }}</span>
+            </div>
+
+            <div class="module-body">
+              <div class="module-title-row">
+                <h3>{{ m.title }}</h3>
+                @if (m.manageLink && isEnabled(m)) {
+                  <a class="manage-link" [routerLink]="m.manageLink" (click)="$event.stopPropagation()">
+                    {{ m.manageLabel }} <span class="material-icons">arrow_forward</span>
+                  </a>
+                }
+              </div>
+              <p class="module-desc" [class.expanded]="expandedKey() === m.key">{{ m.description }}</p>
+            </div>
+
+            <label class="switch" (click)="$event.stopPropagation()">
+              <input type="checkbox" [checked]="isEnabled(m)" [disabled]="savingKey() !== null"
+                     (change)="toggle(m)" [attr.aria-label]="m.title">
+              <span class="slider"></span>
+            </label>
+          </div>
+        }
+      </div>
+    }
+
+    @if (lockedModules().length > 0) {
+      <p class="group-label">No incluidos en tu plan</p>
+      <div class="group-card locked-card">
+        @for (m of lockedModules(); track m.key) {
+          <div class="module-row locked" (click)="toggleExpanded(m)">
+            <div class="module-icon">
+              <span class="material-icons">{{ m.icon }}</span>
+            </div>
+
+            <div class="module-body">
+              <div class="module-title-row">
+                <h3>{{ m.title }}</h3>
+              </div>
+              <p class="module-desc" [class.expanded]="expandedKey() === m.key">{{ m.description }}</p>
+            </div>
+
+            <span class="locked-chip"><span class="material-icons">lock</span> No incluido</span>
+          </div>
+        }
+      </div>
+      <p class="upgrade-hint">
+        <a routerLink="/configuracion/facturacion">Mejora tu plan</a> para desbloquear estos módulos.
+      </p>
     }
   }
 </div>

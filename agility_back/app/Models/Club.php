@@ -19,6 +19,11 @@ class Club extends Model
         'provision_fondos_enabled' => 'provision-fondos',
         'sponsors_enabled' => 'patrocinadores',
         'liga_norte_enabled' => 'liga-norte',
+        // Bitácoras personales de competición. Clubes anteriores a estas claves
+        // no las tienen en settings: la ausencia cuenta como activado (solo un
+        // false explícito apaga el módulo), para no retirárselas al desplegar.
+        'rsce_tracker_enabled' => 'modulo-canina',
+        'rfec_tracker_enabled' => 'modulo-caza',
     ];
 
     protected $fillable = [
