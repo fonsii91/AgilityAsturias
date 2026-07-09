@@ -23,7 +23,6 @@ Concepto de la aplicación, mapa de características y funcionalidades.
 *   **[[gestionar-club]]**: Panel de configuración de identidad visual, marca, contacto y activación de módulos por club.
 *   **[[pistas-entrenamiento]]**: Gestión de las pistas de entrenamiento del club (nombre, foto y terreno), pista principal por defecto, asignación de pista a los horarios de clase y módulo opcional de reserva individual de pistas (entrenamientos libres).
 *   **[[galeria-fotos]]**: Galería de fotos interna del club con subida en lote, compresión, etiquetado de perros/miembros y almacenamiento en Mega S4 por cuota de plan.
-*   **[[lineas-futuras-roadmap]]**: Futuras líneas de desarrollo (Notificaciones Push, Mapas de pistas, etc.).
 
 ### 💼 02. Negocio
 Modelos de monetización, suscripciones SaaS y estrategias comerciales.
