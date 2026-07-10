@@ -301,7 +301,7 @@ class FlowAgilityScraperTest extends TestCase
 
         // Check workload enrichment (it should reuse the pre-existing workload and update counts)
         $workload->refresh();
-        $this->assertEquals(1, $workload->duration_min);
+        $this->assertEquals(2, $workload->duration_min); // 2 min por manga scrapeada
         $this->assertEquals(1, $workload->number_of_runs);
         $this->assertTrue((bool)$workload->is_staff_verified);
     }

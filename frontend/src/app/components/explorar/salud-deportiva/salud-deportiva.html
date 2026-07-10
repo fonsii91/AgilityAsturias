@@ -231,6 +231,11 @@
                 style="padding: 4px 8px;"><mat-icon
                   style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;">verified</mat-icon>
                 Validado</span> }
+              @if(history.status === 'pending_review') { <span
+                class="badge badge-light text-xsmall mx-1 d-inline-flex align-items-center gap-1"
+                style="padding: 4px 8px;"><mat-icon
+                  style="font-size: 14px; width: 14px; height: 14px; line-height: 14px;">hourglass_empty</mat-icon>
+                Pendiente</span> }
             </div>
 
             <div class="hi-right d-flex gap-1">

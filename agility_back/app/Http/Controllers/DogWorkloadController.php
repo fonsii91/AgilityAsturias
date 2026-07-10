@@ -114,8 +114,11 @@ class DogWorkloadController extends Controller
 
             foreach ($diasAsistencia as $dia) {
                 if ($dia <= $today) {
-                    $durationMin = $comp->tipo === 'exhibicion' ? 1 : 2;
-                    $intensityRpe = $comp->tipo === 'exhibicion' ? 3 : 8;
+                    // Un día de compe (calentamientos + mangas + estrés) pesa al menos como una clase (5x6=30):
+                    // 4 min x RPE 8 = 32. Exhibición más ligera: 2 min x RPE 5 = 10.
+                    $isExhibicion = $comp->tipo === 'exhibicion';
+                    $durationMin = $isExhibicion ? 2 : 4;
+                    $intensityRpe = $isExhibicion ? 5 : 8;
 
                     \App\Models\DogWorkload::firstOrCreate(
                         [
@@ -127,6 +130,7 @@ class DogWorkloadController extends Controller
                         [
                             'duration_min' => $durationMin,
                             'intensity_rpe' => $intensityRpe,
+                            'number_of_runs' => $isExhibicion ? null : 2,
                             'status' => 'pending_review',
                             'is_staff_verified' => false
                         ]
@@ -219,13 +223,21 @@ class DogWorkloadController extends Controller
             'number_of_runs' => 'nullable|integer'
         ]);
 
-        $workload->update([
+        $updates = [
             'date' => $data['date'],
             'duration_min' => $data['duration_min'],
             'intensity_rpe' => $data['intensity_rpe'],
             'jumped_max_height' => $data['jumped_max_height'] ?? false,
             'number_of_runs' => $data['number_of_runs'] ?? null,
-        ]);
+        ];
+
+        // Editar una carga pendiente equivale a revisarla: queda confirmada
+        if ($workload->status === 'pending_review') {
+            $updates['status'] = 'confirmed';
+            $updates['user_id'] = auth()->id();
+        }
+
+        $workload->update($updates);
 
         return response()->json($workload);
     }

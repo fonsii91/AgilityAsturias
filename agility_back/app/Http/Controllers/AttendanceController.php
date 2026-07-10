@@ -361,8 +361,11 @@ class AttendanceController extends Controller
                                 }
                             }
 
-                            $durationMin = $competition->tipo === 'exhibicion' ? 1 : 2;
-                            $intensityRpe = $competition->tipo === 'exhibicion' ? 3 : 8;
+                            // Un día de compe (calentamientos + mangas + estrés) pesa al menos como una clase (5x6=30):
+                            // 4 min x RPE 8 = 32. Exhibición más ligera: 2 min x RPE 5 = 10.
+                            $isExhibicion = $competition->tipo === 'exhibicion';
+                            $durationMin = $isExhibicion ? 2 : 4;
+                            $intensityRpe = $isExhibicion ? 5 : 8;
 
                             foreach ($diasAsistencia as $dia) {
                                 $compWorkload = \App\Models\DogWorkload::firstOrCreate(
@@ -375,6 +378,7 @@ class AttendanceController extends Controller
                                     [
                                         'duration_min' => $durationMin,
                                         'intensity_rpe' => $intensityRpe,
+                                        'number_of_runs' => $isExhibicion ? null : 2,
                                         'status' => 'pending_review'
                                     ]
                                 );

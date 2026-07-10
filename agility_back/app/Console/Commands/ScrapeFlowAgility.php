@@ -301,6 +301,8 @@ class ScrapeFlowAgility extends Command
             // --- Registrar Carga de Trabajo Automática de Competición ---
             if ($fallbackComp->tipo === 'competicion' && !empty($item['runs'])) {
                 $runDate = $item['runDate'] ?? $fallbackComp->fecha_evento ?: Carbon::now()->toDateString();
+                // 2 min de alta intensidad por manga (manga + calentamiento), coherente con el default de compe (4 min = 2 mangas)
+                $estimatedMinutes = count($item['runs']) * 2;
                 $workload = DogWorkload::firstOrCreate(
                     [
                         'dog_id' => $dog->id,
@@ -310,7 +312,7 @@ class ScrapeFlowAgility extends Command
                     ],
                     [
                         'club_id' => $dog->club_id,
-                        'duration_min' => count($item['runs']),
+                        'duration_min' => $estimatedMinutes,
                         'number_of_runs' => count($item['runs']),
                         'intensity_rpe' => 8,
                         'status' => 'pending_review'
@@ -318,7 +320,7 @@ class ScrapeFlowAgility extends Command
                 );
                 if ($workload->status === 'pending_review') {
                     $workload->club_id = $dog->club_id;
-                    $workload->duration_min = count($item['runs']);
+                    $workload->duration_min = $estimatedMinutes;
                     $workload->number_of_runs = count($item['runs']);
                 }
                 $workload->is_staff_verified = true;

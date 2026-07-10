@@ -191,8 +191,6 @@ class Dog extends Model
         $acwr = 0;
         if ($chronicLoad > 0) {
             $acwr = round($acuteLoad / $chronicLoad, 2);
-        } else if ($acuteLoad > 0) {
-            $acwr = 1.5; // Artificial spike if starting from zero and sudden work
         }
 
         // --- CÁLCULO DE UMBRALES DE RIESGO CLÍNICO ---
@@ -203,14 +201,6 @@ class Dog extends Model
         if ($this->has_previous_injuries) {
             $yellowThreshold = 1.15;
             $redThreshold = 1.35;
-        }
-
-        // Penalización por sobrepeso relativo
-        if ($this->weight_kg && $this->height_cm) {
-            $ratio = $this->height_cm / $this->weight_kg;
-            if ($ratio < 2.5) {
-               $redThreshold -= 0.10;
-            }
         }
 
         $calibrationDays = isset($daysSinceFirst) ? $daysSinceFirst : 0;
@@ -240,7 +230,8 @@ class Dog extends Model
             'red_threshold' => $redThreshold,
             'calibration_days' => $calibrationDays,
             'is_calibrating' => $isCalibrating,
-            'recent_history' => $workloads->whereIn('status', ['confirmed', 'auto_confirmed'])->values(),
+            // Incluye pending_review para que el historial visible cuadre con las cargas que alimentan el ACWR
+            'recent_history' => $workloads->values(),
             'status_color' => $statusColor
         ];
     }

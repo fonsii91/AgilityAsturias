@@ -140,7 +140,7 @@ export class SaludDeportivaComponent implements OnInit {
         const isCompetition = p.source_type && p.source_type.toLowerCase().includes('competition');
         return {
           ...p,
-          duration_min: p.duration_min || (isCompetition ? 2 : 5),
+          duration_min: p.duration_min || (isCompetition ? 4 : 5),
           intensity_rpe: p.intensity_rpe || (isCompetition ? 8 : 6),
           number_of_runs: p.number_of_runs || (isCompetition ? 2 : 4)
         };

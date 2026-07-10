@@ -1,5 +1,16 @@
 [
   {
+    "version": "1.1.62",
+    "date": "2026-07-10",
+    "features": [
+      "¡Salud Deportiva más fiel a la realidad! Los días de competición ahora cuentan en el medidor de carga de tu perro con el peso que de verdad tienen: un día de concurso ya no computa menos que una clase normal, y al confirmar la actividad las mangas típicas ya vienen prerrellenadas para que solo tengas que ajustarlas. Las exhibiciones también se han ajustado a su esfuerzo real.",
+      "En la 'Actividad Reciente' de Salud Deportiva ahora también aparecen las actividades pendientes de revisar, marcadas con su etiqueta 'Pendiente', para que veas exactamente todo lo que está contando el medidor de tu perro. Y si editas una de ellas desde el historial, queda validada directamente, sin pasos extra."
+    ],
+    "bugfixes": [
+      "El semáforo de riesgo de Salud Deportiva era injustamente estricto con los perros de razas grandes: una regla interna les endurecía los umbrales aunque estuvieran en plena forma. La hemos retirado, así que el semáforo ahora depende solo de la carga de trabajo real y del historial de lesiones de tu perro."
+    ]
+  },
+  {
     "version": "1.1.61",
     "date": "2026-07-08",
     "features": [

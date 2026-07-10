@@ -412,8 +412,8 @@ class StaffAttendanceTest extends TestCase
             'source_type' => 'auto_competition',
             'source_id' => $competition->id,
             'date' => $yesterday . ' 00:00:00',
-            'duration_min' => 1, // exhibition lower default value
-            'intensity_rpe' => 3, // exhibition lower default value
+            'duration_min' => 2, // exhibición: valores por defecto reducidos
+            'intensity_rpe' => 5, // exhibición: valores por defecto reducidos
             'is_staff_verified' => 1
         ]);
     }

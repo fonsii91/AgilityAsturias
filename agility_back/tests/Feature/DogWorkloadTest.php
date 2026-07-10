@@ -266,7 +266,7 @@ class DogWorkloadTest extends TestCase
         // Dog should have 1 workload generated for the exhibition
         $this->assertCount(1, $data);
         $this->assertStringContainsString($date, $data[0]['date']);
-        $this->assertEquals(1, $data[0]['duration_min']); // lowest default values
-        $this->assertEquals(3, $data[0]['intensity_rpe']); // lowest default values
+        $this->assertEquals(2, $data[0]['duration_min']); // exhibición: valores por defecto reducidos
+        $this->assertEquals(5, $data[0]['intensity_rpe']); // exhibición: valores por defecto reducidos
     }
 }
